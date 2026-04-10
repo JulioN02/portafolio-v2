@@ -1,0 +1,743 @@
+openapi: 3.0.3
+info:
+  title: J Soft Solutions Portafolio API
+  description: API REST para el portafolio web v2.0 - Gestión de servicios, productos, herramientas y casos de éxito
+  version: 1.0.0
+  contact:
+    name: J Soft Solutions
+
+servers:
+  - url: http://localhost:3000/api
+    description: Development server
+  - url: https://api.jsoftsolutions.com/api
+    description: Production server
+
+paths:
+  # Health Check
+  /health:
+    get:
+      summary: Health check
+      operationId: healthCheck
+      responses:
+        '200':
+          description: API is running
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  # Auth
+  /auth/login:
+    post:
+      summary: Login admin
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    type: object
+        '401':
+          description: Invalid credentials
+
+  # Services
+  /services:
+    get:
+      summary: List all services
+      operationId: listServices
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: featured
+          in: query
+          schema:
+            type: boolean
+        - name: classification
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of services
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedServices'
+    
+    post:
+      summary: Create service
+      operationId: createService
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceInput'
+      responses:
+        '201':
+          description: Service created
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+
+  /services/{slug}:
+    get:
+      summary: Get service by slug
+      operationId: getServiceBySlug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Service found
+        '404':
+          description: Service not found
+
+  /services/featured:
+    get:
+      summary: Get featured services
+      operationId: getFeaturedServices
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 3
+      responses:
+        '200':
+          description: List of featured services
+
+  /services/classifications:
+    get:
+      summary: Get unique classifications
+      operationId: getServiceClassifications
+      responses:
+        '200':
+          description: Array of classifications
+
+  # Products
+  /products:
+    get:
+      summary: List all products
+      operationId: listProducts
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: featured
+          in: query
+          schema:
+            type: boolean
+        - name: classification
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of products
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProducts'
+    
+    post:
+      summary: Create product
+      operationId: createProduct
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductInput'
+      responses:
+        '201':
+          description: Product created
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+
+  /products/{slug}:
+    get:
+      summary: Get product by slug
+      operationId: getProductBySlug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Product found
+        '404':
+          description: Product not found
+
+  /products/featured:
+    get:
+      summary: Get featured products
+      operationId: getFeaturedProducts
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 3
+      responses:
+        '200':
+          description: List of featured products
+
+  # Tools
+  /tools:
+    get:
+      summary: List all tools
+      operationId: listTools
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: featured
+          in: query
+          schema:
+            type: boolean
+        - name: classification
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of tools
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTools'
+    
+    post:
+      summary: Create tool
+      operationId: createTool
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ToolInput'
+      responses:
+        '201':
+          description: Tool created
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+
+  /tools/{slug}:
+    get:
+      summary: Get tool by slug
+      operationId: getToolBySlug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Tool found
+        '404':
+          description: Tool not found
+
+  /tools/featured:
+    get:
+      summary: Get featured tools
+      operationId: getFeaturedTools
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 3
+      responses:
+        '200':
+          description: List of featured tools
+
+  # Success Cases
+  /success-cases:
+    get:
+      summary: List all success cases
+      operationId: listSuccessCases
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: List of success cases
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSuccessCases'
+    
+    post:
+      summary: Create success case
+      operationId: createSuccessCase
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SuccessCaseInput'
+      responses:
+        '201':
+          description: Success case created
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+
+  /success-cases/{slug}:
+    get:
+      summary: Get success case by slug
+      operationId: getSuccessCaseBySlug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success case found
+        '404':
+          description: Success case not found
+
+  /success-cases/recent:
+    get:
+      summary: Get recent success cases
+      operationId: getRecentSuccessCases
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 3
+      responses:
+        '200':
+          description: List of recent success cases
+
+  # Projects (Aggregation)
+  /projects:
+    get:
+      summary: List all projects (aggregated)
+      operationId: listProjects
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [service, product, tool, successCase]
+        - name: classification
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Aggregated list of projects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProjects'
+
+  /projects/recent:
+    get:
+      summary: Get recent projects
+      operationId: getRecentProjects
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 3
+      responses:
+        '200':
+          description: List of recent projects
+
+  /projects/classifications:
+    get:
+      summary: Get all unique classifications
+      operationId: getProjectClassifications
+      responses:
+        '200':
+          description: Array of unique classifications
+
+  # Contact
+  /contact:
+    post:
+      summary: Submit contact form
+      operationId: submitContact
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactFormInput'
+      responses:
+        '201':
+          description: Contact form submitted
+        '400':
+          description: Validation error
+
+  # Upload
+  /upload:
+    post:
+      summary: Upload file
+      operationId: uploadFile
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: File uploaded
+        '401':
+          description: Unauthorized
+
+components:
+  schemas:
+    ServiceInput:
+      type: object
+      required: [title, slug, classification, shortDescription, fullDescription, images]
+      properties:
+        title:
+          type: string
+          minLength: 3
+          maxLength: 100
+        slug:
+          type: string
+          pattern: '^[a-z0-9]+(-[a-z0-9]+)*$'
+        classification:
+          type: string
+          minLength: 2
+          maxLength: 50
+        shortDescription:
+          type: string
+          minLength: 10
+          maxLength: 300
+        fullDescription:
+          type: string
+          minLength: 50
+        includedItems:
+          type: array
+          items:
+            type: string
+        images:
+          type: array
+          items:
+            type: string
+            format: uri
+        order:
+          type: integer
+          default: 0
+        featured:
+          type: boolean
+          default: false
+        technicalExplanation:
+          type: string
+        technicalImages:
+          type: array
+          items:
+            type: string
+            format: uri
+
+    ProductInput:
+      type: object
+      required: [title, slug, classification, shortDescription, fullDescription, images]
+      properties:
+        title:
+          type: string
+        slug:
+          type: string
+        classification:
+          type: string
+        shortDescription:
+          type: string
+        fullDescription:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+            format: uri
+        externalLink:
+          type: string
+          format: uri
+        order:
+          type: integer
+          default: 0
+        featured:
+          type: boolean
+          default: false
+        technicalExplanation:
+          type: string
+        technicalImages:
+          type: array
+          items:
+            type: string
+            format: uri
+
+    ToolInput:
+      type: object
+      required: [title, slug, classification, shortDescription, fullDescription, images]
+      properties:
+        title:
+          type: string
+        slug:
+          type: string
+        classification:
+          type: string
+        shortDescription:
+          type: string
+        fullDescription:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+            format: uri
+        requiresInstall:
+          type: boolean
+          default: false
+        order:
+          type: integer
+          default: 0
+        featured:
+          type: boolean
+          default: false
+        technicalExplanation:
+          type: string
+        technicalImages:
+          type: array
+          items:
+            type: string
+            format: uri
+
+    SuccessCaseInput:
+      type: object
+      required: [title, slug, description, images]
+      properties:
+        title:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+            format: uri
+        videos:
+          type: array
+          items:
+            type: string
+            format: uri
+        links:
+          type: array
+          items:
+            type: string
+            format: uri
+
+    ContactFormInput:
+      type: object
+      required: [firstName, email, message, source]
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        whatsapp:
+          type: string
+        email:
+          type: string
+          format: email
+        message:
+          type: string
+        source:
+          type: string
+
+    PaginatedServices:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceInput'
+        pagination:
+          $ref: '#/components/schemas/PaginationInfo'
+
+    PaginatedProducts:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductInput'
+        pagination:
+          $ref: '#/components/schemas/PaginationInfo'
+
+    PaginatedTools:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ToolInput'
+        pagination:
+          $ref: '#/components/schemas/PaginationInfo'
+
+    PaginatedSuccessCases:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SuccessCaseInput'
+        pagination:
+          $ref: '#/components/schemas/PaginationInfo'
+
+    PaginatedProjects:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectSummary'
+        pagination:
+          $ref: '#/components/schemas/PaginationInfo'
+
+    ProjectSummary:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [service, product, tool, successCase]
+        title:
+          type: string
+        slug:
+          type: string
+        classification:
+          type: string
+        shortDescription:
+          type: string
+        image:
+          type: string
+        featured:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    PaginationInfo:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        totalPages:
+          type: integer
+        hasNext:
+          type: boolean
+        hasPrev:
+          type: boolean
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
