@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { ClientContactInput, RecruiterContactInput, FormOrigin } from '@jsoft/shared';
 
 const prisma = new PrismaClient();
@@ -22,9 +22,6 @@ export interface ContactFilterInput {
 }
 
 export const contactService = {
-  /**
-   * Create a contact form submission from a client
-   */
   async createClientContact(data: ClientContactInput, source: string) {
     return prisma.contactForm.create({
       data: {
@@ -40,9 +37,6 @@ export const contactService = {
     });
   },
 
-  /**
-   * Create a contact form submission from a recruiter
-   */
   async createRecruiterContact(data: RecruiterContactInput) {
     return prisma.contactForm.create({
       data: {
@@ -57,14 +51,12 @@ export const contactService = {
     });
   },
 
-  /**
-   * Get all contact forms with pagination and filtering
-   */
   async findAll(filter?: ContactFilterInput) {
     const { originType, page = 1, limit = 10 } = filter || {};
     const skip = (page - 1) * limit;
 
-    const where: Prisma.ContactFormWhereInput = {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const where: Record<string, any> = {
       ...(originType && { originType }),
     };
 

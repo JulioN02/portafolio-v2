@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { ServiceInput, ServiceUpdateInput, ServiceFilterInput } from '@jsoft/shared';
 
 const prisma = new PrismaClient();
@@ -26,7 +26,8 @@ export const serviceService = {
     const { featured, classification, page = 1, limit = 10 } = filter || {};
     const skip = (page - 1) * limit;
 
-    const where: Prisma.ServiceWhereInput = {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const where: Record<string, any> = {
       deletedAt: null,
       ...(featured !== undefined && { featured }),
       ...(classification && { classification }),
