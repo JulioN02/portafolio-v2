@@ -1,0 +1,177 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// USUARIOS (Admin)
+// ============================================
+model User {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ============================================
+// SERVICIOS
+// ============================================
+model Service {
+  id                  String   @id @default(cuid())
+  title               String
+  slug                String   @unique
+  classification      String
+  shortDescription    String
+  fullDescription     String
+  includedItems       String[]
+  images              String[]
+  order               Int      @default(0)
+  featured            Boolean  @default(false)
+  deletedAt           DateTime?
+
+  // Campos técnicos para reclutadores
+  technicalExplanation String?
+  technicalImages      String[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([featured, deletedAt])
+  @@index([order, createdAt])
+}
+
+// ============================================
+// PRODUCTOS
+// ============================================
+model Product {
+  id                String   @id @default(cuid())
+  title             String
+  slug              String   @unique
+  classification    String
+  shortDescription  String
+  fullDescription   String
+  images            String[]
+  externalLink      String?
+  order             Int      @default(0)
+  featured          Boolean  @default(false)
+  deletedAt         DateTime?
+
+  // Campos técnicos para reclutadores
+  technicalExplanation String?
+  technicalImages      String[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([featured, deletedAt])
+  @@index([order, createdAt])
+}
+
+// ============================================
+// HERRAMIENTAS
+// ============================================
+model Tool {
+  id                String   @id @default(cuid())
+  title             String
+  slug              String   @unique
+  classification    String
+  shortDescription  String
+  fullDescription   String
+  images            String[]
+  requiresInstall   Boolean  @default(false)
+  order             Int      @default(0)
+  featured          Boolean  @default(false)
+  deletedAt         DateTime?
+
+  // Campos técnicos para reclutadores
+  technicalExplanation String?
+  technicalImages      String[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([featured, deletedAt])
+  @@index([order, createdAt])
+}
+
+// ============================================
+// CASOS DE ÉXITO
+// ============================================
+model SuccessCase {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String
+  images      String[]
+  videos      String[]
+  links       String[]
+  deletedAt   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([deletedAt])
+}
+
+// ============================================
+// BLOG POSTS
+// ============================================
+model BlogPost {
+  id               String      @id @default(cuid())
+  title            String
+  slug             String      @unique
+  category         String
+  shortDescription String
+  coverImage       String
+  mediaGallery     String[]
+  body             String
+  externalLink     String?
+  lessonsLearned   String?
+  status           PostStatus  @default(DRAFT)
+  deletedAt        DateTime?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  publishedAt DateTime?
+
+  @@index([status, deletedAt])
+  @@index([publishedAt])
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  PRIVATE
+  ARCHIVED
+}
+
+// ============================================
+// FORMULARIOS DE CONTACTO
+// ============================================
+model ContactForm {
+  id          String      @id @default(cuid())
+  firstName   String
+  lastName    String?
+  whatsapp    String?
+  email       String
+  message     String
+  source      String
+  originType  FormOrigin
+
+  createdAt DateTime @default(now())
+
+  @@index([originType, createdAt])
+}
+
+enum FormOrigin {
+  CLIENT
+  RECRUITER
+}

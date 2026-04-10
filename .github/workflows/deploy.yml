@@ -1,0 +1,39 @@
+name: Deploy Production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build all packages
+        run: pnpm -r run build
+
+      - name: Deploy API
+        run: echo "Add deployment steps for API"
+
+      - name: Deploy Client Site
+        run: echo "Add deployment steps for client-site"
+
+      - name: Deploy Recruiter Site
+        run: echo "Add deployment steps for recruiter-site"
+
+      - name: Deploy Admin Panel
+        run: echo "Add deployment steps for admin-panel"

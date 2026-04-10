@@ -1,0 +1,17 @@
+{
+  "name": "portafolio-jsoft",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Portafolio Web v2.0 - J Soft Solutions",
+  "scripts": {
+    "build": "pnpm -r run build",
+    "dev": "pnpm -r run dev",
+    "lint": "pnpm -r run lint",
+    "test": "pnpm -r run test"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.15.0"
+}

@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: portafolio-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: julion
+      POSTGRES_PASSWORD: julion123
+      POSTGRES_DB: portafolio_v2
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U julion -d portafolio_v2"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

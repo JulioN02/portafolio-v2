@@ -1,0 +1,170 @@
+# Dependabot configuration
+# Solo actualizaciones menores y de patches para estabilidad
+
+version: 2
+updates:
+  # GitHub Actions - semanal
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "ci"
+    # Ignorar major updates de Actions
+    ignore:
+      - dependency-name: actions/checkout
+        update-types: ["major"]
+
+  # npm dependencies - agrupado por tipo
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 8
+    commit-message:
+      prefix: "deps"
+    # Agrupar por tipo de dependencia
+    groups:
+      production:
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+      development:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+    # Ignorar major updates que rompen
+    ignore:
+      # TypeScript major updates
+      - dependency-name: "typescript"
+        update-types: ["major"]
+      # Vite major updates (6→7→8 rompería config)
+      - dependency-name: "vite"
+        update-types: ["major"]
+      # Express major updates
+      - dependency-name: "express"
+        update-types: ["major"]
+      # TipTap major updates (cambios de API)
+      - dependency-name: "@tiptap/*"
+        update-types: ["major"]
+      # Zod major updates ( breaking changes en 4.x)
+      - dependency-name: "zod"
+        update-types: ["major"]
+      # React 19 major - esperar a que se estabilice
+      - dependency-name: "react"
+        update-types: ["major"]
+      - dependency-name: "react-dom"
+        update-types: ["major"]
+
+  # API workspace
+  - package-ecosystem: "npm"
+    directory: "/api"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    groups:
+      production:
+        dependency-type: "production"
+        update-types: ["minor", "patch"]
+      development:
+        dependency-type: "development"
+        update-types: ["minor", "patch"]
+    ignore:
+      - dependency-name: "typescript"
+        update-types: ["major"]
+      - dependency-name: "express"
+        update-types: ["major"]
+
+  # Client site workspace
+  - package-ecosystem: "npm"
+    directory: "/client-site"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    groups:
+      production:
+        dependency-type: "production"
+        update-types: ["minor", "patch"]
+      development:
+        dependency-type: "development"
+        update-types: ["minor", "patch"]
+    ignore:
+      - dependency-name: "typescript"
+        update-types: ["major"]
+      - dependency-name: "vite"
+        update-types: ["major"]
+      - dependency-name: "react"
+        update-types: ["major"]
+
+  # Admin panel workspace
+  - package-ecosystem: "npm"
+    directory: "/admin-panel"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    groups:
+      production:
+        dependency-type: "production"
+        update-types: ["minor", "patch"]
+      development:
+        dependency-type: "development"
+        update-types: ["minor", "patch"]
+    ignore:
+      - dependency-name: "typescript"
+        update-types: ["major"]
+      - dependency-name: "vite"
+        update-types: ["major"]
+      - dependency-name: "@tiptap/*"
+        update-types: ["major"]
+      - dependency-name: "react"
+        update-types: ["major"]
+
+  # Recruiter site workspace
+  - package-ecosystem: "npm"
+    directory: "/recruiter-site"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    groups:
+      production:
+        dependency-type: "production"
+        update-types: ["minor", "patch"]
+      development:
+        dependency-type: "development"
+        update-types: ["minor", "patch"]
+    ignore:
+      - dependency-name: "typescript"
+        update-types: ["major"]
+      - dependency-name: "vite"
+        update-types: ["major"]
+      - dependency-name: "react"
+        update-types: ["major"]
+
+  # Shared package workspace
+  - package-ecosystem: "npm"
+    directory: "/packages/shared"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    groups:
+      production:
+        dependency-type: "production"
+        update-types: ["minor", "patch"]
+      development:
+        dependency-type: "development"
+        update-types: ["minor", "patch"]
+    ignore:
+      - dependency-name: "typescript"
+        update-types: ["major"]
+      - dependency-name: "zod"
+        update-types: ["major"]

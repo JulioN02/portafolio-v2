@@ -1,0 +1,6 @@
+packages:
+  - 'api'
+  - 'packages/*'
+  - 'client-site'
+  - 'recruiter-site'
+  - 'admin-panel'
