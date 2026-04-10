@@ -8,6 +8,7 @@ import authRoutes from './routes/auth.routes.js';
 import serviceRoutes from './routes/service.routes.js';
 import productRoutes from './routes/product.routes.js';
 import toolRoutes from './routes/tool.routes.js';
+import successCaseRoutes from './routes/successCase.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
 import contactRoutes from './routes/contact.routes.js';
 
@@ -51,6 +52,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/tools', toolRoutes);
+app.use('/api/success-cases', successCaseRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/contact', contactRoutes);
 

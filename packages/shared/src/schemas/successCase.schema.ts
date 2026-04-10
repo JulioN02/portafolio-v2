@@ -19,10 +19,19 @@ export const successCaseSchema = z.object({
 export const successCaseUpdateSchema = successCaseSchema.partial();
 
 /**
+ * Schema for filtering success cases in API queries
+ */
+export const successCaseFilterSchema = z.object({
+  page: z.number().int().min(1).default(1),
+  limit: z.number().int().min(1).max(100).default(10),
+});
+
+/**
  * Type inferred from successCaseSchema
  */
 export type SuccessCaseInput = z.infer<typeof successCaseSchema>;
 export type SuccessCaseUpdateInput = z.infer<typeof successCaseUpdateSchema>;
+export type SuccessCaseFilterInput = z.infer<typeof successCaseFilterSchema>;
 
 /**
  * SuccessCase response type

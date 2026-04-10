@@ -23,6 +23,7 @@ export type {
 export type {
   SuccessCaseInput,
   SuccessCaseUpdateInput,
+  SuccessCaseFilterInput,
   SuccessCaseResponse,
 } from '../schemas/successCase.schema.js';
 
