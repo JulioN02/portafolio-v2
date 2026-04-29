@@ -5,6 +5,9 @@ import styles from './Header.module.css';
 const navLinks = [
   { to: '/', label: 'Inicio' },
   { to: '/servicios', label: 'Servicios' },
+  { to: '/productos', label: 'Productos' },
+  { to: '/herramientas', label: 'Herramientas' },
+  { to: '/casos-de-exito', label: 'Casos de Éxito' },
   { to: '/contacto', label: 'Contacto' },
 ];
 
