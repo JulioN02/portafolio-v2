@@ -30,21 +30,16 @@ export const contactFormsApi = {
     if (filters?.endDate) params.append('endDate', filters.endDate);
     if (filters?.originType) params.append('originType', filters.originType);
 
-    const { data } = await apiClient.get(`/contact-forms?${params}`);
+    const { data } = await apiClient.get(`/contact?${params}`);
     return data;
   },
 
   getById: async (id: string): Promise<ContactFormResponse> => {
-    const { data } = await apiClient.get(`/contact-forms/${id}`);
-    return data;
-  },
-
-  markAsRead: async (id: string): Promise<ContactFormResponse> => {
-    const { data } = await apiClient.patch(`/contact-forms/${id}/read`);
+    const { data } = await apiClient.get(`/contact/${id}`);
     return data;
   },
 
   delete: async (id: string): Promise<void> => {
-    await apiClient.delete(`/contact-forms/${id}`);
+    await apiClient.delete(`/contact/${id}`);
   },
 };

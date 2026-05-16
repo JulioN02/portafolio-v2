@@ -14,14 +14,11 @@ type MessageFilter = 'all' | 'unread' | 'read';
  * Main page for viewing and managing received contact messages
  */
 export function ContactMessagesListPage() {
-  const { useGetAll, useMarkAsRead, useDelete } = useContactForms();
+  const { useGetAll } = useContactForms();
   const { data, isLoading, error } = useGetAll();
-  const markAsReadMutation = useMarkAsRead();
-  const deleteMutation = useDelete();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [filter, setFilter] = useState<MessageFilter>('all');
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   // Calculate stats from data
   const totalMessages = data?.pagination?.total || 0;
@@ -55,19 +52,6 @@ export function ContactMessagesListPage() {
     const readAt = (form as unknown as { readAt?: string }).readAt;
     return !readAt;
   }).length;
-
-  const handleMarkRead = (id: string) => {
-    markAsReadMutation.mutate(id);
-  };
-
-  const handleDelete = (id: string) => {
-    if (deleteConfirm === id) {
-      deleteMutation.mutate(id);
-      setDeleteConfirm(null);
-    } else {
-      setDeleteConfirm(id);
-    }
-  };
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
@@ -184,8 +168,6 @@ export function ContactMessagesListPage() {
       {/* Messages List */}
       <ContactMessageList
         messages={filteredMessages}
-        onMarkRead={handleMarkRead}
-        onDelete={handleDelete}
       />
 
       {/* Pagination */}

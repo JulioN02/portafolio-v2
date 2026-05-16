@@ -1,24 +1,21 @@
 import { useParams, Link } from 'react-router-dom';
-import { Button } from '@jsoft/shared';
 import { useContactForms } from '../../hooks/useContactForms';
 
 /**
  * Contact Message Detail Page
- * Displays a single contact message in full detail
+ * Displays a single contact message in full detail (read-only)
  */
 export function ContactMessageDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const { useGetById, useMarkAsRead, useDelete } = useContactForms();
+  const { useGetById } = useContactForms();
   const { data, isLoading, error } = useGetById(id || '');
-  const markAsReadMutation = useMarkAsRead();
-  const deleteMutation = useDelete();
 
   if (!id) {
     return (
       <div style={{ textAlign: 'center', padding: '2rem' }}>
         <p style={{ color: '#ef4444' }}>Invalid message ID</p>
         <Link to="/contact-messages">
-          <Button style={{ marginTop: '1rem' }}>Back to Messages</Button>
+          <span style={{ color: '#3b82f6', textDecoration: 'underline', cursor: 'pointer' }}>Back to Messages</span>
         </Link>
       </div>
     );
@@ -37,7 +34,7 @@ export function ContactMessageDetailPage() {
       <div style={{ textAlign: 'center', padding: '2rem', color: '#ef4444' }}>
         <p>Error loading message</p>
         <Link to="/contact-messages">
-          <Button style={{ marginTop: '1rem' }}>Back to Messages</Button>
+          <span style={{ color: '#3b82f6', textDecoration: 'underline', cursor: 'pointer' }}>Back to Messages</span>
         </Link>
       </div>
     );
@@ -56,16 +53,6 @@ export function ContactMessageDetailPage() {
       hour: '2-digit',
       minute: '2-digit',
     });
-  };
-
-  const handleMarkAsRead = () => {
-    markAsReadMutation.mutate(id);
-  };
-
-  const handleDelete = () => {
-    if (confirm('Are you sure you want to delete this message?')) {
-      deleteMutation.mutate(id);
-    }
   };
 
   return (
@@ -143,16 +130,8 @@ export function ContactMessageDetailPage() {
             </div>
           </div>
 
-          {/* Actions */}
+          {/* Actions - Read-only view */}
           <div style={{ display: 'flex', gap: '0.5rem' }}>
-            {!isRead && (
-              <Button variant="primary" onClick={handleMarkAsRead}>
-                Mark as Read
-              </Button>
-            )}
-            <Button variant="danger" onClick={handleDelete}>
-              Delete
-            </Button>
           </div>
         </div>
       </div>

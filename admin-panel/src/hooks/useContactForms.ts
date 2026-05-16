@@ -25,14 +25,6 @@ export function useContactForms() {
       enabled: !!id,
     });
 
-  const useMarkAsRead = () =>
-    useMutation({
-      mutationFn: (id: string) => contactFormsApi.markAsRead(id),
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['contactForms'] });
-      },
-    });
-
   const useDelete = () =>
     useMutation({
       mutationFn: (id: string) => contactFormsApi.delete(id),
@@ -44,7 +36,6 @@ export function useContactForms() {
   return {
     useGetAll,
     useGetById,
-    useMarkAsRead,
     useDelete,
   };
 }

@@ -5,8 +5,11 @@ import { useProducts } from '../../hooks/useProducts';
 import { ProductTable } from '../../components/products/ProductTable';
 
 export function ProductsListPage() {
+  const [classificationFilter, setClassificationFilter] = useState('');
   const { useGetAll, useDelete } = useProducts();
-  const { data, isLoading, error } = useGetAll();
+  const { data, isLoading, error } = useGetAll(
+    classificationFilter ? { classification: classificationFilter } : undefined
+  );
   const deleteMutation = useDelete();
 
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
@@ -31,6 +34,23 @@ export function ProductsListPage() {
           <Button>Add Product</Button>
         </Link>
       </div>
+
+      {/* Filter by classification */}
+      <div style={{ marginBottom: '1rem' }}>
+        <input
+          placeholder="Filter by classification..."
+          value={classificationFilter}
+          onChange={(e) => setClassificationFilter(e.target.value)}
+          style={{
+            padding: '0.5rem',
+            border: '1px solid #d1d5db',
+            borderRadius: '4px',
+            fontSize: '0.875rem',
+            width: '250px',
+          }}
+        />
+      </div>
+
       <ProductTable
         products={data?.data || []}
         onDelete={handleDelete}

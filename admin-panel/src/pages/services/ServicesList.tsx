@@ -5,8 +5,11 @@ import { useServices } from '../../hooks/useServices';
 import { ServiceTable } from '../../components/services/ServiceTable';
 
 export function ServicesListPage() {
+  const [classificationFilter, setClassificationFilter] = useState('');
   const { useGetAll, useDelete, useToggleFeatured } = useServices();
-  const { data, isLoading, error } = useGetAll();
+  const { data, isLoading, error } = useGetAll(
+    classificationFilter ? { classification: classificationFilter } : undefined
+  );
   const deleteMutation = useDelete();
   const toggleFeaturedMutation = useToggleFeatured();
 
@@ -36,6 +39,23 @@ export function ServicesListPage() {
           <Button>Add Service</Button>
         </Link>
       </div>
+
+      {/* Filter by classification */}
+      <div style={{ marginBottom: '1rem' }}>
+        <input
+          placeholder="Filter by classification..."
+          value={classificationFilter}
+          onChange={(e) => setClassificationFilter(e.target.value)}
+          style={{
+            padding: '0.5rem',
+            border: '1px solid #d1d5db',
+            borderRadius: '4px',
+            fontSize: '0.875rem',
+            width: '250px',
+          }}
+        />
+      </div>
+
       <ServiceTable
         services={data?.data || []}
         onDelete={handleDelete}

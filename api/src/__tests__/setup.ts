@@ -29,6 +29,14 @@ jest.mock('@prisma/client', () => {
     service: {
       findMany: jest.fn(),
     },
+    blogPost: {
+      findMany: jest.fn(),
+      findFirst: jest.fn(),
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      count: jest.fn(),
+    },
   };
   
   return {

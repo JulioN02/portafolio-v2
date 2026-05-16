@@ -5,9 +5,10 @@ import { useBlogPosts } from '../../hooks/useBlogPosts';
 import { BlogPostList } from '../../components/blog-posts/BlogPostList';
 
 export function BlogPostsListPage() {
-  const { useGetAll, useDelete } = useBlogPosts();
+  const { useGetAll, useDelete, useUpdateStatus } = useBlogPosts();
   const { data, isLoading, error } = useGetAll();
   const deleteMutation = useDelete();
+  const updateStatusMutation = useUpdateStatus();
 
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'DRAFT' | 'PUBLISHED'>('all');
@@ -19,6 +20,10 @@ export function BlogPostsListPage() {
     } else {
       setDeleteConfirm(id);
     }
+  };
+
+  const handleStatusChange = (id: string, newStatus: string) => {
+    updateStatusMutation.mutate({ id, status: newStatus as 'DRAFT' | 'PUBLISHED' | 'PRIVATE' | 'ARCHIVED' });
   };
 
   const allPosts = data?.data || [];
@@ -87,6 +92,7 @@ export function BlogPostsListPage() {
         posts={filteredPosts}
         onEdit={(id) => (window.location.href = `/blog-posts/edit/${id}`)}
         onDelete={handleDelete}
+        onStatusChange={handleStatusChange}
       />
     </div>
   );

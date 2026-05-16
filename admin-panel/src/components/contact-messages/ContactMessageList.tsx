@@ -1,5 +1,3 @@
-import { Button } from '@jsoft/shared';
-
 /**
  * Contact message interface matching user specification
  */
@@ -15,15 +13,14 @@ export interface ContactMessage {
 
 interface ContactMessageListProps {
   messages: ContactMessage[];
-  onMarkRead: (id: string) => void;
-  onDelete: (id: string) => void;
 }
 
 /**
  * Contact Message List Component
  * Displays received contact messages with read/unread visual states
+ * Read-only: no edit/delete actions (per spec)
  */
-export function ContactMessageList({ messages, onMarkRead, onDelete }: ContactMessageListProps) {
+export function ContactMessageList({ messages }: ContactMessageListProps) {
   if (messages.length === 0) {
     return (
       <div style={{ textAlign: 'center', padding: '2rem', color: '#6b7280' }}>
@@ -125,17 +122,21 @@ export function ContactMessageList({ messages, onMarkRead, onDelete }: ContactMe
 
           {/* Actions */}
           <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-            <Button
-              variant={message.isRead ? 'secondary' : 'primary'}
-              size="sm"
-              onClick={() => onMarkRead(message.id)}
-              disabled={message.isRead}
+            <a
+              href={`/contact-messages/${message.id}`}
+              style={{
+                padding: '0.375rem 0.75rem',
+                background: '#3b82f6',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '0.875rem',
+                textDecoration: 'none',
+              }}
             >
-              {message.isRead ? 'Marked as Read' : 'Mark as Read'}
-            </Button>
-            <Button variant="danger" size="sm" onClick={() => onDelete(message.id)}>
-              Delete
-            </Button>
+              View Details
+            </a>
           </div>
         </div>
       ))}

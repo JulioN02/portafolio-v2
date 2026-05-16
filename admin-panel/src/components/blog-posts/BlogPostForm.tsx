@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Input } from '@jsoft/shared';
 import { Button } from '@jsoft/shared';
 import { BlogPostInput, PostStatus } from '@jsoft/shared';
+import { TipTapEditor } from './TipTapEditor';
+import { getTextFromHTML } from '../../utils/getTextFromHTML';
 
 interface BlogPostFormProps {
   initialData?: Partial<BlogPostInput>;
@@ -28,7 +30,8 @@ export function BlogPostForm({ initialData, onSubmit, isLoading }: BlogPostFormP
     if (!category || category.length < 2) newErrors.category = 'Category must be at least 2 characters';
     if (!shortDescription || shortDescription.length < 10) newErrors.shortDescription = 'Short description must be at least 10 characters';
     if (!coverImage) newErrors.coverImage = 'Cover image URL is required';
-    if (!body || body.length < 100) newErrors.body = 'Body must be at least 100 characters';
+    const textContent = getTextFromHTML(body);
+    if (!body || textContent.length < 100) newErrors.body = 'Body must be at least 100 characters (plain text)';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -125,17 +128,10 @@ export function BlogPostForm({ initialData, onSubmit, isLoading }: BlogPostFormP
       />
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-        <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151' }}>Body Content</label>
-        <textarea
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          style={{
-            padding: '0.5rem',
-            border: errors.body ? '1px solid #ef4444' : '1px solid #d1d5db',
-            borderRadius: '4px',
-            minHeight: '300px',
-            fontSize: '1rem'
-          }}
+        <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151' }}>Body Content (TipTap Rich Text Editor)</label>
+        <TipTapEditor
+          content={body}
+          onChange={setBody}
         />
         {errors.body && <span style={{ color: '#ef4444', fontSize: '0.75rem' }}>{errors.body}</span>}
       </div>
