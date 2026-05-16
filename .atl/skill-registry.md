@@ -67,3 +67,27 @@ None detected.
 - **Testing**: Jest script defined but not installed; need to add jest to dependencies
 - **Linting**: ESLint script defined but not installed; need to add eslint config
 - **Type Checking**: Available via `tsc --noEmit` scripts in each package
+
+---
+
+## SDD Context (2026-04-30)
+
+### Metodología SDD Habilitada
+- **Fases**: proposal → specs → design → tasks → apply → verify → archive
+- **Persistencia**: engram
+- **Strict TDD**: ❌ Disabled
+
+### Testing Capabilities
+| Layer | Available | Tool |
+|-------|-----------|------|
+| Unit (api) | ✅ | Jest 30.3.0 |
+| Unit (frontend) | ❌ | No instalado |
+| Integration | ❌ | No instalado |
+| E2E | ❌ | No instalado |
+
+### Protocolo de Seguimiento
+Al terminar cada fase SDD:
+1. ANALIZAR: Revisar logros, dependencias establecidas, pendientes
+2. RESUMIR: Extraer artifact keys, decisiones técnicas
+3. GUARDAR: Guardar en engram con topic_key correspondiente
+4. ACTUALIZAR: Verificar sdd-init/{project} para continuidad

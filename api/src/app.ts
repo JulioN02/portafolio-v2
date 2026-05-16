@@ -12,6 +12,7 @@ import successCaseRoutes from './routes/successCase.routes.js';
 import projectsRoutes from './routes/projects.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
 import contactRoutes from './routes/contact.routes.js';
+import blogPostRoutes from './routes/blog-post.routes.js';
 
 dotenv.config();
 
@@ -57,6 +58,7 @@ app.use('/api/success-cases', successCaseRoutes);
 app.use('/api/projects', projectsRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/blog-posts', blogPostRoutes);
 
 // Protected routes (admin)
 // All routes under /api/admin need authentication

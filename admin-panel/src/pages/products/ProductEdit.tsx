@@ -1,0 +1,33 @@
+import { useParams, useNavigate } from 'react-router-dom';
+import { ProductForm } from '../../components/products/ProductForm';
+import { useProducts } from '../../hooks/useProducts';
+import type { ProductInput } from '@jsoft/shared';
+
+export function ProductEditPage() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { useGetById, useUpdate } = useProducts();
+  const { data: product, isLoading } = useGetById(id!);
+  const updateMutation = useUpdate();
+
+  const handleSubmit = (data: ProductInput) => {
+    updateMutation.mutate(
+      { id: id!, data },
+      {
+        onSuccess: () => {
+          navigate('/products');
+        },
+      }
+    );
+  };
+
+  if (isLoading) return <div style={{ textAlign: 'center', padding: '2rem' }}>Loading...</div>;
+  if (!product) return <div style={{ textAlign: 'center', padding: '2rem', color: '#ef4444' }}>Product not found</div>;
+
+  return (
+    <div>
+      <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>Edit Product</h1>
+      <ProductForm initialData={product} onSubmit={handleSubmit} isLoading={updateMutation.isPending} />
+    </div>
+  );
+}

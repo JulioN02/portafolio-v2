@@ -1,0 +1,555 @@
+{
+  "status": "completed",
+  "executive_summary": "Created 57 implementable tasks across 14 phases for admin panel. Covers infrastructure, API BlogPost (9 endpoints), auth, layout, CRUD for 5 entities, ContactForms, routing, and testing.",
+  "phases": [
+    {
+      "name": "Infrastructure & Setup",
+      "tasks": [
+        {
+          "id": "1.1",
+          "description": "Install dependencies: @tiptap/react, @tiptap/starter-kit, @tanstack/react-query, react-router-dom, zod, slugify",
+          "files": ["package.json"],
+          "dependencies": [],
+          "estimated_effort": "small"
+        },
+        {
+          "id": "1.2",
+          "description": "Create folder structure: src/{api,hooks,components,pages,routes,types,utils}/",
+          "files": ["src/"],
+          "dependencies": [],
+          "estimated_effort": "small"
+        },
+        {
+          "id": "1.3",
+          "description": "Create src/types/index.ts with AuthState, DashboardSummary, NavItem interfaces",
+          "files": ["src/types/index.ts"],
+          "dependencies": [],
+          "estimated_effort": "small"
+        },
+        {
+          "id": "1.4",
+          "description": "Create src/utils/slugify.ts utility function",
+          "files": ["src/utils/slugify.ts"],
+          "dependencies": [],
+          "estimated_effort": "small"
+        },
+        {
+          "id": "1.5",
+          "description": "Create src/utils/getTextFromHTML.ts helper for TipTap validation",
+          "files": ["src/utils/getTextFromHTML.ts"],
+          "dependencies": [],
+          "estimated_effort": "small"
+        },
+        {
+          "id": "1.6",
+          "description": "Setup TanStack Query Client in src/main.tsx with retry:1, refetchOnWindowFocus:false, staleTime:5min",
+          "files": ["src/main.tsx"],
+          "dependencies": ["1.1"],
+          "estimated_effort": "small"
+        }
+      ]
+    },
+    {
+      "name": "API Client & Auth Foundation",
+      "tasks": [
+        {
+          "id": "2.1",
+          "description": "Create src/api/client.ts with base URL from VITE_API_URL, interceptors for JWT from localStorage",
+          "files": ["src/api/client.ts"],
+          "dependencies": ["1.2"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "2.2",
+          "description": "Create src/api/auth.ts with login() POST /api/auth/login, store JWT as 'admin_token'",
+          "files": ["src/api/auth.ts"],
+          "dependencies": ["2.1"],
+          "estimated_effort": "small"
+        },
+        {
+          "id": "2.3",
+          "description": "Create src/hooks/useAuth.ts with login/logout/isAuthenticated checks, JWT decode",
+          "files": ["src/hooks/useAuth.ts"],
+          "dependencies": ["2.2"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "2.4",
+          "description": "Create src/components/auth/ProtectedRoute.tsx using @jsoft/shared ProtectedRoute pattern",
+          "files": ["src/components/auth/ProtectedRoute.tsx"],
+          "dependencies": ["2.3"],
+          "estimated_effort": "small"
+        },
+        {
+          "id": "2.5",
+          "description": "Create src/components/auth/LoginForm.tsx with email/password, useAuth, @jsoft/shared Input/Button/ErrorMessage",
+          "files": ["src/components/auth/LoginForm.tsx", "src/pages/Login.tsx"],
+          "dependencies": ["2.3"],
+          "estimated_effort": "medium"
+        }
+      ]
+    },
+    {
+      "name": "Layout Components",
+      "tasks": [
+        {
+          "id": "3.1",
+          "description": "Create src/components/layout/Sidebar.tsx with NavItem array, collapse state, active route highlight",
+          "files": ["src/components/layout/Sidebar.tsx"],
+          "dependencies": ["1.3"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "3.2",
+          "description": "Create src/components/layout/Header.tsx with user info display and logout button",
+          "files": ["src/components/layout/Header.tsx"],
+          "dependencies": ["2.3"],
+          "estimated_effort": "small"
+        },
+        {
+          "id": "3.3",
+          "description": "Create src/components/layout/DashboardLayout.tsx wrapper with Sidebar + Header + children",
+          "files": ["src/components/layout/DashboardLayout.tsx"],
+          "dependencies": ["3.1", "3.2"],
+          "estimated_effort": "medium"
+        }
+      ]
+    },
+    {
+      "name": "API BlogPost (New Backend Endpoints)",
+      "tasks": [
+        {
+          "id": "4.1",
+          "description": "Create backend routes for BlogPost: GET /api/blog-posts, GET /api/blog-posts/:slug, GET /api/blog-posts/id/:id",
+          "files": ["api/routes/blogPosts.ts"],
+          "dependencies": [],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "4.2",
+          "description": "Create backend routes for BlogPost: POST /api/blog-posts, PUT /api/blog-posts/:id, DELETE /api/blog-posts/:id",
+          "files": ["api/routes/blogPosts.ts"],
+          "dependencies": ["4.1"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "4.3",
+          "description": "Create backend routes for BlogPost: PATCH /api/blog-posts/:id/restore, PATCH /api/blog-posts/:id/reorder, PATCH /api/blog-posts/:id/status",
+          "files": ["api/routes/blogPosts.ts"],
+          "dependencies": ["4.2"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "4.4",
+          "description": "Create src/api/blogPosts.api.ts with 7 functions: getAll, getBySlug, getById, create, update, delete, updateStatus",
+          "files": ["src/api/blogPosts.api.ts"],
+          "dependencies": ["2.1", "4.1"],
+          "estimated_effort": "medium"
+        }
+      ]
+    },
+    {
+      "name": "TanStack Query Hooks",
+      "tasks": [
+        {
+          "id": "5.1",
+          "description": "Create src/hooks/useServices.ts with useGetAll, useGetById, useCreate, useUpdate, useDelete, useToggleFeatured",
+          "files": ["src/hooks/useServices.ts"],
+          "dependencies": ["1.6", "src/api/services.api.ts"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "5.2",
+          "description": "Create src/hooks/useProducts.ts with useGetAll, useGetById, useCreate, useUpdate, useDelete",
+          "files": ["src/hooks/useProducts.ts"],
+          "dependencies": ["1.6", "src/api/products.api.ts"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "5.3",
+          "description": "Create src/hooks/useTools.ts with useGetAll, useGetById, useCreate, useUpdate, useDelete, useReorder",
+          "files": ["src/hooks/useTools.ts"],
+          "dependencies": ["1.6", "src/api/tools.api.ts"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "5.4",
+          "description": "Create src/hooks/useSuccessCases.ts with useGetAll, useGetById, useCreate, useUpdate, useDelete",
+          "files": ["src/hooks/useSuccessCases.ts"],
+          "dependencies": ["1.6", "src/api/successCases.api.ts"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "5.5",
+          "description": "Create src/hooks/useBlogPosts.ts with useGetAll, useGetById, useCreate, useUpdate, useDelete, useUpdateStatus",
+          "files": ["src/hooks/useBlogPosts.ts"],
+          "dependencies": ["1.6", "4.4"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "5.6",
+          "description": "Create src/hooks/useContactForms.ts with useGetAll only (read-only)",
+          "files": ["src/hooks/useContactForms.ts"],
+          "dependencies": ["1.6", "src/api/contactForms.api.ts"],
+          "estimated_effort": "small"
+        }
+      ]
+    },
+    {
+      "name": "Dashboard Page",
+      "tasks": [
+        {
+          "id": "6.1",
+          "description": "Create src/pages/Dashboard.tsx with SummaryCards using useServices/useProducts/useTools/useBlogPosts/useContactForms",
+          "files": ["src/pages/Dashboard.tsx"],
+          "dependencies": ["5.1", "5.2", "5.3", "5.5", "5.6", "3.3"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "6.2",
+          "description": "Create src/components/dashboard/SummaryCard.tsx using @jsoft/shared Card component",
+          "files": ["src/components/dashboard/SummaryCard.tsx"],
+          "dependencies": ["1.3"],
+          "estimated_effort": "small"
+        }
+      ]
+    },
+    {
+      "name": "Services CRUD",
+      "tasks": [
+        {
+          "id": "7.1",
+          "description": "Create src/pages/services/ServicesList.tsx with pagination, filter, delete modal, useServices",
+          "files": ["src/pages/services/ServicesList.tsx"],
+          "dependencies": ["5.1", "3.3"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "7.2",
+          "description": "Create src/pages/services/ServiceCreate.tsx with Zod validation using service.schema, useCreate",
+          "files": ["src/pages/services/ServiceCreate.tsx"],
+          "dependencies": ["5.1"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "7.3",
+          "description": "Create src/pages/services/ServiceEdit.tsx with pre-filled form from useGetById, useUpdate",
+          "files": ["src/pages/services/ServiceEdit.tsx"],
+          "dependencies": ["5.1"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "7.4",
+          "description": "Create src/components/services/ServiceTable.tsx using @jsoft/shared Table/Pagination",
+          "files": ["src/components/services/ServiceTable.tsx"],
+          "dependencies": [],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "7.5",
+          "description": "Create src/components/services/ServiceForm.tsx with @jsoft/shared Input/Button/ErrorMessage",
+          "files": ["src/components/services/ServiceForm.tsx"],
+          "dependencies": [],
+          "estimated_effort": "medium"
+        }
+      ]
+    },
+    {
+      "name": "Products CRUD",
+      "tasks": [
+        {
+          "id": "8.1",
+          "description": "Create src/pages/products/ProductsList.tsx with price filter, delete confirmation, useProducts",
+          "files": ["src/pages/products/ProductsList.tsx"],
+          "dependencies": ["5.2", "3.3"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "8.2",
+          "description": "Create src/pages/products/ProductCreate.tsx with price validation, useCreate",
+          "files": ["src/pages/products/ProductCreate.tsx"],
+          "dependencies": ["5.2"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "8.3",
+          "description": "Create src/pages/products/ProductEdit.tsx with pre-filled form, useUpdate",
+          "files": ["src/pages/products/ProductEdit.tsx"],
+          "dependencies": ["5.2"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "8.4",
+          "description": "Create src/components/products/ProductTable.tsx using @jsoft/shared Table/Pagination",
+          "files": ["src/components/products/ProductTable.tsx"],
+          "dependencies": [],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "8.5",
+          "description": "Create src/components/products/ProductForm.tsx with price field validation",
+          "files": ["src/components/products/ProductForm.tsx"],
+          "dependencies": [],
+          "estimated_effort": "medium"
+        }
+      ]
+    },
+    {
+      "name": "Tools CRUD (with Drag-to-Reorder)",
+      "tasks": [
+        {
+          "id": "9.1",
+          "description": "Create src/pages/tools/ToolsList.tsx with HTML5 drag-and-drop, useTools, useReorder mutation",
+          "files": ["src/pages/tools/ToolsList.tsx"],
+          "dependencies": ["5.3", "3.3"],
+          "estimated_effort": "large"
+        },
+        {
+          "id": "9.2",
+          "description": "Create src/pages/tools/ToolCreate.tsx with optional link field, useCreate",
+          "files": ["src/pages/tools/ToolCreate.tsx"],
+          "dependencies": ["5.3"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "9.3",
+          "description": "Create src/pages/tools/ToolEdit.tsx with pre-filled form, useUpdate",
+          "files": ["src/pages/tools/ToolEdit.tsx"],
+          "dependencies": ["5.3"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "9.4",
+          "description": "Create src/components/tools/ToolList.tsx with drag handlers, visual feedback during drag",
+          "files": ["src/components/tools/ToolList.tsx"],
+          "dependencies": [],
+          "estimated_effort": "large"
+        },
+        {
+          "id": "9.5",
+          "description": "Create src/components/tools/ToolForm.tsx with link validation (URL optional)",
+          "files": ["src/components/tools/ToolForm.tsx"],
+          "dependencies": [],
+          "estimated_effort": "medium"
+        }
+      ]
+    },
+    {
+      "name": "SuccessCases CRUD",
+      "tasks": [
+        {
+          "id": "10.1",
+          "description": "Create src/pages/success-cases/SuccessCasesList.tsx with client filter, useSuccessCases",
+          "files": ["src/pages/success-cases/SuccessCasesList.tsx"],
+          "dependencies": ["5.4", "3.3"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "10.2",
+          "description": "Create src/pages/success-cases/SuccessCaseCreate.tsx with testimonial field, useCreate",
+          "files": ["src/pages/success-cases/SuccessCaseCreate.tsx"],
+          "dependencies": ["5.4"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "10.3",
+          "description": "Create src/pages/success-cases/SuccessCaseEdit.tsx with pre-filled form, useUpdate",
+          "files": ["src/pages/success-cases/SuccessCaseEdit.tsx"],
+          "dependencies": ["5.4"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "10.4",
+          "description": "Create src/components/success-cases/SuccessCaseTable.tsx with client column",
+          "files": ["src/components/success-cases/SuccessCaseTable.tsx"],
+          "dependencies": [],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "10.5",
+          "description": "Create src/components/success-cases/SuccessCaseForm.tsx with testimonial textarea",
+          "files": ["src/components/success-cases/SuccessCaseForm.tsx"],
+          "dependencies": [],
+          "estimated_effort": "medium"
+        }
+      ]
+    },
+    {
+      "name": "BlogPosts CRUD (with TipTap Editor)",
+      "tasks": [
+        {
+          "id": "11.1",
+          "description": "Create src/components/blog-posts/TipTapEditor.tsx with StarterKit extensions, onUpdate handler",
+          "files": ["src/components/blog-posts/TipTapEditor.tsx"],
+          "dependencies": ["1.1"],
+          "estimated_effort": "large"
+        },
+        {
+          "id": "11.2",
+          "description": "Create src/pages/blog-posts/BlogPostsList.tsx with status filter (DRAFT/PUBLISHED), useBlogPosts",
+          "files": ["src/pages/blog-posts/BlogPostsList.tsx"],
+          "dependencies": ["5.5", "3.3"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "11.3",
+          "description": "Create src/pages/blog-posts/BlogPostCreate.tsx with TipTapEditor, slug auto-generation, content validation min 100 chars",
+          "files": ["src/pages/blog-posts/BlogPostCreate.tsx"],
+          "dependencies": ["5.5", "11.1", "1.4", "1.5"],
+          "estimated_effort": "large"
+        },
+        {
+          "id": "11.4",
+          "description": "Create src/pages/blog-posts/BlogPostEdit.tsx with pre-filled TipTap content, useUpdate",
+          "files": ["src/pages/blog-posts/BlogPostEdit.tsx"],
+          "dependencies": ["5.5", "11.1"],
+          "estimated_effort": "large"
+        },
+        {
+          "id": "11.5",
+          "description": "Create src/components/blog-posts/BlogPostTable.tsx with status badge, filter controls",
+          "files": ["src/components/blog-posts/BlogPostTable.tsx"],
+          "dependencies": [],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "11.6",
+          "description": "Create src/components/blog-posts/BlogPostForm.tsx with Title/Slug/Status/TipTapEditor fields",
+          "files": ["src/components/blog-posts/BlogPostForm.tsx"],
+          "dependencies": ["11.1"],
+          "estimated_effort": "large"
+        }
+      ]
+    },
+    {
+      "name": "ContactForms (Read-Only)",
+      "tasks": [
+        {
+          "id": "12.1",
+          "description": "Create src/pages/contact-forms/ContactFormsList.tsx with date filter, pagination, useContactForms",
+          "files": ["src/pages/contact-forms/ContactFormsList.tsx"],
+          "dependencies": ["5.6", "3.3"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "12.2",
+          "description": "Create src/components/contact-forms/ContactFormTable.tsx with expandable rows or modal for details",
+          "files": ["src/components/contact-forms/ContactFormTable.tsx"],
+          "dependencies": [],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "12.3",
+          "description": "Create src/components/contact-forms/ContactFormDetail.tsx or modal view for full message",
+          "files": ["src/components/contact-forms/ContactFormDetail.tsx"],
+          "dependencies": ["12.2"],
+          "estimated_effort": "small"
+        }
+      ]
+    },
+    {
+      "name": "Routing & Integration",
+      "tasks": [
+        {
+          "id": "13.1",
+          "description": "Create src/routes/index.tsx with React Router v7 nested routes: /login, / (DashboardLayout wrapper)",
+          "files": ["src/routes/index.tsx"],
+          "dependencies": ["3.3", "2.4"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "13.2",
+          "description": "Configure all routes: dashboard, services/*, products/*, tools/*, success-cases/*, blog-posts/*, contact-forms",
+          "files": ["src/routes/index.tsx"],
+          "dependencies": ["13.1", "6.1", "7.1", "8.1", "9.1", "10.1", "11.2", "12.1"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "13.3",
+          "description": "Update src/App.tsx with QueryClientProvider, RouterProvider, wrap with DashboardLayout where needed",
+          "files": ["src/App.tsx"],
+          "dependencies": ["1.6", "13.2"],
+          "estimated_effort": "small"
+        },
+        {
+          "id": "13.4",
+          "description": "Update src/main.tsx to render App with StrictMode",
+          "files": ["src/main.tsx"],
+          "dependencies": ["13.3"],
+          "estimated_effort": "small"
+        }
+      ]
+    },
+    {
+      "name": "Testing & Polish",
+      "tasks": [
+        {
+          "id": "14.1",
+          "description": "Manual testing: Auth flow (login → token → redirect → 401 logout)",
+          "files": ["src/"],
+          "dependencies": ["13.4"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "14.2",
+          "description": "Manual testing: Services CRUD (create → list → edit → delete with modal confirmation)",
+          "files": ["src/pages/services/"],
+          "dependencies": ["13.4"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "14.3",
+          "description": "Manual testing: BlogPost with TipTap (content validation <100 chars, slug generation)",
+          "files": ["src/pages/blog-posts/"],
+          "dependencies": ["13.4"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "14.4",
+          "description": "Manual testing: Tools drag-to-reorder → PATCH /api/tools/:id/reorder",
+          "files": ["src/pages/tools/"],
+          "dependencies": ["13.4"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "14.5",
+          "description": "Manual testing: BlogPost status filter → only show DRAFT/PUBLISHED",
+          "files": ["src/pages/blog-posts/"],
+          "dependencies": ["13.4"],
+          "estimated_effort": "small"
+        },
+        {
+          "id": "14.6",
+          "description": "UI polish: Responsive Sidebar (<768px collapse), loading states, error boundaries",
+          "files": ["src/components/layout/", "src/components/"],
+          "dependencies": ["13.4"],
+          "estimated_effort": "medium"
+        },
+        {
+          "id": "14.7",
+          "description": "Verify all protected routes redirect to /login when no token",
+          "files": ["src/routes/"],
+          "dependencies": ["13.4"],
+          "estimated_effort": "small"
+        },
+        {
+          "id": "14.8",
+          "description": "Verify API client interceptor removes token and redirects on 401",
+          "files": ["src/api/client.ts"],
+          "dependencies": ["13.4"],
+          "estimated_effort": "small"
+        }
+      ]
+    }
+  ],
+  "total_tasks": 57,
+  "estimated_sessions": 72,
+  "risks": [
+    "BlogPost API completely missing - 9 new endpoints needed in backend (Phase 4 is critical path)",
+    "TipTap integration complexity - Phase 11.1 requires careful setup with StarterKit extensions",
+    "HTML5 drag-and-drop for Tools reorder (Phase 9.1, 9.4) - potential browser compatibility issues",
+    "JWT expiration handling not explicitly defined - may need refresh token logic later",
+    "React Router v7 nested routes syntax - verify compatibility with React 19"
+  ],
+  "next_recommended": "sdd-apply"
+}

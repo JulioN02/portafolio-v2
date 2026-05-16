@@ -1,0 +1,166 @@
+import { PrismaClient, PostStatus } from '@prisma/client';
+import { BlogPostInput, BlogPostUpdateInput, BlogPostFilterInput } from '@jsoft/shared';
+
+const prisma = new PrismaClient();
+
+const BLOG_POST_SELECT = {
+  id: true,
+  title: true,
+  slug: true,
+  category: true,
+  shortDescription: true,
+  coverImage: true,
+  mediaGallery: true,
+  body: true,
+  externalLink: true,
+  lessonsLearned: true,
+  status: true,
+  deletedAt: true,
+  createdAt: true,
+  updatedAt: true,
+  publishedAt: true,
+} as const;
+
+export const blogPostService = {
+  async findAll(filter?: BlogPostFilterInput) {
+    const { status, category, page = 1, limit = 10 } = filter || {};
+    const skip = (page - 1) * limit;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const where: Record<string, any> = {
+      deletedAt: null,
+      ...(status && { status: status as PostStatus }),
+      ...(category && { category }),
+    };
+
+    const [posts, total] = await Promise.all([
+      prisma.blogPost.findMany({
+        where,
+        select: BLOG_POST_SELECT,
+        orderBy: [{ createdAt: 'desc' }],
+        skip,
+        take: limit,
+      }),
+      prisma.blogPost.count({ where }),
+    ]);
+
+    return {
+      data: posts,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page * limit < total,
+        hasPrev: page > 1,
+      },
+    };
+  },
+
+  async findBySlug(slug: string) {
+    return prisma.blogPost.findFirst({
+      where: { slug, deletedAt: null },
+      select: BLOG_POST_SELECT,
+    });
+  },
+
+  async findById(id: string) {
+    return prisma.blogPost.findUnique({
+      where: { id },
+      select: BLOG_POST_SELECT,
+    });
+  },
+
+  async create(data: BlogPostInput) {
+    return prisma.blogPost.create({
+      data: {
+        title: data.title,
+        slug: data.slug,
+        category: data.category,
+        shortDescription: data.shortDescription,
+        coverImage: data.coverImage,
+        mediaGallery: data.mediaGallery || [],
+        body: data.body,
+        externalLink: data.externalLink,
+        lessonsLearned: data.lessonsLearned,
+        status: data.status || 'DRAFT',
+        ...(data.status === 'PUBLISHED' && { publishedAt: new Date() }),
+      },
+      select: BLOG_POST_SELECT,
+    });
+  },
+
+  async update(id: string, data: BlogPostUpdateInput) {
+    const updateData: Record<string, unknown> = {};
+
+    if (data.title !== undefined) updateData.title = data.title;
+    if (data.slug !== undefined) updateData.slug = data.slug;
+    if (data.category !== undefined) updateData.category = data.category;
+    if (data.shortDescription !== undefined) updateData.shortDescription = data.shortDescription;
+    if (data.coverImage !== undefined) updateData.coverImage = data.coverImage;
+    if (data.mediaGallery !== undefined) updateData.mediaGallery = data.mediaGallery;
+    if (data.body !== undefined) updateData.body = data.body;
+    if (data.externalLink !== undefined) updateData.externalLink = data.externalLink;
+    if (data.lessonsLearned !== undefined) updateData.lessonsLearned = data.lessonsLearned;
+    if (data.status !== undefined) {
+      updateData.status = data.status;
+      if (data.status === 'PUBLISHED') {
+        updateData.publishedAt = new Date();
+      }
+    }
+
+    return prisma.blogPost.update({
+      where: { id },
+      data: updateData,
+      select: BLOG_POST_SELECT,
+    });
+  },
+
+  async softDelete(id: string) {
+    return prisma.blogPost.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+      select: BLOG_POST_SELECT,
+    });
+  },
+
+  async restore(id: string) {
+    return prisma.blogPost.update({
+      where: { id },
+      data: { deletedAt: null },
+      select: BLOG_POST_SELECT,
+    });
+  },
+
+  async reorder(id: string, _newOrder: number) {
+    // Note: BlogPost model doesn't have an order field in Prisma schema
+    // This function is kept for API consistency but would need schema modification
+    return prisma.blogPost.findUnique({
+      where: { id },
+      select: BLOG_POST_SELECT,
+    });
+  },
+
+  async updateStatus(id: string, status: PostStatus) {
+    const updateData: Record<string, unknown> = { status };
+    if (status === 'PUBLISHED') {
+      updateData.publishedAt = new Date();
+    }
+
+    return prisma.blogPost.update({
+      where: { id },
+      data: updateData,
+      select: BLOG_POST_SELECT,
+    });
+  },
+
+  async getCategories() {
+    const result = await prisma.blogPost.findMany({
+      where: { deletedAt: null },
+      select: { category: true },
+      distinct: ['category'],
+      orderBy: { category: 'asc' },
+    });
+    return result.map((item: { category: string }) => item.category);
+  },
+};
