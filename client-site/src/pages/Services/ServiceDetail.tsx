@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import DOMPurify from 'dompurify';
 import { useServiceBySlug } from '../../hooks/useServices';
 import { Loading } from '../../components/common/Loading';
 import { Modal } from '@jsoft/shared';
@@ -125,7 +126,7 @@ export function ServiceDetailPage() {
         {service.fullDescription && (
           <div className={styles.fullDescription}>
             <h2>Descripción completa</h2>
-            <div dangerouslySetInnerHTML={{ __html: service.fullDescription }} />
+            <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(service.fullDescription) }} />
           </div>
         )}
       </div>

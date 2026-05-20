@@ -90,5 +90,12 @@ export type { ModalProps } from './components/index.js';
 export { ProtectedRoute } from './components/index.js';
 export type { ProtectedRouteProps } from './components/index.js';
 
+// Error Boundary Components
+export { ErrorBoundary } from './components/index.js';
+export type { ErrorBoundaryProps } from './components/index.js';
+export { ErrorFallback } from './components/index.js';
+export type { ErrorFallbackProps } from './components/index.js';
+export { withBoundary } from './components/index.js';
+
 // CSS Variables (import to apply design tokens)
 import './styles/variables.css';

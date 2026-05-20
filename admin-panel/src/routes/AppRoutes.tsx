@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedLayout } from '../components/layout/ProtectedLayout';
+import { ErrorBoundary } from '@jsoft/shared';
 
 // Login (public)
 import { LoginPage } from '../pages/LoginPage';
@@ -47,166 +48,204 @@ function AppRoutes() {
   return (
     <Routes>
       {/* Public: Login */}
-      <Route path="/login" element={<LoginPage />} />
+      <Route path="/login" element={<ErrorBoundary><LoginPage /></ErrorBoundary>} />
 
       {/* Protected: All admin routes wrapped in ProtectedLayout (auth + sidebar + header) */}
       <Route
         path="/dashboard"
         element={
-          <ProtectedLayout>
-            <DashboardPage />
-          </ProtectedLayout>
+          <ErrorBoundary>
+            <ProtectedLayout>
+              <DashboardPage />
+            </ProtectedLayout>
+          </ErrorBoundary>
         }
       />
 
       <Route
         path="/blog-posts"
         element={
-          <ProtectedLayout>
-            <BlogPostsListPage />
-          </ProtectedLayout>
+          <ErrorBoundary>
+            <ProtectedLayout>
+              <BlogPostsListPage />
+            </ProtectedLayout>
+          </ErrorBoundary>
         }
       />
       <Route
         path="/blog-posts/create"
         element={
-          <ProtectedLayout>
-            <BlogPostCreatePage />
-          </ProtectedLayout>
+          <ErrorBoundary>
+            <ProtectedLayout>
+              <BlogPostCreatePage />
+            </ProtectedLayout>
+          </ErrorBoundary>
         }
       />
       <Route
         path="/blog-posts/edit/:id"
         element={
-          <ProtectedLayout>
-            <BlogPostEditPage />
-          </ProtectedLayout>
+          <ErrorBoundary>
+            <ProtectedLayout>
+              <BlogPostEditPage />
+            </ProtectedLayout>
+          </ErrorBoundary>
         }
       />
 
       <Route
         path="/services"
         element={
-          <ProtectedLayout>
-            <ServicesListPage />
-          </ProtectedLayout>
+          <ErrorBoundary>
+            <ProtectedLayout>
+              <ServicesListPage />
+            </ProtectedLayout>
+          </ErrorBoundary>
         }
       />
       <Route
         path="/services/create"
         element={
-          <ProtectedLayout>
-            <ServiceCreatePage />
-          </ProtectedLayout>
+          <ErrorBoundary>
+            <ProtectedLayout>
+              <ServiceCreatePage />
+            </ProtectedLayout>
+          </ErrorBoundary>
         }
       />
       <Route
         path="/services/edit/:id"
         element={
-          <ProtectedLayout>
-            <ServiceEditPage />
-          </ProtectedLayout>
+          <ErrorBoundary>
+            <ProtectedLayout>
+              <ServiceEditPage />
+            </ProtectedLayout>
+          </ErrorBoundary>
         }
       />
 
       <Route
         path="/products"
         element={
-          <ProtectedLayout>
-            <ProductsListPage />
-          </ProtectedLayout>
+          <ErrorBoundary>
+            <ProtectedLayout>
+              <ProductsListPage />
+            </ProtectedLayout>
+          </ErrorBoundary>
         }
       />
       <Route
         path="/products/create"
         element={
-          <ProtectedLayout>
-            <ProductCreatePage />
-          </ProtectedLayout>
+          <ErrorBoundary>
+            <ProtectedLayout>
+              <ProductCreatePage />
+            </ProtectedLayout>
+          </ErrorBoundary>
         }
       />
       <Route
         path="/products/edit/:id"
         element={
-          <ProtectedLayout>
-            <ProductEditPage />
-          </ProtectedLayout>
+          <ErrorBoundary>
+            <ProtectedLayout>
+              <ProductEditPage />
+            </ProtectedLayout>
+          </ErrorBoundary>
         }
       />
 
       <Route
         path="/tools"
         element={
-          <ProtectedLayout>
-            <ToolsListPage />
-          </ProtectedLayout>
+          <ErrorBoundary>
+            <ProtectedLayout>
+              <ToolsListPage />
+            </ProtectedLayout>
+          </ErrorBoundary>
         }
       />
       <Route
         path="/tools/create"
         element={
-          <ProtectedLayout>
-            <ToolCreatePage />
-          </ProtectedLayout>
+          <ErrorBoundary>
+            <ProtectedLayout>
+              <ToolCreatePage />
+            </ProtectedLayout>
+          </ErrorBoundary>
         }
       />
       <Route
         path="/tools/edit/:id"
         element={
-          <ProtectedLayout>
-            <ToolEditPage />
-          </ProtectedLayout>
+          <ErrorBoundary>
+            <ProtectedLayout>
+              <ToolEditPage />
+            </ProtectedLayout>
+          </ErrorBoundary>
         }
       />
 
       <Route
         path="/success-cases"
         element={
-          <ProtectedLayout>
-            <SuccessCasesListPage />
-          </ProtectedLayout>
+          <ErrorBoundary>
+            <ProtectedLayout>
+              <SuccessCasesListPage />
+            </ProtectedLayout>
+          </ErrorBoundary>
         }
       />
       <Route
         path="/success-cases/create"
         element={
-          <ProtectedLayout>
-            <SuccessCaseCreatePage />
-          </ProtectedLayout>
+          <ErrorBoundary>
+            <ProtectedLayout>
+              <SuccessCaseCreatePage />
+            </ProtectedLayout>
+          </ErrorBoundary>
         }
       />
       <Route
         path="/success-cases/edit/:id"
         element={
-          <ProtectedLayout>
-            <SuccessCaseEditPage />
-          </ProtectedLayout>
+          <ErrorBoundary>
+            <ProtectedLayout>
+              <SuccessCaseEditPage />
+            </ProtectedLayout>
+          </ErrorBoundary>
         }
       />
 
       <Route
         path="/contact-messages"
         element={
-          <ProtectedLayout>
-            <ContactMessagesListPage />
-          </ProtectedLayout>
+          <ErrorBoundary>
+            <ProtectedLayout>
+              <ContactMessagesListPage />
+            </ProtectedLayout>
+          </ErrorBoundary>
         }
       />
       <Route
         path="/contact-messages/:id"
         element={
-          <ProtectedLayout>
-            <ContactMessageDetailPage />
-          </ProtectedLayout>
+          <ErrorBoundary>
+            <ProtectedLayout>
+              <ContactMessageDetailPage />
+            </ProtectedLayout>
+          </ErrorBoundary>
         }
       />
 
       <Route
         path="/settings"
         element={
-          <ProtectedLayout>
-            <SettingsLayout />
-          </ProtectedLayout>
+          <ErrorBoundary>
+            <ProtectedLayout>
+              <SettingsLayout />
+            </ProtectedLayout>
+          </ErrorBoundary>
         }
       >
         <Route index element={<Navigate to="/settings/profile" replace />} />
@@ -217,9 +256,11 @@ function AppRoutes() {
       <Route
         path="/pages"
         element={
-          <ProtectedLayout>
-            <PagesListPage />
-          </ProtectedLayout>
+          <ErrorBoundary>
+            <ProtectedLayout>
+              <PagesListPage />
+            </ProtectedLayout>
+          </ErrorBoundary>
         }
       />
 

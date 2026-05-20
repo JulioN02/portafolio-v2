@@ -20,3 +20,10 @@ export type { ModalProps } from './ui/Modal/index.js';
 // Auth Components
 export { ProtectedRoute } from './auth/ProtectedRoute.js';
 export type { ProtectedRouteProps } from './auth/ProtectedRoute.js';
+
+// Error Boundary
+export { ErrorBoundary } from './ui/ErrorBoundary/index.js';
+export type { ErrorBoundaryProps } from './ui/ErrorBoundary/index.js';
+export { ErrorFallback } from './ui/ErrorBoundary/index.js';
+export type { ErrorFallbackProps } from './ui/ErrorBoundary/index.js';
+export { withBoundary } from './ui/ErrorBoundary/index.js';

@@ -1,0 +1,75 @@
+# openspec/config.yaml
+schema: spec-driven
+
+context: |
+  Tech stack: pnpm monorepo — Express 4.21 + Prisma 6.3 + PostgreSQL (api), React 19 + Vite 6 + TanStack Query 5 + React Router 7 (frontends), Zod 3.24 + tsup (shared)
+  Architecture: API-First with shared Zod schemas — Express routes/controllers/services pattern, Prisma ORM, PostgreSQL 15, JWT auth, soft-delete pattern via deletedAt
+  Testing: Jest 30 + ts-jest (api only), 6 service-level test files, 70% coverage threshold
+  Style: TypeScript strict mode, no ESLint/Prettier config detected, tsc --noEmit for type checking per package
+
+strict_tdd: true
+
+testing:
+  runner:
+    framework: jest
+    command: pnpm --filter @jsoft/api test
+  layers:
+    unit:
+      available: true
+      tool: Jest 30.3.0 + ts-jest
+      scope: api (services only)
+    integration:
+      available: false
+      tool: none
+    e2e:
+      available: false
+      tool: none
+  coverage:
+    available: true
+    command: jest --coverage
+    threshold: 70% (branches, functions, lines, statements)
+  quality_tools:
+    linter:
+      available: false
+      command: none (eslint script exists but no config)
+    type_checker:
+      available: true
+      commands:
+        - pnpm -r run typecheck
+        - pnpm --filter @jsoft/shared exec tsc --noEmit
+        - pnpm --filter @jsoft/api exec tsc --noEmit
+        - pnpm --filter @jsoft/client-site exec tsc --noEmit
+        - pnpm --filter @jsoft/recruiter-site exec tsc --noEmit
+        - pnpm --filter @jsoft/admin-panel exec tsc --noEmit
+    formatter:
+      available: false
+      command: none
+
+rules:
+  proposal:
+    - Include rollback plan for risky changes
+    - Identify affected packages (api, client-site, recruiter-site, admin-panel, shared)
+    - Consider backward compatibility of shared Zod schemas
+  specs:
+    - Use Given/When/Then format for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+    - Reference Prisma model fields when specifying API contracts
+  design:
+    - Include data flow diagrams for complex operations
+    - Document API request/response shapes referencing Zod schemas
+    - Cover soft-delete and order/featured fields where relevant
+  tasks:
+    - Group tasks by package (shared schema → api → frontend)
+    - Use hierarchical numbering (1.1, 1.2, etc.)
+    - Keep tasks small enough to complete in one session
+  apply:
+    - Follow existing code patterns (services → controllers → routes in api; hooks + components in frontends)
+    - Load relevant coding skills for the project stack
+    - Build @jsoft/shared before api if schemas changed
+  verify:
+    - Run tests: pnpm --filter @jsoft/api test
+    - Run typecheck: pnpm -r run typecheck
+    - Compare implementation against every spec scenario
+  archive:
+    - Sync delta specs to main openspec/specs/
+    - Warn before merging destructive deltas (large removals)

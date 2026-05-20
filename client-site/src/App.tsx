@@ -8,22 +8,23 @@ import { ToolsPage } from './pages/Tools';
 import { SuccessCasesPage } from './pages/SuccessCases';
 import { ContactPage } from './pages/Contact';
 import { NotFoundPage } from './pages/NotFound';
+import { ErrorBoundary } from '@jsoft/shared';
 
 function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/servicios" element={<ServicesPage />} />
-        <Route path="/servicios/:slug" element={<ServiceDetailPage />} />
-        <Route path="/productos" element={<ProductsPage />} />
-        <Route path="/productos/:slug" element={<ProductsPage />} />
-        <Route path="/herramientas" element={<ToolsPage />} />
-        <Route path="/herramientas/:slug" element={<ToolsPage />} />
-        <Route path="/casos-de-exito" element={<SuccessCasesPage />} />
-        <Route path="/casos-de-exito/:slug" element={<SuccessCasesPage />} />
-        <Route path="/contacto" element={<ContactPage />} />
-        <Route path="/404" element={<NotFoundPage />} />
+        <Route path="/" element={<ErrorBoundary><HomePage /></ErrorBoundary>} />
+        <Route path="/servicios" element={<ErrorBoundary><ServicesPage /></ErrorBoundary>} />
+        <Route path="/servicios/:slug" element={<ErrorBoundary><ServiceDetailPage /></ErrorBoundary>} />
+        <Route path="/productos" element={<ErrorBoundary><ProductsPage /></ErrorBoundary>} />
+        <Route path="/productos/:slug" element={<ErrorBoundary><ProductsPage /></ErrorBoundary>} />
+        <Route path="/herramientas" element={<ErrorBoundary><ToolsPage /></ErrorBoundary>} />
+        <Route path="/herramientas/:slug" element={<ErrorBoundary><ToolsPage /></ErrorBoundary>} />
+        <Route path="/casos-de-exito" element={<ErrorBoundary><SuccessCasesPage /></ErrorBoundary>} />
+        <Route path="/casos-de-exito/:slug" element={<ErrorBoundary><SuccessCasesPage /></ErrorBoundary>} />
+        <Route path="/contacto" element={<ErrorBoundary><ContactPage /></ErrorBoundary>} />
+        <Route path="/404" element={<ErrorBoundary><NotFoundPage /></ErrorBoundary>} />
         <Route path="*" element={<Navigate to="/404" replace />} />
       </Route>
     </Routes>
