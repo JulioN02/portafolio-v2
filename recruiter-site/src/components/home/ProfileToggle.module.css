@@ -1,0 +1,102 @@
+.section {
+  padding: var(--spacing-2xl) var(--spacing-md);
+  background-color: var(--color-neutral-0);
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.sectionTitle {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-neutral-900);
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Toggle */
+.toggle {
+  position: relative;
+  display: flex;
+  background-color: var(--color-neutral-100);
+  border-radius: var(--radius-full);
+  padding: 4px;
+  width: fit-content;
+  margin: 0 auto var(--spacing-xl);
+  gap: 4px;
+}
+
+.toggleBtn {
+  position: relative;
+  z-index: 2;
+  padding: var(--spacing-sm) var(--spacing-xl);
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-neutral-600);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+  white-space: nowrap;
+}
+
+.toggleBtn.active {
+  color: var(--color-neutral-0);
+}
+
+.toggleBtn:focus-visible {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: 2px;
+}
+
+.toggleIndicator {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  height: calc(100% - 8px);
+  background-color: var(--color-primary-600);
+  border-radius: var(--radius-full);
+  z-index: 1;
+  transition: transform var(--transition-normal);
+}
+
+/* Content */
+.contentWrapper {
+  position: relative;
+  min-height: 200px;
+}
+
+.content {
+  transition: opacity var(--transition-normal), transform var(--transition-normal);
+}
+
+.content.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.content.hidden {
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.paragraph {
+  font-size: var(--font-size-base);
+  color: var(--color-neutral-700);
+  line-height: var(--line-height-relaxed);
+  margin-bottom: var(--spacing-md);
+}
+
+.paragraph:last-child {
+  margin-bottom: 0;
+}

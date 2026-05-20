@@ -1,4 +1,8 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { ProtectedLayout } from '../components/layout/ProtectedLayout';
+
+// Login (public)
+import { LoginPage } from '../pages/LoginPage';
 
 // Dashboard
 import { DashboardPage } from '../pages/Dashboard';
@@ -42,50 +46,185 @@ import { PagesList as PagesListPage } from '../pages/pages/PagesList';
 function AppRoutes() {
   return (
     <Routes>
-      {/* Root redirect */}
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="/dashboard" element={<DashboardPage />} />
+      {/* Public: Login */}
+      <Route path="/login" element={<LoginPage />} />
 
-      {/* Blog Posts */}
-      <Route path="/blog-posts" element={<BlogPostsListPage />} />
-      <Route path="/blog-posts/create" element={<BlogPostCreatePage />} />
-      <Route path="/blog-posts/edit/:id" element={<BlogPostEditPage />} />
+      {/* Protected: All admin routes wrapped in ProtectedLayout (auth + sidebar + header) */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedLayout>
+            <DashboardPage />
+          </ProtectedLayout>
+        }
+      />
 
-      {/* Services */}
-      <Route path="/services" element={<ServicesListPage />} />
-      <Route path="/services/create" element={<ServiceCreatePage />} />
-      <Route path="/services/edit/:id" element={<ServiceEditPage />} />
+      <Route
+        path="/blog-posts"
+        element={
+          <ProtectedLayout>
+            <BlogPostsListPage />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/blog-posts/create"
+        element={
+          <ProtectedLayout>
+            <BlogPostCreatePage />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/blog-posts/edit/:id"
+        element={
+          <ProtectedLayout>
+            <BlogPostEditPage />
+          </ProtectedLayout>
+        }
+      />
 
-      {/* Products */}
-      <Route path="/products" element={<ProductsListPage />} />
-      <Route path="/products/create" element={<ProductCreatePage />} />
-      <Route path="/products/edit/:id" element={<ProductEditPage />} />
+      <Route
+        path="/services"
+        element={
+          <ProtectedLayout>
+            <ServicesListPage />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/services/create"
+        element={
+          <ProtectedLayout>
+            <ServiceCreatePage />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/services/edit/:id"
+        element={
+          <ProtectedLayout>
+            <ServiceEditPage />
+          </ProtectedLayout>
+        }
+      />
 
-      {/* Tools */}
-      <Route path="/tools" element={<ToolsListPage />} />
-      <Route path="/tools/create" element={<ToolCreatePage />} />
-      <Route path="/tools/edit/:id" element={<ToolEditPage />} />
+      <Route
+        path="/products"
+        element={
+          <ProtectedLayout>
+            <ProductsListPage />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/products/create"
+        element={
+          <ProtectedLayout>
+            <ProductCreatePage />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/products/edit/:id"
+        element={
+          <ProtectedLayout>
+            <ProductEditPage />
+          </ProtectedLayout>
+        }
+      />
 
-      {/* Success Cases */}
-      <Route path="/success-cases" element={<SuccessCasesListPage />} />
-      <Route path="/success-cases/create" element={<SuccessCaseCreatePage />} />
-      <Route path="/success-cases/edit/:id" element={<SuccessCaseEditPage />} />
+      <Route
+        path="/tools"
+        element={
+          <ProtectedLayout>
+            <ToolsListPage />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/tools/create"
+        element={
+          <ProtectedLayout>
+            <ToolCreatePage />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/tools/edit/:id"
+        element={
+          <ProtectedLayout>
+            <ToolEditPage />
+          </ProtectedLayout>
+        }
+      />
 
-      {/* Contact Messages */}
-      <Route path="/contact-messages" element={<ContactMessagesListPage />} />
-      <Route path="/contact-messages/:id" element={<ContactMessageDetailPage />} />
+      <Route
+        path="/success-cases"
+        element={
+          <ProtectedLayout>
+            <SuccessCasesListPage />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/success-cases/create"
+        element={
+          <ProtectedLayout>
+            <SuccessCaseCreatePage />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/success-cases/edit/:id"
+        element={
+          <ProtectedLayout>
+            <SuccessCaseEditPage />
+          </ProtectedLayout>
+        }
+      />
 
-{/* Settings - uses SettingsLayout with nested routes */}
-      <Route path="/settings" element={<SettingsLayout />}>
+      <Route
+        path="/contact-messages"
+        element={
+          <ProtectedLayout>
+            <ContactMessagesListPage />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/contact-messages/:id"
+        element={
+          <ProtectedLayout>
+            <ContactMessageDetailPage />
+          </ProtectedLayout>
+        }
+      />
+
+      <Route
+        path="/settings"
+        element={
+          <ProtectedLayout>
+            <SettingsLayout />
+          </ProtectedLayout>
+        }
+      >
         <Route index element={<Navigate to="/settings/profile" replace />} />
         <Route path="profile" element={<SettingsPage />} />
         <Route path="preferences" element={<SettingsPage />} />
       </Route>
 
-      {/* Pages */}
-      <Route path="/pages" element={<PagesListPage />} />
+      <Route
+        path="/pages"
+        element={
+          <ProtectedLayout>
+            <PagesListPage />
+          </ProtectedLayout>
+        }
+      />
 
-      {/* Fallback for unknown routes */}
+      {/* Root and fallback */}
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );

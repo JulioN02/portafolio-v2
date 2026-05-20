@@ -1,0 +1,128 @@
+.section {
+  padding: var(--spacing-2xl) var(--spacing-md);
+  background-color: var(--color-neutral-50);
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Embla carousel */
+.embla {
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+}
+
+.emblaContainer {
+  display: flex;
+}
+
+.emblaSlide {
+  flex: 0 0 100%;
+  min-width: 0;
+  padding: 0 var(--spacing-sm);
+}
+
+@media (min-width: 768px) {
+  .emblaSlide {
+    flex: 0 0 calc(100% / 2);
+  }
+}
+
+@media (min-width: 1024px) {
+  .emblaSlide {
+    flex: 0 0 calc(100% / 3);
+  }
+}
+
+.slideHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.slideIcon {
+  font-size: var(--font-size-2xl);
+}
+
+.slideTitle {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-neutral-800);
+}
+
+/* Tech list */
+.techList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.techCard {
+  background-color: var(--color-neutral-0);
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.techCard:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.techInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-xs);
+}
+
+.techName {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-neutral-800);
+}
+
+.techLevel {
+  font-size: var(--font-size-xs);
+  color: var(--color-neutral-500);
+}
+
+.levelBar {
+  height: 4px;
+  background-color: var(--color-neutral-200);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.levelFill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.6s ease-out;
+}
+
+/* Dots */
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-lg);
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--color-primary-300);
+  background-color: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: background-color var(--transition-fast);
+}
+
+.dot:hover {
+  background-color: var(--color-primary-200);
+}

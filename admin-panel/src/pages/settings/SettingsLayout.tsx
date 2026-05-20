@@ -1,7 +1,7 @@
 import { Outlet, NavLink } from 'react-router-dom';
 
 const sidebarLinks = [
-  { to: '/settings', label: 'Profile', end: true },
+  { to: '/settings/profile', label: 'Profile', end: true },
   { to: '/settings/preferences', label: 'Preferences' },
   { to: '/settings/security', label: 'Security' },
 ];

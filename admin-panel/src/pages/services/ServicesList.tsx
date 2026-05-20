@@ -8,7 +8,7 @@ export function ServicesListPage() {
   const [classificationFilter, setClassificationFilter] = useState('');
   const { useGetAll, useDelete, useToggleFeatured } = useServices();
   const { data, isLoading, error } = useGetAll(
-    classificationFilter ? { classification: classificationFilter } : undefined
+    classificationFilter ? { classification: classificationFilter, page: 1, limit: 10 } : undefined
   );
   const deleteMutation = useDelete();
   const toggleFeaturedMutation = useToggleFeatured();

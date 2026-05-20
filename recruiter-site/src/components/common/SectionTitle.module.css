@@ -1,0 +1,47 @@
+.wrapper {
+  margin-bottom: var(--spacing-xl);
+}
+
+.wrapperCenter {
+  text-align: center;
+}
+
+.wrapperLeft {
+  text-align: left;
+}
+
+.title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-neutral-900);
+  margin-bottom: 0;
+}
+
+.accent {
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--color-primary-500),
+    var(--color-primary-300)
+  );
+  border-radius: var(--radius-full);
+  margin-top: var(--spacing-xs);
+}
+
+.accentCenter {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.accentLeft {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.subtitle {
+  font-size: var(--font-size-base);
+  color: var(--color-neutral-500);
+  margin-top: var(--spacing-xs);
+  line-height: var(--line-height-relaxed);
+}

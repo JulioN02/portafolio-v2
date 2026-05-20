@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { BlogPostResponse, PostStatus } from '@jsoft/shared';
+import { BlogPostResponse } from '@jsoft/shared';
 
 interface BlogPostListProps {
   posts: BlogPostResponse[];
@@ -9,7 +8,6 @@ interface BlogPostListProps {
 }
 
 export function BlogPostList({ posts, onEdit, onDelete, onStatusChange }: BlogPostListProps) {
-  const [changingStatus, setChangingStatus] = useState<string | null>(null);
 
   const formatDate = (date: Date | string) => {
     const d = typeof date === 'string' ? new Date(date) : date;
@@ -22,7 +20,6 @@ export function BlogPostList({ posts, onEdit, onDelete, onStatusChange }: BlogPo
 
   const handleStatusChange = (postId: string, newStatus: string) => {
     onStatusChange?.(postId, newStatus);
-    setChangingStatus(null);
   };
 
   const statusColors: Record<string, { bg: string; color: string }> = {

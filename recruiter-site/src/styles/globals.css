@@ -1,0 +1,11 @@
+/* Global reset + CSS Variables from @jsoft/shared */
+
+@import '@jsoft/shared/styles/variables.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
