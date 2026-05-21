@@ -40,9 +40,9 @@ export function SuccessCaseCarousel() {
                     : successCase.description}
                 </p>
                 <div className={styles.links}>
-                  {successCase.links?.map((link, i) => (
+                  {successCase.links?.map((link) => (
                     <a 
-                      key={i} 
+                      key={link} 
                       href={link} 
                       target="_blank" 
                       rel="noopener noreferrer"

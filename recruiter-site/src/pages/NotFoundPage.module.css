@@ -56,9 +56,11 @@
   transition: all var(--transition-fast);
 }
 
-.homeButton:hover {
-  background-color: var(--color-primary-700);
-  color: var(--color-neutral-0);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+@media (hover: hover) {
+  .homeButton:hover {
+    background-color: var(--color-primary-700);
+    color: var(--color-neutral-0);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
 }

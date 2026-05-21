@@ -103,8 +103,10 @@
   color: var(--color-primary-700);
 }
 
-.primaryButton:hover {
-  background-color: var(--color-primary-50);
+@media (hover: hover) {
+  .primaryButton:hover {
+    background-color: var(--color-primary-50);
+  }
 }
 
 .secondaryButton {
@@ -113,7 +115,9 @@
   border: 2px solid var(--color-neutral-0);
 }
 
-.secondaryButton:hover {
-  background-color: var(--color-neutral-0);
-  color: var(--color-primary-700);
+@media (hover: hover) {
+  .secondaryButton:hover {
+    background-color: var(--color-neutral-0);
+    color: var(--color-primary-700);
+  }
 }

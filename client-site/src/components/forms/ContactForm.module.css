@@ -111,6 +111,8 @@
   text-decoration: underline;
 }
 
-.resetButton:hover {
-  color: var(--color-primary-700);
+@media (hover: hover) {
+  .resetButton:hover {
+    color: var(--color-primary-700);
+  }
 }

@@ -33,8 +33,10 @@
   color: var(--color-primary-600);
 }
 
-.breadcrumb a:hover {
-  text-decoration: underline;
+@media (hover: hover) {
+  .breadcrumb a:hover {
+    text-decoration: underline;
+  }
 }
 
 /* Grid */
@@ -87,8 +89,10 @@
   transition: background-color var(--transition-fast);
 }
 
-.carouselButton:hover {
-  background-color: var(--color-neutral-0);
+@media (hover: hover) {
+  .carouselButton:hover {
+    background-color: var(--color-neutral-0);
+  }
 }
 
 .carouselButton.prev {
@@ -198,8 +202,10 @@
   margin-top: var(--spacing-md);
 }
 
-.ctaButton:hover {
-  background-color: var(--color-primary-700);
+@media (hover: hover) {
+  .ctaButton:hover {
+    background-color: var(--color-primary-700);
+  }
 }
 
 /* Full Description */

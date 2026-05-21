@@ -128,10 +128,12 @@
   transition: all var(--transition-fast);
 }
 
-.retryButton:hover {
-  background-color: #fff5f5;
-  color: #c53030;
-  border-color: #c53030;
+@media (hover: hover) {
+  .retryButton:hover {
+    background-color: #fff5f5;
+    color: #c53030;
+    border-color: #c53030;
+  }
 }
 
 .retryButton:disabled {
@@ -158,10 +160,12 @@
   min-width: 180px;
 }
 
-.submitButton:hover:not(:disabled) {
-  background-color: var(--color-primary-700);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+@media (hover: hover) {
+  .submitButton:hover:not(:disabled) {
+    background-color: var(--color-primary-700);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
 }
 
 .submitButton:active:not(:disabled) {

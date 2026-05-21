@@ -100,8 +100,10 @@
   text-underline-offset: 2px;
 }
 
-.body a:hover {
-  color: var(--color-primary-700);
+@media (hover: hover) {
+  .body a:hover {
+    color: var(--color-primary-700);
+  }
 }
 
 .body img {
@@ -249,9 +251,11 @@
   transition: background-color var(--transition-fast), transform var(--transition-fast);
 }
 
-.externalLink:hover {
-  background-color: var(--color-primary-700);
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .externalLink:hover {
+    background-color: var(--color-primary-700);
+    transform: translateY(-2px);
+  }
 }
 
 .externalLinkIcon {

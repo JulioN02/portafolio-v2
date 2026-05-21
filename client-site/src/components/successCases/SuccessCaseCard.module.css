@@ -6,9 +6,11 @@
   transition: all var(--transition-fast);
 }
 
-.card:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
 }
 
 .link {
@@ -30,8 +32,10 @@
   transition: transform var(--transition-normal);
 }
 
-.card:hover .image {
-  transform: scale(1.05);
+@media (hover: hover) {
+  .card:hover .image {
+    transform: scale(1.05);
+  }
 }
 
 .content {

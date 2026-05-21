@@ -169,7 +169,7 @@ export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCas
         {images.length > 0 && (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
             {images.map((img, index) => (
-              <div key={index} style={{ position: 'relative' }}>
+              <div key={img} style={{ position: 'relative' }}>
                 <img
                   src={img}
                   alt={`Image ${index + 1}`}

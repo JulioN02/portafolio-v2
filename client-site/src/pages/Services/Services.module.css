@@ -126,9 +126,11 @@
   transition: all var(--transition-fast);
 }
 
-.pageButton:hover:not(:disabled) {
-  border-color: var(--color-primary-500);
-  color: var(--color-primary-600);
+@media (hover: hover) {
+  .pageButton:hover:not(:disabled) {
+    border-color: var(--color-primary-500);
+    color: var(--color-primary-600);
+  }
 }
 
 .pageButton:disabled {

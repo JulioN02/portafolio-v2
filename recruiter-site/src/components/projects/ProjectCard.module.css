@@ -11,10 +11,12 @@
   height: 100%;
 }
 
-.card:hover,
-.card:focus-visible {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  transform: translateY(-4px);
+@media (hover: hover) {
+  .card:hover,
+  .card:focus-visible {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
+  }
 }
 
 .card:focus-visible {
@@ -38,8 +40,10 @@
   transition: transform var(--transition-normal);
 }
 
-.card:hover .image {
-  transform: scale(1.05);
+@media (hover: hover) {
+  .card:hover .image {
+    transform: scale(1.05);
+  }
 }
 
 .imagePlaceholder {

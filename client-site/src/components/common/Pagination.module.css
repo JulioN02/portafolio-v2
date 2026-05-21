@@ -24,9 +24,11 @@
   cursor: pointer;
 }
 
-.arrowButton:hover:not(:disabled) {
-  border-color: var(--color-primary-500);
-  color: var(--color-primary-600);
+@media (hover: hover) {
+  .arrowButton:hover:not(:disabled) {
+    border-color: var(--color-primary-500);
+    color: var(--color-primary-600);
+  }
 }
 
 .arrowButton:disabled {
@@ -49,9 +51,11 @@
   cursor: pointer;
 }
 
-.pageButton:hover:not(.active) {
-  border-color: var(--color-primary-500);
-  color: var(--color-primary-600);
+@media (hover: hover) {
+  .pageButton:hover:not(.active) {
+    border-color: var(--color-primary-500);
+    color: var(--color-primary-600);
+  }
 }
 
 .pageButton.active {

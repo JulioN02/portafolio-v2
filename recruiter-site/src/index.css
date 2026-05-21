@@ -16,6 +16,7 @@ body {
   background-color: var(--color-neutral-0);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
 img {
@@ -30,8 +31,10 @@ a {
   transition: color var(--transition-fast);
 }
 
-a:hover {
-  color: var(--color-primary-700);
+@media (hover: hover) {
+  a:hover {
+    color: var(--color-primary-700);
+  }
 }
 
 ul,
@@ -56,6 +59,18 @@ button {
   .container {
     padding: 0 var(--spacing-lg);
   }
+}
+
+/* Minimum touch target size for interactive elements */
+button, a, input, select, textarea {
+  min-height: 44px;
+}
+
+/* For icon-only buttons, ensure padding reaches 44x44 */
+button:has(svg):only-child {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px;
 }
 
 /* Page transitions */

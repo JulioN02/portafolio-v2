@@ -54,7 +54,9 @@
   transition: all var(--transition-fast);
 }
 
-.button:hover {
-  background-color: var(--color-primary-50);
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .button:hover {
+    background-color: var(--color-primary-50);
+    transform: translateY(-2px);
+  }
 }

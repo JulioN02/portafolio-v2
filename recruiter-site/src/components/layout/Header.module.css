@@ -23,8 +23,10 @@
   text-decoration: none;
 }
 
-.logo:hover {
-  color: var(--color-primary-800);
+@media (hover: hover) {
+  .logo:hover {
+    color: var(--color-primary-800);
+  }
 }
 
 /* Desktop Navigation */
@@ -49,9 +51,11 @@
   text-decoration: none;
 }
 
-.navLink:hover {
-  color: var(--color-primary-600);
-  background-color: var(--color-primary-50);
+@media (hover: hover) {
+  .navLink:hover {
+    color: var(--color-primary-600);
+    background-color: var(--color-primary-50);
+  }
 }
 
 .navLink.active {
@@ -137,7 +141,14 @@
   transition: background-color var(--transition-fast);
 }
 
-.navLinkMobile:hover,
+@media (hover: hover) {
+  .navLinkMobile:hover,
+  .navLinkMobile.active {
+    background-color: var(--color-primary-50);
+    color: var(--color-primary-700);
+  }
+}
+
 .navLinkMobile.active {
   background-color: var(--color-primary-50);
   color: var(--color-primary-700);

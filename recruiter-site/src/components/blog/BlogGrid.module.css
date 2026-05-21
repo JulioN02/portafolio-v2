@@ -153,10 +153,12 @@
   transition: all var(--transition-fast);
 }
 
-.retryButton:hover {
-  background-color: var(--color-primary-50);
-  color: var(--color-primary-700);
-  transform: translateY(-1px);
+@media (hover: hover) {
+  .retryButton:hover {
+    background-color: var(--color-primary-50);
+    color: var(--color-primary-700);
+    transform: translateY(-1px);
+  }
 }
 
 /* ── Pagination ── */
@@ -182,10 +184,12 @@
   transition: all var(--transition-fast);
 }
 
-.pageButton:hover:not(:disabled) {
-  color: var(--color-primary-600);
-  border-color: var(--color-primary-300);
-  background-color: var(--color-primary-50);
+@media (hover: hover) {
+  .pageButton:hover:not(:disabled) {
+    color: var(--color-primary-600);
+    border-color: var(--color-primary-300);
+    background-color: var(--color-primary-50);
+  }
 }
 
 .pageButton:disabled {
@@ -215,9 +219,11 @@
   transition: all var(--transition-fast);
 }
 
-.pageNumber:hover {
-  color: var(--color-primary-600);
-  background-color: var(--color-primary-50);
+@media (hover: hover) {
+  .pageNumber:hover {
+    color: var(--color-primary-600);
+    background-color: var(--color-primary-50);
+  }
 }
 
 .pageNumberActive {
@@ -226,9 +232,11 @@
   border-color: var(--color-primary-600);
 }
 
-.pageNumberActive:hover {
-  color: var(--color-neutral-0);
-  background-color: var(--color-primary-700);
+@media (hover: hover) {
+  .pageNumberActive:hover {
+    color: var(--color-neutral-0);
+    background-color: var(--color-primary-700);
+  }
 }
 
 .pageEllipsis {

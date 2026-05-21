@@ -46,9 +46,11 @@
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+@media (hover: hover) {
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
 }
 
 .imageWrapper {
@@ -107,8 +109,10 @@
   font-weight: 500;
 }
 
-.link:hover {
-  text-decoration: underline;
+@media (hover: hover) {
+  .link:hover {
+    text-decoration: underline;
+  }
 }
 
 .cta {
@@ -123,8 +127,10 @@
   font-weight: 500;
 }
 
-.viewAll:hover {
-  text-decoration: underline;
+@media (hover: hover) {
+  .viewAll:hover {
+    text-decoration: underline;
+  }
 }
 
 .error {

@@ -20,6 +20,7 @@ body {
   line-height: 1.5;
   color: var(--color-text, #1a1a1a);
   background-color: var(--color-bg, #ffffff);
+  overflow-x: hidden;
 }
 
 #root {
@@ -41,6 +42,18 @@ textarea,
 select {
   font-family: inherit;
   font-size: inherit;
+}
+
+/* Minimum touch target size for interactive elements */
+button, a, input, select, textarea {
+  min-height: 44px;
+}
+
+/* For icon-only buttons, ensure padding reaches 44x44 */
+button:has(svg):only-child {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px;
 }
 
 /* TipTap / ProseMirror Editor Styles */

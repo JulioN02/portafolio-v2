@@ -84,7 +84,7 @@ export function ServiceDetailPage() {
                   <div className={styles.carouselDots}>
                     {images.map((_, index) => (
                       <button
-                        key={index}
+                        key={`dot-${index}`}
                         onClick={() => setCurrentImageIndex(index)}
                         className={`${styles.dot} ${
                           index === currentImageIndex ? styles.active : ''
@@ -109,8 +109,8 @@ export function ServiceDetailPage() {
               <div className={styles.included}>
                 <h3 className={styles.includedTitle}>Incluye:</h3>
                 <ul className={styles.includedList}>
-                  {service.includedItems.map((item, index) => (
-                    <li key={index} className={styles.includedItem}>
+                  {service.includedItems.map((item) => (
+                    <li key={item} className={styles.includedItem}>
                       ✓ {item}
                     </li>
                   ))}

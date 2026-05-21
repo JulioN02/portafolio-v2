@@ -88,11 +88,13 @@
   color: var(--color-neutral-0);
 }
 
-.ctaPrimary:hover {
-  background-color: var(--color-primary-700);
-  color: var(--color-neutral-0);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+@media (hover: hover) {
+  .ctaPrimary:hover {
+    background-color: var(--color-primary-700);
+    color: var(--color-neutral-0);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
 }
 
 .ctaSecondary {
@@ -101,8 +103,10 @@
   border: 2px solid var(--color-primary-600);
 }
 
-.ctaSecondary:hover {
-  background-color: var(--color-primary-50);
-  color: var(--color-primary-700);
-  transform: translateY(-1px);
+@media (hover: hover) {
+  .ctaSecondary:hover {
+    background-color: var(--color-primary-50);
+    color: var(--color-primary-700);
+    transform: translateY(-1px);
+  }
 }

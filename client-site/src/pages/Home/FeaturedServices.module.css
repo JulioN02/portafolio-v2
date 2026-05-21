@@ -97,6 +97,8 @@
   transition: color var(--transition-fast);
 }
 
-.link:hover {
-  color: var(--color-primary-700);
+@media (hover: hover) {
+  .link:hover {
+    color: var(--color-primary-700);
+  }
 }

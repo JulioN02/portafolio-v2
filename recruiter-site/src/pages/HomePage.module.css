@@ -45,8 +45,10 @@
   transition: all var(--transition-fast);
 }
 
-.ctaButton:hover {
-  background-color: var(--color-primary-50);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+@media (hover: hover) {
+  .ctaButton:hover {
+    background-color: var(--color-primary-50);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
 }

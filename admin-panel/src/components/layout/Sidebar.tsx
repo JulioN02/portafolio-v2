@@ -28,7 +28,7 @@ export function Sidebar() {
         <span style={{ color: '#fff', fontWeight: 'bold' }}>
           {isCollapsed ? 'JS' : 'Admin Panel'}
         </span>
-        <button onClick={() => setIsCollapsed(!isCollapsed)} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer' }}>
+        <button onClick={() => setIsCollapsed(!isCollapsed)} aria-label={isCollapsed ? 'Expandir menú' : 'Colapsar menú'} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', minWidth: '44px', minHeight: '44px' }}>
           {isCollapsed ? '→' : '←'}
         </button>
       </div>

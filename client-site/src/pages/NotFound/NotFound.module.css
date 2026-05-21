@@ -51,7 +51,9 @@
   margin-top: var(--spacing-md);
 }
 
-.button:hover {
-  background-color: var(--color-primary-700);
-  color: var(--color-neutral-0);
+@media (hover: hover) {
+  .button:hover {
+    background-color: var(--color-primary-700);
+    color: var(--color-neutral-0);
+  }
 }

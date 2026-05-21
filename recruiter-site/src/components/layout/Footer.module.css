@@ -29,8 +29,10 @@
   transition: color var(--transition-fast);
 }
 
-.social a:hover {
-  color: var(--color-neutral-0);
+@media (hover: hover) {
+  .social a:hover {
+    color: var(--color-neutral-0);
+  }
 }
 
 .socialIcon {

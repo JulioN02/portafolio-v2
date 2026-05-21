@@ -68,9 +68,11 @@
   transition: box-shadow var(--transition-fast), transform var(--transition-fast);
 }
 
-.techCard:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transform: translateY(-1px);
+@media (hover: hover) {
+  .techCard:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+  }
 }
 
 .techInfo {
@@ -123,6 +125,8 @@
   transition: background-color var(--transition-fast);
 }
 
-.dot:hover {
-  background-color: var(--color-primary-200);
+@media (hover: hover) {
+  .dot:hover {
+    background-color: var(--color-primary-200);
+  }
 }

@@ -25,8 +25,10 @@
   transition: color var(--transition-fast);
 }
 
-.backLink a:hover {
-  color: var(--color-primary-700);
+@media (hover: hover) {
+  .backLink a:hover {
+    color: var(--color-primary-700);
+  }
 }
 
 /* ── Loading Skeleton ── */
@@ -103,8 +105,10 @@
   transition: all var(--transition-fast);
 }
 
-.backButton:hover {
-  background-color: var(--color-primary-50);
-  color: var(--color-primary-700);
-  transform: translateY(-1px);
+@media (hover: hover) {
+  .backButton:hover {
+    background-color: var(--color-primary-50);
+    color: var(--color-primary-700);
+    transform: translateY(-1px);
+  }
 }
