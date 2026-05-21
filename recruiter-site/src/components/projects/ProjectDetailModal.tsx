@@ -104,6 +104,7 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
               src={project.images[0]}
               alt={project.title}
               className={styles.mainImage}
+              loading="lazy"
             />
           </div>
         )}

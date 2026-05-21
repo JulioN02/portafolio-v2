@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { MetaTags } from '../components/seo/MetaTags';
 import { RecruiterContactForm } from '../components/contact/RecruiterContactForm';
 
 const socialLinks = [
@@ -32,6 +33,10 @@ export function ContactPage() {
         padding: 'var(--spacing-2xl) var(--spacing-md)',
       }}
     >
+      <MetaTags
+        title="Contacto | Julián Naranjo"
+        description="¿Listo para trabajar juntos? Contáctame para nuevas oportunidades laborales o proyectos."
+      />
       <div
         style={{
           maxWidth: '720px',

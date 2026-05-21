@@ -55,6 +55,7 @@ export function BlogPostList({ posts, onEdit, onDelete, onStatusChange }: BlogPo
               <img
                 src={post.coverImage}
                 alt={post.title}
+                loading="lazy"
                 style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '4px' }}
               />
             )}

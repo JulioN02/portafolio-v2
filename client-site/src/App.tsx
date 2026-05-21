@@ -1,14 +1,17 @@
+import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from './components/layout/Layout';
 import { HomePage } from './pages/Home';
 import { ServicesPage } from './pages/Services';
-import { ServiceDetailPage } from './pages/Services/ServiceDetail';
 import { ProductsPage } from './pages/Products';
 import { ToolsPage } from './pages/Tools';
 import { SuccessCasesPage } from './pages/SuccessCases';
 import { ContactPage } from './pages/Contact';
 import { NotFoundPage } from './pages/NotFound';
 import { ErrorBoundary } from '@jsoft/shared';
+import { Loading } from './components/common/Loading';
+
+const ServiceDetailPage = lazy(() => import('./pages/Services/ServiceDetail').then(m => ({ default: m.ServiceDetailPage })));
 
 function App() {
   return (
@@ -16,7 +19,7 @@ function App() {
       <Route element={<Layout />}>
         <Route path="/" element={<ErrorBoundary><HomePage /></ErrorBoundary>} />
         <Route path="/servicios" element={<ErrorBoundary><ServicesPage /></ErrorBoundary>} />
-        <Route path="/servicios/:slug" element={<ErrorBoundary><ServiceDetailPage /></ErrorBoundary>} />
+        <Route path="/servicios/:slug" element={<ErrorBoundary><Suspense fallback={<Loading />}><ServiceDetailPage /></Suspense></ErrorBoundary>} />
         <Route path="/productos" element={<ErrorBoundary><ProductsPage /></ErrorBoundary>} />
         <Route path="/productos/:slug" element={<ErrorBoundary><ProductsPage /></ErrorBoundary>} />
         <Route path="/herramientas" element={<ErrorBoundary><ToolsPage /></ErrorBoundary>} />

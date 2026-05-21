@@ -3,6 +3,7 @@ import { useSuccessCases } from '../../hooks/useSuccessCases';
 import { SuccessCaseCard } from '../../components/successCases/SuccessCaseCard';
 import { Pagination } from '../../components/common/Pagination';
 import { Loading } from '../../components/common/Loading';
+import { MetaTags } from '../../components/seo/MetaTags';
 import styles from './SuccessCases.module.css';
 
 export function SuccessCasesPage() {
@@ -24,6 +25,10 @@ export function SuccessCasesPage() {
 
   return (
     <div className={styles.page}>
+      <MetaTags
+        title="Casos de Éxito | J Soft Solutions"
+        description="Conoce cómo hemos ayudado a nuestros clientes a alcanzar sus objetivos con soluciones digitales."
+      />
       <div className={styles.container}>
         <header className={styles.header}>
           <h1 className={styles.title}>Casos de Éxito</h1>

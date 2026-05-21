@@ -3,6 +3,7 @@ import { useProducts, useClassifications } from '../../hooks/useProducts';
 import { ProductCard } from '../../components/products/ProductCard';
 import { Pagination } from '../../components/common/Pagination';
 import { Loading } from '../../components/common/Loading';
+import { MetaTags } from '../../components/seo/MetaTags';
 import styles from './Products.module.css';
 
 export function ProductsPage() {
@@ -26,6 +27,10 @@ export function ProductsPage() {
 
   return (
     <div className={styles.page}>
+      <MetaTags
+        title="Productos | J Soft Solutions"
+        description="Conoce nuestras soluciones tecnológicas listas para implementar en tu negocio."
+      />
       <div className={styles.container}>
         <header className={styles.header}>
           <h1 className={styles.title}>Nuestros Productos</h1>

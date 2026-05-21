@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { MetaTags } from '../components/seo/MetaTags';
 import { Hero } from '../components/home/Hero';
 import { ProfileToggle } from '../components/home/ProfileToggle';
 import { TechStack } from '../components/home/TechStack';
@@ -8,6 +9,10 @@ import styles from './HomePage.module.css';
 export function HomePage() {
   return (
     <div className={styles.page}>
+      <MetaTags
+        title="Julián Naranjo | Desarrollador Full Stack"
+        description="Desarrollador Full Stack especializado en React, Node.js y TypeScript. Conoce mi portafolio y experiencia."
+      />
       {/* Hero Section */}
       <Hero />
 

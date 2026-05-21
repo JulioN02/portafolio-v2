@@ -1,9 +1,14 @@
+import { MetaTags } from '../../components/seo/MetaTags';
 import { ContactForm } from '../../components/forms/ContactForm';
 import styles from './Contact.module.css';
 
 export function ContactPage() {
   return (
     <div className={styles.page}>
+      <MetaTags
+        title="Contacto | J Soft Solutions"
+        description="Contáctanos para discutir tu proyecto. Estamos en Bogotá, Colombia."
+      />
       <div className={styles.container}>
         <div className={styles.grid}>
           {/* Info */}

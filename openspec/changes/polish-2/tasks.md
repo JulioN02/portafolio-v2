@@ -76,115 +76,119 @@ Implementation checklist following the design's 3-phase implementation order. Ea
 
 ### 2a. SEO
 
-- [ ] **Wrap client-site main.tsx with `<HelmetProvider>`** — `client-site/src/main.tsx`
-  - Import `HelmetProvider` from `react-helmet-async`
-  - Wrap app tree inside `<BrowserRouter>` but before `<ErrorBoundary>`
+- [x] **Wrap client-site main.tsx with `<HelmetProvider>`** — `client-site/src/main.tsx`
+  - Already done in Phase 1
 
-- [ ] **Wrap recruiter-site main.tsx with `<HelmetProvider>`** — `recruiter-site/src/main.tsx`
-  - Import `HelmetProvider` from `react-helmet-async`
-  - Wrap app tree inside `<BrowserRouter>` but before `<ErrorBoundary>`
+- [x] **Wrap recruiter-site main.tsx with `<HelmetProvider>`** — `recruiter-site/src/main.tsx`
+  - Already done in Phase 1
 
-- [ ] **Create `<MetaTags>` component for client-site** — `client-site/src/components/seo/MetaTags.tsx`
+- [x] **Create `<MetaTags>` component for client-site** — `client-site/src/components/seo/MetaTags.tsx`
   - Props: `title`, `description?`, `ogType?`, `canonicalUrl?`, `publishedTime?`, `noindex?`
   - Uses `<Helmet>` from `react-helmet-async`
   - Sets `<title>`, `<meta name="description">`, OG tags, Twitter card tags, canonical URL
   - Default `noindex=false`
 
-- [ ] **Create `<MetaTags>` component for recruiter-site** — `recruiter-site/src/components/seo/MetaTags.tsx`
+- [x] **Create `<MetaTags>` component for recruiter-site** — `recruiter-site/src/components/seo/MetaTags.tsx`
   - Same interface as client-site version
 
-- [ ] **Add `<MetaTags>` to client-site HomePage** — `client-site/src/pages/Home/index.tsx`
+- [x] **Add `<MetaTags>` to client-site HomePage** — `client-site/src/pages/Home/index.tsx`
   - `title="J Soft Solutions | Desarrollo web profesional"`
   - `description="Desarrollo web personalizado en Bogotá. Creamos sitios web, aplicaciones y soluciones digitales para tu negocio."`
 
-- [ ] **Add `<MetaTags>` to client-site ServicesPage** — `client-site/src/pages/Services/index.tsx`
+- [x] **Add `<MetaTags>` to client-site ServicesPage** — `client-site/src/pages/Services/index.tsx`
   - `title="Servicios | J Soft Solutions"`
   - `description="Ofrecemos desarrollo web, diseño UI/UX y consultoría tecnológica personalizada."`
 
-- [ ] **Add `<MetaTags>` to client-site ServiceDetailPage (dynamic)** — `client-site/src/pages/Services/ServiceDetail.tsx`
+- [x] **Add `<MetaTags>` to client-site ServiceDetailPage (dynamic)** — `client-site/src/pages/Services/ServiceDetail.tsx`
   - `title={service.title + " | J Soft Solutions"}`
   - `description={service.shortDescription}`
 
-- [ ] **Add `<MetaTags>` to client-site ProductsPage** — `client-site/src/pages/Products/index.tsx`
+- [x] **Add `<MetaTags>` to client-site ProductsPage** — `client-site/src/pages/Products/index.tsx`
   - `title="Productos | J Soft Solutions"`
   - `description="Conoce nuestras soluciones tecnológicas listas para implementar en tu negocio."`
 
-- [ ] **Add `<MetaTags>` to client-site ToolsPage** — `client-site/src/pages/Tools/index.tsx`
+- [x] **Add `<MetaTags>` to client-site ToolsPage** — `client-site/src/pages/Tools/index.tsx`
   - `title="Herramientas | J Soft Solutions"`
   - `description="Herramientas y tecnologías que utilizamos para desarrollar soluciones innovadoras."`
 
-- [ ] **Add `<MetaTags>` to client-site SuccessCasesPage** — `client-site/src/pages/SuccessCases/index.tsx`
+- [x] **Add `<MetaTags>` to client-site SuccessCasesPage** — `client-site/src/pages/SuccessCases/index.tsx`
   - `title="Casos de Éxito | J Soft Solutions"`
   - `description="Conoce cómo hemos ayudado a nuestros clientes a alcanzar sus objetivos con soluciones digitales."`
 
-- [ ] **Add `<MetaTags>` to client-site ContactPage** — `client-site/src/pages/Contact/index.tsx`
+- [x] **Add `<MetaTags>` to client-site ContactPage** — `client-site/src/pages/Contact/index.tsx`
   - `title="Contacto | J Soft Solutions"`
   - `description="Contáctanos para discutir tu proyecto. Estamos en Bogotá, Colombia."`
 
-- [ ] **Add `<MetaTags>` to client-site NotFoundPage** — `client-site/src/pages/NotFound/index.tsx`
+- [x] **Add `<MetaTags>` to client-site NotFoundPage** — `client-site/src/pages/NotFound/index.tsx`
   - `title="404 - Página no encontrada | J Soft Solutions"`
   - `noindex`
 
-- [ ] **Add `<MetaTags>` to recruiter-site HomePage** — `recruiter-site/src/pages/HomePage.tsx`
+- [x] **Add `<MetaTags>` to recruiter-site HomePage** — `recruiter-site/src/pages/HomePage.tsx`
   - `title="Julián Naranjo | Desarrollador Full Stack"`
   - `description="Desarrollador Full Stack especializado en React, Node.js y TypeScript. Conoce mi portafolio y experiencia."`
 
-- [ ] **Add `<MetaTags>` to recruiter-site ProjectsPage** — `recruiter-site/src/pages/ProjectsPage.tsx`
+- [x] **Add `<MetaTags>` to recruiter-site ProjectsPage** — `recruiter-site/src/pages/ProjectsPage.tsx`
   - `title="Proyectos | Julián Naranjo"`
   - `description="Explora los proyectos en los que he trabajado como desarrollador Full Stack."`
 
-- [ ] **Add `<MetaTags>` to recruiter-site BlogPage** — `recruiter-site/src/pages/BlogPage.tsx`
+- [x] **Add `<MetaTags>` to recruiter-site BlogPage** — `recruiter-site/src/pages/BlogPage.tsx`
   - `title="Blog | Julián Naranjo"`
   - `description="Artículos sobre desarrollo web, tecnología y experiencia como desarrollador."`
 
-- [ ] **Add `<MetaTags>` to recruiter-site BlogPostPage (dynamic)** — `recruiter-site/src/pages/BlogPostPage.tsx`
+- [x] **Add `<MetaTags>` to recruiter-site BlogPostPage (dynamic)** — `recruiter-site/src/pages/BlogPostPage.tsx`
   - `title={post.title + " | Julián Naranjo"}`
   - `description={post.shortDescription}`
   - `ogType="article"`
-  - `publishedTime={post.publishedAt}`
+  - `publishedTime={post.publishedAt?.toISOString()}`
 
-- [ ] **Add `<MetaTags>` to recruiter-site ContactPage** — `recruiter-site/src/pages/ContactPage.tsx`
+- [x] **Add `<MetaTags>` to recruiter-site ContactPage** — `recruiter-site/src/pages/ContactPage.tsx`
   - `title="Contacto | Julián Naranjo"`
   - `description="¿Listo para trabajar juntos? Contáctame para nuevas oportunidades laborales o proyectos."`
 
-- [ ] **Add `<MetaTags>` to recruiter-site NotFoundPage** — `recruiter-site/src/pages/NotFoundPage.tsx`
+- [x] **Add `<MetaTags>` to recruiter-site NotFoundPage** — `recruiter-site/src/pages/NotFoundPage.tsx`
   - `title="404 - Página no encontrada | Julián Naranjo"`
   - `noindex`
 
 ### 2b. Lazy Loading
 
-- [ ] **Lazy-load `ServiceDetailPage` in client-site App.tsx** — `client-site/src/App.tsx`
-  - Replace `import { ServiceDetailPage }` with `const ServiceDetailPage = React.lazy(() => import('./pages/Services/ServiceDetail'))`
+- [x] **Lazy-load `ServiceDetailPage` in client-site App.tsx** — `client-site/src/App.tsx`
+  - Replace `import { ServiceDetailPage }` with `const ServiceDetailPage = lazy(() => import('./pages/Services/ServiceDetail').then(m => ({ default: m.ServiceDetailPage })))`
   - Wrap `<ServiceDetailPage>` route element in `<Suspense fallback={<Loading />}>`
   - Use skeleton matching layout dimensions
 
-- [ ] **Lazy-load `BlogPostContent` import in recruiter-site BlogPostPage** — `recruiter-site/src/pages/BlogPostPage.tsx`
-  - Replace static import with `const BlogPostContent = React.lazy(() => import('../components/blog/BlogPostContent'))`
+- [x] **Lazy-load `BlogPostContent` import in recruiter-site BlogPostPage** — `recruiter-site/src/pages/BlogPostPage.tsx`
+  - Replace static import with `const BlogPostContent = lazy(() => import('../components/blog/BlogPostContent').then(m => ({ default: m.BlogPostContent })))`
   - Wrap `<BlogPostContent>` in `<Suspense fallback={<Skeleton />}>`
 
-- [ ] **Lazy-load admin CRUD form pages (BlogPost Create/Edit) in AppRoutes.tsx** — `admin-panel/src/routes/AppRoutes.tsx`
+- [x] **Lazy-load admin CRUD form pages (BlogPost Create/Edit) in AppRoutes.tsx** — `admin-panel/src/routes/AppRoutes.tsx`
   - Replace `import { BlogPostCreatePage }` / `BlogPostEditPage` with `React.lazy(() => import(...))`
   - Wrap each lazy route in `<Suspense fallback={<Loading />}>`
 
-- [ ] **Lazy-load admin CRUD form pages (Service Create/Edit) in AppRoutes.tsx** — `admin-panel/src/routes/AppRoutes.tsx`
+- [x] **Lazy-load admin CRUD form pages (Service Create/Edit) in AppRoutes.tsx** — `admin-panel/src/routes/AppRoutes.tsx`
   - Replace `import { ServiceCreatePage }` / `ServiceEditPage` with `React.lazy(() => import(...))`
 
-- [ ] **Lazy-load admin CRUD form pages (Product Create/Edit) in AppRoutes.tsx** — `admin-panel/src/routes/AppRoutes.tsx`
+- [x] **Lazy-load admin CRUD form pages (Product Create/Edit) in AppRoutes.tsx** — `admin-panel/src/routes/AppRoutes.tsx`
   - Replace `import { ProductCreatePage }` / `ProductEditPage` with `React.lazy(() => import(...))`
 
-- [ ] **Lazy-load admin CRUD form pages (Tool Create/Edit) in AppRoutes.tsx** — `admin-panel/src/routes/AppRoutes.tsx`
+- [x] **Lazy-load admin CRUD form pages (Tool Create/Edit) in AppRoutes.tsx** — `admin-panel/src/routes/AppRoutes.tsx`
   - Replace `import { ToolCreatePage }` / `ToolEditPage` with `React.lazy(() => import(...))`
 
-- [ ] **Lazy-load admin CRUD form pages (SuccessCase Create/Edit) in AppRoutes.tsx** — `admin-panel/src/routes/AppRoutes.tsx`
+- [x] **Lazy-load admin CRUD form pages (SuccessCase Create/Edit) in AppRoutes.tsx** — `admin-panel/src/routes/AppRoutes.tsx`
   - Replace `import { SuccessCaseCreatePage }` / `SuccessCaseEditPage` with `React.lazy(() => import(...))`
 
-- [ ] **Audit and add `loading="lazy"` to all `<img>` tags without it in admin-panel** — `admin-panel/src/components/**/*.tsx`
+- [x] **Audit and add `loading="lazy"` to all `<img>` tags without it in admin-panel** — `admin-panel/src/components/**/*.tsx`
   - Check: BlogPostForm, ServiceForm, ProductForm, ToolForm, SuccessCaseForm
   - Add explicit `width` and `height` attributes to prevent CLS
 
-- [ ] **Verify `loading="lazy"` is present on all below-fold `<img>` tags across client-site and recruiter-site** — manual audit via code search
+- [x] **Verify `loading="lazy"` is present on all below-fold `<img>` tags across client-site and recruiter-site** — manual audit via code search
+  - client-site: all card/carousel images already have loading="lazy"; ServiceDetail hero is above-fold so skipped
+  - recruiter-site: added loading="lazy" to ProjectDetailModal main image; all others already had it
+  - Admin-panel: added loading="lazy" to BlogPostList thumbnail, SuccessCaseForm preview, ProductForm preview
 
-- [ ] **Verify all Suspense fallbacks match final content dimensions** — review skeletons/spinners for CLS safety
+- [x] **Verify all Suspense fallbacks match final content dimensions** — review skeletons/spinners for CLS safety
+  - client-site: Loading component used (existing)
+  - recruiter-site: skeleton div reused from loading state
+  - admin-panel: inline fallback with centered text
 
 ---
 

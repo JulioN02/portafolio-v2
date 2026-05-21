@@ -173,6 +173,7 @@ export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCas
                 <img
                   src={img}
                   alt={`Image ${index + 1}`}
+                  loading="lazy"
                   style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px' }}
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = 'https://placehold.co/80x80?text=Invalid';

@@ -1,7 +1,10 @@
+import { lazy, Suspense } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useBlogPostBySlug } from '../hooks/useBlogPosts';
-import { BlogPostContent } from '../components/blog/BlogPostContent';
+import { MetaTags } from '../components/seo/MetaTags';
 import styles from './BlogPostPage.module.css';
+
+const BlogPostContent = lazy(() => import('../components/blog/BlogPostContent').then(m => ({ default: m.BlogPostContent })));
 
 export function BlogPostPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -51,11 +54,19 @@ export function BlogPostPage() {
   // ── Content state ──
   return (
     <main className={styles.page}>
+      <MetaTags
+        title={`${post.title} | Julián Naranjo`}
+        description={post.shortDescription}
+        ogType="article"
+        publishedTime={post.publishedAt?.toISOString()}
+      />
       <div className={styles.container}>
         <div className={styles.backLink}>
           <Link to="/blog">&larr; Volver al blog</Link>
         </div>
-        <BlogPostContent post={post} />
+        <Suspense fallback={<div className={styles.loadingState}><div className={styles.skeleton} /></div>}>
+          <BlogPostContent post={post} />
+        </Suspense>
       </div>
     </main>
   );

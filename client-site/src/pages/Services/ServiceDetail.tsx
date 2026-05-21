@@ -5,6 +5,7 @@ import { useServiceBySlug } from '../../hooks/useServices';
 import { Loading } from '../../components/common/Loading';
 import { Modal } from '@jsoft/shared';
 import { ContactForm } from '../../components/forms/ContactForm';
+import { MetaTags } from '../../components/seo/MetaTags';
 import styles from './ServiceDetail.module.css';
 
 export function ServiceDetailPage() {
@@ -41,6 +42,10 @@ export function ServiceDetailPage() {
 
   return (
     <div className={styles.page}>
+      <MetaTags
+        title={`${service.title} | J Soft Solutions`}
+        description={service.shortDescription}
+      />
       <div className={styles.container}>
         {/* Breadcrumb */}
         <nav className={styles.breadcrumb}>

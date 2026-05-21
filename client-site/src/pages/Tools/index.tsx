@@ -3,6 +3,7 @@ import { useTools, useClassifications } from '../../hooks/useTools';
 import { ToolCard } from '../../components/tools/ToolCard';
 import { Pagination } from '../../components/common/Pagination';
 import { Loading } from '../../components/common/Loading';
+import { MetaTags } from '../../components/seo/MetaTags';
 import styles from './Tools.module.css';
 
 export function ToolsPage() {
@@ -26,6 +27,10 @@ export function ToolsPage() {
 
   return (
     <div className={styles.page}>
+      <MetaTags
+        title="Herramientas | J Soft Solutions"
+        description="Herramientas y tecnologías que utilizamos para desarrollar soluciones innovadoras."
+      />
       <div className={styles.container}>
         <header className={styles.header}>
           <h1 className={styles.title}>Nuestras Herramientas</h1>

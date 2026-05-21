@@ -1,9 +1,14 @@
 import { Link } from 'react-router-dom';
+import { MetaTags } from '../../components/seo/MetaTags';
 import styles from './NotFound.module.css';
 
 export function NotFoundPage() {
   return (
     <div className={styles.page}>
+      <MetaTags
+        title="404 - Página no encontrada | J Soft Solutions"
+        noindex
+      />
       <div className={styles.container}>
         <div className={styles.content}>
           <span className={styles.code}>404</span>

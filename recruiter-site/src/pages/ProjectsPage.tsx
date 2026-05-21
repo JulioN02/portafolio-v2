@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { MetaTags } from '../components/seo/MetaTags';
 import { ProjectList } from '../components/projects/ProjectList';
 import { ProjectDetailModal } from '../components/projects/ProjectDetailModal';
 import type { ProjectSummary } from '../types';
@@ -18,6 +19,10 @@ export function ProjectsPage() {
 
   return (
     <>
+      <MetaTags
+        title="Proyectos | Julián Naranjo"
+        description="Explora los proyectos en los que he trabajado como desarrollador Full Stack."
+      />
       <ProjectList onSelectProject={handleSelectProject} />
       {selectedProject && (
         <ProjectDetailModal

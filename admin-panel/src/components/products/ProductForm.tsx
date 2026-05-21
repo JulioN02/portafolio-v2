@@ -159,7 +159,7 @@ export function ProductForm({ initialData, onSubmit, isLoading }: ProductFormPro
           <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
             {images.map((url, index) => (
               <li key={index} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.25rem 0' }}>
-                <img src={url} alt={`Image ${index + 1}`} style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 4 }} />
+                <img src={url} alt={`Image ${index + 1}`} loading="lazy" style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 4 }} />
                 <span style={{ flex: 1, fontSize: '0.75rem', wordBreak: 'break-all' }}>{url}</span>
                 <Button type="button" variant="danger" size="sm" onClick={() => handleRemoveImage(index)}>Remove</Button>
               </li>

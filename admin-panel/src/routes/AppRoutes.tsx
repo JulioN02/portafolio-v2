@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedLayout } from '../components/layout/ProtectedLayout';
 import { ErrorBoundary } from '@jsoft/shared';
@@ -10,28 +11,18 @@ import { DashboardPage } from '../pages/Dashboard';
 
 // Blog Posts
 import { BlogPostsListPage } from '../pages/blog-posts/BlogPostsListPage';
-import { BlogPostCreatePage } from '../pages/blog-posts/BlogPostCreatePage';
-import { BlogPostEditPage } from '../pages/blog-posts/BlogPostEditPage';
 
 // Services
 import { ServicesListPage } from '../pages/services/ServicesList';
-import { ServiceCreatePage } from '../pages/services/ServiceCreate';
-import { ServiceEditPage } from '../pages/services/ServiceEdit';
 
 // Products
 import { ProductsListPage } from '../pages/products/ProductsList';
-import { ProductCreatePage } from '../pages/products/ProductCreate';
-import { ProductEditPage } from '../pages/products/ProductEdit';
 
 // Tools
 import { ToolsListPage } from '../pages/tools/ToolsList';
-import { ToolCreatePage } from '../pages/tools/ToolCreate';
-import { ToolEditPage } from '../pages/tools/ToolEdit';
 
 // SuccessCases
 import { SuccessCasesList as SuccessCasesListPage } from '../pages/success-cases/SuccessCasesList';
-import { SuccessCaseCreate as SuccessCaseCreatePage } from '../pages/success-cases/SuccessCaseCreate';
-import { SuccessCaseEdit as SuccessCaseEditPage } from '../pages/success-cases/SuccessCaseEdit';
 
 // Contact Messages
 import { ContactMessagesListPage } from '../pages/contact-messages/ContactMessagesList';
@@ -43,6 +34,18 @@ import { SettingsPage } from '../pages/settings/SettingsPage';
 
 // Pages
 import { PagesList as PagesListPage } from '../pages/pages/PagesList';
+
+// Lazy-loaded CRUD form pages
+const BlogPostCreatePage = lazy(() => import('../pages/blog-posts/BlogPostCreatePage').then(m => ({ default: m.BlogPostCreatePage })));
+const BlogPostEditPage = lazy(() => import('../pages/blog-posts/BlogPostEditPage').then(m => ({ default: m.BlogPostEditPage })));
+const ServiceCreatePage = lazy(() => import('../pages/services/ServiceCreate').then(m => ({ default: m.ServiceCreatePage })));
+const ServiceEditPage = lazy(() => import('../pages/services/ServiceEdit').then(m => ({ default: m.ServiceEditPage })));
+const ProductCreatePage = lazy(() => import('../pages/products/ProductCreate').then(m => ({ default: m.ProductCreatePage })));
+const ProductEditPage = lazy(() => import('../pages/products/ProductEdit').then(m => ({ default: m.ProductEditPage })));
+const ToolCreatePage = lazy(() => import('../pages/tools/ToolCreate').then(m => ({ default: m.ToolCreatePage })));
+const ToolEditPage = lazy(() => import('../pages/tools/ToolEdit').then(m => ({ default: m.ToolEditPage })));
+const SuccessCaseCreatePage = lazy(() => import('../pages/success-cases/SuccessCaseCreate').then(m => ({ default: m.SuccessCaseCreate })));
+const SuccessCaseEditPage = lazy(() => import('../pages/success-cases/SuccessCaseEdit').then(m => ({ default: m.SuccessCaseEdit })));
 
 function AppRoutes() {
   return (
@@ -77,7 +80,9 @@ function AppRoutes() {
         element={
           <ErrorBoundary>
             <ProtectedLayout>
-              <BlogPostCreatePage />
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>Cargando...</div>}>
+                <BlogPostCreatePage />
+              </Suspense>
             </ProtectedLayout>
           </ErrorBoundary>
         }
@@ -87,7 +92,9 @@ function AppRoutes() {
         element={
           <ErrorBoundary>
             <ProtectedLayout>
-              <BlogPostEditPage />
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>Cargando...</div>}>
+                <BlogPostEditPage />
+              </Suspense>
             </ProtectedLayout>
           </ErrorBoundary>
         }
@@ -108,7 +115,9 @@ function AppRoutes() {
         element={
           <ErrorBoundary>
             <ProtectedLayout>
-              <ServiceCreatePage />
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>Cargando...</div>}>
+                <ServiceCreatePage />
+              </Suspense>
             </ProtectedLayout>
           </ErrorBoundary>
         }
@@ -118,7 +127,9 @@ function AppRoutes() {
         element={
           <ErrorBoundary>
             <ProtectedLayout>
-              <ServiceEditPage />
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>Cargando...</div>}>
+                <ServiceEditPage />
+              </Suspense>
             </ProtectedLayout>
           </ErrorBoundary>
         }
@@ -139,7 +150,9 @@ function AppRoutes() {
         element={
           <ErrorBoundary>
             <ProtectedLayout>
-              <ProductCreatePage />
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>Cargando...</div>}>
+                <ProductCreatePage />
+              </Suspense>
             </ProtectedLayout>
           </ErrorBoundary>
         }
@@ -149,7 +162,9 @@ function AppRoutes() {
         element={
           <ErrorBoundary>
             <ProtectedLayout>
-              <ProductEditPage />
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>Cargando...</div>}>
+                <ProductEditPage />
+              </Suspense>
             </ProtectedLayout>
           </ErrorBoundary>
         }
@@ -170,7 +185,9 @@ function AppRoutes() {
         element={
           <ErrorBoundary>
             <ProtectedLayout>
-              <ToolCreatePage />
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>Cargando...</div>}>
+                <ToolCreatePage />
+              </Suspense>
             </ProtectedLayout>
           </ErrorBoundary>
         }
@@ -180,7 +197,9 @@ function AppRoutes() {
         element={
           <ErrorBoundary>
             <ProtectedLayout>
-              <ToolEditPage />
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>Cargando...</div>}>
+                <ToolEditPage />
+              </Suspense>
             </ProtectedLayout>
           </ErrorBoundary>
         }
@@ -201,7 +220,9 @@ function AppRoutes() {
         element={
           <ErrorBoundary>
             <ProtectedLayout>
-              <SuccessCaseCreatePage />
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>Cargando...</div>}>
+                <SuccessCaseCreatePage />
+              </Suspense>
             </ProtectedLayout>
           </ErrorBoundary>
         }
@@ -211,7 +232,9 @@ function AppRoutes() {
         element={
           <ErrorBoundary>
             <ProtectedLayout>
-              <SuccessCaseEditPage />
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>Cargando...</div>}>
+                <SuccessCaseEditPage />
+              </Suspense>
             </ProtectedLayout>
           </ErrorBoundary>
         }
