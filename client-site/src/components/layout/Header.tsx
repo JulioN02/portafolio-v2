@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import styles from './Header.module.css';
 
 const navLinks = [
@@ -7,6 +7,7 @@ const navLinks = [
   { to: '/servicios', label: 'Servicios' },
   { to: '/productos', label: 'Productos' },
   { to: '/herramientas', label: 'Herramientas' },
+  { to: '/blog', label: 'Blog' },
   { to: '/casos-de-exito', label: 'Casos de Éxito' },
   { to: '/contacto', label: 'Contacto' },
 ];
@@ -15,6 +16,7 @@ export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const location = useLocation();
 
   // Hide header on scroll down, show on scroll up
   useEffect(() => {
@@ -39,7 +41,7 @@ export function Header() {
   // Close menu on route change
   useEffect(() => {
     setIsMenuOpen(false);
-  }, []);
+  }, [location.pathname]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
