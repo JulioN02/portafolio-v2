@@ -7,6 +7,8 @@ import { ProductsPage } from './pages/Products';
 import { ToolsPage } from './pages/Tools';
 import { SuccessCasesPage } from './pages/SuccessCases';
 import { ContactPage } from './pages/Contact';
+import { BlogPage } from './pages/Blog';
+import { BlogPostPage } from './pages/Blog/BlogPost';
 import { NotFoundPage } from './pages/NotFound';
 import { ErrorBoundary } from '@jsoft/shared';
 import { Loading } from './components/common/Loading';
@@ -26,6 +28,8 @@ function App() {
         <Route path="/herramientas/:slug" element={<ErrorBoundary><ToolsPage /></ErrorBoundary>} />
         <Route path="/casos-de-exito" element={<ErrorBoundary><SuccessCasesPage /></ErrorBoundary>} />
         <Route path="/casos-de-exito/:slug" element={<ErrorBoundary><SuccessCasesPage /></ErrorBoundary>} />
+        <Route path="/blog" element={<ErrorBoundary><BlogPage /></ErrorBoundary>} />
+        <Route path="/blog/:slug" element={<ErrorBoundary><BlogPostPage /></ErrorBoundary>} />
         <Route path="/contacto" element={<ErrorBoundary><ContactPage /></ErrorBoundary>} />
         <Route path="/404" element={<ErrorBoundary><NotFoundPage /></ErrorBoundary>} />
         <Route path="*" element={<Navigate to="/404" replace />} />

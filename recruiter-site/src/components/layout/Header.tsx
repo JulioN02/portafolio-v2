@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import styles from './Header.module.css';
 
@@ -11,17 +11,32 @@ const navLinks = [
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        setIsHidden(true);
+      } else {
+        setIsHidden(false);
+      }
+      setLastScrollY(currentScrollY);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   return (
-    <header className={styles.header}>
+    <header className={`${styles.header} ${isHidden ? styles.hidden : ''}`}>
       <div className={styles.container}>
         <Link to="/" className={styles.logo}>
           J Soft Solutions
         </Link>
 
-        {/* Desktop Navigation */}
         <nav className={styles.navDesktop}>
           {navLinks.map((link) => (
             <NavLink
@@ -37,7 +52,6 @@ export function Header() {
           ))}
         </nav>
 
-        {/* Hamburger Button */}
         <button
           className={styles.hamburger}
           onClick={toggleMenu}
@@ -49,7 +63,6 @@ export function Header() {
           <span className={`${styles.hamburgerLine} ${isMenuOpen ? styles.open : ''}`} />
         </button>
 
-        {/* Mobile Navigation */}
         <nav className={`${styles.navMobile} ${isMenuOpen ? styles.open : ''}`}>
           {navLinks.map((link) => (
             <NavLink
