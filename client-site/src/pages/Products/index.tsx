@@ -4,6 +4,7 @@ import { ProductCard } from '../../components/products/ProductCard';
 import { Pagination } from '../../components/common/Pagination';
 import { Loading } from '../../components/common/Loading';
 import { MetaTags } from '../../components/seo/MetaTags';
+import { Select } from '@jsoft/shared';
 import styles from './Products.module.css';
 
 export function ProductsPage() {
@@ -41,22 +42,16 @@ export function ProductsPage() {
 
         {/* Filters */}
         <div className={styles.filters}>
-          <label htmlFor="classification" className={styles.filterLabel}>
-            Filtrar por:
-          </label>
-          <select
+          <Select
             id="classification"
             value={classification}
             onChange={(e) => handleClassificationChange(e.target.value)}
-            className={styles.filterSelect}
-          >
-            <option value="">Todas las categorías</option>
-            {classifications?.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
+            label="Filtrar por:"
+            options={[
+              { value: '', label: 'Todas las categorías' },
+              ...(classifications?.map((cat) => ({ value: cat, label: cat })) ?? []),
+            ]}
+          />
         </div>
 
         {/* Content */}

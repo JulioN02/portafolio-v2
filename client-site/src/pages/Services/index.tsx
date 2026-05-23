@@ -4,6 +4,7 @@ import { ServiceCard } from '../../components/services/ServiceCard';
 import { Loading } from '../../components/common/Loading';
 import { PageHeader } from '../../components/common/PageHeader';
 import { MetaTags } from '../../components/seo/MetaTags';
+import { Select } from '@jsoft/shared';
 import styles from './Services.module.css';
 
 export function ServicesPage() {
@@ -37,20 +38,18 @@ export function ServicesPage() {
 
         {/* Filters */}
         <div className={styles.filters}>
-          <label htmlFor="classification" className={styles.filterLabel}>
-            Filtrar por:
-          </label>
-          <select
+          <Select
             id="classification"
             value={classification}
             onChange={(e) => handleClassificationChange(e.target.value)}
-            className={styles.filterSelect}
-          >
-            <option value="">Todas las categorías</option>
-            <option value="Desarrollo">Desarrollo</option>
-            <option value="Diseño">Diseño</option>
-            <option value="Consultoría">Consultoría</option>
-          </select>
+            label="Filtrar por:"
+            options={[
+              { value: '', label: 'Todas las categorías' },
+              { value: 'Desarrollo', label: 'Desarrollo' },
+              { value: 'Diseño', label: 'Diseño' },
+              { value: 'Consultoría', label: 'Consultoría' },
+            ]}
+          />
         </div>
 
         {/* Content */}

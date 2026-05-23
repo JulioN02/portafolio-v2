@@ -1,7 +1,12 @@
-import { useSiteSections } from '../../hooks/useSiteSections';
+import { useState } from 'react';
+import { useSiteSections, type SectionOrder } from '../../hooks/useSiteSections';
 
 export function PagesList() {
-  const { sections, toggleSection, moveSection, isLoaded } = useSiteSections();
+  const { sections, toggleSection, moveSection, saveSections, isLoaded } = useSiteSections();
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newSectionId, setNewSectionId] = useState('');
+  const [newSectionLabel, setNewSectionLabel] = useState('');
+  const [addError, setAddError] = useState('');
 
   if (!isLoaded) {
     return (
@@ -10,6 +15,35 @@ export function PagesList() {
       </div>
     );
   }
+
+  const handleAddSection = (e: React.FormEvent) => {
+    e.preventDefault();
+    setAddError('');
+
+    const id = newSectionId.trim();
+    const label = newSectionLabel.trim();
+
+    if (!id || !label) {
+      setAddError('Both Section ID and Section Label are required.');
+      return;
+    }
+
+    if (sections.some((s) => s.id === id)) {
+      setAddError(`A section with ID "${id}" already exists.`);
+      return;
+    }
+
+    const newSection: SectionOrder = {
+      id,
+      label,
+      enabled: true,
+    };
+
+    saveSections([...sections, newSection]);
+    setNewSectionId('');
+    setNewSectionLabel('');
+    setShowAddForm(false);
+  };
 
   return (
     <div>
@@ -31,6 +65,29 @@ export function PagesList() {
       >
         Manage the order and visibility of portfolio sections on your public site.
       </p>
+
+      {/* Info Banner */}
+      <div
+        style={{
+          background: '#eff6ff',
+          border: '1px solid #bfdbfe',
+          borderRadius: '8px',
+          padding: '0.75rem 1rem',
+          marginBottom: '1.5rem',
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: '0.5rem',
+          color: '#1e40af',
+          fontSize: '0.875rem',
+          lineHeight: '1.5',
+        }}
+      >
+        <span style={{ fontSize: '1rem', flexShrink: 0 }}>ℹ️</span>
+        <span>
+          This manages the order and visibility of sections on your public portfolio site.
+          Changes are saved locally. API integration coming soon.
+        </span>
+      </div>
 
       <div
         style={{
@@ -183,6 +240,147 @@ export function PagesList() {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Add Section */}
+      <div style={{ marginTop: '1rem' }}>
+        {!showAddForm ? (
+          <button
+            type="button"
+            onClick={() => setShowAddForm(true)}
+            style={{
+              padding: '0.5rem 1rem',
+              borderRadius: '6px',
+              border: '1px solid #d1d5db',
+              background: '#fff',
+              color: '#3b82f6',
+              fontWeight: '500',
+              cursor: 'pointer',
+              fontSize: '0.875rem',
+            }}
+          >
+            + Add Section
+          </button>
+        ) : (
+          <form
+            onSubmit={handleAddSection}
+            style={{
+              background: '#fff',
+              borderRadius: '8px',
+              padding: '1rem',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.75rem',
+            }}
+          >
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+              <div style={{ flex: '1', minWidth: '180px' }}>
+                <label
+                  style={{
+                    display: 'block',
+                    fontSize: '0.75rem',
+                    color: '#6b7280',
+                    marginBottom: '0.25rem',
+                    fontWeight: '500',
+                  }}
+                >
+                  Section ID
+                </label>
+                <input
+                  type="text"
+                  value={newSectionId}
+                  onChange={(e) => setNewSectionId(e.target.value)}
+                  placeholder="e.g. testimonials"
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '0.5rem',
+                    borderRadius: '6px',
+                    border: '1px solid #d1d5db',
+                    background: '#fff',
+                    color: '#111827',
+                    fontSize: '0.875rem',
+                  }}
+                />
+              </div>
+              <div style={{ flex: '1', minWidth: '180px' }}>
+                <label
+                  style={{
+                    display: 'block',
+                    fontSize: '0.75rem',
+                    color: '#6b7280',
+                    marginBottom: '0.25rem',
+                    fontWeight: '500',
+                  }}
+                >
+                  Section Label
+                </label>
+                <input
+                  type="text"
+                  value={newSectionLabel}
+                  onChange={(e) => setNewSectionLabel(e.target.value)}
+                  placeholder="e.g. Testimonials"
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '0.5rem',
+                    borderRadius: '6px',
+                    border: '1px solid #d1d5db',
+                    background: '#fff',
+                    color: '#111827',
+                    fontSize: '0.875rem',
+                  }}
+                />
+              </div>
+            </div>
+
+            {addError && (
+              <p style={{ color: '#ef4444', fontSize: '0.875rem', margin: 0 }}>
+                {addError}
+              </p>
+            )}
+
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <button
+                type="submit"
+                style={{
+                  padding: '0.5rem 1rem',
+                  borderRadius: '6px',
+                  border: 'none',
+                  background: '#3b82f6',
+                  color: '#fff',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  fontSize: '0.875rem',
+                }}
+              >
+                Add Section
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAddForm(false);
+                  setAddError('');
+                  setNewSectionId('');
+                  setNewSectionLabel('');
+                }}
+                style={{
+                  padding: '0.5rem 1rem',
+                  borderRadius: '6px',
+                  border: '1px solid #d1d5db',
+                  background: '#fff',
+                  color: '#6b7280',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  fontSize: '0.875rem',
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        )}
       </div>
     </div>
   );

@@ -23,6 +23,20 @@
   pointer-events: none;
 }
 
+.pattern {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.patternSvg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .content {
   max-width: 720px;
   display: flex;
@@ -30,7 +44,7 @@
   align-items: center;
   gap: var(--spacing-md);
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 .avatarContainer {
@@ -47,6 +61,20 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.avatarFallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--color-blue-medium), var(--color-blue-base));
+}
+
+.avatarFallback svg {
+  width: 70%;
+  height: 70%;
 }
 
 .name {

@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { Input } from '@jsoft/shared';
-import { Button } from '@jsoft/shared';
-import { BlogPostInput, PostStatus } from '@jsoft/shared';
+import { Input, Textarea, Select, Button } from '@jsoft/shared';
+import type { BlogPostInput, PostStatus } from '@jsoft/shared';
 import { TipTapEditor } from './TipTapEditor';
 import { getTextFromHTML } from '../../utils/getTextFromHTML';
 
@@ -74,10 +73,10 @@ export function BlogPostForm({ initialData, onSubmit, isLoading }: BlogPostFormP
             required
           />
         </div>
-        <Button 
-          type="button" 
+        <Button
+          type="button"
+          variant="secondary"
           onClick={generateSlug}
-          style={{ marginBottom: '0.25rem', background: '#6b7280' }}
         >
           Generate Slug
         </Button>
@@ -101,21 +100,14 @@ export function BlogPostForm({ initialData, onSubmit, isLoading }: BlogPostFormP
         required
       />
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-        <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151' }}>Short Description</label>
-        <textarea
-          value={shortDescription}
-          onChange={(e) => setShortDescription(e.target.value)}
-          style={{
-            padding: '0.5rem',
-            border: errors.shortDescription ? '1px solid #ef4444' : '1px solid #d1d5db',
-            borderRadius: '4px',
-            minHeight: '80px',
-            fontSize: '1rem'
-          }}
-        />
-        {errors.shortDescription && <span style={{ color: '#ef4444', fontSize: '0.75rem' }}>{errors.shortDescription}</span>}
-      </div>
+      <Textarea
+        id="shortDescription"
+        label="Short Description"
+        value={shortDescription}
+        onChange={(e) => setShortDescription(e.target.value)}
+        error={errors.shortDescription}
+        required
+      />
 
       <Input
         id="coverImage"
@@ -136,24 +128,18 @@ export function BlogPostForm({ initialData, onSubmit, isLoading }: BlogPostFormP
         {errors.body && <span style={{ color: '#ef4444', fontSize: '0.75rem' }}>{errors.body}</span>}
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-        <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151' }}>Status</label>
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value as PostStatus)}
-          style={{
-            padding: '0.5rem',
-            border: '1px solid #d1d5db',
-            borderRadius: '4px',
-            fontSize: '1rem'
-          }}
-        >
-          <option value="DRAFT">Draft</option>
-          <option value="PUBLISHED">Published</option>
-          <option value="PRIVATE">Private</option>
-          <option value="ARCHIVED">Archived</option>
-        </select>
-      </div>
+      <Select
+        id="status"
+        label="Status"
+        value={status}
+        onChange={(e) => setStatus(e.target.value as PostStatus)}
+        options={[
+          { value: 'DRAFT', label: 'Draft' },
+          { value: 'PUBLISHED', label: 'Published' },
+          { value: 'PRIVATE', label: 'Private' },
+          { value: 'ARCHIVED', label: 'Archived' },
+        ]}
+      />
 
       <Input
         id="externalLink"
@@ -164,20 +150,12 @@ export function BlogPostForm({ initialData, onSubmit, isLoading }: BlogPostFormP
         placeholder="https://..."
       />
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-        <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151' }}>Lessons Learned (optional)</label>
-        <textarea
-          value={lessonsLearned}
-          onChange={(e) => setLessonsLearned(e.target.value)}
-          style={{
-            padding: '0.5rem',
-            border: '1px solid #d1d5db',
-            borderRadius: '4px',
-            minHeight: '100px',
-            fontSize: '1rem'
-          }}
-        />
-      </div>
+      <Textarea
+        id="lessonsLearned"
+        label="Lessons Learned (optional)"
+        value={lessonsLearned}
+        onChange={(e) => setLessonsLearned(e.target.value)}
+      />
 
       <Button type="submit" disabled={isLoading}>
         {isLoading ? 'Saving...' : 'Save Post'}

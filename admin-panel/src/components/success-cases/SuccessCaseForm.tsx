@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { Input } from '@jsoft/shared';
-import { Button } from '@jsoft/shared';
+import { Input, Textarea, Button } from '@jsoft/shared';
 import type { SuccessCaseInput } from '@jsoft/shared';
 
 interface SuccessCaseFormProps {
@@ -116,22 +115,14 @@ export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCas
         error={errors.classification}
         required
       />
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-        <label htmlFor="description" style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151' }}>Description</label>
-        <textarea
-          id="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          style={{
-            padding: '0.5rem',
-            border: errors.description ? '1px solid #ef4444' : '1px solid #d1d5db',
-            borderRadius: '4px',
-            minHeight: '120px',
-            fontSize: '1rem'
-          }}
-        />
-        {errors.description && <span style={{ color: '#ef4444', fontSize: '0.75rem' }}>{errors.description}</span>}
-      </div>
+      <Textarea
+        id="description"
+        label="Description"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        error={errors.description}
+        required
+      />
       <Input
         id="link"
         label="Link (optional)"
@@ -151,20 +142,9 @@ export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCas
             onChange={(e) => setImageInput(e.target.value)}
             error={errors.images}
           />
-          <button
-            type="button"
-            onClick={addImage}
-            style={{
-              padding: '0.5rem 1rem',
-              background: '#4b5563',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
-          >
+          <Button type="button" variant="secondary" size="sm" onClick={addImage}>
             Add
-          </button>
+          </Button>
         </div>
         {images.length > 0 && (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
@@ -179,25 +159,27 @@ export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCas
                     (e.target as HTMLImageElement).src = 'https://placehold.co/80x80?text=Invalid';
                   }}
                 />
-                <button
+                <Button
                   type="button"
+                  variant="danger"
+                  size="sm"
                   onClick={() => removeImage(index)}
                   style={{
                     position: 'absolute',
                     top: '-5px',
                     right: '-5px',
-                    background: '#ef4444',
-                    color: '#fff',
-                    border: 'none',
                     borderRadius: '50%',
                     width: '20px',
                     height: '20px',
-                    cursor: 'pointer',
-                    fontSize: '0.75rem'
+                    fontSize: '0.75rem',
+                    padding: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   }}
                 >
                   ×
-                </button>
+                </Button>
               </div>
             ))}
           </div>

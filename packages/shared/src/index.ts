@@ -89,6 +89,15 @@ export type { ErrorMessageProps } from './components/index.js';
 export { Modal } from './components/index.js';
 export type { ModalProps } from './components/index.js';
 
+export { Textarea } from './components/index.js';
+export type { TextareaProps } from './components/index.js';
+
+export { Select } from './components/index.js';
+export type { SelectProps } from './components/index.js';
+
+export { Checkbox } from './components/index.js';
+export type { CheckboxProps } from './components/index.js';
+
 // Auth Components
 export { ProtectedRoute } from './components/index.js';
 export type { ProtectedRouteProps } from './components/index.js';

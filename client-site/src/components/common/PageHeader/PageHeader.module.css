@@ -3,6 +3,33 @@
   text-align: center;
   padding: var(--spacing-3xl) var(--spacing-md);
   color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle diagonal line decoration */
+.header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 40%;
+  height: 200%;
+  background: rgba(122, 203, 104, 0.04);
+  transform: rotate(15deg);
+  pointer-events: none;
+}
+
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--color-green-accent);
+  opacity: 0.6;
+  pointer-events: none;
 }
 
 @media (min-width: 1024px) {

@@ -20,6 +20,15 @@ export type { ErrorMessageProps } from './ui/ErrorMessage/index.js';
 export { Modal } from './ui/Modal/index.js';
 export type { ModalProps } from './ui/Modal/index.js';
 
+export { Textarea } from './ui/Textarea/index.js';
+export type { TextareaProps } from './ui/Textarea/index.js';
+
+export { Select } from './ui/Select/index.js';
+export type { SelectProps } from './ui/Select/index.js';
+
+export { Checkbox } from './ui/Checkbox/index.js';
+export type { CheckboxProps } from './ui/Checkbox/index.js';
+
 // Auth Components
 export { ProtectedRoute } from './auth/ProtectedRoute.js';
 export type { ProtectedRouteProps } from './auth/ProtectedRoute.js';

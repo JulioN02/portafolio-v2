@@ -30,7 +30,9 @@ import { ContactMessageDetailPage } from '../pages/contact-messages/ContactMessa
 
 // Settings
 import { SettingsLayout } from '../pages/settings/SettingsLayout';
-import { SettingsPage } from '../pages/settings/SettingsPage';
+import { ProfileSettings } from '../pages/settings/ProfileSettings';
+import { PreferencesSettings } from '../pages/settings/PreferencesSettings';
+import { SecuritySettings } from '../pages/settings/SecuritySettings';
 
 // Pages
 import { PagesList as PagesListPage } from '../pages/pages/PagesList';
@@ -272,8 +274,9 @@ function AppRoutes() {
         }
       >
         <Route index element={<Navigate to="/settings/profile" replace />} />
-        <Route path="profile" element={<SettingsPage />} />
-        <Route path="preferences" element={<SettingsPage />} />
+        <Route path="profile" element={<ProfileSettings />} />
+        <Route path="preferences" element={<PreferencesSettings />} />
+        <Route path="security" element={<SecuritySettings />} />
       </Route>
 
       <Route

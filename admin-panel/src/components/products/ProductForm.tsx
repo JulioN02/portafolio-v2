@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Input } from '@jsoft/shared';
+import { Input, Textarea, Checkbox } from '@jsoft/shared';
 import { Button } from '@jsoft/shared';
 import type { ProductInput } from '@jsoft/shared';
 
@@ -107,38 +107,22 @@ export function ProductForm({ initialData, onSubmit, isLoading }: ProductFormPro
         error={errors.classification}
         required
       />
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-        <label htmlFor="shortDescription" style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151' }}>Short Description</label>
-        <textarea
-          id="shortDescription"
-          value={shortDescription}
-          onChange={(e) => setShortDescription(e.target.value)}
-          style={{
-            padding: '0.5rem',
-            border: errors.shortDescription ? '1px solid #ef4444' : '1px solid #d1d5db',
-            borderRadius: '4px',
-            minHeight: '80px',
-            fontSize: '1rem'
-          }}
-        />
-        {errors.shortDescription && <span style={{ color: '#ef4444', fontSize: '0.75rem' }}>{errors.shortDescription}</span>}
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-        <label htmlFor="fullDescription" style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151' }}>Full Description</label>
-        <textarea
-          id="fullDescription"
-          value={fullDescription}
-          onChange={(e) => setFullDescription(e.target.value)}
-          style={{
-            padding: '0.5rem',
-            border: errors.fullDescription ? '1px solid #ef4444' : '1px solid #d1d5db',
-            borderRadius: '4px',
-            minHeight: '120px',
-            fontSize: '1rem'
-          }}
-        />
-        {errors.fullDescription && <span style={{ color: '#ef4444', fontSize: '0.75rem' }}>{errors.fullDescription}</span>}
-      </div>
+      <Textarea
+        id="shortDescription"
+        label="Short Description"
+        value={shortDescription}
+        onChange={(e) => setShortDescription(e.target.value)}
+        error={errors.shortDescription}
+        required
+      />
+      <Textarea
+        id="fullDescription"
+        label="Full Description"
+        value={fullDescription}
+        onChange={(e) => setFullDescription(e.target.value)}
+        error={errors.fullDescription}
+        required
+      />
 
       {/* Images section */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
@@ -182,31 +166,19 @@ export function ProductForm({ initialData, onSubmit, isLoading }: ProductFormPro
         value={order}
         onChange={(e) => setOrder(e.target.value)}
       />
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-        <input
-          type="checkbox"
-          checked={featured}
-          onChange={(e) => setFeatured(e.target.checked)}
-          id="featured"
-        />
-        <label htmlFor="featured" style={{ fontSize: '0.875rem' }}>Featured</label>
-      </div>
+      <Checkbox
+        id="featured"
+        label="Featured"
+        checked={featured}
+        onChange={(e) => setFeatured(e.target.checked)}
+      />
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-        <label htmlFor="technicalExplanation" style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151' }}>Technical Explanation (optional)</label>
-        <textarea
-          id="technicalExplanation"
-          value={technicalExplanation}
-          onChange={(e) => setTechnicalExplanation(e.target.value)}
-          style={{
-            padding: '0.5rem',
-            border: '1px solid #d1d5db',
-            borderRadius: '4px',
-            minHeight: '120px',
-            fontSize: '1rem'
-          }}
-        />
-      </div>
+      <Textarea
+        id="technicalExplanation"
+        label="Technical Explanation (optional)"
+        value={technicalExplanation}
+        onChange={(e) => setTechnicalExplanation(e.target.value)}
+      />
 
       <Button type="submit" disabled={isLoading}>
         {isLoading ? 'Saving...' : 'Save'}
