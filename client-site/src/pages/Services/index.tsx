@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useServices } from '../../hooks/useServices';
 import { ServiceCard } from '../../components/services/ServiceCard';
 import { Loading } from '../../components/common/Loading';
+import { PageHeader } from '../../components/common/PageHeader';
 import { MetaTags } from '../../components/seo/MetaTags';
 import styles from './Services.module.css';
 
@@ -28,13 +29,11 @@ export function ServicesPage() {
         title="Servicios | J Soft Solutions"
         description="Ofrecemos desarrollo web, diseño UI/UX y consultoría tecnológica personalizada."
       />
+      <PageHeader
+        title="Nuestros Servicios"
+        subtitle="Soluciones tecnológicas adaptadas a tus necesidades"
+      />
       <div className={styles.container}>
-        <header className={styles.header}>
-          <h1 className={styles.title}>Nuestros Servicios</h1>
-          <p className={styles.subtitle}>
-            Soluciones tecnológicas adaptadas a tus necesidades
-          </p>
-        </header>
 
         {/* Filters */}
         <div className={styles.filters}>

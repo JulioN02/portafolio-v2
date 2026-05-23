@@ -1,4 +1,5 @@
 import { MetaTags } from '../../components/seo/MetaTags';
+import { PageHeader } from '../../components/common/PageHeader';
 import { ContactForm } from '../../components/forms/ContactForm';
 import styles from './Contact.module.css';
 
@@ -9,14 +10,14 @@ export function ContactPage() {
         title="Contacto | J Soft Solutions"
         description="Contáctanos para discutir tu proyecto. Estamos en Bogotá, Colombia."
       />
+      <PageHeader
+        title="Contacto"
+        subtitle="¿Tienes un proyecto en mente? Me encantaría escuchar sobre él."
+      />
       <div className={styles.container}>
         <div className={styles.grid}>
           {/* Info */}
           <div className={styles.info}>
-            <h1 className={styles.title}>Contacto</h1>
-            <p className={styles.subtitle}>
-              ¿Tienes un proyecto en mente? Me encantaría escuchar sobre él.
-            </p>
 
             <div className={styles.details}>
               <div className={styles.detailItem}>
