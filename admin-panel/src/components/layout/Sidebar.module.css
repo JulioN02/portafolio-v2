@@ -1,0 +1,151 @@
+.sidebar {
+  width: 240px;
+  min-height: 100vh;
+  background: var(--color-blue-base);
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-x: hidden;
+}
+
+.collapsed {
+  width: 64px;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md);
+  height: 64px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.brand {
+  color: var(--color-neutral-0);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-base);
+  white-space: nowrap;
+}
+
+.collapsed .brand {
+  display: none;
+}
+
+.brandShort {
+  display: none;
+  color: var(--color-neutral-0);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-base);
+}
+
+.collapsed .brandShort {
+  display: block;
+}
+
+.toggleButton {
+  background: none;
+  border: none;
+  color: var(--color-neutral-0);
+  cursor: pointer;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-lg);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: var(--radius-md);
+}
+
+.collapsed .toggleButton {
+  transform: rotate(180deg);
+  margin: 0 auto;
+  width: 44px;
+}
+
+@media (hover: hover) {
+  .toggleButton:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.nav {
+  flex: 1;
+  padding: var(--spacing-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--color-neutral-400);
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  min-height: 44px;
+}
+
+.collapsed .navLink {
+  justify-content: center;
+  padding: var(--spacing-sm);
+  width: 44px;
+  margin: 0 auto;
+}
+
+@media (hover: hover) {
+  .navLink:hover {
+    color: var(--color-green-accent-text);
+    background: rgba(122, 203, 104, 0.08);
+  }
+}
+
+.navLinkActive {
+  color: var(--color-green-accent-text);
+  background: rgba(122, 203, 104, 0.12);
+  border-left: 3px solid var(--color-green-accent);
+}
+
+.collapsed .navLinkActive {
+  border-left: none;
+  border-bottom: 2px solid var(--color-green-accent);
+  border-radius: 0;
+}
+
+.navLink svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
+.collapsed .navLink svg {
+  width: 22px;
+  height: 22px;
+}
+
+.navLabel {
+  font-size: var(--font-size-sm);
+}
+
+.collapsed .navLabel {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar {
+    transition: none;
+  }
+  .toggleButton {
+    transition: none;
+  }
+  .navLink {
+    transition: none;
+  }
+}

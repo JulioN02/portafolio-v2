@@ -1,5 +1,6 @@
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
+import styles from './DashboardLayout.module.css';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -7,11 +8,11 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
+    <div className={styles.layout}>
       <Sidebar />
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+      <div className={styles.content}>
         <Header />
-        <main style={{ flex: 1, padding: '2rem', background: '#f3f4f6' }}>
+        <main className={styles.main}>
           {children}
         </main>
       </div>
