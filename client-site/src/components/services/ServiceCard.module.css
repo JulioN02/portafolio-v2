@@ -1,15 +1,24 @@
 .card {
   background-color: var(--color-neutral-0);
+  border: none;
+  border-left: 3px solid var(--color-green-backend);
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-md);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  transition: transform var(--transition-base) var(--ease-in-out),
+              box-shadow var(--transition-base) var(--ease-in-out);
 }
 
 @media (hover: hover) {
   .card:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-lg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
   }
 }
 

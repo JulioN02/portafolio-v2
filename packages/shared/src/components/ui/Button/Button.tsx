@@ -4,8 +4,8 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import styles from './Button.module.css';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'danger';
-export type ButtonSize = 'sm' | 'md' | 'lg';
+export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'whatsapp';
+export type ButtonSize = 'sm' | 'md' | 'lg' | 'large';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   /** Visual style variant */

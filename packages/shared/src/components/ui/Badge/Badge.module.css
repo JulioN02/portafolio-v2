@@ -1,0 +1,26 @@
+.badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.75px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  line-height: 1;
+}
+
+.default,
+.available {
+  color: var(--color-green-backend);
+  background: rgba(62, 152, 93, 0.1);
+}
+
+.developing {
+  color: var(--color-blue-ui);
+  background: rgba(37, 96, 157, 0.1);
+}
+
+.coming {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+}

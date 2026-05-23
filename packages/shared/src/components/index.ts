@@ -8,6 +8,9 @@ export type { InputProps } from './ui/Input/index.js';
 export { Card } from './ui/Card/index.js';
 export type { CardProps } from './ui/Card/index.js';
 
+export { Badge } from './ui/Badge/index.js';
+export type { BadgeProps } from './ui/Badge/index.js';
+
 export { Loading } from './ui/Loading/index.js';
 export type { LoadingProps } from './ui/Loading/index.js';
 

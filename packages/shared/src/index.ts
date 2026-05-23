@@ -77,6 +77,9 @@ export type { InputProps } from './components/index.js';
 export { Card } from './components/index.js';
 export type { CardProps } from './components/index.js';
 
+export { Badge } from './components/index.js';
+export type { BadgeProps } from './components/index.js';
+
 export { Loading } from './components/index.js';
 export type { LoadingProps } from './components/index.js';
 
