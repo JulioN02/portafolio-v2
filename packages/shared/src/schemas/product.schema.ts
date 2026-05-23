@@ -29,10 +29,10 @@ export const productUpdateSchema = productSchema.partial();
  * Schema for filtering products in API queries
  */
 export const productFilterSchema = z.object({
-  featured: z.boolean().optional(),
+  featured: z.coerce.boolean().optional(),
   classification: z.string().optional(),
-  page: z.number().int().min(1).default(1),
-  limit: z.number().int().min(1).max(100).default(10),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(10),
 });
 
 /**

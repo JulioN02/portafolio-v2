@@ -158,6 +158,30 @@ export const productController = {
     }
   },
 
+  async toggleFeatured(req: Request, res: Response): Promise<void> {
+    try {
+      const id = getStringParam(req.params.id);
+      const { featured } = req.body;
+      
+      if (typeof featured !== 'boolean') {
+        res.status(400).json({ error: 'Featured must be a boolean' });
+        return;
+      }
+      
+      const existing = await productService.findById(id);
+      if (!existing) {
+        res.status(404).json({ error: 'Product not found' });
+        return;
+      }
+      
+      const product = await productService.update(id, { featured });
+      res.json(product);
+    } catch (error) {
+      console.error('Product toggleFeatured error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
   async getClassifications(_req: Request, res: Response): Promise<void> {
     try {
       const classifications = await productService.getClassifications();

@@ -17,12 +17,24 @@ export function createApiClient(config: ApiClientConfig) {
 
   /**
    * Builds a full URL with optional query parameters
+   * Handles both absolute (http://...) and relative (/api) base URLs
    */
   function buildUrl(
     path: string,
     params?: Record<string, string | number | boolean>,
   ): string {
-    const url = new URL(path, baseUrl);
+    // Resolve relative base URLs to absolute using the current origin
+    let resolvedBase = baseUrl;
+    if (!resolvedBase.startsWith('http')) {
+      const origin =
+        typeof window !== 'undefined'
+          ? window.location.origin
+          : 'http://localhost:3000';
+      resolvedBase = `${origin}${resolvedBase.startsWith('/') ? '' : '/'}${resolvedBase}`;
+    }
+    const cleanBase = resolvedBase.endsWith('/') ? resolvedBase.slice(0, -1) : resolvedBase;
+    const cleanPath = path.startsWith('/') ? path : `/${path}`;
+    const url = new URL(`${cleanBase}${cleanPath}`);
     if (params) {
       for (const [key, value] of Object.entries(params)) {
         url.searchParams.set(key, String(value));

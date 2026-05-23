@@ -158,6 +158,30 @@ export const toolController = {
     }
   },
 
+  async toggleFeatured(req: Request, res: Response): Promise<void> {
+    try {
+      const id = getStringParam(req.params.id);
+      const { featured } = req.body;
+      
+      if (typeof featured !== 'boolean') {
+        res.status(400).json({ error: 'Featured must be a boolean' });
+        return;
+      }
+      
+      const existing = await toolService.findById(id);
+      if (!existing) {
+        res.status(404).json({ error: 'Tool not found' });
+        return;
+      }
+      
+      const tool = await toolService.update(id, { featured });
+      res.json(tool);
+    } catch (error) {
+      console.error('Tool toggleFeatured error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
   async getClassifications(_req: Request, res: Response): Promise<void> {
     try {
       const classifications = await toolService.getClassifications();

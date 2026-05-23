@@ -43,7 +43,7 @@ export const productsApi = {
   },
 
   reorder: async (id: string, order: number): Promise<ProductResponse> => {
-    const { data } = await apiClient.patch(`/products/${id}/order`, { order });
+    const { data } = await apiClient.patch(`/products/${id}/reorder`, { order });
     return data;
   },
 

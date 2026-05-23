@@ -22,8 +22,8 @@ export const successCaseUpdateSchema = successCaseSchema.partial();
  * Schema for filtering success cases in API queries
  */
 export const successCaseFilterSchema = z.object({
-  page: z.number().int().min(1).default(1),
-  limit: z.number().int().min(1).max(100).default(10),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(10),
 });
 
 /**

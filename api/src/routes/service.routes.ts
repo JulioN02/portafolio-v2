@@ -17,5 +17,6 @@ router.put('/:id', authMiddleware, serviceController.update);
 router.delete('/:id', authMiddleware, serviceController.delete);
 router.patch('/:id/restore', authMiddleware, serviceController.restore);
 router.patch('/:id/reorder', authMiddleware, serviceController.reorder);
+router.patch('/:id/featured', authMiddleware, serviceController.toggleFeatured);
 
 export default router;

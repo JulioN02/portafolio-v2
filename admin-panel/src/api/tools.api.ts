@@ -43,7 +43,7 @@ export const toolsApi = {
   },
 
   reorder: async (id: string, order: number): Promise<ToolResponse> => {
-    const { data } = await apiClient.patch(`/tools/${id}/order`, { order });
+    const { data } = await apiClient.patch(`/tools/${id}/reorder`, { order });
     return data;
   },
 

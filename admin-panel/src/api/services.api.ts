@@ -43,7 +43,7 @@ export const servicesApi = {
   },
 
   reorder: async (id: string, order: number): Promise<ServiceResponse> => {
-    const { data } = await apiClient.patch(`/services/${id}/order`, { order });
+    const { data } = await apiClient.patch(`/services/${id}/reorder`, { order });
     return data;
   },
 
