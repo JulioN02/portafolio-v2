@@ -1,3 +1,4 @@
+import { Button } from '@jsoft/shared';
 import { useAuth } from '../../hooks/useAuth';
 import styles from './Header.module.css';
 
@@ -15,9 +16,9 @@ export function Header() {
           {user?.username?.[0]?.toUpperCase() || 'A'}
         </div>
       </div>
-      <button className={styles.logoutButton} onClick={logout}>
+      <Button variant="danger" size="sm" onClick={logout}>
         Cerrar sesión
-      </button>
+      </Button>
     </header>
   );
 }

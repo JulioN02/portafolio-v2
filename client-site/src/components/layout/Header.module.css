@@ -109,9 +109,11 @@
   transition: width var(--transition-fast) ease-out;
 }
 
-.navLink:hover::after,
-.navLink.active::after {
-  width: 100%;
+@media (hover: hover) {
+  .navLink:hover::after,
+  .navLink.active::after {
+    width: 100%;
+  }
 }
 
 /* Hamburger Button */
