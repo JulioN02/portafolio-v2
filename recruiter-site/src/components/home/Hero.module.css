@@ -4,12 +4,11 @@
   justify-content: center;
   min-height: 100vh;
   padding: var(--spacing-2xl) var(--spacing-md);
-  background: linear-gradient(
-    135deg,
-    var(--color-blue-base) 0%,
-    var(--color-blue-medium) 50%,
-    var(--color-blue-base) 100%
-  );
+  background:
+    radial-gradient(ellipse at 20% 30%, rgba(122,203,104,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(37,96,157,0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(33,73,123,0.1) 0%, transparent 50%),
+    linear-gradient(135deg, var(--color-blue-base) 0%, var(--color-blue-medium) 50%, var(--color-blue-base) 100%);
   text-align: center;
   position: relative;
   overflow: hidden;

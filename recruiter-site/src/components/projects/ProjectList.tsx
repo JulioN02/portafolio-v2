@@ -8,37 +8,23 @@ interface ProjectListProps {
   onSelectProject: (project: ProjectSummary) => void;
 }
 
-const ALL_TYPES = 'ALL' as const;
 const ALL_CLASSIFICATIONS = 'ALL' as const;
-
-/** Filter options with API query param mapping */
-const FILTER_OPTIONS = [
-  { label: 'Todos', value: ALL_TYPES },
-  { label: 'Servicios', value: 'service' },
-  { label: 'Productos', value: 'product' },
-  { label: 'Herramientas', value: 'tool' },
-  { label: 'Casos de Éxito', value: 'successCase' },
-] as const;
 
 const ITEMS_PER_PAGE = 12;
 
 export function ProjectList({ onSelectProject }: ProjectListProps) {
-  const [activeFilter, setActiveFilter] = useState<string>(ALL_TYPES);
   const [activeClassification, setActiveClassification] = useState<string>(ALL_CLASSIFICATIONS);
   const [page, setPage] = useState(1);
 
   const filters = useMemo(() => {
-    const f: { type?: string; classification?: string; page?: number; limit?: number } = {};
-    if (activeFilter !== ALL_TYPES) {
-      f.type = activeFilter;
-    }
+    const f: { classification?: string; page?: number; limit?: number } = {};
     if (activeClassification !== ALL_CLASSIFICATIONS) {
       f.classification = activeClassification;
     }
     f.page = page;
     f.limit = ITEMS_PER_PAGE;
     return f;
-  }, [activeFilter, activeClassification, page]);
+  }, [activeClassification, page]);
 
   const { data, isLoading, isError, error, refetch } = useProjects(filters);
   const { data: classifications = [] } = useProjectClassifications();
@@ -46,13 +32,6 @@ export function ProjectList({ onSelectProject }: ProjectListProps) {
   const projects = data?.data ?? [];
   const totalItems = data?.pagination?.total ?? 0;
   const totalPages = data?.pagination?.totalPages ?? Math.max(1, Math.ceil(totalItems / ITEMS_PER_PAGE));
-
-  /** Handle type filter change — reset classification and page */
-  const handleFilterChange = (type: string) => {
-    setActiveFilter(type);
-    setActiveClassification(ALL_CLASSIFICATIONS);
-    setPage(1);
-  };
 
   /** Handle classification filter change — reset to page 1 */
   const handleClassificationChange = (classification: string) => {
@@ -71,17 +50,6 @@ export function ProjectList({ onSelectProject }: ProjectListProps) {
   if (isLoading) {
     return (
       <div className={styles.container}>
-        <div className={styles.filters}>
-          {FILTER_OPTIONS.map((opt) => (
-            <button
-              key={opt.value}
-              className={`${styles.filterButton} ${activeFilter === opt.value ? styles.filterButtonActive : ''}`}
-              disabled
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
         {/* Classification filters */}
         {classifications.length > 0 && (
           <div className={styles.classificationFilters}>
@@ -118,17 +86,6 @@ export function ProjectList({ onSelectProject }: ProjectListProps) {
   if (isError) {
     return (
       <div className={styles.container}>
-        <div className={styles.filters}>
-          {FILTER_OPTIONS.map((opt) => (
-            <button
-              key={opt.value}
-              className={`${styles.filterButton} ${activeFilter === opt.value ? styles.filterButtonActive : ''}`}
-              disabled
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
         {/* Classification filters */}
         {classifications.length > 0 && (
           <div className={styles.classificationFilters}>
@@ -168,17 +125,6 @@ export function ProjectList({ onSelectProject }: ProjectListProps) {
   if (projects.length === 0) {
     return (
       <div className={styles.container}>
-        <div className={styles.filters}>
-          {FILTER_OPTIONS.map((opt) => (
-            <button
-              key={opt.value}
-              className={`${styles.filterButton} ${activeFilter === opt.value ? styles.filterButtonActive : ''}`}
-              onClick={() => handleFilterChange(opt.value)}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
         {/* Classification filters */}
         {classifications.length > 0 && (
           <div className={styles.classificationFilters}>
@@ -206,16 +152,15 @@ export function ProjectList({ onSelectProject }: ProjectListProps) {
               ? `No se encontraron proyectos en la categoría "${activeClassification}".`
               : 'No se encontraron proyectos.'}
           </p>
-          {(activeFilter !== ALL_TYPES || activeClassification !== ALL_CLASSIFICATIONS) && (
+          {activeClassification !== ALL_CLASSIFICATIONS && (
             <button
               className={styles.retryButton}
               onClick={() => {
-                setActiveFilter(ALL_TYPES);
                 setActiveClassification(ALL_CLASSIFICATIONS);
                 setPage(1);
               }}
             >
-              Ver todos
+              Ver todas las categorías
             </button>
           )}
         </div>
@@ -226,19 +171,6 @@ export function ProjectList({ onSelectProject }: ProjectListProps) {
   // ── Content state ──
   return (
     <div className={styles.container}>
-      {/* Type filters */}
-      <div className={styles.filters}>
-        {FILTER_OPTIONS.map((opt) => (
-          <button
-            key={opt.value}
-            className={`${styles.filterButton} ${activeFilter === opt.value ? styles.filterButtonActive : ''}`}
-            onClick={() => handleFilterChange(opt.value)}
-          >
-            {opt.label}
-          </button>
-        ))}
-      </div>
-
       {/* Classification filters */}
       {classifications.length > 0 && (
         <div className={styles.classificationFilters}>
@@ -301,7 +233,6 @@ export function ProjectList({ onSelectProject }: ProjectListProps) {
       {/* Results count */}
       <p className={styles.resultsCount}>
         {totalItems} proyecto{totalItems !== 1 ? 's' : ''} encontrado{totalItems !== 1 ? 's' : ''}
-        {activeFilter !== ALL_TYPES && ` en ${FILTER_OPTIONS.find((o) => o.value === activeFilter)?.label.toLowerCase()}`}
         {activeClassification !== ALL_CLASSIFICATIONS && ` · categoría "${activeClassification}"`}
       </p>
     </div>

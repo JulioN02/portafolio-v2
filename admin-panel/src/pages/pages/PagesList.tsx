@@ -1,7 +1,10 @@
 import { useState } from 'react';
+import { Button, Input, Loading } from '@jsoft/shared';
+import { useTranslation } from '../../i18n/LanguageContext';
 import { useSiteSections, type SectionOrder } from '../../hooks/useSiteSections';
 
 export function PagesList() {
+  const { t } = useTranslation();
   const { sections, toggleSection, moveSection, saveSections, isLoaded } = useSiteSections();
   const [showAddForm, setShowAddForm] = useState(false);
   const [newSectionId, setNewSectionId] = useState('');
@@ -9,11 +12,7 @@ export function PagesList() {
   const [addError, setAddError] = useState('');
 
   if (!isLoaded) {
-    return (
-      <div style={{ textAlign: 'center', padding: '2rem', color: '#6b7280' }}>
-        Loading...
-      </div>
-    );
+    return <Loading />;
   }
 
   const handleAddSection = (e: React.FormEvent) => {
@@ -24,12 +23,12 @@ export function PagesList() {
     const label = newSectionLabel.trim();
 
     if (!id || !label) {
-      setAddError('Both Section ID and Section Label are required.');
+      setAddError(t('pages.required'));
       return;
     }
 
     if (sections.some((s) => s.id === id)) {
-      setAddError(`A section with ID "${id}" already exists.`);
+      setAddError(t('pages.duplicate'));
       return;
     }
 
@@ -47,166 +46,63 @@ export function PagesList() {
 
   return (
     <div>
-      <h1
-        style={{
-          fontSize: '1.5rem',
-          fontWeight: 'bold',
-          marginBottom: '0.5rem',
-          color: '#111827',
-        }}
-      >
-        Site Sections
-      </h1>
-      <p
-        style={{
-          color: '#6b7280',
-          marginBottom: '1.5rem',
-        }}
-      >
-        Manage the order and visibility of portfolio sections on your public site.
-      </p>
-
-      {/* Info Banner */}
-      <div
-        style={{
-          background: '#eff6ff',
-          border: '1px solid #bfdbfe',
-          borderRadius: '8px',
-          padding: '0.75rem 1rem',
-          marginBottom: '1.5rem',
-          display: 'flex',
-          alignItems: 'flex-start',
-          gap: '0.5rem',
-          color: '#1e40af',
-          fontSize: '0.875rem',
-          lineHeight: '1.5',
-        }}
-      >
-        <span style={{ fontSize: '1rem', flexShrink: 0 }}>ℹ️</span>
-        <span>
-          This manages the order and visibility of sections on your public portfolio site.
-          Changes are saved locally. API integration coming soon.
-        </span>
+      <div className="admin-page-header">
+        <div>
+          <h1>{t('pages.title')}</h1>
+          <p style={{ color: 'var(--color-neutral-500)', fontSize: '0.875rem', margin: '0.25rem 0 0' }}>
+            {t('pages.description')}
+          </p>
+        </div>
       </div>
 
-      <div
-        style={{
-          background: '#fff',
-          borderRadius: '8px',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-          overflow: 'hidden',
-        }}
-      >
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+      {/* Info Banner */}
+      <div className="admin-card" style={{ marginBottom: '1.5rem', padding: '0.75rem 1rem', background: 'var(--color-primary-50)', borderColor: 'var(--color-primary-200)' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', color: 'var(--color-primary-700)', fontSize: '0.875rem', lineHeight: '1.5' }}>
+          <span style={{ fontSize: '1rem', flexShrink: 0 }}>ℹ️</span>
+          <span>
+            {t('pages.info')}
+          </span>
+        </div>
+      </div>
+
+      <div className="admin-card">
+        <table className="admin-table">
           <thead>
-            <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
-              <th
-                style={{
-                  padding: '0.75rem 1rem',
-                  textAlign: 'left',
-                  fontSize: '0.75rem',
-                  fontWeight: '600',
-                  color: '#6b7280',
-                  textTransform: 'uppercase',
-                }}
-              >
-                Order
-              </th>
-              <th
-                style={{
-                  padding: '0.75rem 1rem',
-                  textAlign: 'left',
-                  fontSize: '0.75rem',
-                  fontWeight: '600',
-                  color: '#6b7280',
-                  textTransform: 'uppercase',
-                }}
-              >
-                Section
-              </th>
-              <th
-                style={{
-                  padding: '0.75rem 1rem',
-                  textAlign: 'center',
-                  fontSize: '0.75rem',
-                  fontWeight: '600',
-                  color: '#6b7280',
-                  textTransform: 'uppercase',
-                }}
-              >
-                Visible
-              </th>
+            <tr>
+              <th>{t('pages.order')}</th>
+              <th>{t('pages.section')}</th>
+              <th style={{ textAlign: 'center' }}>{t('pages.visible')}</th>
             </tr>
           </thead>
           <tbody>
             {sections.map((section, index) => (
-              <tr
-                key={section.id}
-                style={{ borderBottom: '1px solid #e5e7eb' }}
-              >
-                <td
-                  style={{
-                    padding: '0.75rem 1rem',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
+              <tr key={section.id}>
+                <td style={{ whiteSpace: 'nowrap' }}>
                   <div style={{ display: 'flex', gap: '0.25rem' }}>
-                    <button
-                      type="button"
+                    <Button
+                      variant="secondary"
+                      size="sm"
                       onClick={() => moveSection(section.id, 'up')}
                       disabled={index === 0}
                       title="Move up"
-                      style={{
-                        padding: '0.25rem 0.5rem',
-                        borderRadius: '4px',
-                        border: '1px solid #d1d5db',
-                        background: index === 0 ? '#f3f4f6' : '#fff',
-                        color: index === 0 ? '#d1d5db' : '#6b7280',
-                        cursor: index === 0 ? 'not-allowed' : 'pointer',
-                        fontSize: '0.75rem',
-                      }}
                     >
                       ↑
-                    </button>
-                    <button
-                      type="button"
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="sm"
                       onClick={() => moveSection(section.id, 'down')}
                       disabled={index === sections.length - 1}
                       title="Move down"
-                      style={{
-                        padding: '0.25rem 0.5rem',
-                        borderRadius: '4px',
-                        border: '1px solid #d1d5db',
-                        background:
-                          index === sections.length - 1 ? '#f3f4f6' : '#fff',
-                        color:
-                          index === sections.length - 1 ? '#d1d5db' : '#6b7280',
-                        cursor:
-                          index === sections.length - 1
-                            ? 'not-allowed'
-                            : 'pointer',
-                        fontSize: '0.75rem',
-                      }}
                     >
                       ↓
-                    </button>
+                    </Button>
                   </div>
                 </td>
-                <td
-                  style={{
-                    padding: '0.75rem 1rem',
-                    fontWeight: '500',
-                    color: '#111827',
-                  }}
-                >
+                <td style={{ fontWeight: '500', color: 'var(--color-neutral-900)' }}>
                   {section.label}
                 </td>
-                <td
-                  style={{
-                    padding: '0.75rem 1rem',
-                    textAlign: 'center',
-                  }}
-                >
+                <td style={{ textAlign: 'center' }}>
                   <button
                     type="button"
                     onClick={() => toggleSection(section.id)}
@@ -245,141 +141,59 @@ export function PagesList() {
       {/* Add Section */}
       <div style={{ marginTop: '1rem' }}>
         {!showAddForm ? (
-          <button
-            type="button"
-            onClick={() => setShowAddForm(true)}
-            style={{
-              padding: '0.5rem 1rem',
-              borderRadius: '6px',
-              border: '1px solid #d1d5db',
-              background: '#fff',
-              color: '#3b82f6',
-              fontWeight: '500',
-              cursor: 'pointer',
-              fontSize: '0.875rem',
-            }}
-          >
-            + Add Section
-          </button>
+          <Button variant="secondary" onClick={() => setShowAddForm(true)}>
+            {t('pages.add')}
+          </Button>
         ) : (
-          <form
-            onSubmit={handleAddSection}
-            style={{
-              background: '#fff',
-              borderRadius: '8px',
-              padding: '1rem',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '0.75rem',
-            }}
-          >
-            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-              <div style={{ flex: '1', minWidth: '180px' }}>
-                <label
-                  style={{
-                    display: 'block',
-                    fontSize: '0.75rem',
-                    color: '#6b7280',
-                    marginBottom: '0.25rem',
-                    fontWeight: '500',
+          <div className="admin-card" style={{ padding: '1rem' }}>
+            <form
+              onSubmit={handleAddSection}
+              style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}
+            >
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                <div style={{ flex: '1', minWidth: '180px' }}>
+                  <Input
+                    id="section-id"
+                    label={t('pages.idLabel')}
+                    value={newSectionId}
+                    onChange={(e) => setNewSectionId(e.target.value)}
+                    placeholder={t('pages.idPlaceholder')}
+                  />
+                </div>
+                <div style={{ flex: '1', minWidth: '180px' }}>
+                  <Input
+                    id="section-label"
+                    label={t('pages.labelLabel')}
+                    value={newSectionLabel}
+                    onChange={(e) => setNewSectionLabel(e.target.value)}
+                    placeholder={t('pages.labelPlaceholder')}
+                  />
+                </div>
+              </div>
+
+              {addError && (
+                <p style={{ color: '#ef4444', fontSize: '0.875rem', margin: 0 }}>
+                  {addError}
+                </p>
+              )}
+
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <Button type="submit">{t('pages.addSection')}</Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => {
+                    setShowAddForm(false);
+                    setAddError('');
+                    setNewSectionId('');
+                    setNewSectionLabel('');
                   }}
                 >
-                  Section ID
-                </label>
-                <input
-                  type="text"
-                  value={newSectionId}
-                  onChange={(e) => setNewSectionId(e.target.value)}
-                  placeholder="e.g. testimonials"
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    borderRadius: '6px',
-                    border: '1px solid #d1d5db',
-                    background: '#fff',
-                    color: '#111827',
-                    fontSize: '0.875rem',
-                  }}
-                />
+                  {t('pages.cancel')}
+                </Button>
               </div>
-              <div style={{ flex: '1', minWidth: '180px' }}>
-                <label
-                  style={{
-                    display: 'block',
-                    fontSize: '0.75rem',
-                    color: '#6b7280',
-                    marginBottom: '0.25rem',
-                    fontWeight: '500',
-                  }}
-                >
-                  Section Label
-                </label>
-                <input
-                  type="text"
-                  value={newSectionLabel}
-                  onChange={(e) => setNewSectionLabel(e.target.value)}
-                  placeholder="e.g. Testimonials"
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    borderRadius: '6px',
-                    border: '1px solid #d1d5db',
-                    background: '#fff',
-                    color: '#111827',
-                    fontSize: '0.875rem',
-                  }}
-                />
-              </div>
-            </div>
-
-            {addError && (
-              <p style={{ color: '#ef4444', fontSize: '0.875rem', margin: 0 }}>
-                {addError}
-              </p>
-            )}
-
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <button
-                type="submit"
-                style={{
-                  padding: '0.5rem 1rem',
-                  borderRadius: '6px',
-                  border: 'none',
-                  background: '#3b82f6',
-                  color: '#fff',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  fontSize: '0.875rem',
-                }}
-              >
-                Add Section
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowAddForm(false);
-                  setAddError('');
-                  setNewSectionId('');
-                  setNewSectionLabel('');
-                }}
-                style={{
-                  padding: '0.5rem 1rem',
-                  borderRadius: '6px',
-                  border: '1px solid #d1d5db',
-                  background: '#fff',
-                  color: '#6b7280',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  fontSize: '0.875rem',
-                }}
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
+            </form>
+          </div>
         )}
       </div>
     </div>

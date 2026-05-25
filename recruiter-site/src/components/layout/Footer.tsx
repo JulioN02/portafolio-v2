@@ -28,6 +28,13 @@ const socialLinks = [
   },
 ];
 
+const logoIcon = (
+  <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" width="32" height="32" aria-hidden="true">
+    <rect width="40" height="40" rx="8" fill="var(--color-green-accent)" />
+    <path d="M12 20 L18 26 L28 14" stroke="var(--color-blue-base)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
 export function Footer() {
   const currentYear = new Date().getFullYear();
 
@@ -36,7 +43,10 @@ export function Footer() {
       <div className={styles.container}>
         <div className={styles.grid}>
           <div className={styles.brand}>
-            <h3 className={styles.title}>J Soft Solutions</h3>
+            <div className={styles.brandLogo}>
+              {logoIcon}
+              <h3 className={styles.title}>J Soft Solutions</h3>
+            </div>
             <p className={styles.description}>
               Desarrollo de software a medida. Transformamos tus ideas en soluciones
               digitales escalables y de alto impacto.
@@ -85,7 +95,10 @@ export function Footer() {
 
       <div className={styles.container}>
         <div className={styles.bottom}>
-          <p className={styles.copyright}>&copy; {currentYear} J Soft Solutions. Todos los derechos reservados.</p>
+          <div className={styles.bottomLeft}>
+            <p className={styles.copyright}>&copy; {currentYear} J Soft Solutions. Todos los derechos reservados.</p>
+            <p className={styles.madeIn}>Hecho con ❤️ en Colombia</p>
+          </div>
           <div className={styles.legalLinks}>
             <a href="/privacidad">Privacidad</a>
             <a href="/terminos">Términos</a>

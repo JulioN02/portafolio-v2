@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Button, Loading, ErrorMessage } from '@jsoft/shared';
+import { useTranslation } from '../../i18n/LanguageContext';
 import { useSuccessCases } from '../../hooks/useSuccessCases';
 import { SuccessCaseList } from '../../components/success-cases/SuccessCaseList';
 
 export function SuccessCasesList() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { useGetAll, useDelete, useReorder } = useSuccessCases();
   
@@ -15,7 +18,7 @@ export function SuccessCasesList() {
   const reorderMutation = useReorder();
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this success case?')) {
+    if (window.confirm(t('common.confirmDelete'))) {
       try {
         await deleteMutation.mutateAsync(id);
       } catch (err) {
@@ -39,86 +42,67 @@ export function SuccessCasesList() {
   };
 
   if (isLoading) {
-    return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>;
+    return <Loading />;
   }
 
   if (error) {
-    return <div style={{ padding: '2rem', color: '#ef4444' }}>Error loading success cases</div>;
+    return <ErrorMessage message={t('common.error')} />;
   }
 
   const successCases = data?.data || [];
   const totalPages = data?.pagination?.totalPages || 1;
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+    <div>
+      <div className="admin-page-header">
         <div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: '600', margin: 0 }}>Success Cases</h1>
-          <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: '0.25rem 0 0' }}>
-            💡 Drag and drop to reorder
+          <h1>{t('successCases.title')}</h1>
+          <p style={{ fontSize: '0.875rem', color: 'var(--color-neutral-500)', margin: '0.25rem 0 0' }}>
+            💡 {t('tools.reorder')}
           </p>
         </div>
-        <Link
-          to="/success-cases/create"
-          style={{
-            padding: '0.5rem 1rem',
-            background: '#3b82f6',
-            color: '#fff',
-            textDecoration: 'none',
-            borderRadius: '4px',
-            fontSize: '0.875rem'
-          }}
-        >
-          Create New
+        <Link to="/success-cases/create">
+          <Button>{t('successCases.add')}</Button>
         </Link>
       </div>
 
       {successCases.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '3rem', color: '#6b7280' }}>
-          No success cases found. Create your first one!
+        <div className="admin-empty">
+          <div className="admin-empty-icon">📋</div>
+          <div className="admin-empty-text">{t('successCases.empty')}</div>
         </div>
       ) : (
         <>
-          <SuccessCaseList
-            successCases={successCases}
-            onReorder={handleReorder}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
+          <div className="admin-card">
+            <SuccessCaseList
+              successCases={successCases}
+              onReorder={handleReorder}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          </div>
           
           {totalPages > 1 && (
             <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '1.5rem' }}>
-              <button
+              <Button
+                variant="secondary"
+                size="sm"
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
-                style={{
-                  padding: '0.5rem 1rem',
-                  background: page === 1 ? '#e5e7eb' : '#3b82f6',
-                  color: page === 1 ? '#9ca3af' : '#fff',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: page === 1 ? 'not-allowed' : 'pointer'
-                }}
               >
-                Previous
-              </button>
-              <span style={{ padding: '0.5rem', fontSize: '0.875rem', color: '#6b7280' }}>
+                {t('common.previous')}
+              </Button>
+              <span style={{ padding: '0.5rem', fontSize: '0.875rem', color: 'var(--color-neutral-500)' }}>
                 Page {page} of {totalPages}
               </span>
-              <button
+              <Button
+                variant="secondary"
+                size="sm"
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                style={{
-                  padding: '0.5rem 1rem',
-                  background: page === totalPages ? '#e5e7eb' : '#3b82f6',
-                  color: page === totalPages ? '#9ca3af' : '#fff',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: page === totalPages ? 'not-allowed' : 'pointer'
-                }}
               >
-                Next
-              </button>
+                {t('common.next')}
+              </Button>
             </div>
           )}
         </>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from '../../i18n/LanguageContext';
 import { Input, Textarea, Select, Button } from '@jsoft/shared';
 import type { BlogPostInput, PostStatus } from '@jsoft/shared';
 import { TipTapEditor } from './TipTapEditor';
@@ -11,6 +12,7 @@ interface BlogPostFormProps {
 }
 
 export function BlogPostForm({ initialData, onSubmit, isLoading }: BlogPostFormProps) {
+  const { t } = useTranslation();
   const [title, setTitle] = useState(initialData?.title || '');
   const [slug, setSlug] = useState(initialData?.slug || '');
   const [shortDescription, setShortDescription] = useState(initialData?.shortDescription || '');
@@ -134,10 +136,10 @@ export function BlogPostForm({ initialData, onSubmit, isLoading }: BlogPostFormP
         value={status}
         onChange={(e) => setStatus(e.target.value as PostStatus)}
         options={[
-          { value: 'DRAFT', label: 'Draft' },
-          { value: 'PUBLISHED', label: 'Published' },
-          { value: 'PRIVATE', label: 'Private' },
-          { value: 'ARCHIVED', label: 'Archived' },
+          { value: 'DRAFT', label: t('blog.draft') },
+          { value: 'PUBLISHED', label: t('blog.published') },
+          { value: 'PRIVATE', label: t('blog.private') },
+          { value: 'ARCHIVED', label: t('blog.archived') },
         ]}
       />
 
@@ -158,7 +160,7 @@ export function BlogPostForm({ initialData, onSubmit, isLoading }: BlogPostFormP
       />
 
       <Button type="submit" disabled={isLoading}>
-        {isLoading ? 'Saving...' : 'Save Post'}
+        {isLoading ? t('blog.saving') : t('blog.save')}
       </Button>
     </form>
   );

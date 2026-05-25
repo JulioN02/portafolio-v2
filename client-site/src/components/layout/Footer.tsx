@@ -46,6 +46,13 @@ const legalLinks = [
   { to: '/terminos', label: 'Términos y Condiciones' },
 ];
 
+const logoIcon = (
+  <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" width="32" height="32" aria-hidden="true">
+    <rect width="40" height="40" rx="8" fill="var(--color-green-accent)" />
+    <path d="M12 20 L18 26 L28 14" stroke="var(--color-blue-base)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
 export function Footer() {
   const currentYear = new Date().getFullYear();
 
@@ -55,7 +62,10 @@ export function Footer() {
         <div className={styles.grid}>
           {/* Brand */}
           <div className={styles.brand}>
-            <h3 className={styles.brandName}>J Soft Solutions</h3>
+            <div className={styles.brandLogo}>
+              {logoIcon}
+              <h3 className={styles.brandName}>J Soft Solutions</h3>
+            </div>
             <p className={styles.brandTagline}>
               Desarrollo web personalizado para tu negocio
             </p>
@@ -101,9 +111,12 @@ export function Footer() {
         <hr className={styles.divider} />
 
         <div className={styles.bottom}>
-          <p className={styles.copyright}>
-            &copy; {currentYear} J Soft Solutions. Todos los derechos reservados.
-          </p>
+          <div className={styles.bottomLeft}>
+            <p className={styles.copyright}>
+              &copy; {currentYear} J Soft Solutions. Todos los derechos reservados.
+            </p>
+            <p className={styles.madeIn}>Hecho con ❤️ en Colombia</p>
+          </div>
           <nav className={styles.legalLinks}>
             {legalLinks.map((link) => (
               <Link key={link.to} to={link.to} className={styles.legalLink}>

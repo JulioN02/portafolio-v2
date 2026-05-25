@@ -3,7 +3,11 @@
   align-items: center;
   justify-content: center;
   padding: var(--spacing-3xl) var(--spacing-md);
-  background: linear-gradient(135deg, var(--color-blue-base), var(--color-blue-medium));
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(122,203,104,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(37,96,157,0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(33,73,123,0.1) 0%, transparent 50%),
+    linear-gradient(135deg, var(--color-blue-base), var(--color-blue-medium));
   color: var(--color-neutral-0);
   position: relative;
   overflow: hidden;

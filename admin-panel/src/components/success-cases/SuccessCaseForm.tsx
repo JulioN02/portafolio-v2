@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from '../../i18n/LanguageContext';
 import { Input, Textarea, Button } from '@jsoft/shared';
 import type { SuccessCaseInput } from '@jsoft/shared';
 
@@ -9,6 +10,7 @@ interface SuccessCaseFormProps {
 }
 
 export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCaseFormProps) {
+  const { t } = useTranslation();
   const [title, setTitle] = useState(initialData?.title || '');
   const [clientName, setClientName] = useState((initialData as Record<string, unknown>)?.clientName as string || '');
   const [description, setDescription] = useState(initialData?.description || '');
@@ -101,7 +103,7 @@ export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCas
       />
       <Input
         id="clientName"
-        label="Client Name"
+        label={t('successCases.client')}
         value={clientName}
         onChange={(e) => setClientName(e.target.value)}
         error={errors.clientName}
@@ -186,7 +188,7 @@ export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCas
         )}
       </div>
       <Button type="submit" disabled={isLoading}>
-        {isLoading ? 'Saving...' : 'Save'}
+        {isLoading ? t('successCases.saving') : t('successCases.save')}
       </Button>
     </form>
   );

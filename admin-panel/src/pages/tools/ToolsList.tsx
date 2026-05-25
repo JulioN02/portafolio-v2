@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '@jsoft/shared';
+import { Button, Loading, ErrorMessage } from '@jsoft/shared';
+import { useTranslation } from '../../i18n/LanguageContext';
 import { useTools } from '../../hooks/useTools';
 import { ToolList } from '../../components/tools/ToolList';
 
 export function ToolsListPage() {
+  const { t } = useTranslation();
   const { useGetAll, useDelete, useReorder } = useTools();
   const { data, isLoading, error } = useGetAll();
   const deleteMutation = useDelete();
@@ -21,25 +23,28 @@ export function ToolsListPage() {
     }
   };
 
-  const handleReorder = (id: string, newOrder: number) => {
-    reorderMutation.mutate({ id, order: newOrder });
+  const handleReorder = (items: { id: string; order: number }[]) => {
+    // Send each item's new order via the API sequentially
+    items.forEach(({ id, order }) => {
+      reorderMutation.mutate({ id, order });
+    });
   };
 
-  if (isLoading) return <div style={{ textAlign: 'center', padding: '2rem' }}>Loading...</div>;
-  if (error) return <div style={{ textAlign: 'center', padding: '2rem', color: '#ef4444' }}>Error loading tools</div>;
+  if (isLoading) return <Loading />;
+  if (error) return <ErrorMessage message={t('common.error')} />;
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Tools</h1>
+      <div className="admin-page-header">
+        <h1>{t('tools.title')}</h1>
         <Link to="/tools/create">
-          <Button>Add Tool</Button>
+          <Button>{t('tools.add')}</Button>
         </Link>
       </div>
       
-      <div style={{ marginBottom: '1rem', padding: '1rem', background: '#f0f9ff', borderRadius: '8px' }}>
-        <p style={{ fontSize: '0.875rem', color: '#0369a1', margin: 0 }}>
-          💡 Drag and drop to reorder tools
+      <div className="admin-card" style={{ marginBottom: '1rem', padding: '1rem', background: 'var(--color-primary-50)', borderRadius: 'var(--radius-lg)' }}>
+        <p style={{ fontSize: '0.875rem', color: 'var(--color-primary-700)', margin: 0 }}>
+          💡 {t('tools.reorder')}
         </p>
       </div>
 

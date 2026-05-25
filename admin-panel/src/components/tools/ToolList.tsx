@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { Button } from '@jsoft/shared';
+import { useTranslation } from '../../i18n/LanguageContext';
 
 interface Tool {
   id: string;
@@ -17,12 +19,13 @@ interface Tool {
 
 interface ToolListProps {
   tools: Tool[];
-  onReorder: (id: string, newOrder: number) => void;
+  onReorder: (items: { id: string; order: number }[]) => void;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
 }
 
 export function ToolList({ tools, onReorder, onEdit, onDelete }: ToolListProps) {
+  const { t } = useTranslation();
   const [dragId, setDragId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
 
@@ -42,12 +45,35 @@ export function ToolList({ tools, onReorder, onEdit, onDelete }: ToolListProps) 
     e.preventDefault();
     if (!dragId || dragId === targetId) return;
 
+    // Build the new order by recalculating ALL positions after the drop
     const draggedTool = tools.find(t => t.id === dragId);
     const targetTool = tools.find(t => t.id === targetId);
     
-    if (draggedTool && targetTool) {
-      onReorder(dragId, targetTool.order);
+    if (!draggedTool || !targetTool) {
+      setDragId(null);
+      setDragOverId(null);
+      return;
     }
+
+    // Get all tool IDs in current sorted order
+    const idsInOrder = sortedTools.map(t => t.id);
+    
+    // Remove dragged item from its current position
+    const draggedIndex = idsInOrder.indexOf(dragId);
+    idsInOrder.splice(draggedIndex, 1);
+    
+    // Insert dragged item at the target's position
+    const targetIndex = idsInOrder.indexOf(targetId);
+    const insertAt = targetIndex >= 0 ? targetIndex : idsInOrder.length;
+    idsInOrder.splice(insertAt, 0, dragId);
+
+    // Assign new sequential order values to ALL items
+    const reorderItems = idsInOrder.map((id, idx) => ({
+      id,
+      order: idx,
+    }));
+
+    onReorder(reorderItems);
     
     setDragId(null);
     setDragOverId(null);
@@ -59,56 +85,67 @@ export function ToolList({ tools, onReorder, onEdit, onDelete }: ToolListProps) 
   };
 
   if (tools.length === 0) {
-    return <p style={{ textAlign: 'center', color: '#6b7280', padding: '2rem' }}>No tools found</p>;
+    return (
+      <div className="admin-empty">
+        <div className="admin-empty-icon">🔧</div>
+        <div className="admin-empty-text">{t('tools.empty')}</div>
+      </div>
+    );
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-      {sortedTools.map((tool) => (
-        <div
-          key={tool.id}
-          draggable
-          onDragStart={(e) => handleDragStart(e, tool.id)}
-          onDragOver={(e) => handleDragOver(e, tool.id)}
-          onDrop={(e) => handleDrop(e, tool.id)}
-          onDragEnd={handleDragEnd}
-          style={{
-            background: '#fff',
-            borderRadius: '8px',
-            padding: '1rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '1rem',
-            cursor: 'grab',
-            border: dragId === tool.id ? '2px solid #4ade80' : 
-                   dragOverId === tool.id ? '2px solid #f59e0b' : '1px solid #e5e7eb',
-            opacity: dragId === tool.id ? 0.5 : 1,
-            transition: 'all 0.2s',
-          }}
-        >
-          <span style={{ fontSize: '1.5rem', cursor: 'grab' }}>⋮⋮</span>
-          <div style={{ flex: 1 }}>
-            <p style={{ fontWeight: '500', margin: 0 }}>{tool.title}</p>
-            <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0 }}>{tool.classification}</p>
+    <div className="admin-card">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', padding: '0.5rem' }}>
+        {sortedTools.map((tool) => (
+          <div
+            key={tool.id}
+            draggable
+            onDragStart={(e) => handleDragStart(e, tool.id)}
+            onDragOver={(e) => handleDragOver(e, tool.id)}
+            onDrop={(e) => handleDrop(e, tool.id)}
+            onDragEnd={handleDragEnd}
+            style={{
+              background: '#fff',
+              borderRadius: '8px',
+              padding: '1rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '1rem',
+              cursor: 'grab',
+              border: `${dragId === tool.id ? '2px solid #4ade80' : 
+                     dragOverId === tool.id ? '2px solid #f59e0b' : '1px solid #e5e7eb'}`,
+              borderLeft: dragId === tool.id ? '3px solid #4ade80' :
+                         dragOverId === tool.id ? '3px solid #f59e0b' : '3px solid var(--color-green-accent)',
+              opacity: dragId === tool.id ? 0.5 : 1,
+              transition: 'all 0.2s',
+            }}
+          >
+            <span style={{ 
+              fontSize: '1.5rem', 
+              cursor: 'grab', 
+              color: 'var(--color-neutral-400)',
+              userSelect: 'none',
+              lineHeight: '1',
+            }}>
+              ⋮⋮
+            </span>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontWeight: '500', margin: 0 }}>{tool.title}</p>
+              <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0 }}>{tool.classification}</p>
+            </div>
+            <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>{t('tools.order')}: {tool.order}</span>
+            {tool.featured && (
+              <span style={{ fontSize: '0.75rem', background: '#fef3c7', padding: '0.125rem 0.375rem', borderRadius: '4px' }}>
+                {t('tools.featured')}
+              </span>
+            )}
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <Button variant="secondary" size="sm" onClick={() => onEdit(tool.id)}>{t('tools.edit')}</Button>
+              <Button variant="danger" size="sm" onClick={() => onDelete(tool.id)}>{t('tools.delete')}</Button>
+            </div>
           </div>
-          <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>Order: {tool.order}</span>
-          {tool.featured && <span style={{ fontSize: '0.75rem', background: '#fef3c7', padding: '0.125rem 0.375rem', borderRadius: '4px' }}>Featured</span>}
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <button 
-              onClick={() => onEdit(tool.id)}
-              style={{ padding: '0.25rem 0.5rem', background: '#6b7280', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-            >
-              Edit
-            </button>
-            <button 
-              onClick={() => onDelete(tool.id)}
-              style={{ padding: '0.25rem 0.5rem', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-            >
-              Delete
-            </button>
-          </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }

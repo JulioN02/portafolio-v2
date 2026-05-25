@@ -1,6 +1,8 @@
 import { useAuth } from '../../hooks/useAuth';
+import { useTranslation } from '../../i18n/LanguageContext';
 
 export function ProfileSettings() {
+  const { t } = useTranslation();
   const { getUser } = useAuth();
   const user = getUser();
 
@@ -14,7 +16,7 @@ export function ProfileSettings() {
           color: '#111827',
         }}
       >
-        Profile
+        {t('settings.profile')}
       </h2>
 
       <div style={{ display: 'grid', gap: '1rem' }}>
@@ -27,7 +29,7 @@ export function ProfileSettings() {
               marginBottom: '0.25rem',
             }}
           >
-            Name
+            {t('settings.name')}
           </label>
           <input
             type="text"
@@ -53,7 +55,7 @@ export function ProfileSettings() {
               marginBottom: '0.25rem',
             }}
           >
-            Role
+            {t('settings.role')}
           </label>
           <input
             type="text"

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@jsoft/shared';
+import { useTranslation } from '../../i18n/LanguageContext';
 import type { ServiceResponse } from '@jsoft/shared';
 
 interface ServiceTableProps {
@@ -9,46 +10,48 @@ interface ServiceTableProps {
 }
 
 export function ServiceTable({ services, onDelete, onToggleFeatured }: ServiceTableProps) {
+  const { t } = useTranslation();
+
   if (services.length === 0) {
-    return <p style={{ textAlign: 'center', color: '#6b7280', padding: '2rem' }}>No services found</p>;
+    return (
+      <div className="admin-empty">
+        <div className="admin-empty-icon">📋</div>
+        <div className="admin-empty-text">{t('services.empty')}</div>
+      </div>
+    );
   }
 
   return (
-    <table style={{ width: '100%', borderCollapse: 'collapse', background: '#fff' }}>
+    <table className="admin-table">
       <thead>
-        <tr style={{ borderBottom: '2px solid #e5e7eb' }}>
-          <th style={{ textAlign: 'left', padding: '0.75rem' }}>Title</th>
-          <th style={{ textAlign: 'left', padding: '0.75rem' }}>Classification</th>
-          <th style={{ textAlign: 'center', padding: '0.75rem' }}>Featured</th>
-          <th style={{ textAlign: 'right', padding: '0.75rem' }}>Actions</th>
+        <tr>
+          <th>Title</th>
+          <th>Classification</th>
+          <th style={{ textAlign: 'center' }}>{t('services.featured')}</th>
+          <th style={{ textAlign: 'right' }}>Actions</th>
         </tr>
       </thead>
       <tbody>
         {services.map((service) => (
-          <tr key={service.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
-            <td style={{ padding: '0.75rem' }}>{service.title}</td>
-            <td style={{ padding: '0.75rem' }}>{service.classification}</td>
-            <td style={{ textAlign: 'center', padding: '0.75rem' }}>
-              <button
+          <tr key={service.id}>
+            <td>{service.title}</td>
+            <td>{service.classification}</td>
+            <td style={{ textAlign: 'center' }}>
+              <Button
+                variant="secondary"
+                size="sm"
                 onClick={() => onToggleFeatured(service.id, !service.featured)}
-                style={{
-                  padding: '0.25rem 0.5rem',
-                  background: service.featured ? '#10b981' : '#6b7280',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '0.75rem'
-                }}
               >
-                {service.featured ? 'Yes' : 'No'}
-              </button>
+                {service.featured ? t('common.yes') : t('common.no')}
+              </Button>
             </td>
-            <td style={{ textAlign: 'right', padding: '0.75rem', display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-              <Link to={`/services/edit/${service.id}`}>
-                <Button variant="secondary" size="sm">Edit</Button>
-              </Link>
-              <Button variant="danger" size="sm" onClick={() => onDelete(service.id)}>Delete</Button>
+            <td style={{ textAlign: 'right' }}>
+              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                <Link to={`/services/edit/${service.id}`}>
+                  <Button variant="secondary" size="sm">{t('services.edit')}</Button>
+                </Link>
+                <Button variant="danger" size="sm" onClick={() => onDelete(service.id)}>{t('services.delete')}</Button>
+              </div>
             </td>
           </tr>
         ))}

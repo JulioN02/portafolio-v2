@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from '../../i18n/LanguageContext';
 import { Input, Textarea, Checkbox } from '@jsoft/shared';
 import { Button } from '@jsoft/shared';
 import type { ProductInput } from '@jsoft/shared';
@@ -18,6 +19,7 @@ interface ProductFormProps {
 }
 
 export function ProductForm({ initialData, onSubmit, isLoading }: ProductFormProps) {
+  const { t } = useTranslation();
   const [title, setTitle] = useState(initialData?.title || '');
   const [slug, setSlug] = useState(initialData?.slug || '');
   const [classification, setClassification] = useState(initialData?.classification || '');
@@ -126,7 +128,7 @@ export function ProductForm({ initialData, onSubmit, isLoading }: ProductFormPro
 
       {/* Images section */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-        <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151' }}>Images (at least one required)</label>
+        <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151' }}>{t('products.images')} (at least one required)</label>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
           <Input
             id="newImageUrl"
@@ -181,7 +183,7 @@ export function ProductForm({ initialData, onSubmit, isLoading }: ProductFormPro
       />
 
       <Button type="submit" disabled={isLoading}>
-        {isLoading ? 'Saving...' : 'Save'}
+        {isLoading ? t('products.saving') : t('products.save')}
       </Button>
     </form>
   );

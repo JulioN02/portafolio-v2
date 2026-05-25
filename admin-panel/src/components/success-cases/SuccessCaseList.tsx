@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import type { SuccessCaseResponse } from '@jsoft/shared';
+import { Button } from '@jsoft/shared';
+import { useTranslation } from '../../i18n/LanguageContext';
 
 interface SuccessCaseListProps {
   successCases: SuccessCaseResponse[];
@@ -17,6 +19,7 @@ interface ExtendedSuccessCase extends SuccessCaseResponse {
 }
 
 export function SuccessCaseList({ successCases, onReorder, onEdit, onDelete }: SuccessCaseListProps) {
+  const { t } = useTranslation();
   const [dragId, setDragId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
 
@@ -64,7 +67,12 @@ export function SuccessCaseList({ successCases, onReorder, onEdit, onDelete }: S
   };
 
   if (successCases.length === 0) {
-    return <p style={{ textAlign: 'center', color: '#6b7280', padding: '2rem' }}>No success cases found</p>;
+    return (
+      <div className="admin-empty">
+        <div className="admin-empty-icon">📋</div>
+        <div className="admin-empty-text">{t('successCases.empty')}</div>
+      </div>
+    );
   }
 
   return (
@@ -113,18 +121,8 @@ export function SuccessCaseList({ successCases, onReorder, onEdit, onDelete }: S
             </a>
           )}
           <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <button 
-              onClick={() => onEdit(successCase.id)}
-              style={{ padding: '0.25rem 0.5rem', background: '#6b7280', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-            >
-              Edit
-            </button>
-            <button 
-              onClick={() => onDelete(successCase.id)}
-              style={{ padding: '0.25rem 0.5rem', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-            >
-              Delete
-            </button>
+            <Button variant="secondary" size="sm" onClick={() => onEdit(successCase.id)}>{t('successCases.edit')}</Button>
+            <Button variant="danger" size="sm" onClick={() => onDelete(successCase.id)}>{t('successCases.delete')}</Button>
           </div>
         </div>
       ))}

@@ -1,8 +1,10 @@
 import { Button } from '@jsoft/shared';
 import { useAuth } from '../../hooks/useAuth';
+import { useTranslation } from '../../i18n/LanguageContext';
 import styles from './Header.module.css';
 
 export function Header() {
+  const { t } = useTranslation();
   const { getUser, logout } = useAuth();
   const user = getUser();
 
@@ -17,7 +19,7 @@ export function Header() {
         </div>
       </div>
       <Button variant="danger" size="sm" onClick={logout}>
-        Cerrar sesión
+        {t('nav.logout')}
       </Button>
     </header>
   );

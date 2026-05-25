@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from '../../i18n/LanguageContext';
 
 interface UserPreferences {
   theme: 'light' | 'dark';
@@ -13,6 +14,7 @@ const DEFAULT_PREFERENCES: UserPreferences = {
 const STORAGE_KEY = 'admin_user_preferences';
 
 export function PreferencesSettings() {
+  const { t, lang, setLang } = useTranslation();
   const [preferences, setPreferences] = useState<UserPreferences>(DEFAULT_PREFERENCES);
   const [isSaved, setIsSaved] = useState(false);
 
@@ -56,7 +58,7 @@ export function PreferencesSettings() {
           color: '#111827',
         }}
       >
-        Preferences
+        {t('settings.preferences')}
       </h2>
 
       <div style={{ display: 'grid', gap: '1rem' }}>
@@ -69,7 +71,7 @@ export function PreferencesSettings() {
               marginBottom: '0.5rem',
             }}
           >
-            Theme
+            {t('settings.theme')}
           </label>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             <button
@@ -84,7 +86,7 @@ export function PreferencesSettings() {
                 cursor: 'pointer',
               }}
             >
-              Light
+              {t('settings.light')}
             </button>
             <button
               type="button"
@@ -98,7 +100,7 @@ export function PreferencesSettings() {
                 cursor: 'pointer',
               }}
             >
-              Dark
+              {t('settings.dark')}
             </button>
           </div>
         </div>
@@ -112,7 +114,7 @@ export function PreferencesSettings() {
               marginBottom: '0.5rem',
             }}
           >
-            Items per page
+            {t('settings.itemsPerPage')}
           </label>
           <select
             value={preferences.itemsPerPage}
@@ -126,10 +128,53 @@ export function PreferencesSettings() {
               minWidth: '120px',
             }}
           >
-            <option value={10}>10 items</option>
+            <option value={10}>{preferences.itemsPerPage} items</option>
             <option value={25}>25 items</option>
             <option value={50}>50 items</option>
           </select>
+        </div>
+
+        <div>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '0.875rem',
+              color: '#6b7280',
+              marginBottom: '0.5rem',
+            }}
+          >
+            {t('settings.language')}
+          </label>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button
+              type="button"
+              onClick={() => setLang('es')}
+              style={{
+                padding: '0.5rem 1rem',
+                borderRadius: '6px',
+                border: lang === 'es' ? '2px solid #3b82f6' : '1px solid #d1d5db',
+                background: lang === 'es' ? '#eff6ff' : '#fff',
+                color: lang === 'es' ? '#3b82f6' : '#6b7280',
+                cursor: 'pointer',
+              }}
+            >
+              {t('settings.spanish')}
+            </button>
+            <button
+              type="button"
+              onClick={() => setLang('en')}
+              style={{
+                padding: '0.5rem 1rem',
+                borderRadius: '6px',
+                border: lang === 'en' ? '2px solid #3b82f6' : '1px solid #d1d5db',
+                background: lang === 'en' ? '#eff6ff' : '#fff',
+                color: lang === 'en' ? '#3b82f6' : '#6b7280',
+                cursor: 'pointer',
+              }}
+            >
+              {t('settings.english')}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -147,12 +192,12 @@ export function PreferencesSettings() {
             cursor: 'pointer',
           }}
         >
-          Save Preferences
+          {t('settings.save')}
         </button>
 
         {isSaved && (
           <span style={{ color: '#10b981', fontSize: '0.875rem' }}>
-            Preferences saved successfully!
+            {t('settings.saved')}
           </span>
         )}
       </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Button } from '@jsoft/shared';
+import { Button, Loading, ErrorMessage } from '@jsoft/shared';
 import type { ContactFormResponse } from '@jsoft/shared';
+import { useTranslation } from '../../i18n/LanguageContext';
 import { useContactForms } from '../../hooks/useContactForms';
 import { ContactMessageList, type ContactMessage } from '../../components/contact-messages/ContactMessageList';
 
@@ -14,6 +15,7 @@ type MessageFilter = 'all' | 'unread' | 'read';
  * Main page for viewing and managing received contact messages
  */
 export function ContactMessagesListPage() {
+  const { t } = useTranslation();
   const { useGetAll } = useContactForms();
   const { data, isLoading, error } = useGetAll();
 
@@ -58,38 +60,23 @@ export function ContactMessagesListPage() {
   };
 
   if (isLoading) {
-    return (
-      <div style={{ textAlign: 'center', padding: '2rem' }}>
-        <p style={{ color: '#6b7280' }}>Loading...</p>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (error) {
-    return (
-      <div style={{ textAlign: 'center', padding: '2rem', color: '#ef4444' }}>
-        Error loading contact messages
-      </div>
-    );
+    return <ErrorMessage message={t('common.error')} />;
   }
 
   return (
     <div>
       {/* Header */}
-      <div style={{ marginBottom: '1.5rem' }}>
-        <h1
-          style={{
-            fontSize: '1.5rem',
-            fontWeight: 'bold',
-            color: '#111827',
-            marginBottom: '0.5rem',
-          }}
-        >
-          Contact Messages
-        </h1>
-        <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-          View and manage messages received from your portfolio contact forms
-        </p>
+      <div className="admin-page-header">
+        <div>
+          <h1>{t('contactMessages.title')}</h1>
+          <p style={{ color: 'var(--color-neutral-500)', fontSize: '0.875rem', margin: '0.25rem 0 0' }}>
+            {t('contactMessages.title')}
+          </p>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -110,7 +97,7 @@ export function ContactMessagesListPage() {
           }}
         >
           <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.25rem' }}>
-            Total Messages
+            {t('contactMessages.title')}
           </div>
           <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#111827' }}>
             {totalMessages}
@@ -125,7 +112,7 @@ export function ContactMessagesListPage() {
           }}
         >
           <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.25rem' }}>
-            Unread Messages
+            Unread
           </div>
           <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#3b82f6' }}>
             {unreadCount}
@@ -134,34 +121,16 @@ export function ContactMessagesListPage() {
       </div>
 
       {/* Filter Tabs */}
-      <div
-        style={{
-          display: 'flex',
-          gap: '0.5rem',
-          marginBottom: '1.5rem',
-          borderBottom: '1px solid #e5e7eb',
-          paddingBottom: '0.5rem',
-        }}
-      >
+      <div className="admin-filter-bar" style={{ borderBottom: '1px solid var(--color-neutral-200)', paddingBottom: '0.5rem' }}>
         {(['all', 'unread', 'read'] as MessageFilter[]).map((filterOption) => (
-          <button
+          <Button
             key={filterOption}
+            variant={filter === filterOption ? 'primary' : 'secondary'}
+            size="sm"
             onClick={() => setFilter(filterOption)}
-            style={{
-              padding: '0.5rem 1rem',
-              background: filter === filterOption ? '#3b82f6' : 'transparent',
-              color: filter === filterOption ? '#fff' : '#6b7280',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontSize: '0.875rem',
-              fontWeight: '500',
-              textTransform: 'capitalize',
-              transition: 'all 0.2s ease',
-            }}
           >
             {filterOption}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -186,7 +155,7 @@ export function ContactMessagesListPage() {
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={!data.pagination.hasPrev}
           >
-            Previous
+            {t('common.previous')}
           </Button>
           <span
             style={{
@@ -204,7 +173,7 @@ export function ContactMessagesListPage() {
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={!data.pagination.hasNext}
           >
-            Next
+            {t('common.next')}
           </Button>
         </div>
       )}

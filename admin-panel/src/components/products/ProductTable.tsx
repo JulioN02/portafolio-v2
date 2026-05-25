@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@jsoft/shared';
+import { useTranslation } from '../../i18n/LanguageContext';
 import type { ProductResponse } from '@jsoft/shared';
 
 interface ProductTableProps {
@@ -8,31 +9,40 @@ interface ProductTableProps {
 }
 
 export function ProductTable({ products, onDelete }: ProductTableProps) {
+  const { t } = useTranslation();
+
   if (products.length === 0) {
-    return <p style={{ textAlign: 'center', color: '#6b7280', padding: '2rem' }}>No products found</p>;
+    return (
+      <div className="admin-empty">
+        <div className="admin-empty-icon">📋</div>
+        <div className="admin-empty-text">{t('products.empty')}</div>
+      </div>
+    );
   }
 
   return (
-    <table style={{ width: '100%', borderCollapse: 'collapse', background: '#fff' }}>
+    <table className="admin-table">
       <thead>
-        <tr style={{ borderBottom: '2px solid #e5e7eb' }}>
-          <th style={{ textAlign: 'left', padding: '0.75rem' }}>Title</th>
-          <th style={{ textAlign: 'left', padding: '0.75rem' }}>Classification</th>
-          <th style={{ textAlign: 'left', padding: '0.75rem' }}>Images</th>
-          <th style={{ textAlign: 'right', padding: '0.75rem' }}>Actions</th>
+        <tr>
+          <th>Title</th>
+          <th>Classification</th>
+          <th>{t('products.images')}</th>
+          <th style={{ textAlign: 'right' }}>Actions</th>
         </tr>
       </thead>
       <tbody>
         {products.map((product) => (
-          <tr key={product.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
-            <td style={{ padding: '0.75rem' }}>{product.title}</td>
-            <td style={{ padding: '0.75rem' }}>{product.classification}</td>
-            <td style={{ padding: '0.75rem' }}>{product.images.length}</td>
-            <td style={{ textAlign: 'right', padding: '0.75rem', display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-              <Link to={`/products/edit/${product.id}`}>
-                <Button variant="secondary" size="sm">Edit</Button>
-              </Link>
-              <Button variant="danger" size="sm" onClick={() => onDelete(product.id)}>Delete</Button>
+          <tr key={product.id}>
+            <td>{product.title}</td>
+            <td>{product.classification}</td>
+            <td>{product.images.length}</td>
+            <td style={{ textAlign: 'right' }}>
+              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                <Link to={`/products/edit/${product.id}`}>
+                  <Button variant="secondary" size="sm">{t('products.edit')}</Button>
+                </Link>
+                <Button variant="danger" size="sm" onClick={() => onDelete(product.id)}>{t('products.delete')}</Button>
+              </div>
             </td>
           </tr>
         ))}

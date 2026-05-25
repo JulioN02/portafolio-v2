@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { useTranslation } from '../../i18n/LanguageContext';
 
 export function SecuritySettings() {
+  const { t } = useTranslation();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -9,11 +11,11 @@ export function SecuritySettings() {
     e.preventDefault();
 
     if (newPassword !== confirmPassword) {
-      alert('New passwords do not match');
+      alert(t('settings.passwordMismatch'));
       return;
     }
 
-    alert('Password change: API endpoint not implemented yet');
+    alert(t('settings.passwordStub'));
   };
 
   return (
@@ -26,7 +28,7 @@ export function SecuritySettings() {
           color: '#111827',
         }}
       >
-        Security
+        {t('settings.security')}
       </h2>
 
       <form onSubmit={handleSubmit}>
@@ -40,7 +42,7 @@ export function SecuritySettings() {
                 marginBottom: '0.25rem',
               }}
             >
-              Current Password
+              {t('settings.currentPassword')}
             </label>
             <input
               type="password"
@@ -67,7 +69,7 @@ export function SecuritySettings() {
                 marginBottom: '0.25rem',
               }}
             >
-              New Password
+              {t('settings.newPassword')}
             </label>
             <input
               type="password"
@@ -95,7 +97,7 @@ export function SecuritySettings() {
                 marginBottom: '0.25rem',
               }}
             >
-              Confirm New Password
+              {t('settings.confirmPassword')}
             </label>
             <input
               type="password"
@@ -126,7 +128,7 @@ export function SecuritySettings() {
                 cursor: 'pointer',
               }}
             >
-              Change Password
+              {t('settings.changePassword')}
             </button>
           </div>
         </div>

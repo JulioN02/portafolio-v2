@@ -1,9 +1,11 @@
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from '../../i18n/LanguageContext';
 import { useSuccessCases } from '../../hooks/useSuccessCases';
 import { SuccessCaseForm } from '../../components/success-cases/SuccessCaseForm';
 import type { SuccessCaseInput, SuccessCaseUpdateInput } from '@jsoft/shared';
 
 export function SuccessCaseEdit() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { useGetById, useUpdate } = useSuccessCases();
@@ -25,14 +27,14 @@ export function SuccessCaseEdit() {
   };
 
   if (isLoading) {
-    return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>;
+    return <div style={{ padding: '2rem', textAlign: 'center' }}>{t('common.loading')}</div>;
   }
 
   if (error || !successCase) {
     return (
       <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
         <div style={{ color: '#ef4444', marginBottom: '1rem' }}>
-          Error loading success case
+          {t('common.error')}
         </div>
         <button
           onClick={() => navigate('/success-cases')}
@@ -45,7 +47,7 @@ export function SuccessCaseEdit() {
             cursor: 'pointer'
           }}
         >
-          Back to Success Cases
+          {t('contactMessages.back')} {t('successCases.title')}
         </button>
       </div>
     );
@@ -66,11 +68,11 @@ export function SuccessCaseEdit() {
           fontSize: '0.875rem'
         }}
       >
-        ← Back to Success Cases
+        ← {t('contactMessages.back')} {t('successCases.title')}
       </button>
       
       <h1 style={{ fontSize: '1.5rem', fontWeight: '600', marginBottom: '1.5rem' }}>
-        Edit Success Case
+        {t('successCases.edit')} {t('successCases.title')}
       </h1>
       
       <SuccessCaseForm

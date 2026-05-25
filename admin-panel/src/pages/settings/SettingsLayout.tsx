@@ -1,12 +1,15 @@
 import { Outlet, NavLink } from 'react-router-dom';
-
-const sidebarLinks = [
-  { to: '/settings/profile', label: 'Profile', end: true },
-  { to: '/settings/preferences', label: 'Preferences' },
-  { to: '/settings/security', label: 'Security' },
-];
+import { useTranslation } from '../../i18n/LanguageContext';
 
 export function SettingsLayout() {
+  const { t } = useTranslation();
+
+  const sidebarLinks = [
+    { to: '/settings/profile', label: t('settings.profile'), end: true },
+    { to: '/settings/preferences', label: t('settings.preferences') },
+    { to: '/settings/security', label: t('settings.security') },
+  ];
+
   return (
     <div>
       <h1
@@ -17,7 +20,7 @@ export function SettingsLayout() {
           color: '#111827',
         }}
       >
-        Settings
+        {t('settings.title')}
       </h1>
 
       <div style={{ display: 'grid', gridTemplateColumns: '200px 1fr', gap: '1.5rem' }}>

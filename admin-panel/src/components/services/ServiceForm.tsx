@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from '../../i18n/LanguageContext';
 import { Input, Textarea, Checkbox } from '@jsoft/shared';
 import { Button } from '@jsoft/shared';
 import { ServiceInput } from '@jsoft/shared';
@@ -18,6 +19,7 @@ const generateSlug = (title: string): string => {
 };
 
 export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormProps) {
+  const { t } = useTranslation();
   const [title, setTitle] = useState(initialData?.title || '');
   const [slug, setSlug] = useState(initialData?.slug || '');
   const [classification, setClassification] = useState(initialData?.classification || '');
@@ -121,7 +123,7 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
         onChange={(e) => setFeatured(e.target.checked)}
       />
       <Button type="submit" disabled={isLoading}>
-        {isLoading ? 'Saving...' : 'Save'}
+        {isLoading ? t('services.saving') : t('services.save')}
       </Button>
     </form>
   );

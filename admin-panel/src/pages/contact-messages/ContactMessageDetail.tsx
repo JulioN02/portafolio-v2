@@ -1,4 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
+import { useTranslation } from '../../i18n/LanguageContext';
 import { useContactForms } from '../../hooks/useContactForms';
 
 /**
@@ -6,6 +7,7 @@ import { useContactForms } from '../../hooks/useContactForms';
  * Displays a single contact message in full detail (read-only)
  */
 export function ContactMessageDetailPage() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const { useGetById } = useContactForms();
   const { data, isLoading, error } = useGetById(id || '');
@@ -15,7 +17,7 @@ export function ContactMessageDetailPage() {
       <div style={{ textAlign: 'center', padding: '2rem' }}>
         <p style={{ color: '#ef4444' }}>Invalid message ID</p>
         <Link to="/contact-messages">
-          <span style={{ color: '#3b82f6', textDecoration: 'underline', cursor: 'pointer' }}>Back to Messages</span>
+          <span style={{ color: '#3b82f6', textDecoration: 'underline', cursor: 'pointer' }}>{t('contactMessages.back')}</span>
         </Link>
       </div>
     );
@@ -24,7 +26,7 @@ export function ContactMessageDetailPage() {
   if (isLoading) {
     return (
       <div style={{ textAlign: 'center', padding: '2rem' }}>
-        <p style={{ color: '#6b7280' }}>Loading...</p>
+        <p style={{ color: '#6b7280' }}>{t('common.loading')}</p>
       </div>
     );
   }
@@ -32,9 +34,9 @@ export function ContactMessageDetailPage() {
   if (error || !data) {
     return (
       <div style={{ textAlign: 'center', padding: '2rem', color: '#ef4444' }}>
-        <p>Error loading message</p>
+        <p>{t('common.error')}</p>
         <Link to="/contact-messages">
-          <span style={{ color: '#3b82f6', textDecoration: 'underline', cursor: 'pointer' }}>Back to Messages</span>
+          <span style={{ color: '#3b82f6', textDecoration: 'underline', cursor: 'pointer' }}>{t('contactMessages.back')}</span>
         </Link>
       </div>
     );
@@ -68,7 +70,7 @@ export function ContactMessageDetailPage() {
           fontSize: '0.875rem',
         }}
       >
-        ← Back to Messages
+        ← {t('contactMessages.back')}
       </Link>
 
       {/* Header */}
@@ -126,7 +128,7 @@ export function ContactMessageDetailPage() {
 
             {/* Date */}
             <div style={{ color: '#9ca3af', fontSize: '0.75rem', marginTop: '0.5rem' }}>
-              Received: {formatDate(message.createdAt)}
+              {t('contactMessages.date')}: {formatDate(message.createdAt)}
             </div>
           </div>
 

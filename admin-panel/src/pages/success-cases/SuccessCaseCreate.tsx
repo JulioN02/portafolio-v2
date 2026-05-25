@@ -1,9 +1,11 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from '../../i18n/LanguageContext';
 import { useSuccessCases } from '../../hooks/useSuccessCases';
 import { SuccessCaseForm } from '../../components/success-cases/SuccessCaseForm';
 import type { SuccessCaseInput } from '@jsoft/shared';
 
 export function SuccessCaseCreate() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { useCreate } = useSuccessCases();
   
@@ -34,11 +36,11 @@ export function SuccessCaseCreate() {
           fontSize: '0.875rem'
         }}
       >
-        ← Back to Success Cases
+        ← {t('contactMessages.back')} {t('successCases.title')}
       </button>
       
       <h1 style={{ fontSize: '1.5rem', fontWeight: '600', marginBottom: '1.5rem' }}>
-        Create New Success Case
+        {t('successCases.create')}
       </h1>
       
       <SuccessCaseForm

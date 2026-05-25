@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from '../i18n/LanguageContext';
 import { useServices } from '../hooks/useServices';
 import { useProducts } from '../hooks/useProducts';
 import { useTools } from '../hooks/useTools';
@@ -17,6 +18,7 @@ function formatDate(date: Date | string): string {
 }
 
 export function DashboardPage() {
+  const { t } = useTranslation();
   const { useGetAll: useServicesAll } = useServices();
   const { useGetAll: useProductsAll } = useProducts();
   const { useGetAll: useToolsAll } = useTools();
@@ -49,7 +51,7 @@ export function DashboardPage() {
           color: '#111827',
         }}
       >
-        Dashboard
+        {t('dashboard.title')}
       </h1>
 
       <div
@@ -59,11 +61,11 @@ export function DashboardPage() {
           gap: '1.5rem',
         }}
       >
-        <SummaryCard title="Services" value={stats.services} icon="🛠️" color="#3b82f6" />
-        <SummaryCard title="Products" value={stats.products} icon="📦" color="#8b5cf6" />
-        <SummaryCard title="Tools" value={stats.tools} icon="🔧" color="#f59e0b" />
-        <SummaryCard title="Blog Posts" value={stats.blogPosts} icon="📝" color="#10b981" />
-        <SummaryCard title="Contact Forms" value={stats.contacts} icon="📧" color="#ef4444" />
+        <SummaryCard title={t('services.title')} value={stats.services} icon="🛠️" color="#3b82f6" />
+        <SummaryCard title={t('products.title')} value={stats.products} icon="📦" color="#8b5cf6" />
+        <SummaryCard title={t('tools.title')} value={stats.tools} icon="🔧" color="#f59e0b" />
+        <SummaryCard title={t('blog.title')} value={stats.blogPosts} icon="📝" color="#10b981" />
+        <SummaryCard title={t('contactMessages.title')} value={stats.contacts} icon="📧" color="#ef4444" />
       </div>
 
       {/* Quick Actions */}
@@ -76,7 +78,7 @@ export function DashboardPage() {
             color: '#111827',
           }}
         >
-          Quick Actions
+          {t('dashboard.quickActions')}
         </h2>
         <div
           style={{
@@ -103,7 +105,7 @@ export function DashboardPage() {
             }}
           >
             <span style={{ fontSize: '1.25rem' }}>📝</span>
-            Create Blog Post
+            {t('dashboard.createBlogPost')}
           </Link>
           <Link
             to="/services/create"
@@ -123,7 +125,7 @@ export function DashboardPage() {
             }}
           >
             <span style={{ fontSize: '1.25rem' }}>🛠️</span>
-            Create Service
+            {t('dashboard.createService')}
           </Link>
           <Link
             to="/contact-messages"
@@ -143,7 +145,7 @@ export function DashboardPage() {
             }}
           >
             <span style={{ fontSize: '1.25rem' }}>📧</span>
-            View Contact Messages
+            {t('dashboard.viewMessages')}
           </Link>
         </div>
       </div>
@@ -158,7 +160,7 @@ export function DashboardPage() {
             color: '#111827',
           }}
         >
-          Recent Activity
+          {t('dashboard.recentActivity')}
         </h2>
         <div
           style={{
@@ -173,16 +175,16 @@ export function DashboardPage() {
               <thead>
                 <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
                   <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase' }}>
-                    Name
+                    {t('contactMessages.name')}
                   </th>
                   <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase' }}>
-                    Email
+                    {t('contactMessages.email')}
                   </th>
                   <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase' }}>
-                    Subject
+                    {t('contactMessages.subject')}
                   </th>
                   <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase' }}>
-                    Date
+                    {t('contactMessages.date')}
                   </th>
                 </tr>
               </thead>
@@ -217,7 +219,7 @@ export function DashboardPage() {
             </table>
           ) : (
             <p style={{ color: '#6b7280', textAlign: 'center', padding: '2rem' }}>
-              No contact messages yet
+              {t('dashboard.noMessages')}
             </p>
           )}
         </div>

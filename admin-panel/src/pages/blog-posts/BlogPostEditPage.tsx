@@ -1,9 +1,11 @@
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from '../../i18n/LanguageContext';
 import { BlogPostForm } from '../../components/blog-posts/BlogPostForm';
 import { useBlogPosts } from '../../hooks/useBlogPosts';
 import { BlogPostInput } from '@jsoft/shared';
 
 export function BlogPostEditPage() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { useGetById, useUpdate } = useBlogPosts();
@@ -21,12 +23,12 @@ export function BlogPostEditPage() {
     );
   };
 
-  if (isLoading) return <div style={{ textAlign: 'center', padding: '2rem' }}>Loading...</div>;
+  if (isLoading) return <div style={{ textAlign: 'center', padding: '2rem' }}>{t('common.loading')}</div>;
   if (!post) return <div style={{ textAlign: 'center', padding: '2rem', color: '#ef4444' }}>Post not found</div>;
 
   return (
     <div>
-      <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>Edit Blog Post</h1>
+      <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>{t('blog.edit')} Blog Post</h1>
       <BlogPostForm 
         initialData={{
           title: post.title,

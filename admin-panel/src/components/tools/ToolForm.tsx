@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from '../../i18n/LanguageContext';
 import { Input, Textarea, Checkbox } from '@jsoft/shared';
 import { Button } from '@jsoft/shared';
 import { ToolInput } from '@jsoft/shared';
@@ -10,6 +11,7 @@ interface ToolFormProps {
 }
 
 export function ToolForm({ initialData, onSubmit, isLoading }: ToolFormProps) {
+  const { t } = useTranslation();
   const [title, setTitle] = useState(initialData?.title || '');
   const [slug, setSlug] = useState(initialData?.slug || '');
   const [classification, setClassification] = useState(initialData?.classification || '');
@@ -124,7 +126,7 @@ export function ToolForm({ initialData, onSubmit, isLoading }: ToolFormProps) {
       />
       <Checkbox
         id="featured"
-        label="Featured"
+        label={t('tools.featured')}
         checked={featured}
         onChange={(e) => setFeatured(e.target.checked)}
       />
@@ -135,7 +137,7 @@ export function ToolForm({ initialData, onSubmit, isLoading }: ToolFormProps) {
         onChange={(e) => setTechnicalExplanation(e.target.value)}
       />
       <Button type="submit" disabled={isLoading}>
-        {isLoading ? 'Saving...' : 'Save'}
+        {isLoading ? t('tools.saving') : t('tools.save')}
       </Button>
     </form>
   );
