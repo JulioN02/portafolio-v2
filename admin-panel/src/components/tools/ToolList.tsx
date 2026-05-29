@@ -22,9 +22,10 @@ interface ToolListProps {
   onReorder: (items: { id: string; order: number }[]) => void;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
+  onToggleFeatured?: (id: string, featured: boolean) => void;
 }
 
-export function ToolList({ tools, onReorder, onEdit, onDelete }: ToolListProps) {
+export function ToolList({ tools, onReorder, onEdit, onDelete, onToggleFeatured }: ToolListProps) {
   const { t } = useTranslation();
   const [dragId, setDragId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
@@ -134,10 +135,14 @@ export function ToolList({ tools, onReorder, onEdit, onDelete }: ToolListProps) 
               <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0 }}>{tool.classification}</p>
             </div>
             <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>{t('tools.order')}: {tool.order}</span>
-            {tool.featured && (
-              <span style={{ fontSize: '0.75rem', background: '#fef3c7', padding: '0.125rem 0.375rem', borderRadius: '4px' }}>
-                {t('tools.featured')}
-              </span>
+            {onToggleFeatured && (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => onToggleFeatured(tool.id, !tool.featured)}
+              >
+                {tool.featured ? t('common.yes') : t('common.no')}
+              </Button>
             )}
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               <Button variant="secondary" size="sm" onClick={() => onEdit(tool.id)}>{t('tools.edit')}</Button>

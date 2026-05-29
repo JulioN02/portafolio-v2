@@ -27,7 +27,17 @@ export const projectsController = {
     try {
       const limit = parseInt(req.query.limit as string) || 3;
       const projects = await projectsService.findRecent(limit);
-      res.json(projects);
+      res.json({
+        data: projects,
+        pagination: {
+          page: 1,
+          limit,
+          total: projects.length,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
+        },
+      });
     } catch (error) {
       console.error('Projects findRecent error:', error);
       res.status(500).json({ error: 'Internal server error' });

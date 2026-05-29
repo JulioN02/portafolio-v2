@@ -8,6 +8,10 @@ interface ProjectCardProps {
 
 /** Maps API type values to Spanish labels */
 const typeLabels: Record<string, string> = {
+  service: 'Servicio',
+  product: 'Producto',
+  tool: 'Herramienta',
+  successCase: 'Caso de Éxito',
   SERVICE: 'Servicio',
   PRODUCT: 'Producto',
   TOOL: 'Herramienta',
@@ -53,7 +57,7 @@ export function ProjectCard({ project, onSelect }: ProjectCardProps) {
           {project.classification}
         </span>
         <h3 className={styles.title}>{project.title}</h3>
-        <p className={styles.description}>{project.description}</p>
+        <p className={styles.description}>{project.shortDescription}</p>
       </div>
     </article>
   );

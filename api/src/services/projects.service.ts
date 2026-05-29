@@ -120,19 +120,16 @@ export const projectsService = {
             slug: true,
             description: true,
             images: true,
+            featured: true,
             createdAt: true,
           },
           orderBy: [{ createdAt: 'desc' }],
         }).then(items => items.map(item => ({
-          id: item.id,
+          ...item,
           type: 'successCase' as const,
-          title: item.title,
-          slug: item.slug,
           classification: 'success-case', // SuccessCase has no classification
           shortDescription: item.description,
           image: item.images[0] || '',
-          featured: false, // SuccessCase has no featured
-          createdAt: item.createdAt,
         })))
       );
     }
@@ -162,58 +159,44 @@ export const projectsService = {
   },
 
   async findRecent(limit = 3): Promise<ProjectSummary[]> {
-    // Get recent items from each type
+    const recentSelect = {
+      id: true, title: true, slug: true, classification: true,
+      shortDescription: true, images: true, featured: true, createdAt: true,
+    } as const;
+
+    // Helper: try featured first, fallback to recent
+    const featuredOrRecent = async <T extends Record<string, any>>(
+      delegate: (where: Record<string, any>) => Promise<T[]>,
+      mapItem: (item: T) => ProjectSummary,
+    ): Promise<ProjectSummary[]> => {
+      const featured = await delegate({ deletedAt: null, featured: true });
+      if (featured.length > 0) return featured.map(mapItem);
+      const recent = await delegate({ deletedAt: null });
+      return recent.map(mapItem);
+    };
+
+    const successCaseSelect = {
+      id: true, title: true, slug: true, description: true,
+      images: true, featured: true, createdAt: true,
+    } as const;
+
     const [services, products, tools, successCases] = await Promise.all([
-      prisma.service.findMany({
-        where: { deletedAt: null },
-        select: {
-          id: true, title: true, slug: true, classification: true,
-          shortDescription: true, images: true, featured: true, createdAt: true,
-        },
-        orderBy: [{ createdAt: 'desc' }],
-        take: limit,
-      }).then(items => items.map(item => ({
-        ...item, type: 'service' as const, image: item.images[0] || '',
-      }))),
-      
-      prisma.product.findMany({
-        where: { deletedAt: null },
-        select: {
-          id: true, title: true, slug: true, classification: true,
-          shortDescription: true, images: true, featured: true, createdAt: true,
-        },
-        orderBy: [{ createdAt: 'desc' }],
-        take: limit,
-      }).then(items => items.map(item => ({
-        ...item, type: 'product' as const, image: item.images[0] || '',
-      }))),
-      
-      prisma.tool.findMany({
-        where: { deletedAt: null },
-        select: {
-          id: true, title: true, slug: true, classification: true,
-          shortDescription: true, images: true, featured: true, createdAt: true,
-        },
-        orderBy: [{ createdAt: 'desc' }],
-        take: limit,
-      }).then(items => items.map(item => ({
-        ...item, type: 'tool' as const, image: item.images[0] || '',
-      }))),
-      
-      prisma.successCase.findMany({
-        where: { deletedAt: null },
-        select: {
-          id: true, title: true, slug: true, description: true,
-          images: true, createdAt: true,
-        },
-        orderBy: [{ createdAt: 'desc' }],
-        take: limit,
-      }).then(items => items.map(item => ({
-        id: item.id, type: 'successCase' as const, title: item.title,
-        slug: item.slug, classification: 'success-case',
-        shortDescription: item.description, image: item.images[0] || '',
-        featured: false, createdAt: item.createdAt,
-      }))),
+      featuredOrRecent(
+        (where) => prisma.service.findMany({ where, select: recentSelect, orderBy: [{ createdAt: 'desc' }], take: 1 }),
+        (i: any) => ({ ...i, type: 'service' as const, image: i.images[0] || '' }),
+      ),
+      featuredOrRecent(
+        (where) => prisma.product.findMany({ where, select: recentSelect, orderBy: [{ createdAt: 'desc' }], take: 1 }),
+        (i: any) => ({ ...i, type: 'product' as const, image: i.images[0] || '' }),
+      ),
+      featuredOrRecent(
+        (where) => prisma.tool.findMany({ where, select: recentSelect, orderBy: [{ createdAt: 'desc' }], take: 1 }),
+        (i: any) => ({ ...i, type: 'tool' as const, image: i.images[0] || '' }),
+      ),
+      featuredOrRecent(
+        (where) => prisma.successCase.findMany({ where, select: successCaseSelect, orderBy: [{ createdAt: 'desc' }], take: 1 }),
+        (i: any) => ({ ...i, type: 'successCase' as const, classification: 'success-case', shortDescription: i.description, image: i.images[0] || '' }),
+      ),
     ]);
 
     // Merge all and sort by createdAt, then take the top N

@@ -83,6 +83,8 @@ export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCas
         slug: initialData?.slug || generateSlug(title),
         description,
         images: images.length > 0 ? images : ['https://placehold.co/600x400'],
+        order: 0,
+        featured: false,
         ...(initialData as Record<string, unknown>),
         clientName,
         classification,

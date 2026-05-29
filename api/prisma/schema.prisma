@@ -113,12 +113,15 @@ model SuccessCase {
   images      String[]
   videos      String[]
   links       String[]
+  order       Int      @default(0)
+  featured    Boolean  @default(false)
   deletedAt   DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([deletedAt])
+  @@index([featured, deletedAt])
+  @@index([order, createdAt])
 }
 
 // ============================================

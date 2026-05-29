@@ -5,7 +5,7 @@ export function BlogPage() {
   return (
     <main>
       <MetaTags
-        title="Blog | Julián Naranjo"
+        title="Blog | Julio Nieto"
         description="Artículos sobre desarrollo web, tecnología y experiencia como desarrollador."
       />
       <BlogGrid />

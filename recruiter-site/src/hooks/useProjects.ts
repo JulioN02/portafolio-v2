@@ -44,6 +44,10 @@ export function useRecentProjects() {
  * Map of project types to their detail API endpoints.
  */
 const detailEndpointMap: Record<string, string> = {
+  service: '/services',
+  product: '/products',
+  tool: '/tools',
+  successCase: '/success-cases',
   SERVICE: '/services',
   PRODUCT: '/products',
   TOOL: '/tools',

@@ -55,10 +55,10 @@ export function BlogPostPage() {
   return (
     <main className={styles.page}>
       <MetaTags
-        title={`${post.title} | Julián Naranjo`}
+        title={`${post.title} | Julio Nieto`}
         description={post.shortDescription}
         ogType="article"
-        publishedTime={post.publishedAt?.toISOString()}
+        publishedTime={post.publishedAt instanceof Date ? post.publishedAt.toISOString() : post.publishedAt ?? undefined}
       />
       <div className={styles.container}>
         <div className={styles.backLink}>

@@ -10,7 +10,7 @@ export function HomePage() {
   return (
     <div className={styles.page}>
       <MetaTags
-        title="Julián Naranjo | Desarrollador Full Stack"
+        title="Julio Nieto | Desarrollador Full Stack"
         description="Desarrollador Full Stack especializado en React, Node.js y TypeScript. Conoce mi portafolio y experiencia."
       />
       {/* Hero Section */}

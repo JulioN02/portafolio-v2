@@ -1,35 +1,34 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import DOMPurify from 'dompurify';
-import { useServiceBySlug } from '../../hooks/useServices';
+import { useSuccessCaseBySlug } from '../../hooks/useSuccessCases';
 import { Loading } from '../../components/common/Loading';
+import { MetaTags } from '../../components/seo/MetaTags';
 import { Modal } from '@jsoft/shared';
 import { ContactForm } from '../../components/forms/ContactForm';
-import { MetaTags } from '../../components/seo/MetaTags';
-import styles from './ServiceDetail.module.css';
+import styles from './SuccessCaseDetail.module.css';
 
-export function ServiceDetailPage() {
+export function SuccessCaseDetailPage() {
   const { slug } = useParams<{ slug: string }>();
-  const { data: service, isLoading, error } = useServiceBySlug(slug || '');
+  const { data: successCase, isLoading, error } = useSuccessCaseBySlug(slug || '');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
-  if (isLoading) return <Loading fullPage message="Cargando servicio..." />;
+  if (isLoading) return <Loading fullPage message="Cargando caso de éxito..." />;
 
-  if (error || !service) {
+  if (error || !successCase) {
     return (
       <div className={styles.error}>
-        <h2>Servicio no encontrado</h2>
-        <p>El servicio que buscas no existe o ha sido eliminado.</p>
-        <Link to="/servicios" className={styles.backLink}>
-          ← Volver a servicios
+        <h2>Caso de éxito no encontrado</h2>
+        <p>El caso de éxito que buscas no existe o ha sido eliminado.</p>
+        <Link to="/casos-de-exito" className={styles.backLink}>
+          ← Volver a casos de éxito
         </Link>
       </div>
     );
   }
 
-  const images = service.images.length > 0
-    ? service.images
+  const images = successCase.images.length > 0
+    ? successCase.images
     : ['https://placehold.co/800x600/e5e7eb/9ca3af?text=Sin+imagen'];
 
   const nextImage = () => {
@@ -43,15 +42,15 @@ export function ServiceDetailPage() {
   return (
     <div className={styles.page}>
       <MetaTags
-        title={`${service.title} | J Soft Solutions`}
-        description={service.shortDescription}
+        title={`${successCase.title} | J Soft Solutions`}
+        description={successCase.description}
       />
       <div className={styles.container}>
         {/* Breadcrumb */}
         <nav className={styles.breadcrumb}>
-          <Link to="/servicios">Servicios</Link>
+          <Link to="/casos-de-exito">Casos de Éxito</Link>
           <span>/</span>
-          <span>{service.title}</span>
+          <span>{successCase.title}</span>
         </nav>
 
         <div className={styles.grid}>
@@ -60,7 +59,7 @@ export function ServiceDetailPage() {
             <div className={styles.carousel}>
               <img
                 src={images[currentImageIndex]}
-                alt={`${service.title} - Imagen ${currentImageIndex + 1}`}
+                alt={`${successCase.title} - Imagen ${currentImageIndex + 1}`}
                 className={styles.carouselImage}
                 referrerPolicy="no-referrer"
               />
@@ -101,18 +100,24 @@ export function ServiceDetailPage() {
 
           {/* Content */}
           <div className={styles.content}>
-            <span className={styles.classification}>{service.classification}</span>
-            <h1 className={styles.title}>{service.title}</h1>
-            <p className={styles.description}>{service.shortDescription}</p>
+            <h1 className={styles.title}>{successCase.title}</h1>
+            <p className={styles.description}>{successCase.description}</p>
 
-            {/* Included Items */}
-            {service.includedItems.length > 0 && (
-              <div className={styles.included}>
-                <h3 className={styles.includedTitle}>Incluye:</h3>
-                <ul className={styles.includedList}>
-                  {service.includedItems.map((item) => (
-                    <li key={item} className={styles.includedItem}>
-                      {item}
+            {/* Links */}
+            {successCase.links && successCase.links.length > 0 && (
+              <div className={styles.linksSection}>
+                <h3 className={styles.linksTitle}>Enlaces relacionados</h3>
+                <ul className={styles.linksList}>
+                  {successCase.links.map((link, index) => (
+                    <li key={index}>
+                      <a
+                        href={link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={styles.linkItem}
+                      >
+                        🔗 {link}
+                      </a>
                     </li>
                   ))}
                 </ul>
@@ -128,11 +133,23 @@ export function ServiceDetailPage() {
           </div>
         </div>
 
-        {/* Full Description */}
-        {service.fullDescription && (
-          <div className={styles.fullDescription}>
-            <h2>Descripción completa</h2>
-            <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(service.fullDescription) }} />
+        {/* Videos Section */}
+        {successCase.videos && successCase.videos.length > 0 && (
+          <div className={styles.videosSection}>
+            <h2>Videos</h2>
+            <div className={styles.videosGrid}>
+              {successCase.videos.map((video, index) => (
+                <div key={index} className={styles.videoWrapper}>
+                  <video
+                    controls
+                    className={styles.video}
+                    src={video}
+                  >
+                    Tu navegador no soporta la reproducción de video.
+                  </video>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
@@ -144,7 +161,7 @@ export function ServiceDetailPage() {
         title="Solicitar información"
       >
         <ContactForm
-          source={`service:${service.title}`}
+          source={`successCase:${successCase.title}`}
           onSuccess={() => setIsContactModalOpen(false)}
         />
       </Modal>

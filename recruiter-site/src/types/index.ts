@@ -4,12 +4,15 @@
 
 export interface ProjectSummary {
   id: string;
-  type: 'SERVICE' | 'PRODUCT' | 'TOOL' | 'SUCCESS_CASE';
+  type: string;
   title: string;
   slug: string;
   classification: string;
-  description: string;
+  shortDescription: string;
   images: string[];
+  featured?: boolean;
+  createdAt?: string;
+  image?: string;
   technicalExplanation?: string;
   technicalImages?: string[];
 }

@@ -8,11 +8,12 @@ import { ProductTable } from '../../components/products/ProductTable';
 export function ProductsListPage() {
   const { t } = useTranslation();
   const [classificationFilter, setClassificationFilter] = useState('');
-  const { useGetAll, useDelete } = useProducts();
+  const { useGetAll, useDelete, useToggleFeatured } = useProducts();
   const { data, isLoading, error } = useGetAll(
     classificationFilter ? { classification: classificationFilter, page: 1, limit: 10 } : undefined
   );
   const deleteMutation = useDelete();
+  const toggleFeaturedMutation = useToggleFeatured();
 
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
@@ -23,6 +24,10 @@ export function ProductsListPage() {
     } else {
       setDeleteConfirm(id);
     }
+  };
+
+  const handleToggleFeatured = (id: string, featured: boolean) => {
+    toggleFeaturedMutation.mutate({ id, featured });
   };
 
   if (isLoading) return <Loading />;
@@ -51,6 +56,7 @@ export function ProductsListPage() {
         <ProductTable
           products={data?.data || []}
           onDelete={handleDelete}
+          onToggleFeatured={handleToggleFeatured}
         />
       </div>
     </div>

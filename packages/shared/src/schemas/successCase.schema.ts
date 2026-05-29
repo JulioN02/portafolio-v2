@@ -11,6 +11,8 @@ export const successCaseSchema = z.object({
   images: z.array(z.string().url()).min(1),
   videos: z.array(z.string().url()).optional(),
   links: z.array(z.string().url()).optional(),
+  order: z.number().int().min(0).default(0),
+  featured: z.boolean().default(false),
 });
 
 /**
@@ -22,6 +24,8 @@ export const successCaseUpdateSchema = successCaseSchema.partial();
  * Schema for filtering success cases in API queries
  */
 export const successCaseFilterSchema = z.object({
+  featured: z.coerce.boolean().optional(),
+  classification: z.string().optional(),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(10),
 });

@@ -52,6 +52,15 @@ export function useSuccessCases() {
       },
     });
 
+  const useToggleFeatured = () =>
+    useMutation({
+      mutationFn: ({ id, featured }: { id: string; featured: boolean }) =>
+        successCasesApi.toggleFeatured(id, featured),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['successCases'] });
+      },
+    });
+
   return {
     useGetAll,
     useGetById,
@@ -59,5 +68,6 @@ export function useSuccessCases() {
     useUpdate,
     useDelete,
     useReorder,
+    useToggleFeatured,
   };
 }

@@ -42,11 +42,6 @@ export const servicesApi = {
     return data;
   },
 
-  reorder: async (id: string, order: number): Promise<ServiceResponse> => {
-    const { data } = await apiClient.patch(`/services/${id}/reorder`, { order });
-    return data;
-  },
-
   toggleFeatured: async (id: string, featured: boolean): Promise<ServiceResponse> => {
     const { data } = await apiClient.patch(`/services/${id}/featured`, { featured });
     return data;

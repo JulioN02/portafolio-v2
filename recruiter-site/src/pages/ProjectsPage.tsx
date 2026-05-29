@@ -20,7 +20,7 @@ export function ProjectsPage() {
   return (
     <>
       <MetaTags
-        title="Proyectos | Julián Naranjo"
+        title="Proyectos | Julio Nieto"
         description="Explora los proyectos en los que he trabajado como desarrollador Full Stack."
       />
       <ProjectList onSelectProject={handleSelectProject} />

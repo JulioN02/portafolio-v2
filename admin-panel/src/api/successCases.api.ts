@@ -41,7 +41,12 @@ export const successCasesApi = {
   },
 
   reorder: async (id: string, order: number): Promise<SuccessCaseResponse> => {
-    const { data } = await apiClient.patch(`/success-cases/${id}/order`, { order });
+    const { data } = await apiClient.patch(`/success-cases/${id}/reorder`, { order });
+    return data;
+  },
+
+  toggleFeatured: async (id: string, featured: boolean): Promise<SuccessCaseResponse> => {
+    const { data } = await apiClient.patch(`/success-cases/${id}/featured`, { featured });
     return data;
   },
 };

@@ -8,6 +8,7 @@ interface SuccessCaseListProps {
   onReorder: (id: string, newOrder: number) => void;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
+  onToggleFeatured?: (id: string, featured: boolean) => void;
 }
 
 // Extended interface with additional fields that may come from the API
@@ -15,10 +16,9 @@ interface ExtendedSuccessCase extends SuccessCaseResponse {
   clientName?: string;
   classification?: string;
   link?: string;
-  order?: number;
 }
 
-export function SuccessCaseList({ successCases, onReorder, onEdit, onDelete }: SuccessCaseListProps) {
+export function SuccessCaseList({ successCases, onReorder, onEdit, onDelete, onToggleFeatured }: SuccessCaseListProps) {
   const { t } = useTranslation();
   const [dragId, setDragId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
@@ -109,6 +109,15 @@ export function SuccessCaseList({ successCases, onReorder, onEdit, onDelete }: S
           </div>
           {successCase.order !== undefined && (
             <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>Order: {successCase.order}</span>
+          )}
+          {onToggleFeatured && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => onToggleFeatured(successCase.id, !(successCase as ExtendedSuccessCase).featured)}
+            >
+              {(successCase as ExtendedSuccessCase).featured ? t('common.yes') : t('common.no')}
+            </Button>
           )}
           {successCase.link && (
             <a 

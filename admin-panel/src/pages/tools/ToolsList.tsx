@@ -7,12 +7,17 @@ import { ToolList } from '../../components/tools/ToolList';
 
 export function ToolsListPage() {
   const { t } = useTranslation();
-  const { useGetAll, useDelete, useReorder } = useTools();
+  const { useGetAll, useDelete, useReorder, useToggleFeatured } = useTools();
   const { data, isLoading, error } = useGetAll();
   const deleteMutation = useDelete();
   const reorderMutation = useReorder();
+  const toggleFeaturedMutation = useToggleFeatured();
 
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+
+  const handleToggleFeatured = (id: string, featured: boolean) => {
+    toggleFeaturedMutation.mutate({ id, featured });
+  };
 
   const handleDelete = (id: string) => {
     if (deleteConfirm === id) {
@@ -53,6 +58,7 @@ export function ToolsListPage() {
         onReorder={handleReorder}
         onEdit={(id) => window.location.href = `/tools/edit/${id}`}
         onDelete={handleDelete}
+        onToggleFeatured={handleToggleFeatured}
       />
     </div>
   );

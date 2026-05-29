@@ -34,7 +34,7 @@ export function ContactPage() {
       }}
     >
       <MetaTags
-        title="Contacto | Julián Naranjo"
+        title="Contacto | Julio Nieto"
         description="¿Listo para trabajar juntos? Contáctame para nuevas oportunidades laborales o proyectos."
       />
       <div

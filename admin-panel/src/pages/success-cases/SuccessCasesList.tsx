@@ -8,7 +8,7 @@ import { SuccessCaseList } from '../../components/success-cases/SuccessCaseList'
 export function SuccessCasesList() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { useGetAll, useDelete, useReorder } = useSuccessCases();
+  const { useGetAll, useDelete, useReorder, useToggleFeatured } = useSuccessCases();
   
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
@@ -16,6 +16,11 @@ export function SuccessCasesList() {
   const { data, isLoading, error } = useGetAll({ page, limit });
   const deleteMutation = useDelete();
   const reorderMutation = useReorder();
+  const toggleFeaturedMutation = useToggleFeatured();
+
+  const handleToggleFeatured = (id: string, featured: boolean) => {
+    toggleFeaturedMutation.mutate({ id, featured });
+  };
 
   const handleDelete = async (id: string) => {
     if (window.confirm(t('common.confirmDelete'))) {
@@ -79,6 +84,7 @@ export function SuccessCasesList() {
               onReorder={handleReorder}
               onEdit={handleEdit}
               onDelete={handleDelete}
+              onToggleFeatured={handleToggleFeatured}
             />
           </div>
           

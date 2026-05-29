@@ -40,6 +40,17 @@ export const successCaseController = {
     }
   },
 
+  async findFeatured(req: Request, res: Response): Promise<void> {
+    try {
+      const limit = parseInt(req.query.limit as string) || 3;
+      const successCases = await successCaseService.findFeatured(limit);
+      res.json(successCases);
+    } catch (error) {
+      console.error('SuccessCase findFeatured error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
   async findRecent(req: Request, res: Response): Promise<void> {
     try {
       const limit = parseInt(req.query.limit as string) || 3;
@@ -136,6 +147,44 @@ export const successCaseController = {
       res.json(successCase);
     } catch (error) {
       console.error('SuccessCase restore error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  async toggleFeatured(req: Request, res: Response): Promise<void> {
+    try {
+      const id = getStringParam(req.params.id);
+      const { featured } = req.body;
+      
+      const existing = await successCaseService.findById(id);
+      if (!existing) {
+        res.status(404).json({ error: 'Success case not found' });
+        return;
+      }
+      
+      const successCase = await successCaseService.update(id, { featured });
+      res.json(successCase);
+    } catch (error) {
+      console.error('SuccessCase toggleFeatured error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  async reorder(req: Request, res: Response): Promise<void> {
+    try {
+      const id = getStringParam(req.params.id);
+      const { order } = req.body;
+      
+      const existing = await successCaseService.findById(id);
+      if (!existing) {
+        res.status(404).json({ error: 'Success case not found' });
+        return;
+      }
+      
+      const successCase = await successCaseService.reorder(id, order);
+      res.json(successCase);
+    } catch (error) {
+      console.error('SuccessCase reorder error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   },

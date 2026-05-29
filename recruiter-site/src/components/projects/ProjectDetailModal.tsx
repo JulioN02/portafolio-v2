@@ -11,6 +11,10 @@ interface ProjectDetailModalProps {
 
 /** Maps API type values to Spanish labels */
 const typeLabels: Record<string, string> = {
+  service: 'Servicio',
+  product: 'Producto',
+  tool: 'Herramienta',
+  successCase: 'Caso de Éxito',
   SERVICE: 'Servicio',
   PRODUCT: 'Producto',
   TOOL: 'Herramienta',
@@ -95,7 +99,7 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
         <h2 className={styles.title}>{project.title}</h2>
 
         {/* ── Description ── */}
-        <p className={styles.description}>{project.description}</p>
+        <p className={styles.description}>{project.shortDescription}</p>
 
         {/* ── Main image ── */}
         {project.images && project.images.length > 0 && (

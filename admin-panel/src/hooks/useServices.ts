@@ -52,15 +52,6 @@ export function useServices() {
       },
     });
 
-  const useReorder = () =>
-    useMutation({
-      mutationFn: ({ id, order }: { id: string; order: number }) =>
-        servicesApi.reorder(id, order),
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['services'] });
-      },
-    });
-
   return {
     useGetAll,
     useGetById,
@@ -68,6 +59,5 @@ export function useServices() {
     useUpdate,
     useDelete,
     useToggleFeatured,
-    useReorder,
   };
 }

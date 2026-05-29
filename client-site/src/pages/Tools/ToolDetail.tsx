@@ -1,35 +1,35 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import DOMPurify from 'dompurify';
-import { useServiceBySlug } from '../../hooks/useServices';
+import { useToolBySlug } from '../../hooks/useTools';
 import { Loading } from '../../components/common/Loading';
+import { MetaTags } from '../../components/seo/MetaTags';
 import { Modal } from '@jsoft/shared';
 import { ContactForm } from '../../components/forms/ContactForm';
-import { MetaTags } from '../../components/seo/MetaTags';
-import styles from './ServiceDetail.module.css';
+import styles from './ToolDetail.module.css';
 
-export function ServiceDetailPage() {
+export function ToolDetailPage() {
   const { slug } = useParams<{ slug: string }>();
-  const { data: service, isLoading, error } = useServiceBySlug(slug || '');
+  const { data: tool, isLoading, error } = useToolBySlug(slug || '');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
-  if (isLoading) return <Loading fullPage message="Cargando servicio..." />;
+  if (isLoading) return <Loading fullPage message="Cargando herramienta..." />;
 
-  if (error || !service) {
+  if (error || !tool) {
     return (
       <div className={styles.error}>
-        <h2>Servicio no encontrado</h2>
-        <p>El servicio que buscas no existe o ha sido eliminado.</p>
-        <Link to="/servicios" className={styles.backLink}>
-          ← Volver a servicios
+        <h2>Herramienta no encontrada</h2>
+        <p>La herramienta que buscas no existe o ha sido eliminada.</p>
+        <Link to="/herramientas" className={styles.backLink}>
+          ← Volver a herramientas
         </Link>
       </div>
     );
   }
 
-  const images = service.images.length > 0
-    ? service.images
+  const images = tool.images.length > 0
+    ? tool.images
     : ['https://placehold.co/800x600/e5e7eb/9ca3af?text=Sin+imagen'];
 
   const nextImage = () => {
@@ -43,15 +43,15 @@ export function ServiceDetailPage() {
   return (
     <div className={styles.page}>
       <MetaTags
-        title={`${service.title} | J Soft Solutions`}
-        description={service.shortDescription}
+        title={`${tool.title} | J Soft Solutions`}
+        description={tool.shortDescription}
       />
       <div className={styles.container}>
         {/* Breadcrumb */}
         <nav className={styles.breadcrumb}>
-          <Link to="/servicios">Servicios</Link>
+          <Link to="/herramientas">Herramientas</Link>
           <span>/</span>
-          <span>{service.title}</span>
+          <span>{tool.title}</span>
         </nav>
 
         <div className={styles.grid}>
@@ -60,7 +60,7 @@ export function ServiceDetailPage() {
             <div className={styles.carousel}>
               <img
                 src={images[currentImageIndex]}
-                alt={`${service.title} - Imagen ${currentImageIndex + 1}`}
+                alt={`${tool.title} - Imagen ${currentImageIndex + 1}`}
                 className={styles.carouselImage}
                 referrerPolicy="no-referrer"
               />
@@ -101,21 +101,14 @@ export function ServiceDetailPage() {
 
           {/* Content */}
           <div className={styles.content}>
-            <span className={styles.classification}>{service.classification}</span>
-            <h1 className={styles.title}>{service.title}</h1>
-            <p className={styles.description}>{service.shortDescription}</p>
+            <span className={styles.classification}>{tool.classification}</span>
+            <h1 className={styles.title}>{tool.title}</h1>
+            <p className={styles.description}>{tool.shortDescription}</p>
 
-            {/* Included Items */}
-            {service.includedItems.length > 0 && (
-              <div className={styles.included}>
-                <h3 className={styles.includedTitle}>Incluye:</h3>
-                <ul className={styles.includedList}>
-                  {service.includedItems.map((item) => (
-                    <li key={item} className={styles.includedItem}>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
+            {/* Requires Install badge */}
+            {tool.requiresInstall && (
+              <div className={styles.installBadge}>
+                ⚙️ Requiere instalación
               </div>
             )}
 
@@ -129,10 +122,10 @@ export function ServiceDetailPage() {
         </div>
 
         {/* Full Description */}
-        {service.fullDescription && (
+        {tool.fullDescription && (
           <div className={styles.fullDescription}>
             <h2>Descripción completa</h2>
-            <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(service.fullDescription) }} />
+            <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(tool.fullDescription) }} />
           </div>
         )}
       </div>
@@ -144,7 +137,7 @@ export function ServiceDetailPage() {
         title="Solicitar información"
       >
         <ContactForm
-          source={`service:${service.title}`}
+          source={`tool:${tool.title}`}
           onSuccess={() => setIsContactModalOpen(false)}
         />
       </Modal>

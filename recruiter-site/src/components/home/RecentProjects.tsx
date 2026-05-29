@@ -90,7 +90,7 @@ export function RecentProjects() {
                       {project.classification}
                     </span>
                     <h3 className={styles.cardTitle}>{project.title}</h3>
-                    <p className={styles.cardDescription}>{project.description}</p>
+                    <p className={styles.cardDescription}>{project.shortDescription}</p>
                   </div>
                 </Link>
               </div>

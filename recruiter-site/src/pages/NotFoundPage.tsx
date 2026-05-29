@@ -6,7 +6,7 @@ export function NotFoundPage() {
   return (
     <main className={styles.page}>
       <MetaTags
-        title="404 - Página no encontrada | Julián Naranjo"
+        title="404 - Página no encontrada | Julio Nieto"
         noindex
       />
       <div className={styles.content}>
