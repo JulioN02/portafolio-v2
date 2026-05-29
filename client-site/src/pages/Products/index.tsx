@@ -5,6 +5,7 @@ import { Pagination } from '../../components/common/Pagination';
 import { Loading } from '../../components/common/Loading';
 import { MetaTags } from '../../components/seo/MetaTags';
 import { Select } from '@jsoft/shared';
+import { PageHeader } from '../../components/common/PageHeader';
 import styles from './Products.module.css';
 
 export function ProductsPage() {
