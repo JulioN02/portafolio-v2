@@ -33,7 +33,6 @@ export function SuccessCasesPage() {
       <PageHeader
         title="Casos de Éxito"
         subtitle="Conoce cómo hemos ayudado a nuestros clientes a alcanzar sus objetivos"
-        backgroundImage="/uploads/liftapp.png"
       />
       <div className={styles.container}>
         {/* Filters */}

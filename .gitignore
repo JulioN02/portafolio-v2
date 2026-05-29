@@ -65,8 +65,12 @@ playwright-report/
 # =============================================================================
 # Uploaded files
 # =============================================================================
-api/uploads/
-uploads/
+api/uploads/*
+uploads/*
+
+# Exception: static asset images needed by the frontend
+!api/uploads/*.png
+!uploads/*.png
 
 # =============================================================================
 # Temporary files

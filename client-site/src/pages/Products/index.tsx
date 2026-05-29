@@ -36,7 +36,6 @@ export function ProductsPage() {
       <PageHeader
         title="Nuestros Productos"
         subtitle="Soluciones tecnológicas diseñadas para potenciar tu negocio"
-        backgroundImage="/uploads/products.png"
       />
       <div className={styles.container}>
         {/* Filters */}

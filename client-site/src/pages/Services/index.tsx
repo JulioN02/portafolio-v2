@@ -33,7 +33,7 @@ export function ServicesPage() {
       <PageHeader
         title="Nuestros Servicios"
         subtitle="Soluciones tecnológicas adaptadas a tus necesidades"
-        backgroundImage="/uploads/servicesHome.png"
+        backgroundImage="/uploads/servicios.png"
       />
       <div className={styles.container}>
 

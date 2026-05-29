@@ -14,7 +14,7 @@ export function HomePage() {
         description="Desarrollador Full Stack especializado en React, Node.js y TypeScript. Conoce mi portafolio y experiencia."
       />
       {/* Hero Section */}
-      <Hero />
+      <Hero avatarUrl="/uploads/sobremi.png" />
 
       {/* Profile Toggle Section */}
       <ProfileToggle />

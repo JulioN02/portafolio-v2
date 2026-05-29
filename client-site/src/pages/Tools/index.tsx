@@ -36,7 +36,6 @@ export function ToolsPage() {
       <PageHeader
         title="Nuestras Herramientas"
         subtitle="Tecnologías y herramientas que utilizamos para crear soluciones innovadoras"
-        backgroundImage="/uploads/templates.png"
       />
       <div className={styles.container}>
         {/* Filters */}

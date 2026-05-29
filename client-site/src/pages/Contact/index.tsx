@@ -13,7 +13,7 @@ export function ContactPage() {
       <PageHeader
         title="Contacto"
         subtitle="¿Tienes un proyecto en mente? Me encantaría escuchar sobre él."
-        backgroundImage="/uploads/contact.png"
+        backgroundImage="/uploads/contacto.png"
       />
       <div className={styles.container}>
         <div className={styles.grid}>
