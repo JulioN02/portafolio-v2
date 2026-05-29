@@ -47,10 +47,7 @@ const legalLinks = [
 ];
 
 const logoIcon = (
-  <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" width="32" height="32" aria-hidden="true">
-    <rect width="40" height="40" rx="8" fill="var(--color-green-accent)" />
-    <path d="M12 20 L18 26 L28 14" stroke="var(--color-blue-base)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
+  <img src="/uploads/LogoJSS.png" alt="J Soft Solutions" width="36" height="36" style={{ borderRadius: 'var(--radius-sm)' }} />
 );
 
 export function Footer() {

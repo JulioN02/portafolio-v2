@@ -11,6 +11,7 @@ const BADGES = [
 export function Hero() {
   return (
     <section className={styles.hero}>
+      <div className={styles.heroBgImage} aria-hidden="true" />
       <div className={styles.overlay} />
       <div className={styles.pattern} aria-hidden="true">
         <svg className={styles.patternSvg} viewBox="0 0 1200 800" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">

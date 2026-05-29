@@ -27,20 +27,70 @@ const socialLinks = [
 
 export function ContactPage() {
   return (
-    <main
-      style={{
-        minHeight: '60vh',
-        padding: 'var(--spacing-2xl) var(--spacing-md)',
-      }}
-    >
-      <MetaTags
-        title="Contacto | Julio Nieto"
-        description="¿Listo para trabajar juntos? Contáctame para nuevas oportunidades laborales o proyectos."
-      />
+    <main>
+      {/* ── Banner ── */}
+      <section
+        style={{
+          position: 'relative',
+          minHeight: '40vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center',
+          padding: 'var(--spacing-3xl) var(--spacing-md)',
+          background:
+            'linear-gradient(135deg, rgba(25,41,80,0.7), rgba(33,73,123,0.6))',
+          overflow: 'hidden',
+        }}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: "url('/uploads/contacto.png') center/cover no-repeat",
+            opacity: 0.2,
+            pointerEvents: 'none',
+          }}
+          aria-hidden="true"
+        />
+        <div
+          style={{
+            position: 'relative',
+            zIndex: 1,
+            maxWidth: '720px',
+          }}
+        >
+          <h1
+            style={{
+              fontSize: 'var(--font-size-4xl)',
+              fontWeight: 'var(--font-weight-bold)',
+              color: '#fff',
+              marginBottom: 'var(--spacing-sm)',
+            }}
+          >
+            Contacto
+          </h1>
+          <p
+            style={{
+              fontSize: 'var(--font-size-lg)',
+              color: 'rgba(255,255,255,0.9)',
+              lineHeight: 'var(--line-height-relaxed)',
+              maxWidth: '560px',
+              margin: '0 auto',
+            }}
+          >
+            ¿Interesado en mis servicios? Complete el formulario y me pondré en
+            contacto a la brevedad.
+          </p>
+        </div>
+      </section>
+
+      {/* ── Content ── */}
       <div
         style={{
           maxWidth: '720px',
           margin: '0 auto',
+          padding: 'var(--spacing-2xl) var(--spacing-md)',
         }}
       >
         {/* ── Back Link ── */}
@@ -60,31 +110,6 @@ export function ContactPage() {
             ← Volver al inicio
           </Link>
         </div>
-
-        {/* ── Header ── */}
-        <h1
-          style={{
-            fontSize: 'var(--font-size-3xl)',
-            fontWeight: 'var(--font-weight-bold)',
-            color: 'var(--color-neutral-900)',
-            marginBottom: 'var(--spacing-sm)',
-          }}
-        >
-          Contacto
-        </h1>
-
-        <p
-          style={{
-            fontSize: 'var(--font-size-base)',
-            color: 'var(--color-neutral-600)',
-            lineHeight: 'var(--line-height-relaxed)',
-            marginBottom: 'var(--spacing-xl)',
-            maxWidth: '560px',
-          }}
-        >
-          ¿Interesado en mis servicios? Complete el formulario y me pondré en
-          contacto a la brevedad.
-        </p>
 
         {/* ── Form ── */}
         <RecruiterContactForm />
