@@ -4,6 +4,7 @@ import { SuccessCaseCard } from '../../components/successCases/SuccessCaseCard';
 import { Pagination } from '../../components/common/Pagination';
 import { Loading } from '../../components/common/Loading';
 import { MetaTags } from '../../components/seo/MetaTags';
+import { PageHeader } from '../../components/common/PageHeader';
 import styles from './SuccessCases.module.css';
 
 export function SuccessCasesPage() {
@@ -29,14 +30,12 @@ export function SuccessCasesPage() {
         title="Casos de Éxito | J Soft Solutions"
         description="Conoce cómo hemos ayudado a nuestros clientes a alcanzar sus objetivos con soluciones digitales."
       />
+      <PageHeader
+        title="Casos de Éxito"
+        subtitle="Conoce cómo hemos ayudado a nuestros clientes a alcanzar sus objetivos"
+        backgroundImage="/uploads/liftapp.png"
+      />
       <div className={styles.container}>
-        <header className={styles.header}>
-          <h1 className={styles.title}>Casos de Éxito</h1>
-          <p className={styles.subtitle}>
-            Conoce cómo hemos ayudado a nuestros clientes a alcanzar sus objetivos
-          </p>
-        </header>
-
         {/* Filters */}
         <div className={styles.filters}>
           <label htmlFor="industry" className={styles.filterLabel}>

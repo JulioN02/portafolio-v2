@@ -32,14 +32,12 @@ export function ProductsPage() {
         title="Productos | J Soft Solutions"
         description="Conoce nuestras soluciones tecnológicas listas para implementar en tu negocio."
       />
+      <PageHeader
+        title="Nuestros Productos"
+        subtitle="Soluciones tecnológicas diseñadas para potenciar tu negocio"
+        backgroundImage="/uploads/products.png"
+      />
       <div className={styles.container}>
-        <header className={styles.header}>
-          <h1 className={styles.title}>Nuestros Productos</h1>
-          <p className={styles.subtitle}>
-            Soluciones tecnológicas diseñadas para potenciar tu negocio
-          </p>
-        </header>
-
         {/* Filters */}
         <div className={styles.filters}>
           <Select

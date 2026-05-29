@@ -5,6 +5,7 @@ import { Pagination } from '../../components/common/Pagination';
 import { Loading } from '../../components/common/Loading';
 import { MetaTags } from '../../components/seo/MetaTags';
 import { Select } from '@jsoft/shared';
+import { PageHeader } from '../../components/common/PageHeader';
 import styles from './Tools.module.css';
 
 export function ToolsPage() {
@@ -32,14 +33,12 @@ export function ToolsPage() {
         title="Herramientas | J Soft Solutions"
         description="Herramientas y tecnologías que utilizamos para desarrollar soluciones innovadoras."
       />
+      <PageHeader
+        title="Nuestras Herramientas"
+        subtitle="Tecnologías y herramientas que utilizamos para crear soluciones innovadoras"
+        backgroundImage="/uploads/templates.png"
+      />
       <div className={styles.container}>
-        <header className={styles.header}>
-          <h1 className={styles.title}>Nuestras Herramientas</h1>
-          <p className={styles.subtitle}>
-            Tecnologías y herramientas que utilizamos para crear soluciones innovadoras
-          </p>
-        </header>
-
         {/* Filters */}
         <div className={styles.filters}>
           <Select

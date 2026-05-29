@@ -15,6 +15,15 @@
   text-align: center;
 }
 
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('/uploads/heroinicio.png') center/cover no-repeat;
+  opacity: 0.12;
+  pointer-events: none;
+}
+
 @media (min-width: 1024px) {
   .hero {
     min-height: 85vh;

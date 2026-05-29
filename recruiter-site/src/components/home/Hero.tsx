@@ -16,6 +16,7 @@ export function Hero({
 }: HeroProps) {
   return (
     <section className={styles.hero}>
+      <div className={styles.heroBgImage} aria-hidden="true" />
       <div className={styles.pattern} aria-hidden="true">
         <svg className={styles.patternSvg} viewBox="0 0 1200 800" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="80" cy="100" r="60" fill="rgba(122,203,104,0.06)" />
