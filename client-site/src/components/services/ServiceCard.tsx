@@ -18,6 +18,7 @@ export function ServiceCard({ service }: ServiceCardProps) {
             alt={service.title}
             className={styles.image}
             loading="lazy"
+            referrerPolicy="no-referrer"
           />
           
         </div>

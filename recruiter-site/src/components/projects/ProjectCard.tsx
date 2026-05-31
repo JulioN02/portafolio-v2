@@ -19,7 +19,8 @@ const typeLabels: Record<string, string> = {
 };
 
 export function ProjectCard({ project, onSelect }: ProjectCardProps) {
-  const hasImage = project.images && project.images.length > 0;
+  const hasImage = !!(project.image || (project.images && project.images.length > 0));
+  const imageSrc = project.image || (project.images && project.images[0]) || '';
 
   return (
     <article
@@ -37,10 +38,11 @@ export function ProjectCard({ project, onSelect }: ProjectCardProps) {
       <div className={styles.imageWrapper}>
         {hasImage ? (
           <img
-            src={project.images[0]}
+            src={imageSrc}
             alt={project.title}
             className={styles.image}
             loading="lazy"
+            referrerPolicy="no-referrer"
           />
         ) : (
           <div className={styles.imagePlaceholder}>

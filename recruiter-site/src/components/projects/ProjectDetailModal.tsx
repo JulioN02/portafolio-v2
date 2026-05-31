@@ -56,8 +56,10 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
     }
   };
 
-  const hasMultipleImages =
-    project.images && project.images.length > 1;
+  const projectImages: string[] = project.image
+    ? [project.image, ...(project.images?.slice(1) ?? [])]
+    : project.images ?? [];
+  const hasMultipleImages = projectImages.length > 1;
   const hasTechnicalImages =
     detail &&
     Array.isArray((detail as Record<string, unknown>).technicalImages) &&
@@ -102,14 +104,32 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
         <p className={styles.description}>{project.shortDescription}</p>
 
         {/* ── Main image ── */}
-        {project.images && project.images.length > 0 && (
-          <div className={styles.mainImageWrapper}>
+        {projectImages.length > 0 && (
+          <div className={styles.imageSection}>
             <img
-              src={project.images[0]}
+              src={projectImages[0]}
               alt={project.title}
               className={styles.mainImage}
-              loading="lazy"
             />
+          </div>
+        )}
+
+        {/* Thumbnail gallery */}
+        {projectImages.length > 1 && (
+          <div className={styles.gallery}>
+            {projectImages.slice(1).map((img, i) => (
+              <button
+                key={i}
+                className={styles.galleryThumb}
+                onClick={() => setExpandedImage(img)}
+              >
+                <img
+                  src={img}
+                  alt={`${project.title} - Imagen ${i + 1}`}
+                  className={styles.galleryImg}
+                />
+              </button>
+            ))}
           </div>
         )}
 
