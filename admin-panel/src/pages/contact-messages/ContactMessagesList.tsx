@@ -200,7 +200,7 @@ export function ContactMessagesListPage() {
 
   const handleAddLabel = useCallback(() => {
     if (!newLabel.trim() || !selectedMessage) return;
-    const updatedLabels = [...selectedMessage.labels, newLabel.trim()];
+    const updatedLabels = [...(selectedMessage.labels ?? []), newLabel.trim()];
     setLabels.mutate({ id: selectedMessage.id, labels: updatedLabels });
     setNewLabel('');
   }, [newLabel, selectedMessage, setLabels]);
@@ -208,7 +208,7 @@ export function ContactMessagesListPage() {
   const handleRemoveLabel = useCallback(
     (label: string) => {
       if (!selectedMessage) return;
-      const updatedLabels = selectedMessage.labels.filter((l) => l !== label);
+      const updatedLabels = (selectedMessage.labels ?? []).filter((l) => l !== label);
       setLabels.mutate({ id: selectedMessage.id, labels: updatedLabels });
     },
     [selectedMessage, setLabels],
@@ -701,12 +701,12 @@ export function ContactMessagesListPage() {
                       marginBottom: '0.5rem',
                     }}
                   >
-                    {selectedMessage.labels.length === 0 ? (
+                    {(selectedMessage.labels ?? []).length === 0 ? (
                       <span style={{ fontSize: '0.8125rem', color: '#9ca3af' }}>
                         —
                       </span>
                     ) : (
-                      selectedMessage.labels.map((label) => (
+                      (selectedMessage.labels ?? []).map((label) => (
                         <span
                           key={label}
                           style={{

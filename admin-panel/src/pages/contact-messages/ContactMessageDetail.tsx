@@ -38,14 +38,14 @@ export function ContactMessageDetailPage() {
 
   const handleAddLabel = () => {
     if (!newLabel.trim() || !data) return;
-    const updatedLabels = [...data.labels, newLabel.trim()];
+    const updatedLabels = [...(data.labels ?? []), newLabel.trim()];
     setLabels.mutate({ id: data.id, labels: updatedLabels });
     setNewLabel('');
   };
 
   const handleRemoveLabel = (label: string) => {
     if (!data) return;
-    const updatedLabels = data.labels.filter((l) => l !== label);
+    const updatedLabels = (data.labels ?? []).filter((l) => l !== label);
     setLabels.mutate({ id: data.id, labels: updatedLabels });
   };
 
@@ -241,10 +241,10 @@ export function ContactMessageDetailPage() {
 
         {/* Existing labels */}
         <div style={{ display: 'flex', gap: '0.375rem', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
-          {message.labels.length === 0 ? (
+          {(message.labels ?? []).length === 0 ? (
             <span style={{ fontSize: '0.8125rem', color: '#9ca3af' }}>—</span>
           ) : (
-            message.labels.map((label) => (
+            (message.labels ?? []).map((label) => (
               <span
                 key={label}
                 style={{

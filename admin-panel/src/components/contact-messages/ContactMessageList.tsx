@@ -122,14 +122,14 @@ export function ContactMessageList({ messages, selectedId, onSelect, onArchive }
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
-                  marginBottom: message.labels.length > 0 ? '0.25rem' : 0,
+                  marginBottom: (message.labels ?? []).length > 0 ? '0.25rem' : 0,
                 }}
               >
                 {truncate(message.message, 80)}
               </div>
 
               {/* Label badges */}
-              {message.labels.length > 0 && (
+              {(message.labels ?? []).length > 0 && (
                 <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
                   {message.labels.map((label) => (
                     <span
