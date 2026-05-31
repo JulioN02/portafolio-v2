@@ -20,7 +20,12 @@ export function useProducts({ filter, enabled = true }: UseProductsOptions = {})
 export function useFeaturedProducts(limit = 5) {
   return useQuery({
     queryKey: ['products', 'featured', limit],
-    queryFn: () => apiClient.get<ProductResponse[]>(`/products/featured?limit=${limit}`),
+    queryFn: () =>
+      apiClient
+        .get<PaginatedResponse<ProductResponse>>('/products', {
+          params: { limit, status: 'PUBLISHED' } as Record<string, string | number | boolean>,
+        })
+        .then((res) => res.data),
   });
 }
 
