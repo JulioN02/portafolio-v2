@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, PostStatus } from '@prisma/client';
 import { ServiceInput, ServiceUpdateInput, ServiceFilterInput } from '@jsoft/shared';
 
 const prisma = new PrismaClient();
@@ -12,8 +12,8 @@ const SERVICE_SELECT = {
   fullDescription: true,
   includedItems: true,
   images: true,
-  order: true,
-  featured: true,
+  status: true,
+  publishedAt: true,
   deletedAt: true,
   technicalExplanation: true,
   technicalImages: true,
@@ -23,13 +23,13 @@ const SERVICE_SELECT = {
 
 export const serviceService = {
   async findAll(filter?: ServiceFilterInput) {
-    const { featured, classification, page = 1, limit = 10 } = filter || {};
+    const { status, classification, page = 1, limit = 10 } = filter || {};
     const skip = (page - 1) * limit;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const where: Record<string, any> = {
       deletedAt: null,
-      ...(featured !== undefined && { featured }),
+      ...(status && { status: status as PostStatus }),
       ...(classification && { classification }),
     };
 
@@ -37,7 +37,7 @@ export const serviceService = {
       prisma.service.findMany({
         where,
         select: SERVICE_SELECT,
-        orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
+        orderBy: [{ createdAt: 'desc' }],
         skip,
         take: limit,
       }),
@@ -64,15 +64,6 @@ export const serviceService = {
     });
   },
 
-  async findFeatured(limit = 3) {
-    return prisma.service.findMany({
-      where: { featured: true, deletedAt: null },
-      select: SERVICE_SELECT,
-      orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
-      take: limit,
-    });
-  },
-
   async findById(id: string) {
     return prisma.service.findUnique({
       where: { id },
@@ -90,8 +81,8 @@ export const serviceService = {
         fullDescription: data.fullDescription,
         includedItems: data.includedItems,
         images: data.images,
-        order: data.order ?? 0,
-        featured: data.featured ?? false,
+        status: data.status || 'DRAFT',
+        ...(data.status === 'PUBLISHED' && { publishedAt: new Date() }),
         technicalExplanation: data.technicalExplanation,
         technicalImages: data.technicalImages,
       },
@@ -100,21 +91,27 @@ export const serviceService = {
   },
 
   async update(id: string, data: ServiceUpdateInput) {
+    const updateData: Record<string, unknown> = {};
+
+    if (data.title !== undefined) updateData.title = data.title;
+    if (data.slug !== undefined) updateData.slug = data.slug;
+    if (data.classification !== undefined) updateData.classification = data.classification;
+    if (data.shortDescription !== undefined) updateData.shortDescription = data.shortDescription;
+    if (data.fullDescription !== undefined) updateData.fullDescription = data.fullDescription;
+    if (data.includedItems !== undefined) updateData.includedItems = data.includedItems;
+    if (data.images !== undefined) updateData.images = data.images;
+    if (data.status !== undefined) {
+      updateData.status = data.status;
+      if (data.status === 'PUBLISHED') {
+        updateData.publishedAt = new Date();
+      }
+    }
+    if (data.technicalExplanation !== undefined) updateData.technicalExplanation = data.technicalExplanation;
+    if (data.technicalImages !== undefined) updateData.technicalImages = data.technicalImages;
+
     return prisma.service.update({
       where: { id },
-      data: {
-        ...(data.title !== undefined && { title: data.title }),
-        ...(data.slug !== undefined && { slug: data.slug }),
-        ...(data.classification !== undefined && { classification: data.classification }),
-        ...(data.shortDescription !== undefined && { shortDescription: data.shortDescription }),
-        ...(data.fullDescription !== undefined && { fullDescription: data.fullDescription }),
-        ...(data.includedItems !== undefined && { includedItems: data.includedItems }),
-        ...(data.images !== undefined && { images: data.images }),
-        ...(data.order !== undefined && { order: data.order }),
-        ...(data.featured !== undefined && { featured: data.featured }),
-        ...(data.technicalExplanation !== undefined && { technicalExplanation: data.technicalExplanation }),
-        ...(data.technicalImages !== undefined && { technicalImages: data.technicalImages }),
-      },
+      data: updateData,
       select: SERVICE_SELECT,
     });
   },
@@ -135,10 +132,15 @@ export const serviceService = {
     });
   },
 
-  async reorder(id: string, newOrder: number) {
+  async updateStatus(id: string, status: PostStatus) {
+    const updateData: Record<string, unknown> = { status };
+    if (status === 'PUBLISHED') {
+      updateData.publishedAt = new Date();
+    }
+
     return prisma.service.update({
       where: { id },
-      data: { order: newOrder },
+      data: updateData,
       select: SERVICE_SELECT,
     });
   },

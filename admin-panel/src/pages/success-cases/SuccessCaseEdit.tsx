@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useSuccessCases } from '../../hooks/useSuccessCases';
 import { SuccessCaseForm } from '../../components/success-cases/SuccessCaseForm';
+import { BackButton } from '@/components/shared/BackButton';
 import type { SuccessCaseInput, SuccessCaseUpdateInput } from '@jsoft/shared';
 
 export function SuccessCaseEdit() {
@@ -55,21 +56,7 @@ export function SuccessCaseEdit() {
 
   return (
     <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
-      <button
-        onClick={() => navigate('/success-cases')}
-        style={{
-          marginBottom: '1rem',
-          padding: '0.5rem 1rem',
-          background: '#6b7280',
-          color: '#fff',
-          border: 'none',
-          borderRadius: '4px',
-          cursor: 'pointer',
-          fontSize: '0.875rem'
-        }}
-      >
-        ← {t('contactMessages.back')} {t('successCases.title')}
-      </button>
+      <BackButton to="/success-cases" />
       
       <h1 style={{ fontSize: '1.5rem', fontWeight: '600', marginBottom: '1.5rem' }}>
         {t('successCases.edit')} {t('successCases.title')}

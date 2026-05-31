@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { ServiceForm } from '../../components/services/ServiceForm';
 import { useServices } from '../../hooks/useServices';
+import { BackButton } from '@/components/shared/BackButton';
 import { ServiceInput } from '@jsoft/shared';
 
 export function ServiceEditPage() {
@@ -28,6 +29,7 @@ export function ServiceEditPage() {
 
   return (
     <div>
+      <BackButton to="/services" />
       <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>{t('services.edit')} Service</h1>
       <ServiceForm initialData={service} onSubmit={handleSubmit} isLoading={updateMutation.isPending} />
     </div>

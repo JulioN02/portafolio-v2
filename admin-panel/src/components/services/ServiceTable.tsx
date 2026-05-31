@@ -1,15 +1,17 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
+import { StatusBadge } from '@/components/shared/StatusBadge';
+import { StatusSelect } from '@/components/shared/StatusSelect';
 import type { ServiceResponse } from '@jsoft/shared';
 
 interface ServiceTableProps {
   services: ServiceResponse[];
   onDelete: (id: string) => void;
-  onToggleFeatured: (id: string, featured: boolean) => void;
+  onStatusChange?: (id: string, status: string) => void;
 }
 
-export function ServiceTable({ services, onDelete, onToggleFeatured }: ServiceTableProps) {
+export function ServiceTable({ services, onDelete, onStatusChange }: ServiceTableProps) {
   const { t } = useTranslation();
 
   if (services.length === 0) {
@@ -27,7 +29,7 @@ export function ServiceTable({ services, onDelete, onToggleFeatured }: ServiceTa
         <tr>
           <th>Title</th>
           <th>Classification</th>
-          <th style={{ textAlign: 'center' }}>{t('services.featured')}</th>
+          {onStatusChange && <th style={{ textAlign: 'center' }}>{t('blog.status')}</th>}
           <th style={{ textAlign: 'right' }}>Actions</th>
         </tr>
       </thead>
@@ -36,15 +38,14 @@ export function ServiceTable({ services, onDelete, onToggleFeatured }: ServiceTa
           <tr key={service.id}>
             <td>{service.title}</td>
             <td>{service.classification}</td>
-            <td style={{ textAlign: 'center' }}>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => onToggleFeatured(service.id, !service.featured)}
-              >
-                {service.featured ? t('common.yes') : t('common.no')}
-              </Button>
-            </td>
+            {onStatusChange && (
+              <td style={{ textAlign: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}>
+                  <StatusBadge status={service.status} />
+                  <StatusSelect value={service.status} onChange={(newStatus) => onStatusChange(service.id, newStatus)} />
+                </div>
+              </td>
+            )}
             <td style={{ textAlign: 'right' }}>
               <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
                 <Link to={`/services/edit/${service.id}`}>

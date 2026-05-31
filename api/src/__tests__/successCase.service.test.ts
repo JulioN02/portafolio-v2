@@ -193,9 +193,9 @@ describe('SuccessCase Service', () => {
     });
   });
 
-  describe('no reorder method', () => {
-    it('should not have reorder method unlike product/tool', () => {
-      expect(successCaseService.reorder).toBeUndefined();
+  describe('reorder removed', () => {
+    it('should not have reorder method (removed in admin-core-refactor)', () => {
+      expect((successCaseService as any).reorder).toBeUndefined();
     });
   });
 });

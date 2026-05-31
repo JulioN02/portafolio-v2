@@ -1,27 +1,25 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button, Loading, ErrorMessage } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useBlogPosts } from '../../hooks/useBlogPosts';
 import { BlogPostList } from '../../components/blog-posts/BlogPostList';
+import { ConfirmDeleteModal } from '@/components/shared/ConfirmDeleteModal';
 
 export function BlogPostsListPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { useGetAll, useDelete, useUpdateStatus } = useBlogPosts();
   const { data, isLoading, error } = useGetAll();
   const deleteMutation = useDelete();
   const updateStatusMutation = useUpdateStatus();
 
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
   const [filter, setFilter] = useState<'all' | 'DRAFT' | 'PUBLISHED'>('all');
 
   const handleDelete = (id: string) => {
-    if (deleteConfirm === id) {
-      deleteMutation.mutate(id);
-      setDeleteConfirm(null);
-    } else {
-      setDeleteConfirm(id);
-    }
+    const post = data?.data?.find((p) => p.id === id);
+    setDeleteTarget({ id, title: post?.title || '' });
   };
 
   const handleStatusChange = (id: string, newStatus: string) => {
@@ -74,9 +72,18 @@ export function BlogPostsListPage() {
 
       <BlogPostList
         posts={filteredPosts}
-        onEdit={(id) => (window.location.href = `/blog-posts/edit/${id}`)}
+        onEdit={(id) => navigate(`/blog-posts/edit/${id}`)}
         onDelete={handleDelete}
         onStatusChange={handleStatusChange}
+      />
+
+      <ConfirmDeleteModal
+        isOpen={deleteTarget !== null}
+        title={deleteTarget?.title || ''}
+        entityName="artículo"
+        onConfirm={() => { if (deleteTarget) deleteMutation.mutate(deleteTarget.id); setDeleteTarget(null); }}
+        onCancel={() => setDeleteTarget(null)}
+        isLoading={deleteMutation.isPending}
       />
     </div>
   );

@@ -1,13 +1,19 @@
-import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useBlogPosts } from '../../hooks/useBlogPosts';
 import { BlogCard } from './BlogCard';
 import styles from './BlogGrid.module.css';
 
 const ITEMS_PER_PAGE = 9;
 
-export function BlogGrid() {
-  const [page, setPage] = useState(1);
-  const { data, isLoading, isError, error, refetch } = useBlogPosts(page);
+interface BlogGridProps {
+  category?: string;
+  search?: string;
+}
+
+export function BlogGrid({ category, search }: BlogGridProps) {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = Number(searchParams.get('page')) || 1;
+  const { data, isLoading, isError, error, refetch } = useBlogPosts(page, { category, search });
 
   const posts = data?.data ?? [];
   const totalItems = data?.pagination?.total ?? 0;
@@ -16,7 +22,11 @@ export function BlogGrid() {
   /** Handle pagination */
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > totalPages) return;
-    setPage(newPage);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set('page', String(newPage));
+      return next;
+    }, { replace: true });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 

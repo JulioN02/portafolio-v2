@@ -25,103 +25,123 @@ model User {
 // SERVICIOS
 // ============================================
 model Service {
-  id                  String   @id @default(cuid())
+  id                  String      @id @default(cuid())
   title               String
-  slug                String   @unique
+  slug                String      @unique
   classification      String
   shortDescription    String
   fullDescription     String
   includedItems       String[]
   images              String[]
-  order               Int      @default(0)
-  featured            Boolean  @default(false)
+  status              PostStatus  @default(DRAFT)
   deletedAt           DateTime?
 
   // Campos técnicos para reclutadores
   technicalExplanation String?
   technicalImages      String[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  publishedAt DateTime?
 
-  @@index([featured, deletedAt])
-  @@index([order, createdAt])
+  @@index([status, deletedAt])
+  @@index([publishedAt])
 }
 
 // ============================================
 // PRODUCTOS
 // ============================================
 model Product {
-  id                String   @id @default(cuid())
+  id                String      @id @default(cuid())
   title             String
-  slug              String   @unique
+  slug              String      @unique
   classification    String
   shortDescription  String
   fullDescription   String
   images            String[]
   externalLink      String?
-  order             Int      @default(0)
-  featured          Boolean  @default(false)
+  featured          Boolean     @default(false)
+  status            PostStatus  @default(DRAFT)
   deletedAt         DateTime?
 
   // Campos técnicos para reclutadores
   technicalExplanation String?
   technicalImages      String[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  publishedAt DateTime?
 
   @@index([featured, deletedAt])
-  @@index([order, createdAt])
+  @@index([status, deletedAt])
+  @@index([publishedAt])
 }
 
 // ============================================
 // HERRAMIENTAS
 // ============================================
 model Tool {
-  id                String   @id @default(cuid())
+  id                String      @id @default(cuid())
   title             String
-  slug              String   @unique
+  slug              String      @unique
   classification    String
   shortDescription  String
   fullDescription   String
   images            String[]
-  requiresInstall   Boolean  @default(false)
-  order             Int      @default(0)
-  featured          Boolean  @default(false)
+  requiresInstall   Boolean     @default(false)
+  featured          Boolean     @default(false)
+  status            PostStatus  @default(DRAFT)
   deletedAt         DateTime?
 
   // Campos técnicos para reclutadores
   technicalExplanation String?
   technicalImages      String[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  publishedAt DateTime?
 
   @@index([featured, deletedAt])
-  @@index([order, createdAt])
+  @@index([status, deletedAt])
+  @@index([publishedAt])
 }
 
 // ============================================
 // CASOS DE ÉXITO
 // ============================================
 model SuccessCase {
-  id          String   @id @default(cuid())
+  id          String      @id @default(cuid())
   title       String
-  slug        String   @unique
+  slug        String      @unique
   description String
   images      String[]
   videos      String[]
   links       String[]
-  order       Int      @default(0)
-  featured    Boolean  @default(false)
+  status      PostStatus  @default(DRAFT)
   deletedAt   DateTime?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  publishedAt DateTime?
+
+  @@index([status, deletedAt])
+  @@index([publishedAt])
+}
+
+// ============================================
+// SECCIONES DE PÁGINA (Homepage)
+// ============================================
+model SiteSection {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  label     String
+  visible   Boolean  @default(true)
+  order     Int      @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([featured, deletedAt])
-  @@index([order, createdAt])
+  @@index([order])
 }
 
 // ============================================
@@ -168,10 +188,14 @@ model ContactForm {
   message     String
   source      String
   originType  FormOrigin
+  readAt      DateTime?
+  archived    Boolean     @default(false)
+  labels      String[]
 
   createdAt DateTime @default(now())
 
   @@index([originType, createdAt])
+  @@index([archived, createdAt])
 }
 
 enum FormOrigin {

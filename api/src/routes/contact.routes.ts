@@ -26,4 +26,13 @@ router.get('/:id', contactController.findById);
 // DELETE /api/contact/:id - Delete contact form
 router.delete('/:id', contactController.delete);
 
+// PATCH /api/contact/:id/read - Mark contact as read
+router.patch('/:id/read', contactController.markRead);
+
+// PATCH /api/contact/:id/archive - Toggle archive status
+router.patch('/:id/archive', contactController.toggleArchive);
+
+// POST /api/contact/:id/labels - Set labels
+router.post('/:id/labels', contactController.setLabels);
+
 export default router;

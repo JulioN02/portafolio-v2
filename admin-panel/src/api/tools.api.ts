@@ -8,6 +8,7 @@ export const toolsApi = {
     if (filters?.limit) params.append('limit', String(filters.limit));
     if (filters?.classification) params.append('classification', filters.classification);
     if (filters?.featured !== undefined) params.append('featured', String(filters.featured));
+    if (filters?.status) params.append('status', filters.status);
 
     const { data } = await apiClient.get(`/tools?${params}`);
     return data;
@@ -42,13 +43,13 @@ export const toolsApi = {
     return data;
   },
 
-  reorder: async (id: string, order: number): Promise<ToolResponse> => {
-    const { data } = await apiClient.patch(`/tools/${id}/reorder`, { order });
+  toggleFeatured: async (id: string, featured: boolean): Promise<ToolResponse> => {
+    const { data } = await apiClient.patch(`/tools/${id}/featured`, { featured });
     return data;
   },
 
-  toggleFeatured: async (id: string, featured: boolean): Promise<ToolResponse> => {
-    const { data } = await apiClient.patch(`/tools/${id}/featured`, { featured });
+  updateStatus: async (id: string, status: string): Promise<ToolResponse> => {
+    const { data } = await apiClient.patch(`/tools/${id}/status`, { status });
     return data;
   },
 };

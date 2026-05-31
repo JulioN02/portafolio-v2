@@ -1,18 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { contactFormsApi } from '../api/contactForms.api';
-
-interface ContactFormsFilterInput {
-  startDate?: string;
-  endDate?: string;
-  page?: number;
-  limit?: number;
-  originType?: string;
-}
+import { contactFormsApi } from '@/api/contactForms.api';
+import type { ContactFormFilterInput } from '@jsoft/shared';
 
 export function useContactForms() {
   const queryClient = useQueryClient();
 
-  const useGetAll = (filters?: ContactFormsFilterInput) =>
+  const useGetAll = (filters?: ContactFormFilterInput) =>
     useQuery({
       queryKey: ['contactForms', 'all', filters],
       queryFn: () => contactFormsApi.getAll(filters),
@@ -33,9 +26,37 @@ export function useContactForms() {
       },
     });
 
+  const useMarkRead = () =>
+    useMutation({
+      mutationFn: (id: string) => contactFormsApi.markRead(id),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['contactForms'] });
+      },
+    });
+
+  const useToggleArchive = () =>
+    useMutation({
+      mutationFn: (id: string) => contactFormsApi.toggleArchive(id),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['contactForms'] });
+      },
+    });
+
+  const useSetLabels = () =>
+    useMutation({
+      mutationFn: ({ id, labels }: { id: string; labels: string[] }) =>
+        contactFormsApi.setLabels(id, labels),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['contactForms'] });
+      },
+    });
+
   return {
     useGetAll,
     useGetById,
     useDelete,
+    useMarkRead,
+    useToggleArchive,
+    useSetLabels,
   };
 }

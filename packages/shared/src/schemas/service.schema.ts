@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { postStatusEnum } from './blogPost.schema.js';
 
 /**
  * Schema for Service entity
@@ -12,8 +13,7 @@ export const serviceSchema = z.object({
   fullDescription: z.string().min(50, 'Full description must be at least 50 characters'),
   includedItems: z.array(z.string().min(3)).min(1, 'At least one included item is required'),
   images: z.array(z.string().url()).min(1, 'At least one image is required'),
-  order: z.number().int().min(0).default(0),
-  featured: z.boolean().default(false),
+  status: postStatusEnum.default('DRAFT'),
   
   // Technical fields for recruiters (optional)
   technicalExplanation: z.string().max(15000).optional(),
@@ -29,10 +29,17 @@ export const serviceUpdateSchema = serviceSchema.partial();
  * Schema for filtering services in API queries
  */
 export const serviceFilterSchema = z.object({
-  featured: z.coerce.boolean().optional(),
+  status: postStatusEnum.optional(),
   classification: z.string().optional(),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(10),
+});
+
+/**
+ * Schema for changing service status
+ */
+export const serviceStatusSchema = z.object({
+  status: postStatusEnum,
 });
 
 /**
@@ -41,6 +48,7 @@ export const serviceFilterSchema = z.object({
 export type ServiceInput = z.infer<typeof serviceSchema>;
 export type ServiceUpdateInput = z.infer<typeof serviceUpdateSchema>;
 export type ServiceFilterInput = z.infer<typeof serviceFilterSchema>;
+export type ServiceStatusInput = z.infer<typeof serviceStatusSchema>;
 
 /**
  * Service response type (what the API returns)
@@ -50,4 +58,5 @@ export interface ServiceResponse extends ServiceInput {
   deletedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
+  publishedAt: Date | null;
 }

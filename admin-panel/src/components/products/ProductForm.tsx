@@ -28,8 +28,8 @@ export function ProductForm({ initialData, onSubmit, isLoading }: ProductFormPro
   const [images, setImages] = useState<string[]>(initialData?.images || []);
   const [newImageUrl, setNewImageUrl] = useState('');
   const [externalLink, setExternalLink] = useState(initialData?.externalLink || '');
-  const [order, setOrder] = useState(initialData?.order?.toString() || '0');
   const [featured, setFeatured] = useState(initialData?.featured || false);
+  const [status, setStatus] = useState<string>(initialData?.status || 'DRAFT');
   const [technicalExplanation, setTechnicalExplanation] = useState(initialData?.technicalExplanation || '');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -74,8 +74,8 @@ export function ProductForm({ initialData, onSubmit, isLoading }: ProductFormPro
         shortDescription,
         fullDescription,
         images,
+        status: status as 'DRAFT' | 'PUBLISHED' | 'PRIVATE' | 'ARCHIVED',
         externalLink: externalLink || undefined,
-        order: parseInt(order, 10) || 0,
         featured,
         technicalExplanation: technicalExplanation || undefined,
         technicalImages: initialData?.technicalImages,
@@ -161,13 +161,24 @@ export function ProductForm({ initialData, onSubmit, isLoading }: ProductFormPro
         value={externalLink}
         onChange={(e) => setExternalLink(e.target.value)}
       />
-      <Input
-        id="order"
-        label="Order"
-        type="number"
-        value={order}
-        onChange={(e) => setOrder(e.target.value)}
-      />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+        <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151' }}>{t('blog.status')}</label>
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+          style={{
+            padding: '0.5rem',
+            borderRadius: '4px',
+            border: '1px solid #d1d5db',
+            fontSize: '0.875rem',
+          }}
+        >
+          <option value="DRAFT">{t('blog.draft')}</option>
+          <option value="PUBLISHED">{t('blog.published')}</option>
+          <option value="PRIVATE">{t('blog.private')}</option>
+          <option value="ARCHIVED">{t('blog.archived')}</option>
+        </select>
+      </div>
       <Checkbox
         id="featured"
         label="Featured"

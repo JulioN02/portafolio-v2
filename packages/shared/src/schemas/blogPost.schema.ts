@@ -34,6 +34,7 @@ export const blogPostUpdateSchema = blogPostSchema.partial();
 export const blogPostFilterSchema = z.object({
   status: postStatusEnum.optional(),
   category: z.string().optional(),
+  search: z.string().optional(),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(10),
 });

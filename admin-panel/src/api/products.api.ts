@@ -8,6 +8,7 @@ export const productsApi = {
     if (filters?.limit) params.append('limit', String(filters.limit));
     if (filters?.classification) params.append('classification', filters.classification);
     if (filters?.featured !== undefined) params.append('featured', String(filters.featured));
+    if (filters?.status) params.append('status', filters.status);
 
     const { data } = await apiClient.get(`/products?${params}`);
     return data;
@@ -42,13 +43,13 @@ export const productsApi = {
     return data;
   },
 
-  reorder: async (id: string, order: number): Promise<ProductResponse> => {
-    const { data } = await apiClient.patch(`/products/${id}/reorder`, { order });
+  toggleFeatured: async (id: string, featured: boolean): Promise<ProductResponse> => {
+    const { data } = await apiClient.patch(`/products/${id}/featured`, { featured });
     return data;
   },
 
-  toggleFeatured: async (id: string, featured: boolean): Promise<ProductResponse> => {
-    const { data } = await apiClient.patch(`/products/${id}/featured`, { featured });
+  updateStatus: async (id: string, status: string): Promise<ProductResponse> => {
+    const { data } = await apiClient.patch(`/products/${id}/status`, { status });
     return data;
   },
 };

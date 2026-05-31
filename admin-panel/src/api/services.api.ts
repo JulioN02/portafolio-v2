@@ -7,7 +7,7 @@ export const servicesApi = {
     if (filters?.page) params.append('page', String(filters.page));
     if (filters?.limit) params.append('limit', String(filters.limit));
     if (filters?.classification) params.append('classification', filters.classification);
-    if (filters?.featured !== undefined) params.append('featured', String(filters.featured));
+    if (filters?.status) params.append('status', filters.status);
 
     const { data } = await apiClient.get(`/services?${params}`);
     return data;
@@ -42,8 +42,8 @@ export const servicesApi = {
     return data;
   },
 
-  toggleFeatured: async (id: string, featured: boolean): Promise<ServiceResponse> => {
-    const { data } = await apiClient.patch(`/services/${id}/featured`, { featured });
+  updateStatus: async (id: string, status: string): Promise<ServiceResponse> => {
+    const { data } = await apiClient.patch(`/services/${id}/status`, { status });
     return data;
   },
 };

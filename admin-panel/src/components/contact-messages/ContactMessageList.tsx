@@ -1,151 +1,184 @@
-import { useTranslation } from '../../i18n/LanguageContext';
+import { useTranslation } from '@/i18n/LanguageContext';
 
 /**
- * Contact message interface matching user specification
+ * Contact message interface for the list display
  */
 export interface ContactMessage {
   id: string;
   name: string;
   email: string;
-  subject: string;
   message: string;
   createdAt: string;
   isRead: boolean;
+  archived: boolean;
+  labels: string[];
 }
 
 interface ContactMessageListProps {
   messages: ContactMessage[];
+  selectedId?: string | null;
+  onSelect?: (id: string) => void;
+  onArchive?: (id: string) => void;
 }
 
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diff = now.getTime() - date.getTime();
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+  if (days === 0) {
+    return date.toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
+  }
+  if (days === 1) return 'Ayer';
+  if (days < 7) {
+    return date.toLocaleDateString('es', { weekday: 'short' });
+  }
+  return date.toLocaleDateString('es', {
+    day: 'numeric',
+    month: 'short',
+  });
+};
+
+const truncate = (text: string, max = 100) => {
+  if (text.length <= max) return text;
+  return text.slice(0, max).trimEnd() + '…';
+};
+
 /**
- * Contact Message List Component
- * Displays received contact messages with read/unread visual states
- * Read-only: no edit/delete actions (per spec)
+ * Contact Message List Component — Gmail-like list
+ * Each item: sender name, email, date, message preview, read/unread indicator, archive button, label badges
  */
-export function ContactMessageList({ messages }: ContactMessageListProps) {
+export function ContactMessageList({ messages, selectedId, onSelect, onArchive }: ContactMessageListProps) {
   const { t } = useTranslation();
+
   if (messages.length === 0) {
     return (
-      <div className="admin-empty">
-        <div className="admin-empty-icon">✉️</div>
-        <div className="admin-empty-text">{t('contactMessages.empty')}</div>
+      <div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>
+        <p>{t('contactMessages.empty')}</p>
       </div>
     );
   }
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
-
   return (
-    <div className="admin-card" style={{ padding: '1rem' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        {messages.map((message) => (
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
+      {messages.map((message) => {
+        const isSelected = message.id === selectedId;
+        return (
           <div
             key={message.id}
+            onClick={() => onSelect?.(message.id)}
             style={{
-              background: message.isRead ? '#fff' : '#eff6ff',
-              border: message.isRead ? '1px solid #e5e7eb' : '1px solid #bfdbfe',
-              borderRadius: '8px',
-              padding: '1rem',
-              transition: 'all 0.2s ease',
+              display: 'flex',
+              alignItems: 'flex-start',
+              padding: '0.75rem 1rem',
+              cursor: 'pointer',
+              borderBottom: '1px solid #e5e7eb',
+              borderLeft: message.isRead ? '3px solid transparent' : '3px solid #3b82f6',
+              background: isSelected ? '#eff6ff' : message.isRead ? '#fff' : '#f9fafb',
+              transition: 'background 0.15s',
+            }}
+            onMouseEnter={(e) => {
+              if (!isSelected) e.currentTarget.style.background = '#f3f4f6';
+            }}
+            onMouseLeave={(e) => {
+              if (!isSelected) e.currentTarget.style.background = message.isRead ? '#fff' : '#f9fafb';
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-              <div style={{ flex: 1 }}>
-                {/* Header: Name + Unread Badge */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                  <span
-                    style={{
-                      fontWeight: message.isRead ? '500' : '700',
-                      fontSize: '1rem',
-                      color: '#111827',
-                    }}
-                  >
-                    {message.name}
-                  </span>
-                  {!message.isRead && (
-                    <span
-                      style={{
-                        background: '#3b82f6',
-                        color: '#fff',
-                        fontSize: '0.625rem',
-                        fontWeight: '600',
-                        padding: '0.125rem 0.375rem',
-                        borderRadius: '9999px',
-                        textTransform: 'uppercase',
-                      }}
-                    >
-                      New
-                    </span>
-                  )}
-                </div>
-                {/* Email */}
-                <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.25rem' }}>
-                  {message.email}
-                </div>
+            {/* Content */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              {/* Header row: name + date */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.125rem' }}>
+                <span
+                  style={{
+                    fontWeight: message.isRead ? '500' : '700',
+                    fontSize: '0.875rem',
+                    color: '#111827',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    flex: 1,
+                    marginRight: '0.5rem',
+                  }}
+                >
+                  {message.name}
+                </span>
+                <span style={{ fontSize: '0.75rem', color: '#9ca3af', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                  {formatDate(message.createdAt)}
+                </span>
               </div>
-              {/* Date */}
-              <div style={{ fontSize: '0.75rem', color: '#9ca3af', whiteSpace: 'nowrap' }}>
-                {formatDate(message.createdAt)}
+
+              {/* Email */}
+              <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.125rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {message.email}
               </div>
-            </div>
 
-            {/* Subject */}
-            <div
-              style={{
-                fontWeight: message.isRead ? '400' : '600',
-                fontSize: '0.875rem',
-                color: '#374151',
-                marginBottom: '0.5rem',
-              }}
-            >
-              {message.subject}
-            </div>
-
-            {/* Message */}
-            <div
-              style={{
-                fontSize: '0.875rem',
-                color: '#4b5563',
-                lineHeight: '1.5',
-                marginBottom: '1rem',
-                background: '#f9fafb',
-                padding: '0.75rem',
-                borderRadius: '6px',
-              }}
-            >
-              {message.message}
-            </div>
-
-            {/* Actions */}
-            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-              <a
-                href={`/contact-messages/${message.id}`}
+              {/* Message preview */}
+              <div
                 style={{
-                  padding: '0.375rem 0.75rem',
-                  background: '#3b82f6',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '0.875rem',
-                  textDecoration: 'none',
+                  fontSize: '0.8125rem',
+                  color: '#4b5563',
+                  lineHeight: '1.4',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  marginBottom: message.labels.length > 0 ? '0.25rem' : 0,
                 }}
               >
-                View Details
-              </a>
+                {truncate(message.message, 80)}
+              </div>
+
+              {/* Label badges */}
+              {message.labels.length > 0 && (
+                <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
+                  {message.labels.map((label) => (
+                    <span
+                      key={label}
+                      style={{
+                        fontSize: '0.625rem',
+                        padding: '0.0625rem 0.375rem',
+                        borderRadius: '9999px',
+                        background: '#dbeafe',
+                        color: '#1e40af',
+                        fontWeight: 500,
+                      }}
+                    >
+                      {label}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
+
+            {/* Archive button */}
+            {onArchive && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onArchive(message.id);
+                }}
+                title={message.archived ? t('contactMessages.unarchive') : t('contactMessages.archive')}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '0.25rem',
+                  marginLeft: '0.5rem',
+                  flexShrink: 0,
+                  color: '#9ca3af',
+                  fontSize: '1rem',
+                  lineHeight: 1,
+                  borderRadius: '4px',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = '#e5e7eb'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'none'; }}
+              >
+                {message.archived ? '📂' : '📁'}
+              </button>
+            )}
           </div>
-        ))}
-      </div>
+        );
+      })}
     </div>
   );
 }

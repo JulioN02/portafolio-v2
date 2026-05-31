@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { ZodError } from 'zod';
 import { serviceService } from '../services/service.service.js';
-import { serviceSchema, serviceUpdateSchema, serviceFilterSchema } from '@jsoft/shared';
+import { serviceSchema, serviceUpdateSchema, serviceFilterSchema, serviceStatusSchema } from '@jsoft/shared';
 
 // Helper to ensure param is a string (Express 5 types can be string | string[])
 const getStringParam = (param: string | string[] | undefined): string => {
@@ -36,17 +36,6 @@ export const serviceController = {
       res.json(service);
     } catch (error) {
       console.error('Service findBySlug error:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  },
-
-  async findFeatured(req: Request, res: Response): Promise<void> {
-    try {
-      const limit = parseInt(req.query.limit as string) || 3;
-      const services = await serviceService.findFeatured(limit);
-      res.json(services);
-    } catch (error) {
-      console.error('Service findFeatured error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   },
@@ -140,44 +129,25 @@ export const serviceController = {
     }
   },
 
-  async reorder(req: Request, res: Response): Promise<void> {
+  async updateStatus(req: Request, res: Response): Promise<void> {
     try {
       const id = getStringParam(req.params.id);
-      const { order } = req.body;
-      
-      if (typeof order !== 'number') {
-        res.status(400).json({ error: 'Order must be a number' });
-        return;
-      }
-      
-      const service = await serviceService.reorder(id, order);
-      res.json(service);
-    } catch (error) {
-      console.error('Service reorder error:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  },
+      const { status } = serviceStatusSchema.parse(req.body);
 
-  async toggleFeatured(req: Request, res: Response): Promise<void> {
-    try {
-      const id = getStringParam(req.params.id);
-      const { featured } = req.body;
-      
-      if (typeof featured !== 'boolean') {
-        res.status(400).json({ error: 'Featured must be a boolean' });
-        return;
-      }
-      
       const existing = await serviceService.findById(id);
       if (!existing) {
         res.status(404).json({ error: 'Service not found' });
         return;
       }
-      
-      const service = await serviceService.update(id, { featured });
+
+      const service = await serviceService.updateStatus(id, status);
       res.json(service);
     } catch (error) {
-      console.error('Service toggleFeatured error:', error);
+      if (error instanceof ZodError) {
+        res.status(400).json({ error: 'Validation Error', details: error.flatten().fieldErrors });
+        return;
+      }
+      console.error('Service updateStatus error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   },

@@ -117,7 +117,6 @@ describe('Projects Service', () => {
 
       expect(result.data[0].shortDescription).toBe('Case description');
       expect(result.data[0].classification).toBe('success-case');
-      expect(result.data[0].featured).toBe(false);
     });
   });
 

@@ -1,15 +1,18 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
+import { StatusBadge } from '@/components/shared/StatusBadge';
+import { StatusSelect } from '@/components/shared/StatusSelect';
 import type { ProductResponse } from '@jsoft/shared';
 
 interface ProductTableProps {
   products: ProductResponse[];
   onDelete: (id: string) => void;
   onToggleFeatured?: (id: string, featured: boolean) => void;
+  onStatusChange?: (id: string, status: string) => void;
 }
 
-export function ProductTable({ products, onDelete, onToggleFeatured }: ProductTableProps) {
+export function ProductTable({ products, onDelete, onToggleFeatured, onStatusChange }: ProductTableProps) {
   const { t } = useTranslation();
 
   if (products.length === 0) {
@@ -28,7 +31,8 @@ export function ProductTable({ products, onDelete, onToggleFeatured }: ProductTa
           <th>Title</th>
           <th>Classification</th>
           <th>{t('products.images')}</th>
-          <th style={{ textAlign: 'center' }}>{t('services.featured')}</th>
+          <th style={{ textAlign: 'center' }}>{t('blog.status')}</th>
+          <th style={{ textAlign: 'center' }}>{t('tools.featured')}</th>
           <th style={{ textAlign: 'right' }}>Actions</th>
         </tr>
       </thead>
@@ -38,6 +42,14 @@ export function ProductTable({ products, onDelete, onToggleFeatured }: ProductTa
             <td>{product.title}</td>
             <td>{product.classification}</td>
             <td>{product.images.length}</td>
+            <td style={{ textAlign: 'center' }}>
+              {onStatusChange && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}>
+                  <StatusBadge status={product.status} />
+                  <StatusSelect value={product.status} onChange={(newStatus) => onStatusChange(product.id, newStatus)} />
+                </div>
+              )}
+            </td>
             <td style={{ textAlign: 'center' }}>
               {onToggleFeatured && (
                 <Button

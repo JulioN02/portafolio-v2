@@ -198,22 +198,6 @@ describe('Product Service', () => {
     });
   });
 
-  describe('reorder', () => {
-    it('should update product order', async () => {
-      const mockProduct = { id: '1', title: 'Product', order: 5, deletedAt: null };
-      (mockPrisma.product.update as jest.Mock).mockResolvedValue(mockProduct);
-
-      const result = await productService.reorder('1', 5);
-
-      expect(result.order).toBe(5);
-      expect(mockPrisma.product.update).toHaveBeenCalledWith({
-        where: { id: '1' },
-        data: { order: 5 },
-        select: expect.any(Object),
-      });
-    });
-  });
-
   describe('getClassifications', () => {
     it('should return unique classifications', async () => {
       const mockClassifications = [

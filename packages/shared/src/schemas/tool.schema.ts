@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { postStatusEnum } from './blogPost.schema.js';
 
 /**
  * Schema for Tool entity
@@ -12,8 +13,8 @@ export const toolSchema = z.object({
   fullDescription: z.string().min(50),
   images: z.array(z.string().url()).min(1),
   requiresInstall: z.boolean().default(false),
-  order: z.number().int().min(0).default(0),
   featured: z.boolean().default(false),
+  status: postStatusEnum.default('DRAFT'),
   
   // Technical fields for recruiters (optional)
   technicalExplanation: z.string().max(15000).optional(),
@@ -30,9 +31,17 @@ export const toolUpdateSchema = toolSchema.partial();
  */
 export const toolFilterSchema = z.object({
   featured: z.coerce.boolean().optional(),
+  status: postStatusEnum.optional(),
   classification: z.string().optional(),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(10),
+});
+
+/**
+ * Schema for changing tool status
+ */
+export const toolStatusSchema = z.object({
+  status: postStatusEnum,
 });
 
 /**
@@ -41,6 +50,7 @@ export const toolFilterSchema = z.object({
 export type ToolInput = z.infer<typeof toolSchema>;
 export type ToolUpdateInput = z.infer<typeof toolUpdateSchema>;
 export type ToolFilterInput = z.infer<typeof toolFilterSchema>;
+export type ToolStatusInput = z.infer<typeof toolStatusSchema>;
 
 /**
  * Tool response type
@@ -50,4 +60,5 @@ export interface ToolResponse extends ToolInput {
   deletedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
+  publishedAt: Date | null;
 }

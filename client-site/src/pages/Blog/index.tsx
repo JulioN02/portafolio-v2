@@ -1,23 +1,70 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { MetaTags } from '../../components/seo/MetaTags';
 import { BlogCard } from '../../components/blog/BlogCard';
-import { useBlogPosts } from '../../hooks/useBlogPosts';
+import { useBlogPosts, useBlogCategories } from '../../hooks/useBlogPosts';
 import styles from './Blog.module.css';
 
 const ITEMS_PER_PAGE = 9;
 
 export function BlogPage() {
-  const [page, setPage] = useState(1);
-  const { data, isLoading, isError, error, refetch } = useBlogPosts(page);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const category = searchParams.get('category') || undefined;
+  const search = searchParams.get('search') || undefined;
+  const page = Number(searchParams.get('page')) || 1;
+
+  const [searchInput, setSearchInput] = useState(search || '');
+
+  const { data, isLoading, isError, error, refetch } = useBlogPosts(page, { category, search });
+  const { data: categories } = useBlogCategories();
 
   const posts = data?.data ?? [];
   const totalItems = data?.pagination?.total ?? 0;
   const totalPages = data?.pagination?.totalPages ?? Math.max(1, Math.ceil(totalItems / ITEMS_PER_PAGE));
 
+  // Debounce search input — update URL search param after 300ms of inactivity
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        if (searchInput) {
+          next.set('search', searchInput);
+        } else {
+          next.delete('search');
+        }
+        // Reset to page 1 on search change
+        next.delete('page');
+        return next;
+      }, { replace: true });
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchInput, setSearchParams]);
+
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > totalPages) return;
-    setPage(newPage);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set('page', String(newPage));
+      return next;
+    }, { replace: true });
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCategoryChange = (value: string) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (value) {
+        next.set('category', value);
+      } else {
+        next.delete('category');
+      }
+      next.delete('page');
+      return next;
+    }, { replace: true });
+  };
+
+  const handleSearchInputChange = (value: string) => {
+    setSearchInput(value);
   };
 
   // Loading state
@@ -89,6 +136,33 @@ export function BlogPage() {
       />
       <h1 className={styles.title}>Blog</h1>
       <p className={styles.subtitle}>Artículos, tutoriales y reflexiones sobre tecnología</p>
+
+      <div className={styles.filters}>
+        <div className={styles.searchWrapper}>
+          <input
+            type="search"
+            className={styles.searchInput}
+            placeholder="Buscar artículos…"
+            value={searchInput}
+            onChange={(e) => handleSearchInputChange(e.target.value)}
+            aria-label="Buscar artículos"
+          />
+        </div>
+
+        <select
+          className={styles.categorySelect}
+          value={category || ''}
+          onChange={(e) => handleCategoryChange(e.target.value)}
+          aria-label="Filtrar por categoría"
+        >
+          <option value="">Todas las categorías</option>
+          {categories?.map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
+      </div>
 
       <div className={styles.grid}>
         {posts.map((post) => (

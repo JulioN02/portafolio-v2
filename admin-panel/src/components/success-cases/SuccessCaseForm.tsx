@@ -12,12 +12,10 @@ interface SuccessCaseFormProps {
 export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCaseFormProps) {
   const { t } = useTranslation();
   const [title, setTitle] = useState(initialData?.title || '');
-  const [clientName, setClientName] = useState((initialData as Record<string, unknown>)?.clientName as string || '');
   const [description, setDescription] = useState(initialData?.description || '');
-  const [classification, setClassification] = useState((initialData as Record<string, unknown>)?.classification as string || '');
-  const [link, setLink] = useState((initialData as Record<string, unknown>)?.link as string || '');
   const [images, setImages] = useState<string[]>(initialData?.images || []);
   const [imageInput, setImageInput] = useState('');
+  const [status, setStatus] = useState<string>(initialData?.status || 'DRAFT');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Helper to generate slug from title
@@ -37,33 +35,15 @@ export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCas
     if (!title || title.length < 3) {
       newErrors.title = 'Title must be at least 3 characters';
     }
-    if (!clientName || clientName.length < 1) {
-      newErrors.clientName = 'Client name is required';
-    }
     if (!description || description.length < 10) {
       newErrors.description = 'Description must be at least 10 characters';
-    }
-    if (!classification || classification.length < 2) {
-      newErrors.classification = 'Classification must be at least 2 characters';
-    }
-    if (link && !isValidUrl(link)) {
-      newErrors.link = 'Please enter a valid URL';
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const isValidUrl = (url: string): boolean => {
-    try {
-      new URL(url);
-      return true;
-    } catch {
-      return false;
-    }
-  };
-
   const addImage = () => {
-    if (imageInput && isValidUrl(imageInput)) {
+    if (imageInput && imageInput.startsWith('http')) {
       setImages([...images, imageInput]);
       setImageInput('');
     } else if (imageInput) {
@@ -83,13 +63,8 @@ export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCas
         slug: initialData?.slug || generateSlug(title),
         description,
         images: images.length > 0 ? images : ['https://placehold.co/600x400'],
-        order: 0,
-        featured: false,
-        ...(initialData as Record<string, unknown>),
-        clientName,
-        classification,
-        link: link || undefined,
-      } as SuccessCaseInput);
+        status: status as 'DRAFT' | 'PUBLISHED' | 'PRIVATE' | 'ARCHIVED',
+      });
     }
   };
 
@@ -103,22 +78,6 @@ export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCas
         error={errors.title}
         required
       />
-      <Input
-        id="clientName"
-        label={t('successCases.client')}
-        value={clientName}
-        onChange={(e) => setClientName(e.target.value)}
-        error={errors.clientName}
-        required
-      />
-      <Input
-        id="classification"
-        label="Classification"
-        value={classification}
-        onChange={(e) => setClassification(e.target.value)}
-        error={errors.classification}
-        required
-      />
       <Textarea
         id="description"
         label="Description"
@@ -126,15 +85,6 @@ export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCas
         onChange={(e) => setDescription(e.target.value)}
         error={errors.description}
         required
-      />
-      <Input
-        id="link"
-        label="Link (optional)"
-        type="url"
-        value={link}
-        onChange={(e) => setLink(e.target.value)}
-        error={errors.link}
-        placeholder="https://example.com"
       />
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
         <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151' }}>Images (optional)</label>
@@ -188,6 +138,24 @@ export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCas
             ))}
           </div>
         )}
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+        <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151' }}>{t('blog.status')}</label>
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+          style={{
+            padding: '0.5rem',
+            borderRadius: '4px',
+            border: '1px solid #d1d5db',
+            fontSize: '0.875rem',
+          }}
+        >
+          <option value="DRAFT">{t('blog.draft')}</option>
+          <option value="PUBLISHED">{t('blog.published')}</option>
+          <option value="PRIVATE">{t('blog.private')}</option>
+          <option value="ARCHIVED">{t('blog.archived')}</option>
+        </select>
       </div>
       <Button type="submit" disabled={isLoading}>
         {isLoading ? t('successCases.saving') : t('successCases.save')}

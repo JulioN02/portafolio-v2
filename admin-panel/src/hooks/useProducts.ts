@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { productsApi } from '../api/products.api';
-import type { ProductInput, ProductUpdateInput, ProductFilterInput } from '@jsoft/shared';
+import type { ProductInput, ProductUpdateInput, ProductFilterInput, ProductStatusInput } from '@jsoft/shared';
 
 export function useProducts() {
   const queryClient = useQueryClient();
@@ -52,10 +52,10 @@ export function useProducts() {
       },
     });
 
-  const useReorder = () =>
+  const useUpdateStatus = () =>
     useMutation({
-      mutationFn: ({ id, order }: { id: string; order: number }) =>
-        productsApi.reorder(id, order),
+      mutationFn: ({ id, status }: { id: string; status: ProductStatusInput['status'] }) =>
+        productsApi.updateStatus(id, status),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['products'] });
       },
@@ -68,6 +68,6 @@ export function useProducts() {
     useUpdate,
     useDelete,
     useToggleFeatured,
-    useReorder,
+    useUpdateStatus,
   };
 }

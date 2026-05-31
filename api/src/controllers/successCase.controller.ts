@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { ZodError } from 'zod';
 import { successCaseService } from '../services/successCase.service.js';
-import { successCaseSchema, successCaseUpdateSchema, successCaseFilterSchema } from '@jsoft/shared';
+import { successCaseSchema, successCaseUpdateSchema, successCaseFilterSchema, successCaseStatusSchema } from '@jsoft/shared';
 
 // Helper to ensure param is a string (Express 5 types can be string | string[])
 const getStringParam = (param: string | string[] | undefined): string => {
@@ -36,17 +36,6 @@ export const successCaseController = {
       res.json(successCase);
     } catch (error) {
       console.error('SuccessCase findBySlug error:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  },
-
-  async findFeatured(req: Request, res: Response): Promise<void> {
-    try {
-      const limit = parseInt(req.query.limit as string) || 3;
-      const successCases = await successCaseService.findFeatured(limit);
-      res.json(successCases);
-    } catch (error) {
-      console.error('SuccessCase findFeatured error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   },
@@ -151,40 +140,25 @@ export const successCaseController = {
     }
   },
 
-  async toggleFeatured(req: Request, res: Response): Promise<void> {
+  async updateStatus(req: Request, res: Response): Promise<void> {
     try {
       const id = getStringParam(req.params.id);
-      const { featured } = req.body;
-      
-      const existing = await successCaseService.findById(id);
-      if (!existing) {
-        res.status(404).json({ error: 'Success case not found' });
-        return;
-      }
-      
-      const successCase = await successCaseService.update(id, { featured });
-      res.json(successCase);
-    } catch (error) {
-      console.error('SuccessCase toggleFeatured error:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  },
+      const { status } = successCaseStatusSchema.parse(req.body);
 
-  async reorder(req: Request, res: Response): Promise<void> {
-    try {
-      const id = getStringParam(req.params.id);
-      const { order } = req.body;
-      
       const existing = await successCaseService.findById(id);
       if (!existing) {
         res.status(404).json({ error: 'Success case not found' });
         return;
       }
-      
-      const successCase = await successCaseService.reorder(id, order);
+
+      const successCase = await successCaseService.updateStatus(id, status);
       res.json(successCase);
     } catch (error) {
-      console.error('SuccessCase reorder error:', error);
+      if (error instanceof ZodError) {
+        res.status(400).json({ error: 'Validation Error', details: error.flatten().fieldErrors });
+        return;
+      }
+      console.error('SuccessCase updateStatus error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   },

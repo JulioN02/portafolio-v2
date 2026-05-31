@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { Input, Textarea, Checkbox } from '@jsoft/shared';
 import { Button } from '@jsoft/shared';
-import { ToolInput } from '@jsoft/shared';
+import type { ToolInput } from '@jsoft/shared';
 
 interface ToolFormProps {
   initialData?: Partial<ToolInput>;
@@ -18,8 +18,8 @@ export function ToolForm({ initialData, onSubmit, isLoading }: ToolFormProps) {
   const [shortDescription, setShortDescription] = useState(initialData?.shortDescription || '');
   const [fullDescription, setFullDescription] = useState(initialData?.fullDescription || '');
   const [requiresInstall, setRequiresInstall] = useState(initialData?.requiresInstall || false);
-  const [order, setOrder] = useState(initialData?.order?.toString() || '0');
   const [featured, setFeatured] = useState(initialData?.featured || false);
+  const [status, setStatus] = useState<string>(initialData?.status || 'DRAFT');
   const [technicalExplanation, setTechnicalExplanation] = useState(initialData?.technicalExplanation || '');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -61,8 +61,8 @@ export function ToolForm({ initialData, onSubmit, isLoading }: ToolFormProps) {
         fullDescription,
         images: initialData?.images || [],
         requiresInstall,
-        order: parseInt(order, 10) || 0,
         featured,
+        status: status as 'DRAFT' | 'PUBLISHED' | 'PRIVATE' | 'ARCHIVED',
         technicalExplanation: technicalExplanation || undefined,
         technicalImages: initialData?.technicalImages,
       });
@@ -111,18 +111,29 @@ export function ToolForm({ initialData, onSubmit, isLoading }: ToolFormProps) {
         error={errors.fullDescription}
         required
       />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+        <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151' }}>{t('blog.status')}</label>
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+          style={{
+            padding: '0.5rem',
+            borderRadius: '4px',
+            border: '1px solid #d1d5db',
+            fontSize: '0.875rem',
+          }}
+        >
+          <option value="DRAFT">{t('blog.draft')}</option>
+          <option value="PUBLISHED">{t('blog.published')}</option>
+          <option value="PRIVATE">{t('blog.private')}</option>
+          <option value="ARCHIVED">{t('blog.archived')}</option>
+        </select>
+      </div>
       <Checkbox
         id="requiresInstall"
         label="Requires Install"
         checked={requiresInstall}
         onChange={(e) => setRequiresInstall(e.target.checked)}
-      />
-      <Input
-        id="order"
-        label="Order"
-        type="number"
-        value={order}
-        onChange={(e) => setOrder(e.target.value)}
       />
       <Checkbox
         id="featured"

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { postStatusEnum } from './blogPost.schema.js';
 
 /**
  * Schema for Product entity
@@ -12,8 +13,8 @@ export const productSchema = z.object({
   fullDescription: z.string().min(50),
   images: z.array(z.string().url()).min(1),
   externalLink: z.string().url().optional(),
-  order: z.number().int().min(0).default(0),
   featured: z.boolean().default(false),
+  status: postStatusEnum.default('DRAFT'),
   
   // Technical fields for recruiters (optional)
   technicalExplanation: z.string().max(15000).optional(),
@@ -30,9 +31,17 @@ export const productUpdateSchema = productSchema.partial();
  */
 export const productFilterSchema = z.object({
   featured: z.coerce.boolean().optional(),
+  status: postStatusEnum.optional(),
   classification: z.string().optional(),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(10),
+});
+
+/**
+ * Schema for changing product status
+ */
+export const productStatusSchema = z.object({
+  status: postStatusEnum,
 });
 
 /**
@@ -41,6 +50,7 @@ export const productFilterSchema = z.object({
 export type ProductInput = z.infer<typeof productSchema>;
 export type ProductUpdateInput = z.infer<typeof productUpdateSchema>;
 export type ProductFilterInput = z.infer<typeof productFilterSchema>;
+export type ProductStatusInput = z.infer<typeof productStatusSchema>;
 
 /**
  * Product response type
@@ -50,4 +60,5 @@ export interface ProductResponse extends ProductInput {
   deletedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
+  publishedAt: Date | null;
 }

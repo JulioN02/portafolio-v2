@@ -11,7 +11,7 @@ export interface ProjectSummary {
   classification: string;
   shortDescription: string;
   image: string; // first image
-  featured: boolean;
+  featured?: boolean; // only present on Product and Tool
   createdAt: Date;
 }
 
@@ -28,7 +28,7 @@ export const projectsService = {
     const skip = (page - 1) * limit;
 
     // Build queries based on filters
-    const queries = [];
+    const queries: Promise<ProjectSummary[]>[] = [];
 
     if (!type || type === 'service') {
       queries.push(
@@ -44,12 +44,16 @@ export const projectsService = {
             classification: true,
             shortDescription: true,
             images: true,
-            featured: true,
             createdAt: true,
           },
           orderBy: [{ createdAt: 'desc' }],
         }).then(items => items.map(item => ({
-          ...item,
+          id: item.id,
+          title: item.title,
+          slug: item.slug,
+          classification: item.classification,
+          shortDescription: item.shortDescription,
+          createdAt: item.createdAt,
           type: 'service' as const,
           image: item.images[0] || '',
         })))
@@ -75,7 +79,13 @@ export const projectsService = {
           },
           orderBy: [{ createdAt: 'desc' }],
         }).then(items => items.map(item => ({
-          ...item,
+          id: item.id,
+          title: item.title,
+          slug: item.slug,
+          classification: item.classification,
+          shortDescription: item.shortDescription,
+          createdAt: item.createdAt,
+          featured: item.featured,
           type: 'product' as const,
           image: item.images[0] || '',
         })))
@@ -101,7 +111,13 @@ export const projectsService = {
           },
           orderBy: [{ createdAt: 'desc' }],
         }).then(items => items.map(item => ({
-          ...item,
+          id: item.id,
+          title: item.title,
+          slug: item.slug,
+          classification: item.classification,
+          shortDescription: item.shortDescription,
+          createdAt: item.createdAt,
+          featured: item.featured,
           type: 'tool' as const,
           image: item.images[0] || '',
         })))
@@ -120,15 +136,17 @@ export const projectsService = {
             slug: true,
             description: true,
             images: true,
-            featured: true,
             createdAt: true,
           },
           orderBy: [{ createdAt: 'desc' }],
         }).then(items => items.map(item => ({
-          ...item,
-          type: 'successCase' as const,
-          classification: 'success-case', // SuccessCase has no classification
+          id: item.id,
+          title: item.title,
+          slug: item.slug,
+          classification: 'success-case',
           shortDescription: item.description,
+          createdAt: item.createdAt,
+          type: 'successCase' as const,
           image: item.images[0] || '',
         })))
       );
@@ -161,42 +179,87 @@ export const projectsService = {
   async findRecent(limit = 3): Promise<ProjectSummary[]> {
     const recentSelect = {
       id: true, title: true, slug: true, classification: true,
+      shortDescription: true, images: true, createdAt: true,
+    } as const;
+
+    const productSelect = {
+      id: true, title: true, slug: true, classification: true,
       shortDescription: true, images: true, featured: true, createdAt: true,
     } as const;
 
-    // Helper: try featured first, fallback to recent
-    const featuredOrRecent = async <T extends Record<string, any>>(
-      delegate: (where: Record<string, any>) => Promise<T[]>,
-      mapItem: (item: T) => ProjectSummary,
-    ): Promise<ProjectSummary[]> => {
-      const featured = await delegate({ deletedAt: null, featured: true });
-      if (featured.length > 0) return featured.map(mapItem);
-      const recent = await delegate({ deletedAt: null });
-      return recent.map(mapItem);
-    };
+    const toolSelect = {
+      id: true, title: true, slug: true, classification: true,
+      shortDescription: true, images: true, featured: true, createdAt: true,
+    } as const;
 
     const successCaseSelect = {
       id: true, title: true, slug: true, description: true,
-      images: true, featured: true, createdAt: true,
+      images: true, createdAt: true,
     } as const;
 
     const [services, products, tools, successCases] = await Promise.all([
-      featuredOrRecent(
-        (where) => prisma.service.findMany({ where, select: recentSelect, orderBy: [{ createdAt: 'desc' }], take: 1 }),
-        (i: any) => ({ ...i, type: 'service' as const, image: i.images[0] || '' }),
-      ),
-      featuredOrRecent(
-        (where) => prisma.product.findMany({ where, select: recentSelect, orderBy: [{ createdAt: 'desc' }], take: 1 }),
-        (i: any) => ({ ...i, type: 'product' as const, image: i.images[0] || '' }),
-      ),
-      featuredOrRecent(
-        (where) => prisma.tool.findMany({ where, select: recentSelect, orderBy: [{ createdAt: 'desc' }], take: 1 }),
-        (i: any) => ({ ...i, type: 'tool' as const, image: i.images[0] || '' }),
-      ),
-      featuredOrRecent(
-        (where) => prisma.successCase.findMany({ where, select: successCaseSelect, orderBy: [{ createdAt: 'desc' }], take: 1 }),
-        (i: any) => ({ ...i, type: 'successCase' as const, classification: 'success-case', shortDescription: i.description, image: i.images[0] || '' }),
-      ),
+      prisma.service.findMany({
+        where: { deletedAt: null },
+        select: recentSelect,
+        orderBy: [{ createdAt: 'desc' }],
+        take: limit,
+      }).then(items => items.map(item => ({
+        id: item.id,
+        title: item.title,
+        slug: item.slug,
+        classification: item.classification,
+        shortDescription: item.shortDescription,
+        createdAt: item.createdAt,
+        type: 'service' as const,
+        image: item.images[0] || '',
+      }))),
+      prisma.product.findMany({
+        where: { deletedAt: null },
+        select: productSelect,
+        orderBy: [{ createdAt: 'desc' }],
+        take: limit,
+      }).then(items => items.map(item => ({
+        id: item.id,
+        title: item.title,
+        slug: item.slug,
+        classification: item.classification,
+        shortDescription: item.shortDescription,
+        createdAt: item.createdAt,
+        featured: item.featured,
+        type: 'product' as const,
+        image: item.images[0] || '',
+      }))),
+      prisma.tool.findMany({
+        where: { deletedAt: null },
+        select: toolSelect,
+        orderBy: [{ createdAt: 'desc' }],
+        take: limit,
+      }).then(items => items.map(item => ({
+        id: item.id,
+        title: item.title,
+        slug: item.slug,
+        classification: item.classification,
+        shortDescription: item.shortDescription,
+        createdAt: item.createdAt,
+        featured: item.featured,
+        type: 'tool' as const,
+        image: item.images[0] || '',
+      }))),
+      prisma.successCase.findMany({
+        where: { deletedAt: null },
+        select: successCaseSelect,
+        orderBy: [{ createdAt: 'desc' }],
+        take: limit,
+      }).then(items => items.map(item => ({
+        id: item.id,
+        title: item.title,
+        slug: item.slug,
+        classification: 'success-case',
+        shortDescription: item.description,
+        createdAt: item.createdAt,
+        type: 'successCase' as const,
+        image: item.images[0] || '',
+      }))),
     ]);
 
     // Merge all and sort by createdAt, then take the top N

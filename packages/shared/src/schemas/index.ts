@@ -6,3 +6,4 @@ export * from './successCase.schema.js';
 export * from './blogPost.schema.js';
 export * from './contact.schema.js';
 export * from './login.schema.js';
+export * from './siteSection.schema.js';

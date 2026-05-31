@@ -19,9 +19,7 @@ export function ServiceCard({ service }: ServiceCardProps) {
             className={styles.image}
             loading="lazy"
           />
-          {service.featured && (
-            <span className={styles.badge}>Destacado</span>
-          )}
+          
         </div>
 
         <div className={styles.content}>

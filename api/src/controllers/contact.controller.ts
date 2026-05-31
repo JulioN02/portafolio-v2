@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { z } from 'zod';
 import { ZodError } from 'zod';
 import { contactService } from '../services/contact.service.js';
 import { clientContactSchema, recruiterContactSchema, FormOrigin } from '@jsoft/shared';
@@ -68,8 +69,12 @@ export const contactController = {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
       const originType = req.query.originType as FormOrigin | undefined;
+      const search = req.query.search as string | undefined;
+      const isRead = req.query.isRead !== undefined ? req.query.isRead === 'true' : undefined;
+      const isArchived = req.query.isArchived !== undefined ? req.query.isArchived === 'true' : undefined;
+      const label = req.query.label as string | undefined;
       
-      const result = await contactService.findAll({ page, limit, originType });
+      const result = await contactService.findAll({ page, limit, originType, search, isRead, isArchived, label });
       
       res.json(result);
     } catch (error) {
@@ -119,6 +124,62 @@ export const contactController = {
       res.json({ message: 'Contact form deleted successfully' });
     } catch (error) {
       console.error('Delete contact error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  /**
+   * PATCH /api/contact/:id/read
+   * Mark a contact form as read (admin only)
+   */
+  async markRead(req: Request, res: Response): Promise<void> {
+    try {
+      const id = req.params.id as string;
+      const result = await contactService.markRead(id);
+
+      res.json(result);
+    } catch (error) {
+      console.error('Mark contact read error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  /**
+   * PATCH /api/contact/:id/archive
+   * Toggle archive status of a contact form (admin only)
+   */
+  async toggleArchive(req: Request, res: Response): Promise<void> {
+    try {
+      const id = req.params.id as string;
+      const result = await contactService.toggleArchive(id);
+
+      res.json(result);
+    } catch (error) {
+      console.error('Toggle contact archive error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  /**
+   * POST /api/contact/:id/labels
+   * Set labels on a contact form (admin only)
+   */
+  async setLabels(req: Request, res: Response): Promise<void> {
+    try {
+      const id = req.params.id as string;
+      const labels = z.array(z.string()).parse(req.body.labels);
+      const result = await contactService.setLabels(id, labels);
+
+      res.json(result);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        res.status(400).json({
+          error: 'Validation Error',
+          details: error.flatten().fieldErrors,
+        });
+        return;
+      }
+      console.error('Set contact labels error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   },

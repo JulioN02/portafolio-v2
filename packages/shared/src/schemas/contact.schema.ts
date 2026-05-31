@@ -46,6 +46,21 @@ export type RecruiterContactInput = z.infer<typeof recruiterContactSchema>;
 export type ContactFormInput = z.infer<typeof contactFormSchema>;
 
 /**
+ * Schema for filtering contact forms in admin
+ */
+export const contactFormFilterSchema = z.object({
+  search: z.string().optional(),
+  isRead: z.coerce.boolean().optional(),
+  isArchived: z.coerce.boolean().optional(),
+  label: z.string().optional(),
+  originType: formOriginEnum.optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+});
+
+export type ContactFormFilterInput = z.infer<typeof contactFormFilterSchema>;
+
+/**
  * ContactForm response type
  */
 export interface ContactFormResponse {
@@ -57,5 +72,8 @@ export interface ContactFormResponse {
   message: string;
   source: string;
   originType: FormOrigin;
+  readAt: Date | null;
+  archived: boolean;
+  labels: string[];
   createdAt: Date;
 }

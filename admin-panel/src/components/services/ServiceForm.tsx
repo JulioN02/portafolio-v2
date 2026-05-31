@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
-import { Input, Textarea, Checkbox } from '@jsoft/shared';
+import { Input, Textarea } from '@jsoft/shared';
 import { Button } from '@jsoft/shared';
-import { ServiceInput } from '@jsoft/shared';
+import type { ServiceInput } from '@jsoft/shared';
 
 interface ServiceFormProps {
   initialData?: Partial<ServiceInput>;
@@ -25,8 +25,7 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
   const [classification, setClassification] = useState(initialData?.classification || '');
   const [shortDescription, setShortDescription] = useState(initialData?.shortDescription || '');
   const [fullDescription, setFullDescription] = useState(initialData?.fullDescription || '');
-  const [order, setOrder] = useState(initialData?.order?.toString() || '0');
-  const [featured, setFeatured] = useState(initialData?.featured || false);
+  const [status, setStatus] = useState<string>(initialData?.status || 'DRAFT');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleTitleChange = (newTitle: string) => {
@@ -59,8 +58,7 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
         fullDescription,
         includedItems: initialData?.includedItems || [],
         images: initialData?.images || [],
-        order: parseInt(order, 10) || 0,
-        featured,
+        status: status as ServiceInput['status'],
         technicalExplanation: initialData?.technicalExplanation,
         technicalImages: initialData?.technicalImages,
       });
@@ -109,19 +107,24 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
         error={errors.fullDescription}
         required
       />
-      <Input
-        id="order"
-        label="Order"
-        type="number"
-        value={order}
-        onChange={(e) => setOrder(e.target.value)}
-      />
-      <Checkbox
-        id="featured"
-        label="Featured"
-        checked={featured}
-        onChange={(e) => setFeatured(e.target.checked)}
-      />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+        <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151' }}>{t('blog.status')}</label>
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+          style={{
+            padding: '0.5rem',
+            borderRadius: '4px',
+            border: '1px solid #d1d5db',
+            fontSize: '0.875rem',
+          }}
+        >
+          <option value="DRAFT">{t('blog.draft')}</option>
+          <option value="PUBLISHED">{t('blog.published')}</option>
+          <option value="PRIVATE">{t('blog.private')}</option>
+          <option value="ARCHIVED">{t('blog.archived')}</option>
+        </select>
+      </div>
       <Button type="submit" disabled={isLoading}>
         {isLoading ? t('services.saving') : t('services.save')}
       </Button>

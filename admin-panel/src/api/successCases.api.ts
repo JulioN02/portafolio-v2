@@ -6,6 +6,7 @@ export const successCasesApi = {
     const params = new URLSearchParams();
     if (filters?.page) params.append('page', String(filters.page));
     if (filters?.limit) params.append('limit', String(filters.limit));
+    if (filters?.status) params.append('status', filters.status);
 
     const { data } = await apiClient.get(`/success-cases?${params}`);
     return data;
@@ -40,13 +41,8 @@ export const successCasesApi = {
     return data;
   },
 
-  reorder: async (id: string, order: number): Promise<SuccessCaseResponse> => {
-    const { data } = await apiClient.patch(`/success-cases/${id}/reorder`, { order });
-    return data;
-  },
-
-  toggleFeatured: async (id: string, featured: boolean): Promise<SuccessCaseResponse> => {
-    const { data } = await apiClient.patch(`/success-cases/${id}/featured`, { featured });
+  updateStatus: async (id: string, status: string): Promise<SuccessCaseResponse> => {
+    const { data } = await apiClient.patch(`/success-cases/${id}/status`, { status });
     return data;
   },
 };

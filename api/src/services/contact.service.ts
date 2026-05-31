@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { ClientContactInput, RecruiterContactInput, FormOrigin } from '@jsoft/shared';
+import { NotFoundError } from '../utils/errors.js';
 
 const prisma = new PrismaClient();
 
@@ -12,6 +13,9 @@ const CONTACT_SELECT = {
   message: true,
   source: true,
   originType: true,
+  readAt: true,
+  archived: true,
+  labels: true,
   createdAt: true,
 };
 
@@ -19,6 +23,10 @@ export interface ContactFilterInput {
   originType?: FormOrigin;
   page?: number;
   limit?: number;
+  search?: string;
+  isRead?: boolean;
+  isArchived?: boolean;
+  label?: string;
 }
 
 export const contactService = {
@@ -52,13 +60,25 @@ export const contactService = {
   },
 
   async findAll(filter?: ContactFilterInput) {
-    const { originType, page = 1, limit = 10 } = filter || {};
+    const { originType, page = 1, limit = 10, search, isRead, isArchived, label } = filter || {};
     const skip = (page - 1) * limit;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const where: Record<string, any> = {
       ...(originType && { originType }),
+      ...(isRead !== undefined && { readAt: isRead ? { not: null } : null }),
+      ...(isArchived !== undefined && { archived: isArchived }),
+      ...(label && { labels: { has: label } }),
     };
+
+    if (search) {
+      where.OR = [
+        { firstName: { contains: search, mode: 'insensitive' } },
+        { lastName: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } },
+        { message: { contains: search, mode: 'insensitive' } },
+      ];
+    }
 
     const [contacts, total] = await Promise.all([
       prisma.contactForm.findMany({
@@ -100,6 +120,41 @@ export const contactService = {
   async delete(id: string) {
     return prisma.contactForm.delete({
       where: { id },
+    });
+  },
+
+  /**
+   * Mark a contact form as read
+   */
+  async markRead(id: string) {
+    return prisma.contactForm.update({
+      where: { id },
+      data: { readAt: new Date() },
+      select: { id: true, readAt: true },
+    });
+  },
+
+  /**
+   * Toggle archive status of a contact form
+   */
+  async toggleArchive(id: string) {
+    const current = await prisma.contactForm.findUnique({ where: { id }, select: { archived: true } });
+    if (!current) throw new NotFoundError('Contact form not found');
+    return prisma.contactForm.update({
+      where: { id },
+      data: { archived: !current.archived },
+      select: { id: true, archived: true },
+    });
+  },
+
+  /**
+   * Set labels on a contact form
+   */
+  async setLabels(id: string, labels: string[]) {
+    return prisma.contactForm.update({
+      where: { id },
+      data: { labels },
+      select: { id: true, labels: true },
     });
   },
 

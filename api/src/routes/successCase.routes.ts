@@ -6,7 +6,6 @@ const router: IRouter = Router();
 
 // Public routes
 router.get('/', successCaseController.findAll);
-router.get('/featured', successCaseController.findFeatured);
 router.get('/recent', successCaseController.findRecent);
 router.get('/:slug', successCaseController.findBySlug);
 router.get('/by-id/:id', successCaseController.findById);
@@ -16,7 +15,6 @@ router.post('/', authMiddleware, successCaseController.create);
 router.put('/:id', authMiddleware, successCaseController.update);
 router.delete('/:id', authMiddleware, successCaseController.delete);
 router.patch('/:id/restore', authMiddleware, successCaseController.restore);
-router.patch('/:id/featured', authMiddleware, successCaseController.toggleFeatured);
-router.patch('/:id/reorder', authMiddleware, successCaseController.reorder);
+router.patch('/:id/status', authMiddleware, successCaseController.updateStatus);
 
 export default router;

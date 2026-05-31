@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { servicesApi } from '../api/services.api';
-import type { ServiceInput, ServiceUpdateInput, ServiceFilterInput } from '@jsoft/shared';
+import type { ServiceInput, ServiceUpdateInput, ServiceFilterInput, ServiceStatusInput } from '@jsoft/shared';
 
 export function useServices() {
   const queryClient = useQueryClient();
@@ -43,10 +43,10 @@ export function useServices() {
       },
     });
 
-  const useToggleFeatured = () =>
+  const useUpdateStatus = () =>
     useMutation({
-      mutationFn: ({ id, featured }: { id: string; featured: boolean }) =>
-        servicesApi.toggleFeatured(id, featured),
+      mutationFn: ({ id, status }: { id: string; status: ServiceStatusInput['status'] }) =>
+        servicesApi.updateStatus(id, status),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['services'] });
       },
@@ -58,6 +58,6 @@ export function useServices() {
     useCreate,
     useUpdate,
     useDelete,
-    useToggleFeatured,
+    useUpdateStatus,
   };
 }

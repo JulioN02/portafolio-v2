@@ -4,31 +4,37 @@ import { Button, Input, Loading, ErrorMessage } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useServices } from '../../hooks/useServices';
 import { ServiceTable } from '../../components/services/ServiceTable';
+import { ConfirmDeleteModal } from '@/components/shared/ConfirmDeleteModal';
 
 export function ServicesListPage() {
   const { t } = useTranslation();
   const [classificationFilter, setClassificationFilter] = useState('');
-  const { useGetAll, useDelete, useToggleFeatured } = useServices();
+  const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
+  const { useGetAll, useDelete, useUpdateStatus } = useServices();
   const { data, isLoading, error } = useGetAll(
     classificationFilter ? { classification: classificationFilter, page: 1, limit: 10 } : undefined
   );
   const deleteMutation = useDelete();
-  const toggleFeaturedMutation = useToggleFeatured();
+  const updateStatusMutation = useUpdateStatus();
 
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
 
   const handleDelete = (id: string) => {
-    if (deleteConfirm === id) {
-      deleteMutation.mutate(id);
-      setDeleteConfirm(null);
-    } else {
-      setDeleteConfirm(id);
-    }
+    const service = data?.data?.find((s) => s.id === id);
+    setDeleteTarget({ id, title: service?.title || '' });
   };
 
-  const handleToggleFeatured = (id: string, featured: boolean) => {
-    toggleFeaturedMutation.mutate({ id, featured });
+  const handleStatusChange = (id: string, status: string) => {
+    updateStatusMutation.mutate({ id, status: status as 'DRAFT' | 'PUBLISHED' | 'PRIVATE' | 'ARCHIVED' });
   };
+
+  const allServices = data?.data || [];
+  const filteredServices = statusFilter
+    ? allServices.filter((s) => s.status === statusFilter)
+    : allServices;
+
+  const draftCount = allServices.filter((s) => s.status === 'DRAFT').length;
+  const publishedCount = allServices.filter((s) => s.status === 'PUBLISHED').length;
 
   if (isLoading) return <Loading />;
   if (error) return <ErrorMessage message={t('common.error')} />;
@@ -52,13 +58,46 @@ export function ServicesListPage() {
         />
       </div>
 
+      <div className="admin-filter-bar">
+        <Button
+          variant={!statusFilter ? 'primary' : 'secondary'}
+          size="sm"
+          onClick={() => setStatusFilter(undefined)}
+        >
+          {t('common.all')} ({allServices.length})
+        </Button>
+        <Button
+          variant={statusFilter === 'PUBLISHED' ? 'primary' : 'secondary'}
+          size="sm"
+          onClick={() => setStatusFilter('PUBLISHED')}
+        >
+          {t('blog.published')} ({publishedCount})
+        </Button>
+        <Button
+          variant={statusFilter === 'DRAFT' ? 'primary' : 'secondary'}
+          size="sm"
+          onClick={() => setStatusFilter('DRAFT')}
+        >
+          {t('blog.drafts')} ({draftCount})
+        </Button>
+      </div>
+
       <div className="admin-card">
         <ServiceTable
-          services={data?.data || []}
+          services={filteredServices}
           onDelete={handleDelete}
-          onToggleFeatured={handleToggleFeatured}
+          onStatusChange={handleStatusChange}
         />
       </div>
+
+      <ConfirmDeleteModal
+        isOpen={deleteTarget !== null}
+        title={deleteTarget?.title || ''}
+        entityName="servicio"
+        onConfirm={() => { if (deleteTarget) deleteMutation.mutate(deleteTarget.id); setDeleteTarget(null); }}
+        onCancel={() => setDeleteTarget(null)}
+        isLoading={deleteMutation.isPending}
+      />
     </div>
   );
 }

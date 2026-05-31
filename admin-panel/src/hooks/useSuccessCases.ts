@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { successCasesApi } from '../api/successCases.api';
-import type { SuccessCaseInput, SuccessCaseUpdateInput, SuccessCaseFilterInput } from '@jsoft/shared';
+import type { SuccessCaseInput, SuccessCaseUpdateInput, SuccessCaseFilterInput, SuccessCaseStatusInput } from '@jsoft/shared';
 
 export function useSuccessCases() {
   const queryClient = useQueryClient();
@@ -43,19 +43,10 @@ export function useSuccessCases() {
       },
     });
 
-  const useReorder = () =>
+  const useUpdateStatus = () =>
     useMutation({
-      mutationFn: ({ id, order }: { id: string; order: number }) =>
-        successCasesApi.reorder(id, order),
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['successCases'] });
-      },
-    });
-
-  const useToggleFeatured = () =>
-    useMutation({
-      mutationFn: ({ id, featured }: { id: string; featured: boolean }) =>
-        successCasesApi.toggleFeatured(id, featured),
+      mutationFn: ({ id, status }: { id: string; status: SuccessCaseStatusInput['status'] }) =>
+        successCasesApi.updateStatus(id, status),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['successCases'] });
       },
@@ -67,7 +58,6 @@ export function useSuccessCases() {
     useCreate,
     useUpdate,
     useDelete,
-    useReorder,
-    useToggleFeatured,
+    useUpdateStatus,
   };
 }

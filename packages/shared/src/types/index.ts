@@ -3,6 +3,7 @@ export type {
   ServiceInput,
   ServiceUpdateInput,
   ServiceFilterInput,
+  ServiceStatusInput,
   ServiceResponse,
 } from '../schemas/service.schema.js';
 
@@ -10,6 +11,7 @@ export type {
   ProductInput,
   ProductUpdateInput,
   ProductFilterInput,
+  ProductStatusInput,
   ProductResponse,
 } from '../schemas/product.schema.js';
 
@@ -17,6 +19,7 @@ export type {
   ToolInput,
   ToolUpdateInput,
   ToolFilterInput,
+  ToolStatusInput,
   ToolResponse,
 } from '../schemas/tool.schema.js';
 
@@ -24,6 +27,7 @@ export type {
   SuccessCaseInput,
   SuccessCaseUpdateInput,
   SuccessCaseFilterInput,
+  SuccessCaseStatusInput,
   SuccessCaseResponse,
 } from '../schemas/successCase.schema.js';
 
@@ -41,6 +45,7 @@ export type {
   ClientContactInput,
   RecruiterContactInput,
   ContactFormInput,
+  ContactFormFilterInput,
   ContactFormResponse,
 } from '../schemas/contact.schema.js';
 
@@ -49,6 +54,13 @@ export type {
   JwtPayload,
   LoginResponse,
 } from '../schemas/login.schema.js';
+
+export type {
+  SiteSectionInput,
+  SiteSectionUpdateInput,
+  SiteSectionReorderInput,
+  SiteSectionResponse,
+} from '../schemas/siteSection.schema.js';
 
 // Common types
 export interface PaginationParams {

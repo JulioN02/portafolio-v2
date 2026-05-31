@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toolsApi } from '../api/tools.api';
-import type { ToolInput, ToolUpdateInput, ToolFilterInput } from '@jsoft/shared';
+import type { ToolInput, ToolUpdateInput, ToolFilterInput, ToolStatusInput } from '@jsoft/shared';
 
 export function useTools() {
   const queryClient = useQueryClient();
@@ -52,10 +52,10 @@ export function useTools() {
       },
     });
 
-  const useReorder = () =>
+  const useUpdateStatus = () =>
     useMutation({
-      mutationFn: ({ id, order }: { id: string; order: number }) =>
-        toolsApi.reorder(id, order),
+      mutationFn: ({ id, status }: { id: string; status: ToolStatusInput['status'] }) =>
+        toolsApi.updateStatus(id, status),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['tools'] });
       },
@@ -68,6 +68,6 @@ export function useTools() {
     useUpdate,
     useDelete,
     useToggleFeatured,
-    useReorder,
+    useUpdateStatus,
   };
 }

@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, PostStatus } from '@prisma/client';
 import { ToolInput, ToolUpdateInput, ToolFilterInput } from '@jsoft/shared';
 
 const prisma = new PrismaClient();
@@ -12,8 +12,9 @@ const TOOL_SELECT = {
   fullDescription: true,
   images: true,
   requiresInstall: true,
-  order: true,
   featured: true,
+  status: true,
+  publishedAt: true,
   deletedAt: true,
   technicalExplanation: true,
   technicalImages: true,
@@ -23,13 +24,14 @@ const TOOL_SELECT = {
 
 export const toolService = {
   async findAll(filter?: ToolFilterInput) {
-    const { featured, classification, page = 1, limit = 10 } = filter || {};
+    const { featured, status, classification, page = 1, limit = 10 } = filter || {};
     const skip = (page - 1) * limit;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const where: Record<string, any> = {
       deletedAt: null,
       ...(featured !== undefined && { featured }),
+      ...(status && { status: status as PostStatus }),
       ...(classification && { classification }),
     };
 
@@ -37,7 +39,7 @@ export const toolService = {
       prisma.tool.findMany({
         where,
         select: TOOL_SELECT,
-        orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
+        orderBy: [{ createdAt: 'desc' }],
         skip,
         take: limit,
       }),
@@ -68,7 +70,7 @@ export const toolService = {
     return prisma.tool.findMany({
       where: { featured: true, deletedAt: null },
       select: TOOL_SELECT,
-      orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
+      orderBy: [{ createdAt: 'desc' }],
       take: limit,
     });
   },
@@ -90,8 +92,9 @@ export const toolService = {
         fullDescription: data.fullDescription,
         images: data.images,
         requiresInstall: data.requiresInstall ?? false,
-        order: data.order ?? 0,
         featured: data.featured ?? false,
+        status: data.status || 'DRAFT',
+        ...(data.status === 'PUBLISHED' && { publishedAt: new Date() }),
         technicalExplanation: data.technicalExplanation,
         technicalImages: data.technicalImages ?? [],
       },
@@ -100,21 +103,28 @@ export const toolService = {
   },
 
   async update(id: string, data: ToolUpdateInput) {
+    const updateData: Record<string, unknown> = {};
+
+    if (data.title !== undefined) updateData.title = data.title;
+    if (data.slug !== undefined) updateData.slug = data.slug;
+    if (data.classification !== undefined) updateData.classification = data.classification;
+    if (data.shortDescription !== undefined) updateData.shortDescription = data.shortDescription;
+    if (data.fullDescription !== undefined) updateData.fullDescription = data.fullDescription;
+    if (data.images !== undefined) updateData.images = data.images;
+    if (data.requiresInstall !== undefined) updateData.requiresInstall = data.requiresInstall;
+    if (data.featured !== undefined) updateData.featured = data.featured;
+    if (data.status !== undefined) {
+      updateData.status = data.status;
+      if (data.status === 'PUBLISHED') {
+        updateData.publishedAt = new Date();
+      }
+    }
+    if (data.technicalExplanation !== undefined) updateData.technicalExplanation = data.technicalExplanation;
+    if (data.technicalImages !== undefined) updateData.technicalImages = data.technicalImages;
+
     return prisma.tool.update({
       where: { id },
-      data: {
-        ...(data.title !== undefined && { title: data.title }),
-        ...(data.slug !== undefined && { slug: data.slug }),
-        ...(data.classification !== undefined && { classification: data.classification }),
-        ...(data.shortDescription !== undefined && { shortDescription: data.shortDescription }),
-        ...(data.fullDescription !== undefined && { fullDescription: data.fullDescription }),
-        ...(data.images !== undefined && { images: data.images }),
-        ...(data.requiresInstall !== undefined && { requiresInstall: data.requiresInstall }),
-        ...(data.order !== undefined && { order: data.order }),
-        ...(data.featured !== undefined && { featured: data.featured }),
-        ...(data.technicalExplanation !== undefined && { technicalExplanation: data.technicalExplanation }),
-        ...(data.technicalImages !== undefined && { technicalImages: data.technicalImages }),
-      },
+      data: updateData,
       select: TOOL_SELECT,
     });
   },
@@ -135,10 +145,15 @@ export const toolService = {
     });
   },
 
-  async reorder(id: string, newOrder: number) {
+  async updateStatus(id: string, status: PostStatus) {
+    const updateData: Record<string, unknown> = { status };
+    if (status === 'PUBLISHED') {
+      updateData.publishedAt = new Date();
+    }
+
     return prisma.tool.update({
       where: { id },
-      data: { order: newOrder },
+      data: updateData,
       select: TOOL_SELECT,
     });
   },

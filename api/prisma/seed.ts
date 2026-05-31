@@ -32,13 +32,30 @@ async function main() {
       fullDescription: '<p>Servicio de desarrollo web personalizado...</p>',
       includedItems: ['Diseño responsive', 'Optimización SEO', 'Soporte técnico'],
       images: ['https://placehold.co/800x600/2563eb/white?text=Web+Development'],
-      order: 1,
-      featured: true,
+      status: 'DRAFT',
       technicalExplanation: '<p>Desarrollado con React, Node.js y PostgreSQL...</p>',
     },
   });
 
   console.log('✅ Sample service created:', service.title);
+
+  // Seed default site sections
+  const defaultSections = [
+    { key: 'services', label: 'Servicios', visible: true, order: 0 },
+    { key: 'products', label: 'Productos', visible: true, order: 1 },
+    { key: 'tools', label: 'Herramientas', visible: true, order: 2 },
+    { key: 'success-cases', label: 'Casos de Éxito', visible: true, order: 3 },
+  ];
+
+  for (const section of defaultSections) {
+    await prisma.siteSection.upsert({
+      where: { key: section.key },
+      update: {},
+      create: section,
+    });
+  }
+
+  console.log('✅ Default site sections created');
 
   console.log('🎉 Seed completed successfully!');
 }

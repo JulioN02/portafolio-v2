@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, PostStatus } from '@prisma/client';
 import { SuccessCaseInput, SuccessCaseUpdateInput, SuccessCaseFilterInput } from '@jsoft/shared';
 
 const prisma = new PrismaClient();
@@ -11,8 +11,8 @@ const SUCCESS_CASE_SELECT = {
   images: true,
   videos: true,
   links: true,
-  order: true,
-  featured: true,
+  status: true,
+  publishedAt: true,
   deletedAt: true,
   createdAt: true,
   updatedAt: true,
@@ -20,20 +20,20 @@ const SUCCESS_CASE_SELECT = {
 
 export const successCaseService = {
   async findAll(filter?: SuccessCaseFilterInput) {
-    const { featured, page = 1, limit = 10 } = filter || {};
+    const { status, page = 1, limit = 10 } = filter || {};
     const skip = (page - 1) * limit;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const where: Record<string, any> = {
       deletedAt: null,
-      ...(featured !== undefined && { featured }),
+      ...(status && { status: status as PostStatus }),
     };
 
     const [successCases, total] = await Promise.all([
       prisma.successCase.findMany({
         where,
         select: SUCCESS_CASE_SELECT,
-        orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
+        orderBy: [{ createdAt: 'desc' }],
         skip,
         take: limit,
       }),
@@ -57,15 +57,6 @@ export const successCaseService = {
     return prisma.successCase.findFirst({
       where: { slug, deletedAt: null },
       select: SUCCESS_CASE_SELECT,
-    });
-  },
-
-  async findFeatured(limit = 3) {
-    return prisma.successCase.findMany({
-      where: { featured: true, deletedAt: null },
-      select: SUCCESS_CASE_SELECT,
-      orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
-      take: limit,
     });
   },
 
@@ -94,26 +85,32 @@ export const successCaseService = {
         images: data.images,
         videos: data.videos ?? [],
         links: data.links ?? [],
-        order: data.order ?? 0,
-        featured: data.featured ?? false,
+        status: data.status || 'DRAFT',
+        ...(data.status === 'PUBLISHED' && { publishedAt: new Date() }),
       },
       select: SUCCESS_CASE_SELECT,
     });
   },
 
   async update(id: string, data: SuccessCaseUpdateInput) {
+    const updateData: Record<string, unknown> = {};
+
+    if (data.title !== undefined) updateData.title = data.title;
+    if (data.slug !== undefined) updateData.slug = data.slug;
+    if (data.description !== undefined) updateData.description = data.description;
+    if (data.images !== undefined) updateData.images = data.images;
+    if (data.videos !== undefined) updateData.videos = data.videos;
+    if (data.links !== undefined) updateData.links = data.links;
+    if (data.status !== undefined) {
+      updateData.status = data.status;
+      if (data.status === 'PUBLISHED') {
+        updateData.publishedAt = new Date();
+      }
+    }
+
     return prisma.successCase.update({
       where: { id },
-      data: {
-        ...(data.title !== undefined && { title: data.title }),
-        ...(data.slug !== undefined && { slug: data.slug }),
-        ...(data.description !== undefined && { description: data.description }),
-        ...(data.images !== undefined && { images: data.images }),
-        ...(data.videos !== undefined && { videos: data.videos }),
-        ...(data.links !== undefined && { links: data.links }),
-        ...(data.order !== undefined && { order: data.order }),
-        ...(data.featured !== undefined && { featured: data.featured }),
-      },
+      data: updateData,
       select: SUCCESS_CASE_SELECT,
     });
   },
@@ -134,10 +131,15 @@ export const successCaseService = {
     });
   },
 
-  async reorder(id: string, newOrder: number) {
+  async updateStatus(id: string, status: PostStatus) {
+    const updateData: Record<string, unknown> = { status };
+    if (status === 'PUBLISHED') {
+      updateData.publishedAt = new Date();
+    }
+
     return prisma.successCase.update({
       where: { id },
-      data: { order: newOrder },
+      data: updateData,
       select: SUCCESS_CASE_SELECT,
     });
   },

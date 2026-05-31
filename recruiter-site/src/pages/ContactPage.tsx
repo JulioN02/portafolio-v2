@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { MetaTags } from '../components/seo/MetaTags';
 import { RecruiterContactForm } from '../components/contact/RecruiterContactForm';
 
 const socialLinks = [

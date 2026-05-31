@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { BlogPostForm } from '../../components/blog-posts/BlogPostForm';
 import { useBlogPosts } from '../../hooks/useBlogPosts';
+import { BackButton } from '@/components/shared/BackButton';
 import { BlogPostInput } from '@jsoft/shared';
 
 export function BlogPostEditPage() {
@@ -28,6 +29,7 @@ export function BlogPostEditPage() {
 
   return (
     <div>
+      <BackButton to="/blog-posts" />
       <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>{t('blog.edit')} Blog Post</h1>
       <BlogPostForm 
         initialData={{

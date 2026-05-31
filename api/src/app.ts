@@ -13,6 +13,7 @@ import projectsRoutes from './routes/projects.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
 import contactRoutes from './routes/contact.routes.js';
 import blogPostRoutes from './routes/blog-post.routes.js';
+import siteSectionRoutes from './routes/siteSection.routes.js';
 
 dotenv.config();
 
@@ -59,6 +60,7 @@ app.use('/api/projects', projectsRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/blog-posts', blogPostRoutes);
+app.use('/api/site-sections', siteSectionRoutes);
 
 // Protected routes (admin)
 // All routes under /api/admin need authentication

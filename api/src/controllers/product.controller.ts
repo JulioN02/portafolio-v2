@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { ZodError } from 'zod';
 import { productService } from '../services/product.service.js';
-import { productSchema, productUpdateSchema, productFilterSchema } from '@jsoft/shared';
+import { productSchema, productUpdateSchema, productFilterSchema, productStatusSchema } from '@jsoft/shared';
 
 // Helper to ensure param is a string (Express 5 types can be string | string[])
 const getStringParam = (param: string | string[] | undefined): string => {
@@ -140,24 +140,6 @@ export const productController = {
     }
   },
 
-  async reorder(req: Request, res: Response): Promise<void> {
-    try {
-      const id = getStringParam(req.params.id);
-      const { order } = req.body;
-      
-      if (typeof order !== 'number') {
-        res.status(400).json({ error: 'Order must be a number' });
-        return;
-      }
-      
-      const product = await productService.reorder(id, order);
-      res.json(product);
-    } catch (error) {
-      console.error('Product reorder error:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  },
-
   async toggleFeatured(req: Request, res: Response): Promise<void> {
     try {
       const id = getStringParam(req.params.id);
@@ -178,6 +160,29 @@ export const productController = {
       res.json(product);
     } catch (error) {
       console.error('Product toggleFeatured error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  async updateStatus(req: Request, res: Response): Promise<void> {
+    try {
+      const id = getStringParam(req.params.id);
+      const { status } = productStatusSchema.parse(req.body);
+
+      const existing = await productService.findById(id);
+      if (!existing) {
+        res.status(404).json({ error: 'Product not found' });
+        return;
+      }
+
+      const product = await productService.updateStatus(id, status);
+      res.json(product);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        res.status(400).json({ error: 'Validation Error', details: error.flatten().fieldErrors });
+        return;
+      }
+      console.error('Product updateStatus error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   },

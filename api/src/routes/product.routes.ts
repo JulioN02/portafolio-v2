@@ -16,7 +16,7 @@ router.post('/', authMiddleware, productController.create);
 router.put('/:id', authMiddleware, productController.update);
 router.delete('/:id', authMiddleware, productController.delete);
 router.patch('/:id/restore', authMiddleware, productController.restore);
-router.patch('/:id/reorder', authMiddleware, productController.reorder);
 router.patch('/:id/featured', authMiddleware, productController.toggleFeatured);
+router.patch('/:id/status', authMiddleware, productController.updateStatus);
 
 export default router;

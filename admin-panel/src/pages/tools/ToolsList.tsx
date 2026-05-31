@@ -1,39 +1,43 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button, Loading, ErrorMessage } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useTools } from '../../hooks/useTools';
 import { ToolList } from '../../components/tools/ToolList';
+import { ConfirmDeleteModal } from '@/components/shared/ConfirmDeleteModal';
 
 export function ToolsListPage() {
   const { t } = useTranslation();
-  const { useGetAll, useDelete, useReorder, useToggleFeatured } = useTools();
+  const navigate = useNavigate();
+  const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
+  const { useGetAll, useDelete, useToggleFeatured, useUpdateStatus } = useTools();
   const { data, isLoading, error } = useGetAll();
   const deleteMutation = useDelete();
-  const reorderMutation = useReorder();
   const toggleFeaturedMutation = useToggleFeatured();
+  const updateStatusMutation = useUpdateStatus();
 
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
 
   const handleToggleFeatured = (id: string, featured: boolean) => {
     toggleFeaturedMutation.mutate({ id, featured });
   };
 
   const handleDelete = (id: string) => {
-    if (deleteConfirm === id) {
-      deleteMutation.mutate(id);
-      setDeleteConfirm(null);
-    } else {
-      setDeleteConfirm(id);
-    }
+    const tool = data?.data?.find((t) => t.id === id);
+    setDeleteTarget({ id, title: tool?.title || '' });
   };
 
-  const handleReorder = (items: { id: string; order: number }[]) => {
-    // Send each item's new order via the API sequentially
-    items.forEach(({ id, order }) => {
-      reorderMutation.mutate({ id, order });
-    });
+  const handleStatusChange = (id: string, status: string) => {
+    updateStatusMutation.mutate({ id, status: status as 'DRAFT' | 'PUBLISHED' | 'PRIVATE' | 'ARCHIVED' });
   };
+
+  const allTools = data?.data || [];
+  const filteredTools = statusFilter
+    ? allTools.filter((t) => t.status === statusFilter)
+    : allTools;
+
+  const draftCount = allTools.filter((t) => t.status === 'DRAFT').length;
+  const publishedCount = allTools.filter((t) => t.status === 'PUBLISHED').length;
 
   if (isLoading) return <Loading />;
   if (error) return <ErrorMessage message={t('common.error')} />;
@@ -46,19 +50,46 @@ export function ToolsListPage() {
           <Button>{t('tools.add')}</Button>
         </Link>
       </div>
-      
-      <div className="admin-card" style={{ marginBottom: '1rem', padding: '1rem', background: 'var(--color-primary-50)', borderRadius: 'var(--radius-lg)' }}>
-        <p style={{ fontSize: '0.875rem', color: 'var(--color-primary-700)', margin: 0 }}>
-          💡 {t('tools.reorder')}
-        </p>
+
+      <div className="admin-filter-bar">
+        <Button
+          variant={!statusFilter ? 'primary' : 'secondary'}
+          size="sm"
+          onClick={() => setStatusFilter(undefined)}
+        >
+          {t('common.all')} ({allTools.length})
+        </Button>
+        <Button
+          variant={statusFilter === 'PUBLISHED' ? 'primary' : 'secondary'}
+          size="sm"
+          onClick={() => setStatusFilter('PUBLISHED')}
+        >
+          {t('blog.published')} ({publishedCount})
+        </Button>
+        <Button
+          variant={statusFilter === 'DRAFT' ? 'primary' : 'secondary'}
+          size="sm"
+          onClick={() => setStatusFilter('DRAFT')}
+        >
+          {t('blog.drafts')} ({draftCount})
+        </Button>
       </div>
 
       <ToolList
-        tools={(data?.data || []).map(t => ({ ...t, order: t.order || 0 }))}
-        onReorder={handleReorder}
-        onEdit={(id) => window.location.href = `/tools/edit/${id}`}
+        tools={filteredTools}
+        onEdit={(id) => navigate(`/tools/edit/${id}`)}
         onDelete={handleDelete}
         onToggleFeatured={handleToggleFeatured}
+        onStatusChange={handleStatusChange}
+      />
+
+      <ConfirmDeleteModal
+        isOpen={deleteTarget !== null}
+        title={deleteTarget?.title || ''}
+        entityName="herramienta"
+        onConfirm={() => { if (deleteTarget) deleteMutation.mutate(deleteTarget.id); setDeleteTarget(null); }}
+        onCancel={() => setDeleteTarget(null)}
+        isLoading={deleteMutation.isPending}
       />
     </div>
   );

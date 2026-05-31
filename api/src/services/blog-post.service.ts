@@ -33,6 +33,14 @@ export const blogPostService = {
       ...(category && { category }),
     };
 
+    if (filter?.search) {
+      where.OR = [
+        { title: { contains: filter.search, mode: 'insensitive' } },
+        { shortDescription: { contains: filter.search, mode: 'insensitive' } },
+        { body: { contains: filter.search, mode: 'insensitive' } },
+      ];
+    }
+
     const [posts, total] = await Promise.all([
       prisma.blogPost.findMany({
         where,
