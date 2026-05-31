@@ -11,18 +11,17 @@ export function useSiteSections() {
 }
 
 /**
- * Returns only the visible sections as a Set of keys for easy lookup
+ * Returns the visible sections sorted by `order`, plus loading/error state.
+ * The sections array is already sorted by the API (or we sort client-side as fallback).
  */
 export function useVisibleSections(): {
-  visible: Set<string>;
+  sections: SiteSectionResponse[];
   isLoading: boolean;
   error: unknown;
 } {
   const { data, isLoading, error } = useSiteSections();
-  const visible = new Set(
-    (data ?? [])
-      .filter((s) => s.visible)
-      .map((s) => s.key),
-  );
-  return { visible, isLoading, error };
+  const sorted = (data ?? [])
+    .filter((s) => s.visible)
+    .sort((a, b) => a.order - b.order);
+  return { sections: sorted, isLoading, error };
 }
