@@ -1,8 +1,8 @@
 import type { SuccessCaseResponse } from '@jsoft/shared';
-import { Button } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { StatusSelect } from '@/components/shared/StatusSelect';
+import formStyles from '../../styles/form.module.css';
 
 interface SuccessCaseListProps {
   successCases: SuccessCaseResponse[];
@@ -26,9 +26,8 @@ export function SuccessCaseList({ successCases, onEdit, onDelete, onStatusChange
 
   if (successCases.length === 0) {
     return (
-      <div className="admin-empty">
-        <div className="admin-empty-icon">📋</div>
-        <div className="admin-empty-text">{t('successCases.empty')}</div>
+      <div className={formStyles.emptyState}>
+        <p>{t('successCases.empty')}</p>
       </div>
     );
   }
@@ -72,8 +71,8 @@ export function SuccessCaseList({ successCases, onEdit, onDelete, onStatusChange
             </a>
           )}
           <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <Button variant="secondary" size="sm" onClick={() => onEdit(successCase.id)}>{t('successCases.edit')}</Button>
-            <Button variant="danger" size="sm" onClick={() => onDelete(successCase.id)}>{t('successCases.delete')}</Button>
+            <button className={formStyles.btnEdit} onClick={() => onEdit(successCase.id)}>{t('successCases.edit')}</button>
+            <button className={formStyles.btnDelete} onClick={() => onDelete(successCase.id)}>{t('successCases.delete')}</button>
           </div>
         </div>
       ))}

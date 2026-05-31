@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
-import { Input, Textarea, Button } from '@jsoft/shared';
+import { Button } from '@jsoft/shared';
 import type { SuccessCaseInput } from '@jsoft/shared';
+import formStyles from '../../styles/form.module.css';
 
 interface SuccessCaseFormProps {
   initialData?: Partial<SuccessCaseInput>;
@@ -69,97 +70,119 @@ export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCas
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-      <Input
-        id="title"
-        label="Title"
-        value={title}
-        onChange={(e) => handleTitleChange(e.target.value)}
-        error={errors.title}
-        required
-      />
-      <Textarea
-        id="description"
-        label="Description"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        error={errors.description}
-        required
-      />
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-        <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151' }}>Images (optional)</label>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <Input
-            id="imageInput"
-            placeholder="Enter image URL"
-            value={imageInput}
-            onChange={(e) => setImageInput(e.target.value)}
-            error={errors.images}
+    <form onSubmit={handleSubmit}>
+      {/* Basic Info Section */}
+      <fieldset className={formStyles.formSection}>
+        <legend className={formStyles.sectionTitle}>Basic Information</legend>
+        <div className={formStyles.formGroup}>
+          <label className={formStyles.formLabel} htmlFor="title">Title</label>
+          <input
+            id="title"
+            className={`${formStyles.formInput} ${errors.title ? formStyles.inputError : ''}`}
+            value={title}
+            onChange={(e) => handleTitleChange(e.target.value)}
+            required
           />
-          <Button type="button" variant="secondary" size="sm" onClick={addImage}>
-            Add
-          </Button>
+          {errors.title && <span className={formStyles.formError}>{errors.title}</span>}
         </div>
-        {images.length > 0 && (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
-            {images.map((img, index) => (
-              <div key={img} style={{ position: 'relative' }}>
-                <img
-                  src={img}
-                  alt={`Image ${index + 1}`}
-                  loading="lazy"
-                  style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px' }}
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = 'https://placehold.co/80x80?text=Invalid';
-                  }}
-                />
-                <Button
-                  type="button"
-                  variant="danger"
-                  size="sm"
-                  onClick={() => removeImage(index)}
-                  style={{
-                    position: 'absolute',
-                    top: '-5px',
-                    right: '-5px',
-                    borderRadius: '50%',
-                    width: '20px',
-                    height: '20px',
-                    fontSize: '0.75rem',
-                    padding: 0,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  ×
-                </Button>
-              </div>
-            ))}
+      </fieldset>
+
+      {/* Description Section */}
+      <fieldset className={formStyles.formSection}>
+        <legend className={formStyles.sectionTitle}>Description</legend>
+        <div className={formStyles.formGroup}>
+          <label className={formStyles.formLabel} htmlFor="description">Description</label>
+          <textarea
+            id="description"
+            className={`${formStyles.formInput} ${formStyles.formTextarea} ${errors.description ? formStyles.inputError : ''}`}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            required
+          />
+          {errors.description && <span className={formStyles.formError}>{errors.description}</span>}
+        </div>
+      </fieldset>
+
+      {/* Images Section */}
+      <fieldset className={formStyles.formSection}>
+        <legend className={formStyles.sectionTitle}>Images</legend>
+        <div className={formStyles.formGroup}>
+          <label className={formStyles.formLabel}>Images <span className={formStyles.optional}>(optional)</span></label>
+          <div className={formStyles.inputActionGroup}>
+            <input
+              id="imageInput"
+              placeholder="Enter image URL"
+              value={imageInput}
+              onChange={(e) => setImageInput(e.target.value)}
+              className={`${formStyles.formInput} ${errors.images ? formStyles.inputError : ''}`}
+            />
+            <Button type="button" className={formStyles.btnAction} onClick={addImage}>
+              Add
+            </Button>
           </div>
-        )}
+          {images.length > 0 && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
+              {images.map((img, index) => (
+                <div key={img} style={{ position: 'relative' }}>
+                  <img
+                    src={img}
+                    alt={`Image ${index + 1}`}
+                    loading="lazy"
+                    style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px' }}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://placehold.co/80x80?text=Invalid';
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    className={formStyles.btnAction}
+                    onClick={() => removeImage(index)}
+                    style={{
+                      position: 'absolute',
+                      top: '-5px',
+                      right: '-5px',
+                      borderRadius: '50%',
+                      width: '20px',
+                      height: '20px',
+                      fontSize: '0.75rem',
+                      padding: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    ×
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </fieldset>
+
+      {/* Settings Section */}
+      <fieldset className={formStyles.formSection}>
+        <legend className={formStyles.sectionTitle}>Settings</legend>
+        <div className={formStyles.formGroup}>
+          <label className={formStyles.formLabel}>{t('blog.status')}</label>
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            className={formStyles.formInput}
+          >
+            <option value="DRAFT">{t('blog.draft')}</option>
+            <option value="PUBLISHED">{t('blog.published')}</option>
+            <option value="PRIVATE">{t('blog.private')}</option>
+            <option value="ARCHIVED">{t('blog.archived')}</option>
+          </select>
+        </div>
+      </fieldset>
+
+      <div className={formStyles.formActions}>
+        <Button type="submit" className={formStyles.btnPrimary} disabled={isLoading}>
+          {isLoading ? t('successCases.saving') : t('successCases.save')}
+        </Button>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-        <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151' }}>{t('blog.status')}</label>
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-          style={{
-            padding: '0.5rem',
-            borderRadius: '4px',
-            border: '1px solid #d1d5db',
-            fontSize: '0.875rem',
-          }}
-        >
-          <option value="DRAFT">{t('blog.draft')}</option>
-          <option value="PUBLISHED">{t('blog.published')}</option>
-          <option value="PRIVATE">{t('blog.private')}</option>
-          <option value="ARCHIVED">{t('blog.archived')}</option>
-        </select>
-      </div>
-      <Button type="submit" disabled={isLoading}>
-        {isLoading ? t('successCases.saving') : t('successCases.save')}
-      </Button>
     </form>
   );
 }

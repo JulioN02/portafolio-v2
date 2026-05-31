@@ -1,6 +1,7 @@
-import { Button, Loading } from '@jsoft/shared';
+import { Loading } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useSiteSections } from '../../hooks/useSiteSections';
+import formStyles from '../../styles/form.module.css';
 
 export function PagesList() {
   const { t } = useTranslation();
@@ -11,19 +12,19 @@ export function PagesList() {
   }
 
   return (
-    <div>
-      <div className="admin-page-header">
+    <div className={formStyles.adminContainer}>
+      <div className={formStyles.pageHeader}>
         <div>
-          <h1>{t('pages.title')}</h1>
-          <p style={{ color: 'var(--color-neutral-500)', fontSize: '0.875rem', margin: '0.25rem 0 0' }}>
+          <h1 className={formStyles.pageTitle}>{t('pages.title')}</h1>
+          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', margin: '0.25rem 0 0' }}>
             {t('pages.description')}
           </p>
         </div>
       </div>
 
       {/* Info Banner */}
-      <div className="admin-card" style={{ marginBottom: '1.5rem', padding: '0.75rem 1rem', background: 'var(--color-primary-50)', borderColor: 'var(--color-primary-200)' }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', color: 'var(--color-primary-700)', fontSize: '0.875rem', lineHeight: '1.5' }}>
+      <div className={formStyles.tableWrapper} style={{ marginBottom: '1.5rem', padding: '0.75rem 1rem' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', color: 'var(--color-text-main)', fontSize: '0.875rem', lineHeight: '1.5' }}>
           <span style={{ fontSize: '1rem', flexShrink: 0 }}>ℹ️</span>
           <span>
             {t('pages.info')}
@@ -31,7 +32,7 @@ export function PagesList() {
         </div>
       </div>
 
-      <div className="admin-card">
+      <div className={formStyles.tableWrapper}>
         <table className="admin-table">
           <thead>
             <tr>
@@ -45,27 +46,25 @@ export function PagesList() {
               <tr key={section.id}>
                 <td style={{ whiteSpace: 'nowrap' }}>
                   <div style={{ display: 'flex', gap: '0.25rem' }}>
-                    <Button
-                      variant="secondary"
-                      size="sm"
+                    <button
+                      className={formStyles.btnIcon}
                       onClick={() => moveSection(section.id, 'up')}
                       disabled={index === 0}
                       title="Move up"
                     >
                       ↑
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      size="sm"
+                    </button>
+                    <button
+                      className={formStyles.btnIcon}
                       onClick={() => moveSection(section.id, 'down')}
                       disabled={index === sections.length - 1}
                       title="Move down"
                     >
                       ↓
-                    </Button>
+                    </button>
                   </div>
                 </td>
-                <td style={{ fontWeight: '500', color: 'var(--color-neutral-900)' }}>
+                <td style={{ fontWeight: '500', color: 'var(--color-text-title)' }}>
                   {section.label}
                 </td>
                 <td style={{ textAlign: 'center' }}>

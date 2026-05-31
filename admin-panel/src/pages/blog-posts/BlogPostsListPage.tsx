@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button, Loading, ErrorMessage } from '@jsoft/shared';
+import { Loading, ErrorMessage } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useBlogPosts } from '../../hooks/useBlogPosts';
 import { BlogPostList } from '../../components/blog-posts/BlogPostList';
 import { ConfirmDeleteModal } from '@/components/shared/ConfirmDeleteModal';
+import formStyles from '../../styles/form.module.css';
 
 export function BlogPostsListPage() {
   const { t } = useTranslation();
@@ -38,36 +39,36 @@ export function BlogPostsListPage() {
   if (error) return <ErrorMessage message={t('common.error')} />;
 
   return (
-    <div>
-      <div className="admin-page-header">
-        <h1>{t('blog.title')}</h1>
+    <div className={formStyles.adminContainer}>
+      <div className={formStyles.pageHeader}>
+        <h1 className={formStyles.pageTitle}>{t('blog.title')}</h1>
         <Link to="/blog-posts/create">
-          <Button>{t('blog.add')}</Button>
+          <button className={formStyles.btnAdd}>+ {t('blog.add')}</button>
         </Link>
       </div>
 
-      <div className="admin-filter-bar">
-        <Button
-          variant={filter === 'all' ? 'primary' : 'secondary'}
-          size="sm"
+      <div className={formStyles.filterBar}>
+        <button
+          className={formStyles.btnStatus}
+          style={filter === 'all' ? { backgroundColor: 'var(--color-primary)', color: '#fff', borderColor: 'var(--color-primary)' } : {}}
           onClick={() => setFilter('all')}
         >
           {t('common.all')} ({allPosts.length})
-        </Button>
-        <Button
-          variant={filter === 'PUBLISHED' ? 'primary' : 'secondary'}
-          size="sm"
+        </button>
+        <button
+          className={formStyles.btnStatus}
+          style={filter === 'PUBLISHED' ? { backgroundColor: 'var(--color-primary)', color: '#fff', borderColor: 'var(--color-primary)' } : {}}
           onClick={() => setFilter('PUBLISHED')}
         >
           {t('blog.published')} ({publishedCount})
-        </Button>
-        <Button
-          variant={filter === 'DRAFT' ? 'primary' : 'secondary'}
-          size="sm"
+        </button>
+        <button
+          className={formStyles.btnStatus}
+          style={filter === 'DRAFT' ? { backgroundColor: 'var(--color-primary)', color: '#fff', borderColor: 'var(--color-primary)' } : {}}
           onClick={() => setFilter('DRAFT')}
         >
           {t('blog.drafts')} ({draftCount})
-        </Button>
+        </button>
       </div>
 
       <BlogPostList

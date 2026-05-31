@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
-import { Input, Textarea, Checkbox } from '@jsoft/shared';
 import { Button } from '@jsoft/shared';
 import type { ProductInput } from '@jsoft/shared';
+import formStyles from '../../styles/form.module.css';
 
 // Helper to generate slug from title
 const generateSlug = (title: string): string => {
@@ -84,118 +84,154 @@ export function ProductForm({ initialData, onSubmit, isLoading }: ProductFormPro
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-      <Input
-        id="title"
-        label="Title"
-        value={title}
-        onChange={(e) => handleTitleChange(e.target.value)}
-        error={errors.title}
-        required
-      />
-      <Input
-        id="slug"
-        label="Slug"
-        value={slug}
-        onChange={(e) => setSlug(e.target.value)}
-        error={errors.slug}
-        required
-      />
-      <Input
-        id="classification"
-        label="Classification"
-        value={classification}
-        onChange={(e) => setClassification(e.target.value)}
-        error={errors.classification}
-        required
-      />
-      <Textarea
-        id="shortDescription"
-        label="Short Description"
-        value={shortDescription}
-        onChange={(e) => setShortDescription(e.target.value)}
-        error={errors.shortDescription}
-        required
-      />
-      <Textarea
-        id="fullDescription"
-        label="Full Description"
-        value={fullDescription}
-        onChange={(e) => setFullDescription(e.target.value)}
-        error={errors.fullDescription}
-        required
-      />
-
-      {/* Images section */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-        <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151' }}>{t('products.images')} (at least one required)</label>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <Input
-            id="newImageUrl"
-            type="url"
-            placeholder="https://example.com/image.jpg"
-            value={newImageUrl}
-            onChange={(e) => setNewImageUrl(e.target.value)}
-            style={{ flex: 1 }}
-          />
-          <Button type="button" variant="secondary" onClick={handleAddImage}>Add</Button>
+    <form onSubmit={handleSubmit}>
+      {/* Basic Info Section */}
+      <fieldset className={formStyles.formSection}>
+        <legend className={formStyles.sectionTitle}>Basic Information</legend>
+        <div className={formStyles.gridTwoCols}>
+          <div className={formStyles.formGroup}>
+            <label className={formStyles.formLabel} htmlFor="title">Title</label>
+            <input
+              id="title"
+              className={`${formStyles.formInput} ${errors.title ? formStyles.inputError : ''}`}
+              value={title}
+              onChange={(e) => handleTitleChange(e.target.value)}
+              required
+            />
+            {errors.title && <span className={formStyles.formError}>{errors.title}</span>}
+          </div>
+          <div className={formStyles.formGroup}>
+            <label className={formStyles.formLabel} htmlFor="slug">Slug</label>
+            <input
+              id="slug"
+              className={`${formStyles.formInput} ${errors.slug ? formStyles.inputError : ''}`}
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
+              required
+            />
+            {errors.slug && <span className={formStyles.formError}>{errors.slug}</span>}
+          </div>
         </div>
-        {errors.images && <span style={{ color: '#ef4444', fontSize: '0.75rem' }}>{errors.images}</span>}
-        {images.length > 0 && (
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-            {images.map((url, index) => (
-              <li key={url} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.25rem 0' }}>
-                <img src={url} alt={`Image ${index + 1}`} loading="lazy" style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 4 }} />
-                <span style={{ flex: 1, fontSize: '0.75rem', wordBreak: 'break-all' }}>{url}</span>
-                <Button type="button" variant="danger" size="sm" onClick={() => handleRemoveImage(index)}>Remove</Button>
-              </li>
-            ))}
-          </ul>
-        )}
+        <div className={formStyles.formGroup}>
+          <label className={formStyles.formLabel} htmlFor="classification">Classification</label>
+          <input
+            id="classification"
+            className={`${formStyles.formInput} ${errors.classification ? formStyles.inputError : ''}`}
+            value={classification}
+            onChange={(e) => setClassification(e.target.value)}
+            required
+          />
+          {errors.classification && <span className={formStyles.formError}>{errors.classification}</span>}
+        </div>
+      </fieldset>
+
+      {/* Description Section */}
+      <fieldset className={formStyles.formSection}>
+        <legend className={formStyles.sectionTitle}>Description</legend>
+        <div className={formStyles.formGroup}>
+          <label className={formStyles.formLabel} htmlFor="shortDescription">Short Description</label>
+          <textarea
+            id="shortDescription"
+            className={`${formStyles.formInput} ${formStyles.formTextarea} ${errors.shortDescription ? formStyles.inputError : ''}`}
+            value={shortDescription}
+            onChange={(e) => setShortDescription(e.target.value)}
+            required
+          />
+          {errors.shortDescription && <span className={formStyles.formError}>{errors.shortDescription}</span>}
+        </div>
+        <div className={formStyles.formGroup}>
+          <label className={formStyles.formLabel} htmlFor="fullDescription">Full Description</label>
+          <textarea
+            id="fullDescription"
+            className={`${formStyles.formInput} ${formStyles.formTextarea} ${errors.fullDescription ? formStyles.inputError : ''}`}
+            value={fullDescription}
+            onChange={(e) => setFullDescription(e.target.value)}
+            required
+            style={{ minHeight: '200px' }}
+          />
+          {errors.fullDescription && <span className={formStyles.formError}>{errors.fullDescription}</span>}
+        </div>
+      </fieldset>
+
+      {/* Images Section */}
+      <fieldset className={formStyles.formSection}>
+        <legend className={formStyles.sectionTitle}>Images</legend>
+        <div className={formStyles.formGroup}>
+          <label className={formStyles.formLabel}>{t('products.images')} <span className={formStyles.optional}>(at least one required)</span></label>
+          <div className={formStyles.inputActionGroup}>
+            <input
+              id="newImageUrl"
+              type="url"
+              placeholder="https://example.com/image.jpg"
+              value={newImageUrl}
+              onChange={(e) => setNewImageUrl(e.target.value)}
+              className={`${formStyles.formInput} ${errors.images ? formStyles.inputError : ''}`}
+            />
+            <Button type="button" className={formStyles.btnAction} onClick={handleAddImage}>Add</Button>
+          </div>
+          {errors.images && <span className={formStyles.formError}>{errors.images}</span>}
+          {images.length > 0 && (
+            <ul style={{ listStyle: 'none', padding: 0, margin: '0.5rem 0 0 0' }}>
+              {images.map((url, index) => (
+                <li key={url} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.25rem 0' }}>
+                  <img src={url} alt={`Image ${index + 1}`} loading="lazy" style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 4 }} />
+                  <span style={{ flex: 1, fontSize: '0.75rem', wordBreak: 'break-all' }}>{url}</span>
+                  <Button type="button" className={formStyles.btnAction} onClick={() => handleRemoveImage(index)}>Remove</Button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </fieldset>
+
+      {/* Settings Section */}
+      <fieldset className={formStyles.formSection}>
+        <legend className={formStyles.sectionTitle}>Settings</legend>
+        <div className={formStyles.gridTwoCols}>
+          <div className={formStyles.formGroup}>
+            <label className={formStyles.formLabel}>{t('blog.status')}</label>
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className={formStyles.formInput}
+            >
+              <option value="DRAFT">{t('blog.draft')}</option>
+              <option value="PUBLISHED">{t('blog.published')}</option>
+              <option value="PRIVATE">{t('blog.private')}</option>
+              <option value="ARCHIVED">{t('blog.archived')}</option>
+            </select>
+          </div>
+          <div className={formStyles.formGroup} style={{ flexDirection: 'row', alignItems: 'center', gap: '0.5rem' }}>
+            <input type="checkbox" id="featured" checked={featured} onChange={(e) => setFeatured(e.target.checked)} style={{ width: '16px', height: '16px', cursor: 'pointer' }} />
+            <label className={formStyles.formLabel} htmlFor="featured" style={{ margin: 0, cursor: 'pointer' }}>Featured</label>
+          </div>
+        </div>
+        <div className={formStyles.formGroup}>
+          <label className={formStyles.formLabel} htmlFor="externalLink">External Link (optional)</label>
+          <input
+            id="externalLink"
+            type="url"
+            className={formStyles.formInput}
+            value={externalLink}
+            onChange={(e) => setExternalLink(e.target.value)}
+          />
+        </div>
+        <div className={formStyles.formGroup}>
+          <label className={formStyles.formLabel} htmlFor="technicalExplanation">Technical Explanation (optional)</label>
+          <textarea
+            id="technicalExplanation"
+            className={`${formStyles.formInput} ${formStyles.formTextarea}`}
+            value={technicalExplanation}
+            onChange={(e) => setTechnicalExplanation(e.target.value)}
+          />
+        </div>
+      </fieldset>
+
+      <div className={formStyles.formActions}>
+        <Button type="submit" className={formStyles.btnPrimary} disabled={isLoading}>
+          {isLoading ? t('products.saving') : t('products.save')}
+        </Button>
       </div>
-
-      <Input
-        id="externalLink"
-        label="External Link (optional)"
-        type="url"
-        value={externalLink}
-        onChange={(e) => setExternalLink(e.target.value)}
-      />
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-        <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151' }}>{t('blog.status')}</label>
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-          style={{
-            padding: '0.5rem',
-            borderRadius: '4px',
-            border: '1px solid #d1d5db',
-            fontSize: '0.875rem',
-          }}
-        >
-          <option value="DRAFT">{t('blog.draft')}</option>
-          <option value="PUBLISHED">{t('blog.published')}</option>
-          <option value="PRIVATE">{t('blog.private')}</option>
-          <option value="ARCHIVED">{t('blog.archived')}</option>
-        </select>
-      </div>
-      <Checkbox
-        id="featured"
-        label="Featured"
-        checked={featured}
-        onChange={(e) => setFeatured(e.target.checked)}
-      />
-
-      <Textarea
-        id="technicalExplanation"
-        label="Technical Explanation (optional)"
-        value={technicalExplanation}
-        onChange={(e) => setTechnicalExplanation(e.target.value)}
-      />
-
-      <Button type="submit" disabled={isLoading}>
-        {isLoading ? t('products.saving') : t('products.save')}
-      </Button>
     </form>
   );
 }

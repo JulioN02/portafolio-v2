@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Input, Loading, ErrorMessage } from '@jsoft/shared';
+import { Loading, ErrorMessage } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useProducts } from '../../hooks/useProducts';
 import { ProductTable } from '../../components/products/ProductTable';
 import { ConfirmDeleteModal } from '@/components/shared/ConfirmDeleteModal';
+import formStyles from '../../styles/form.module.css';
 
 export function ProductsListPage() {
   const { t } = useTranslation();
@@ -45,49 +46,46 @@ export function ProductsListPage() {
   if (error) return <ErrorMessage message={t('common.error')} />;
 
   return (
-    <div>
-      <div className="admin-page-header">
-        <h1>{t('products.title')}</h1>
+    <div className={formStyles.adminContainer}>
+      <div className={formStyles.pageHeader}>
+        <h1 className={formStyles.pageTitle}>{t('products.title')}</h1>
         <Link to="/products/create">
-          <Button>{t('products.add')}</Button>
+          <button className={formStyles.btnAdd}>+ {t('products.add')}</button>
         </Link>
       </div>
 
       {/* Filter by classification */}
-      <div className="admin-filter-bar">
-        <Input
-          id="product-filter"
+      <div className={formStyles.filterBar}>
+        <input
+          className={formStyles.filterSearch}
           placeholder={t('products.filterBy')}
           value={classificationFilter}
           onChange={(e) => setClassificationFilter(e.target.value)}
         />
-      </div>
-
-      <div className="admin-filter-bar">
-        <Button
-          variant={!statusFilter ? 'primary' : 'secondary'}
-          size="sm"
+        <button
+          className={formStyles.btnStatus}
+          style={!statusFilter ? { backgroundColor: 'var(--color-primary)', color: '#fff', borderColor: 'var(--color-primary)' } : {}}
           onClick={() => setStatusFilter(undefined)}
         >
           {t('common.all')} ({allProducts.length})
-        </Button>
-        <Button
-          variant={statusFilter === 'PUBLISHED' ? 'primary' : 'secondary'}
-          size="sm"
+        </button>
+        <button
+          className={formStyles.btnStatus}
+          style={statusFilter === 'PUBLISHED' ? { backgroundColor: 'var(--color-primary)', color: '#fff', borderColor: 'var(--color-primary)' } : {}}
           onClick={() => setStatusFilter('PUBLISHED')}
         >
           {t('blog.published')} ({publishedCount})
-        </Button>
-        <Button
-          variant={statusFilter === 'DRAFT' ? 'primary' : 'secondary'}
-          size="sm"
+        </button>
+        <button
+          className={formStyles.btnStatus}
+          style={statusFilter === 'DRAFT' ? { backgroundColor: 'var(--color-primary)', color: '#fff', borderColor: 'var(--color-primary)' } : {}}
           onClick={() => setStatusFilter('DRAFT')}
         >
           {t('blog.drafts')} ({draftCount})
-        </Button>
+        </button>
       </div>
 
-      <div className="admin-card">
+      <div className={formStyles.tableWrapper}>
         <ProductTable
           products={filteredProducts}
           onDelete={handleDelete}

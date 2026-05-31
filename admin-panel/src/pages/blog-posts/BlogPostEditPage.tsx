@@ -2,8 +2,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { BlogPostForm } from '../../components/blog-posts/BlogPostForm';
 import { useBlogPosts } from '../../hooks/useBlogPosts';
-import { BackButton } from '@/components/shared/BackButton';
-import { BlogPostInput } from '@jsoft/shared';
+import { FormLayout } from '@/components/shared/FormLayout';
+import type { BlogPostInput } from '@jsoft/shared';
 
 export function BlogPostEditPage() {
   const { t } = useTranslation();
@@ -28,10 +28,8 @@ export function BlogPostEditPage() {
   if (!post) return <div style={{ textAlign: 'center', padding: '2rem', color: '#ef4444' }}>Post not found</div>;
 
   return (
-    <div>
-      <BackButton to="/blog-posts" />
-      <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>{t('blog.edit')} Blog Post</h1>
-      <BlogPostForm 
+    <FormLayout title={t('blog.edit')} subtitle="Edit blog post details" backTo="/blog-posts">
+      <BlogPostForm
         initialData={{
           title: post.title,
           slug: post.slug,
@@ -42,10 +40,10 @@ export function BlogPostEditPage() {
           category: post.category,
           externalLink: post.externalLink,
           lessonsLearned: post.lessonsLearned,
-        }} 
-        onSubmit={handleSubmit} 
-        isLoading={updateMutation.isPending} 
+        }}
+        onSubmit={handleSubmit}
+        isLoading={updateMutation.isPending}
       />
-    </div>
+    </FormLayout>
   );
 }

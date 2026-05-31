@@ -2,8 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { BlogPostForm } from '../../components/blog-posts/BlogPostForm';
 import { useBlogPosts } from '../../hooks/useBlogPosts';
-import { BackButton } from '@/components/shared/BackButton';
-import { BlogPostInput } from '@jsoft/shared';
+import { FormLayout } from '@/components/shared/FormLayout';
+import type { BlogPostInput } from '@jsoft/shared';
 
 export function BlogPostCreatePage() {
   const { t } = useTranslation();
@@ -20,10 +20,8 @@ export function BlogPostCreatePage() {
   };
 
   return (
-    <div>
-      <BackButton to="/blog-posts" />
-      <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>{t('blog.create')}</h1>
+    <FormLayout title={t('blog.create')} subtitle="Create a new blog post" backTo="/blog-posts">
       <BlogPostForm onSubmit={handleSubmit} isLoading={createMutation.isPending} />
-    </div>
+    </FormLayout>
   );
 }

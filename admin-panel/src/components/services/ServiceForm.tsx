@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
-import { Input, Textarea } from '@jsoft/shared';
 import { Button } from '@jsoft/shared';
 import type { ServiceInput } from '@jsoft/shared';
+import formStyles from '../../styles/form.module.css';
 
 interface ServiceFormProps {
   initialData?: Partial<ServiceInput>;
@@ -66,68 +66,98 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-      <Input
-        id="title"
-        label="Title"
-        value={title}
-        onChange={(e) => handleTitleChange(e.target.value)}
-        error={errors.title}
-        required
-      />
-      <Input
-        id="slug"
-        label="Slug"
-        value={slug}
-        onChange={(e) => setSlug(e.target.value)}
-        error={errors.slug}
-        required
-      />
-      <Input
-        id="classification"
-        label="Classification"
-        value={classification}
-        onChange={(e) => setClassification(e.target.value)}
-        error={errors.classification}
-        required
-      />
-      <Textarea
-        id="shortDescription"
-        label="Short Description"
-        value={shortDescription}
-        onChange={(e) => setShortDescription(e.target.value)}
-        error={errors.shortDescription}
-        required
-      />
-      <Textarea
-        id="fullDescription"
-        label="Full Description"
-        value={fullDescription}
-        onChange={(e) => setFullDescription(e.target.value)}
-        error={errors.fullDescription}
-        required
-      />
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-        <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151' }}>{t('blog.status')}</label>
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-          style={{
-            padding: '0.5rem',
-            borderRadius: '4px',
-            border: '1px solid #d1d5db',
-            fontSize: '0.875rem',
-          }}
-        >
-          <option value="DRAFT">{t('blog.draft')}</option>
-          <option value="PUBLISHED">{t('blog.published')}</option>
-          <option value="PRIVATE">{t('blog.private')}</option>
-          <option value="ARCHIVED">{t('blog.archived')}</option>
-        </select>
+    <form onSubmit={handleSubmit}>
+      {/* Basic Info Section */}
+      <fieldset className={formStyles.formSection}>
+        <legend className={formStyles.sectionTitle}>Basic Information</legend>
+        <div className={formStyles.gridTwoCols}>
+          <div className={formStyles.formGroup}>
+            <label className={formStyles.formLabel} htmlFor="title">Title</label>
+            <input
+              id="title"
+              className={`${formStyles.formInput} ${errors.title ? formStyles.inputError : ''}`}
+              value={title}
+              onChange={(e) => handleTitleChange(e.target.value)}
+              required
+            />
+            {errors.title && <span className={formStyles.formError}>{errors.title}</span>}
+          </div>
+          <div className={formStyles.formGroup}>
+            <label className={formStyles.formLabel} htmlFor="slug">Slug</label>
+            <input
+              id="slug"
+              className={`${formStyles.formInput} ${errors.slug ? formStyles.inputError : ''}`}
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
+              required
+            />
+            {errors.slug && <span className={formStyles.formError}>{errors.slug}</span>}
+          </div>
+        </div>
+        <div className={formStyles.formGroup}>
+          <label className={formStyles.formLabel} htmlFor="classification">Classification</label>
+          <input
+            id="classification"
+            className={`${formStyles.formInput} ${errors.classification ? formStyles.inputError : ''}`}
+            value={classification}
+            onChange={(e) => setClassification(e.target.value)}
+            required
+          />
+          {errors.classification && <span className={formStyles.formError}>{errors.classification}</span>}
+        </div>
+      </fieldset>
+
+      {/* Description Section */}
+      <fieldset className={formStyles.formSection}>
+        <legend className={formStyles.sectionTitle}>Description</legend>
+        <div className={formStyles.formGroup}>
+          <label className={formStyles.formLabel} htmlFor="shortDescription">Short Description</label>
+          <textarea
+            id="shortDescription"
+            className={`${formStyles.formInput} ${formStyles.formTextarea} ${errors.shortDescription ? formStyles.inputError : ''}`}
+            value={shortDescription}
+            onChange={(e) => setShortDescription(e.target.value)}
+            required
+          />
+          {errors.shortDescription && <span className={formStyles.formError}>{errors.shortDescription}</span>}
+        </div>
+        <div className={formStyles.formGroup}>
+          <label className={formStyles.formLabel} htmlFor="fullDescription">Full Description</label>
+          <textarea
+            id="fullDescription"
+            className={`${formStyles.formInput} ${formStyles.formTextarea} ${errors.fullDescription ? formStyles.inputError : ''}`}
+            value={fullDescription}
+            onChange={(e) => setFullDescription(e.target.value)}
+            required
+            style={{ minHeight: '200px' }}
+          />
+          {errors.fullDescription && <span className={formStyles.formError}>{errors.fullDescription}</span>}
+        </div>
+      </fieldset>
+
+      {/* Settings Section */}
+      <fieldset className={formStyles.formSection}>
+        <legend className={formStyles.sectionTitle}>Settings</legend>
+        <div className={formStyles.formGroup}>
+          <label className={formStyles.formLabel}>{t('blog.status')}</label>
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            className={formStyles.formInput}
+          >
+            <option value="DRAFT">{t('blog.draft')}</option>
+            <option value="PUBLISHED">{t('blog.published')}</option>
+            <option value="PRIVATE">{t('blog.private')}</option>
+            <option value="ARCHIVED">{t('blog.archived')}</option>
+          </select>
+        </div>
+      </fieldset>
+
+      <div className={formStyles.formActions}>
+        <Button type="submit" className={formStyles.btnPrimary} disabled={isLoading}>
+          {isLoading ? t('services.saving') : t('services.save')}
+        </Button>
       </div>
-      <Button type="submit" disabled={isLoading}>
-        {isLoading ? t('services.saving') : t('services.save')}
-      </Button>
     </form>
   );
 }

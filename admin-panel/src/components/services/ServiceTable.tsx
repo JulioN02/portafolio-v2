@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
-import { Button } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { StatusSelect } from '@/components/shared/StatusSelect';
 import type { ServiceResponse } from '@jsoft/shared';
+import formStyles from '../../styles/form.module.css';
 
 interface ServiceTableProps {
   services: ServiceResponse[];
@@ -16,9 +16,8 @@ export function ServiceTable({ services, onDelete, onStatusChange }: ServiceTabl
 
   if (services.length === 0) {
     return (
-      <div className="admin-empty">
-        <div className="admin-empty-icon">📋</div>
-        <div className="admin-empty-text">{t('services.empty')}</div>
+      <div className={formStyles.emptyState}>
+        <p>{t('services.empty')}</p>
       </div>
     );
   }
@@ -49,9 +48,9 @@ export function ServiceTable({ services, onDelete, onStatusChange }: ServiceTabl
             <td style={{ textAlign: 'right' }}>
               <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
                 <Link to={`/services/edit/${service.id}`}>
-                  <Button variant="secondary" size="sm">{t('services.edit')}</Button>
+                  <button className={formStyles.btnEdit}>{t('services.edit')}</button>
                 </Link>
-                <Button variant="danger" size="sm" onClick={() => onDelete(service.id)}>{t('services.delete')}</Button>
+                <button className={formStyles.btnDelete} onClick={() => onDelete(service.id)}>{t('services.delete')}</button>
               </div>
             </td>
           </tr>

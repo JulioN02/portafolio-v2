@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button, Loading, ErrorMessage } from '@jsoft/shared';
+import { Loading, ErrorMessage } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useTools } from '../../hooks/useTools';
 import { ToolList } from '../../components/tools/ToolList';
 import { ConfirmDeleteModal } from '@/components/shared/ConfirmDeleteModal';
+import formStyles from '../../styles/form.module.css';
 
 export function ToolsListPage() {
   const { t } = useTranslation();
@@ -43,36 +44,36 @@ export function ToolsListPage() {
   if (error) return <ErrorMessage message={t('common.error')} />;
 
   return (
-    <div>
-      <div className="admin-page-header">
-        <h1>{t('tools.title')}</h1>
+    <div className={formStyles.adminContainer}>
+      <div className={formStyles.pageHeader}>
+        <h1 className={formStyles.pageTitle}>{t('tools.title')}</h1>
         <Link to="/tools/create">
-          <Button>{t('tools.add')}</Button>
+          <button className={formStyles.btnAdd}>+ {t('tools.add')}</button>
         </Link>
       </div>
 
-      <div className="admin-filter-bar">
-        <Button
-          variant={!statusFilter ? 'primary' : 'secondary'}
-          size="sm"
+      <div className={formStyles.filterBar}>
+        <button
+          className={formStyles.btnStatus}
+          style={!statusFilter ? { backgroundColor: 'var(--color-primary)', color: '#fff', borderColor: 'var(--color-primary)' } : {}}
           onClick={() => setStatusFilter(undefined)}
         >
           {t('common.all')} ({allTools.length})
-        </Button>
-        <Button
-          variant={statusFilter === 'PUBLISHED' ? 'primary' : 'secondary'}
-          size="sm"
+        </button>
+        <button
+          className={formStyles.btnStatus}
+          style={statusFilter === 'PUBLISHED' ? { backgroundColor: 'var(--color-primary)', color: '#fff', borderColor: 'var(--color-primary)' } : {}}
           onClick={() => setStatusFilter('PUBLISHED')}
         >
           {t('blog.published')} ({publishedCount})
-        </Button>
-        <Button
-          variant={statusFilter === 'DRAFT' ? 'primary' : 'secondary'}
-          size="sm"
+        </button>
+        <button
+          className={formStyles.btnStatus}
+          style={statusFilter === 'DRAFT' ? { backgroundColor: 'var(--color-primary)', color: '#fff', borderColor: 'var(--color-primary)' } : {}}
           onClick={() => setStatusFilter('DRAFT')}
         >
           {t('blog.drafts')} ({draftCount})
-        </Button>
+        </button>
       </div>
 
       <ToolList

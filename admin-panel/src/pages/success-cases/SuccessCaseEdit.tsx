@@ -2,7 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useSuccessCases } from '../../hooks/useSuccessCases';
 import { SuccessCaseForm } from '../../components/success-cases/SuccessCaseForm';
-import { BackButton } from '@/components/shared/BackButton';
+import { FormLayout } from '@/components/shared/FormLayout';
 import type { SuccessCaseInput, SuccessCaseUpdateInput } from '@jsoft/shared';
 
 export function SuccessCaseEdit() {
@@ -10,15 +10,15 @@ export function SuccessCaseEdit() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { useGetById, useUpdate } = useSuccessCases();
-  
+
   const { data: successCase, isLoading, error } = useGetById(id!);
   const updateMutation = useUpdate();
 
   const handleSubmit = async (data: SuccessCaseInput) => {
     try {
-      await updateMutation.mutateAsync({ 
-        id: id!, 
-        data: data as Partial<SuccessCaseUpdateInput> 
+      await updateMutation.mutateAsync({
+        id: id!,
+        data: data as Partial<SuccessCaseUpdateInput>
       });
       navigate('/success-cases');
     } catch (err) {
@@ -55,18 +55,12 @@ export function SuccessCaseEdit() {
   }
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
-      <BackButton to="/success-cases" />
-      
-      <h1 style={{ fontSize: '1.5rem', fontWeight: '600', marginBottom: '1.5rem' }}>
-        {t('successCases.edit')} {t('successCases.title')}
-      </h1>
-      
+    <FormLayout title={`${t('successCases.edit')} ${t('successCases.title')}`} subtitle="Edit success case details" backTo="/success-cases">
       <SuccessCaseForm
         initialData={successCase}
         onSubmit={handleSubmit}
         isLoading={updateMutation.isPending}
       />
-    </div>
+    </FormLayout>
   );
 }

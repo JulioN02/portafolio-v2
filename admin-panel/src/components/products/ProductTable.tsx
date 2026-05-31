@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
-import { Button } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { StatusSelect } from '@/components/shared/StatusSelect';
 import type { ProductResponse } from '@jsoft/shared';
+import formStyles from '../../styles/form.module.css';
 
 interface ProductTableProps {
   products: ProductResponse[];
@@ -17,9 +17,8 @@ export function ProductTable({ products, onDelete, onToggleFeatured, onStatusCha
 
   if (products.length === 0) {
     return (
-      <div className="admin-empty">
-        <div className="admin-empty-icon">📋</div>
-        <div className="admin-empty-text">{t('products.empty')}</div>
+      <div className={formStyles.emptyState}>
+        <p>{t('products.empty')}</p>
       </div>
     );
   }
@@ -52,21 +51,20 @@ export function ProductTable({ products, onDelete, onToggleFeatured, onStatusCha
             </td>
             <td style={{ textAlign: 'center' }}>
               {onToggleFeatured && (
-                <Button
-                  variant="secondary"
-                  size="sm"
+                <button
+                  className={formStyles.btnStatus}
                   onClick={() => onToggleFeatured(product.id, !product.featured)}
                 >
                   {product.featured ? t('common.yes') : t('common.no')}
-                </Button>
+                </button>
               )}
             </td>
             <td style={{ textAlign: 'right' }}>
               <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
                 <Link to={`/products/edit/${product.id}`}>
-                  <Button variant="secondary" size="sm">{t('products.edit')}</Button>
+                  <button className={formStyles.btnEdit}>{t('products.edit')}</button>
                 </Link>
-                <Button variant="danger" size="sm" onClick={() => onDelete(product.id)}>{t('products.delete')}</Button>
+                <button className={formStyles.btnDelete} onClick={() => onDelete(product.id)}>{t('products.delete')}</button>
               </div>
             </td>
           </tr>

@@ -2,8 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { ToolForm } from '../../components/tools/ToolForm';
 import { useTools } from '../../hooks/useTools';
-import { BackButton } from '@/components/shared/BackButton';
-import { ToolInput } from '@jsoft/shared';
+import { FormLayout } from '@/components/shared/FormLayout';
+import type { ToolInput } from '@jsoft/shared';
 
 export function ToolCreatePage() {
   const { t } = useTranslation();
@@ -20,10 +20,8 @@ export function ToolCreatePage() {
   };
 
   return (
-    <div>
-      <BackButton to="/tools" />
-      <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>{t('tools.create')}</h1>
+    <FormLayout title={t('tools.create')} subtitle="Create a new tool" backTo="/tools">
       <ToolForm onSubmit={handleSubmit} isLoading={createMutation.isPending} />
-    </div>
+    </FormLayout>
   );
 }

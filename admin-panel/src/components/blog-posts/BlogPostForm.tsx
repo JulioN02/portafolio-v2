@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
-import { Input, Textarea, Select, Button } from '@jsoft/shared';
+import { Select, Button } from '@jsoft/shared';
 import type { BlogPostInput, PostStatus } from '@jsoft/shared';
 import { TipTapEditor } from './TipTapEditor';
 import { getTextFromHTML } from '../../utils/getTextFromHTML';
+import formStyles from '../../styles/form.module.css';
 
 interface BlogPostFormProps {
   initialData?: Partial<BlogPostInput>;
@@ -63,105 +64,147 @@ export function BlogPostForm({ initialData, onSubmit, isLoading }: BlogPostFormP
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-      <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.5rem' }}>
-        <div style={{ flex: 1 }}>
-          <Input
-            id="title"
-            label="Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            error={errors.title}
+    <form onSubmit={handleSubmit}>
+      {/* Basic Info Section */}
+      <fieldset className={formStyles.formSection}>
+        <legend className={formStyles.sectionTitle}>Basic Information</legend>
+        <div className={formStyles.formGroup}>
+          <div className={formStyles.inputActionGroup}>
+            <div style={{ flex: 1 }}>
+              <div className={formStyles.formGroup}>
+                <label className={formStyles.formLabel} htmlFor="title">Title</label>
+                <input
+                  id="title"
+                  className={`${formStyles.formInput} ${errors.title ? formStyles.inputError : ''}`}
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  required
+                />
+                {errors.title && <span className={formStyles.formError}>{errors.title}</span>}
+              </div>
+            </div>
+            <Button
+              type="button"
+              className={formStyles.btnAction}
+              onClick={generateSlug}
+            >
+              Generate Slug
+            </Button>
+          </div>
+        </div>
+        <div className={formStyles.gridTwoCols}>
+          <div className={formStyles.formGroup}>
+            <label className={formStyles.formLabel} htmlFor="slug">Slug</label>
+            <input
+              id="slug"
+              className={`${formStyles.formInput} ${errors.slug ? formStyles.inputError : ''}`}
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
+              required
+            />
+            {errors.slug && <span className={formStyles.formError}>{errors.slug}</span>}
+          </div>
+          <div className={formStyles.formGroup}>
+            <label className={formStyles.formLabel} htmlFor="category">Category</label>
+            <input
+              id="category"
+              className={`${formStyles.formInput} ${errors.category ? formStyles.inputError : ''}`}
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              required
+            />
+            {errors.category && <span className={formStyles.formError}>{errors.category}</span>}
+          </div>
+        </div>
+      </fieldset>
+
+      {/* Content Section */}
+      <fieldset className={formStyles.formSection}>
+        <legend className={formStyles.sectionTitle}>Content</legend>
+        <div className={formStyles.formGroup}>
+          <label className={formStyles.formLabel} htmlFor="shortDescription">Short Description</label>
+          <textarea
+            id="shortDescription"
+            className={`${formStyles.formInput} ${formStyles.formTextarea} ${errors.shortDescription ? formStyles.inputError : ''}`}
+            value={shortDescription}
+            onChange={(e) => setShortDescription(e.target.value)}
             required
           />
+          {errors.shortDescription && <span className={formStyles.formError}>{errors.shortDescription}</span>}
         </div>
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={generateSlug}
-        >
-          Generate Slug
+        <div className={formStyles.formGroup}>
+          <label className={formStyles.formLabel}>Body Content (TipTap Rich Text Editor)</label>
+          <TipTapEditor
+            content={body}
+            onChange={setBody}
+          />
+          {errors.body && <span className={formStyles.formError}>{errors.body}</span>}
+        </div>
+      </fieldset>
+
+      {/* Cover Image Section */}
+      <fieldset className={formStyles.formSection}>
+        <legend className={formStyles.sectionTitle}>Cover Image</legend>
+        <div className={formStyles.formGroup}>
+          <label className={formStyles.formLabel} htmlFor="coverImage">Cover Image URL</label>
+          <input
+            id="coverImage"
+            type="url"
+            className={`${formStyles.formInput} ${errors.coverImage ? formStyles.inputError : ''}`}
+            value={coverImage}
+            onChange={(e) => setCoverImage(e.target.value)}
+            required
+          />
+          {errors.coverImage && <span className={formStyles.formError}>{errors.coverImage}</span>}
+        </div>
+      </fieldset>
+
+      {/* Settings Section */}
+      <fieldset className={formStyles.formSection}>
+        <legend className={formStyles.sectionTitle}>Settings</legend>
+        <div className={formStyles.gridTwoCols}>
+          <div className={formStyles.formGroup}>
+            <Select
+              id="status"
+              label="Status"
+              value={status}
+              onChange={(e) => setStatus(e.target.value as PostStatus)}
+              options={[
+                { value: 'DRAFT', label: t('blog.draft') },
+                { value: 'PUBLISHED', label: t('blog.published') },
+                { value: 'PRIVATE', label: t('blog.private') },
+                { value: 'ARCHIVED', label: t('blog.archived') },
+              ]}
+            />
+          </div>
+          <div className={formStyles.formGroup}>
+            <label className={formStyles.formLabel} htmlFor="externalLink">External Link (optional)</label>
+            <input
+              id="externalLink"
+              type="url"
+              className={formStyles.formInput}
+              value={externalLink}
+              onChange={(e) => setExternalLink(e.target.value)}
+              placeholder="https://..."
+            />
+          </div>
+        </div>
+        <div className={formStyles.formGroup}>
+          <label className={formStyles.formLabel} htmlFor="lessonsLearned">Lessons Learned (optional)</label>
+          <textarea
+            id="lessonsLearned"
+            className={`${formStyles.formInput} ${formStyles.formTextarea}`}
+            value={lessonsLearned}
+            onChange={(e) => setLessonsLearned(e.target.value)}
+          />
+        </div>
+      </fieldset>
+
+      <div className={formStyles.formActions}>
+        <Button type="submit" className={formStyles.btnPrimary} disabled={isLoading}>
+          {isLoading ? t('blog.saving') : t('blog.save')}
         </Button>
       </div>
-
-      <Input
-        id="slug"
-        label="Slug"
-        value={slug}
-        onChange={(e) => setSlug(e.target.value)}
-        error={errors.slug}
-        required
-      />
-
-      <Input
-        id="category"
-        label="Category"
-        value={category}
-        onChange={(e) => setCategory(e.target.value)}
-        error={errors.category}
-        required
-      />
-
-      <Textarea
-        id="shortDescription"
-        label="Short Description"
-        value={shortDescription}
-        onChange={(e) => setShortDescription(e.target.value)}
-        error={errors.shortDescription}
-        required
-      />
-
-      <Input
-        id="coverImage"
-        label="Cover Image URL"
-        type="url"
-        value={coverImage}
-        onChange={(e) => setCoverImage(e.target.value)}
-        error={errors.coverImage}
-        required
-      />
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-        <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151' }}>Body Content (TipTap Rich Text Editor)</label>
-        <TipTapEditor
-          content={body}
-          onChange={setBody}
-        />
-        {errors.body && <span style={{ color: '#ef4444', fontSize: '0.75rem' }}>{errors.body}</span>}
-      </div>
-
-      <Select
-        id="status"
-        label="Status"
-        value={status}
-        onChange={(e) => setStatus(e.target.value as PostStatus)}
-        options={[
-          { value: 'DRAFT', label: t('blog.draft') },
-          { value: 'PUBLISHED', label: t('blog.published') },
-          { value: 'PRIVATE', label: t('blog.private') },
-          { value: 'ARCHIVED', label: t('blog.archived') },
-        ]}
-      />
-
-      <Input
-        id="externalLink"
-        label="External Link (optional)"
-        type="url"
-        value={externalLink}
-        onChange={(e) => setExternalLink(e.target.value)}
-        placeholder="https://..."
-      />
-
-      <Textarea
-        id="lessonsLearned"
-        label="Lessons Learned (optional)"
-        value={lessonsLearned}
-        onChange={(e) => setLessonsLearned(e.target.value)}
-      />
-
-      <Button type="submit" disabled={isLoading}>
-        {isLoading ? t('blog.saving') : t('blog.save')}
-      </Button>
     </form>
   );
 }
