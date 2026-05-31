@@ -6,13 +6,12 @@ import { ProductCarousel } from '../../components/products/ProductCarousel';
 import { ToolCarousel } from '../../components/tools/ToolCarousel';
 import { CTA } from './CTA';
 import { useVisibleSections } from '../../hooks/useSiteSections';
-import { Loading } from '../../components/common/Loading';
 
 export function HomePage() {
-  const { visible, isLoading } = useVisibleSections();
+  const { visible, isLoading, error } = useVisibleSections();
 
-  // Mientras carga, mostramos todo el contenido normalmente (no bloqueamos)
-  const showSection = (key: string) => isLoading || visible.has(key);
+  // Mientras carga o si hay error, mostramos todo el contenido
+  const showSection = (key: string) => isLoading || error || visible.has(key);
 
   return (
     <>
