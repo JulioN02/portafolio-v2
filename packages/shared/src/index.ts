@@ -111,3 +111,17 @@ export { withBoundary } from './components/index.js';
 
 // CSS Variables (import to apply design tokens)
 import './styles/variables.css';
+
+// Component CSS — imported explicitly so tsup bundles them into dist/index.css.
+// We use inline class name strings in components (not CSS module bindings)
+// because tsup strips module JS mappings, but the CSS is still valid.
+import './components/ui/Modal/Modal.module.css';
+import './components/ui/Button/Button.module.css';
+import './components/ui/Card/Card.module.css';
+import './components/ui/Badge/Badge.module.css';
+import './components/ui/Loading/Loading.module.css';
+import './components/ui/ErrorMessage/ErrorMessage.module.css';
+import './components/ui/Input/Input.module.css';
+import './components/ui/Textarea/Textarea.module.css';
+import './components/ui/Select/Select.module.css';
+import './components/ui/Checkbox/Checkbox.module.css';

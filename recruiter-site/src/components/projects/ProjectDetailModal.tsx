@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import DOMPurify from 'dompurify';
 import { useProjectDetail } from '../../hooks/useProjects';
 import type { ProjectSummary } from '../../types';
@@ -29,6 +29,7 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
 
   const overlayRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const [expandedImage, setExpandedImage] = useState<string | null>(null);
 
   // Close on Escape key
   const handleKeyDown = useCallback(
@@ -110,6 +111,24 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
               src={projectImages[0]}
               alt={project.title}
               className={styles.mainImage}
+            />
+          </div>
+        )}
+
+        {/* Expanded image viewer */}
+        {expandedImage && (
+          <div className={styles.expandedImageWrapper}>
+            <button
+              className={styles.expandedClose}
+              onClick={() => setExpandedImage(null)}
+              aria-label="Cerrar imagen expandida"
+            >
+              &times;
+            </button>
+            <img
+              src={expandedImage}
+              alt="Imagen expandida"
+              className={styles.expandedImage}
             />
           </div>
         )}

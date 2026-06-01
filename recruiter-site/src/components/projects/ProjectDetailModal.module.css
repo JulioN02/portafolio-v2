@@ -107,6 +107,15 @@
 
 /* ── Main Image ── */
 
+.imageSection {
+  width: 100%;
+  max-height: 400px;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-lg);
+  background-color: var(--color-neutral-100);
+}
+
 .mainImageWrapper {
   width: 100%;
   max-height: 400px;
@@ -153,6 +162,73 @@
   .galleryImage:hover {
     opacity: 0.85;
   }
+}
+
+/* ── Thumbnail gallery (inline buttons) ── */
+
+.galleryThumb {
+  display: inline-block;
+  width: 80px;
+  height: 60px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  cursor: pointer;
+  background: none;
+  transition: border-color var(--transition-fast), opacity var(--transition-fast);
+}
+
+.galleryThumb:hover {
+  border-color: var(--color-primary-500);
+  opacity: 0.85;
+}
+
+.galleryImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── Expanded image viewer (inside modal) ── */
+
+.expandedImageWrapper {
+  position: relative;
+  margin-bottom: var(--spacing-md);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background-color: var(--color-neutral-900);
+}
+
+.expandedImage {
+  display: block;
+  width: 100%;
+  max-height: 500px;
+  object-fit: contain;
+}
+
+.expandedClose {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-2xl);
+  line-height: 1;
+  color: var(--color-neutral-0);
+  background-color: rgba(0, 0, 0, 0.5);
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  z-index: 1;
+}
+
+.expandedClose:hover {
+  background-color: rgba(0, 0, 0, 0.8);
 }
 
 /* ── Loading State ── */
