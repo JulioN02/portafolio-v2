@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Input, Button } from '@jsoft/shared';
+import { Button } from '@jsoft/shared';
 import { useSubmitContact } from '../../hooks/useContact';
 import { Spinner } from '../common/Spinner';
 import styles from './ContactForm.module.css';
@@ -74,6 +74,42 @@ export function ContactForm({ source = 'general', onSuccess }: ContactFormProps)
     }
   };
 
+  /* ── Renders a field with label + input + error ── */
+  const renderField = ({
+    id,
+    label,
+    type = 'text',
+    value,
+    placeholder,
+    autoComplete,
+    error,
+  }: {
+    id: string;
+    label: string;
+    type?: string;
+    value: string;
+    placeholder?: string;
+    autoComplete?: string;
+    error?: string;
+  }) => (
+    <div className={styles.field}>
+      <label htmlFor={id} className={styles.label}>{label}</label>
+      <input
+        id={id}
+        name={id}
+        type={type}
+        value={value}
+        onChange={handleChange}
+        placeholder={placeholder}
+        autoComplete={autoComplete}
+        disabled={isPending}
+        className={`${styles.input} ${error ? styles.inputError : ''}`}
+        aria-invalid={error ? 'true' : undefined}
+      />
+      {error && <span className={styles.errorText}>{error}</span>}
+    </div>
+  );
+
   if (success) {
     return (
       <div className={styles.success}>
@@ -88,55 +124,17 @@ export function ContactForm({ source = 'general', onSuccess }: ContactFormProps)
   }
 
   return (
-    <form onSubmit={handleSubmit} className={styles.form}>
+    <form onSubmit={handleSubmit} className={styles.form} noValidate>
       <div className={styles.row}>
-        <Input
-          id="firstName"
-          name="firstName"
-          label="Nombre"
-          value={formData.firstName}
-          onChange={handleChange}
-          error={errors.firstName}
-          placeholder="Tu nombre"
-          required
-        />
-        <Input
-          id="lastName"
-          name="lastName"
-          label="Apellido"
-          value={formData.lastName}
-          onChange={handleChange}
-          error={errors.lastName}
-          placeholder="Tu apellido"
-          required
-        />
+        {renderField({ id: 'firstName', label: 'Nombre', value: formData.firstName, placeholder: 'Tu nombre', autoComplete: 'given-name', error: errors.firstName })}
+        {renderField({ id: 'lastName', label: 'Apellido', value: formData.lastName, placeholder: 'Tu apellido', autoComplete: 'family-name', error: errors.lastName })}
       </div>
 
-      <Input
-        id="email"
-        name="email"
-        type="email"
-        label="Email"
-        value={formData.email}
-        onChange={handleChange}
-        error={errors.email}
-        placeholder="tu@email.com"
-        required
-      />
+      {renderField({ id: 'email', label: 'Email', type: 'email', value: formData.email, placeholder: 'tu@email.com', autoComplete: 'email', error: errors.email })}
 
-      <Input
-        id="whatsapp"
-        name="whatsapp"
-        type="tel"
-        label="WhatsApp"
-        value={formData.whatsapp}
-        onChange={handleChange}
-        error={errors.whatsapp}
-        placeholder="+57 300 123 4567"
-        required
-      />
+      {renderField({ id: 'whatsapp', label: 'WhatsApp', type: 'tel', value: formData.whatsapp, placeholder: '+57 300 123 4567', autoComplete: 'tel', error: errors.whatsapp })}
 
-      <div className={styles.textareaWrapper}>
+      <div className={styles.field}>
         <label htmlFor="message" className={styles.label}>
           Mensaje
         </label>
@@ -147,8 +145,9 @@ export function ContactForm({ source = 'general', onSuccess }: ContactFormProps)
           onChange={handleChange}
           placeholder="Cuéntame sobre tu proyecto..."
           rows={4}
-          className={`${styles.textarea} ${errors.message ? styles.textareaError : ''}`}
-          required
+          disabled={isPending}
+          className={`${styles.textarea} ${errors.message ? styles.inputError : ''}`}
+          aria-invalid={errors.message ? 'true' : undefined}
         />
         {errors.message && (
           <span className={styles.errorText}>{errors.message}</span>

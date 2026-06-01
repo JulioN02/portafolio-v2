@@ -1,7 +1,7 @@
 .form {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: var(--spacing-lg);
 }
 
 .row {
@@ -15,7 +15,9 @@
   }
 }
 
-.textareaWrapper {
+/* ── Field ── */
+
+.field {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
@@ -23,58 +25,89 @@
 
 .label {
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-neutral-700);
 }
 
+/* ── Shared Input Styles ── */
+
+.input,
 .textarea {
   width: 100%;
   padding: var(--spacing-sm) var(--spacing-md);
-  border: 1px solid var(--color-neutral-300);
-  border-radius: var(--radius-md);
-  font-family: inherit;
+  font-family: var(--font-family-sans);
   font-size: var(--font-size-base);
+  color: var(--color-neutral-800);
+  background-color: var(--color-neutral-0);
+  border: 1px solid var(--color-neutral-300);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--color-neutral-400);
+}
+
+.input:focus,
+.textarea:focus {
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 2px var(--color-primary-100);
+}
+
+.input:disabled,
+.textarea:disabled {
+  background-color: var(--color-neutral-100);
+  color: var(--color-neutral-500);
+  cursor: not-allowed;
+}
+
+/* Error state */
+.inputError {
+  border-color: var(--color-danger-500);
+}
+
+.inputError:focus {
+  border-color: var(--color-danger-500);
+  box-shadow: 0 0 0 2px var(--color-danger-100);
+}
+
+/* ── Textarea ── */
+
+.textarea {
   resize: vertical;
   min-height: 100px;
+  line-height: var(--line-height-relaxed);
 }
 
-.textarea:focus {
-  outline: none;
-  border-color: var(--color-primary-500);
-  box-shadow: 0 0 0 3px var(--color-primary-100);
-}
-
-.textareaError {
-  border-color: var(--color-danger-500);
-}
-
-.textareaError:focus {
-  border-color: var(--color-danger-500);
-  box-shadow: 0 0 0 3px var(--color-danger-100);
-}
+/* ── Error text ── */
 
 .errorText {
-  font-size: var(--font-size-sm);
-  color: var(--color-danger-600);
+  font-size: var(--font-size-xs);
+  color: var(--color-danger-500);
 }
+
+/* ── Submit error banner ── */
 
 .submitError {
   padding: var(--spacing-sm) var(--spacing-md);
   background-color: var(--color-danger-50);
   border: 1px solid var(--color-danger-200);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   color: var(--color-danger-700);
   font-size: var(--font-size-sm);
 }
 
 .submitButton {
-  margin-top: var(--spacing-sm);
+  margin-top: var(--spacing-xs);
 }
 
-/* Success State */
+/* ── Success State ── */
+
 .success {
   text-align: center;
-  padding: var(--spacing-xl);
+  padding: var(--spacing-2xl) var(--spacing-lg);
 }
 
 .successIcon {
@@ -100,6 +133,7 @@
 .success p {
   color: var(--color-neutral-600);
   margin-bottom: var(--spacing-lg);
+  line-height: var(--line-height-relaxed);
 }
 
 .resetButton {
@@ -109,6 +143,7 @@
   font-weight: var(--font-weight-medium);
   cursor: pointer;
   text-decoration: underline;
+  font-size: var(--font-size-base);
 }
 
 @media (hover: hover) {
