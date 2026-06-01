@@ -64,36 +64,37 @@
 }
 
 .classifButton {
-  padding: var(--spacing-2xs) var(--spacing-md);
-  font-size: var(--font-size-xs);
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  color: var(--color-neutral-500);
+  color: var(--color-neutral-600);
   background-color: var(--color-neutral-0);
-  border: 1px solid var(--color-neutral-200);
-  border-radius: var(--radius-full);
+  border: 1px solid var(--color-neutral-300);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all var(--transition-fast);
+  white-space: nowrap;
 }
 
 @media (hover: hover) {
   .classifButton:hover:not(:disabled) {
-    color: var(--color-green-accent-text);
-    border-color: var(--color-green-accent);
-    background-color: rgba(122, 203, 104, 0.08);
+    color: var(--color-primary-600);
+    border-color: var(--color-primary-300);
+    background-color: var(--color-primary-50);
   }
 }
 
 .classifButtonActive {
-  color: var(--color-blue-dark, #0f1d3a);
-  background-color: var(--color-green-accent);
-  border-color: var(--color-green-accent);
+  color: var(--color-neutral-0);
+  background-color: var(--color-primary-600);
+  border-color: var(--color-primary-600);
 }
 
 @media (hover: hover) {
   .classifButtonActive:hover:not(:disabled) {
-    color: var(--color-blue-dark, #0f1d3a);
-    background-color: #7acb68;
-    border-color: #7acb68;
+    color: var(--color-neutral-0);
+    background-color: var(--color-primary-700);
+    border-color: var(--color-primary-700);
   }
 }
 

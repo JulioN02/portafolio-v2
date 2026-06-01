@@ -42,7 +42,6 @@ export function ProjectCard({ project, onSelect }: ProjectCardProps) {
             alt={project.title}
             className={styles.image}
             loading="lazy"
-            referrerPolicy="no-referrer"
           />
         ) : (
           <div className={styles.imagePlaceholder}>

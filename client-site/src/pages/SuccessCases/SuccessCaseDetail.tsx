@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type SyntheticEvent } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useSuccessCaseBySlug } from '../../hooks/useSuccessCases';
 import { Loading } from '../../components/common/Loading';
@@ -6,6 +6,8 @@ import { MetaTags } from '../../components/seo/MetaTags';
 import { Modal } from '@jsoft/shared';
 import { ContactForm } from '../../components/forms/ContactForm';
 import styles from './SuccessCaseDetail.module.css';
+
+const FALLBACK_IMG = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="800" height="600" fill="%23e5e7eb"%3E%3Crect width="800" height="600"/%3E%3Ctext x="400" y="300" text-anchor="middle" dy=".3em" font-size="20" fill="%239ca3af"%3ESin imagen%3C/text%3E%3C/svg%3E';
 
 export function SuccessCaseDetailPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -61,7 +63,9 @@ export function SuccessCaseDetailPage() {
                 src={images[currentImageIndex]}
                 alt={`${successCase.title} - Imagen ${currentImageIndex + 1}`}
                 className={styles.carouselImage}
-                referrerPolicy="no-referrer"
+                onError={(e: SyntheticEvent<HTMLImageElement>) => {
+                  e.currentTarget.src = FALLBACK_IMG;
+                }}
               />
 
               {images.length > 1 && (

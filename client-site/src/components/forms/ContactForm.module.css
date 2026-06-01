@@ -100,7 +100,27 @@
 }
 
 .submitButton {
+  width: 100%;
+  padding: 0.75rem 1.5rem !important;
+  font-size: var(--font-size-base) !important;
+  border-radius: var(--radius-sm) !important;
+  background: var(--color-primary-600) !important;
+  color: var(--color-neutral-0) !important;
+  border: none !important;
+  font-weight: var(--font-weight-semibold) !important;
+  min-height: 48px !important;
   margin-top: var(--spacing-xs);
+  transition: background-color var(--transition-fast) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+@media (hover: hover) {
+  .submitButton:hover:not(:disabled) {
+    background: var(--color-primary-700) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  }
 }
 
 /* ── Success State ── */
