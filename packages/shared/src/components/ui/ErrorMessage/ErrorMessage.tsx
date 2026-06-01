@@ -1,8 +1,17 @@
 /**
  * Error message component with optional retry action
+ *
+ * NOTE: Class names defined inline — CSS module maps are stripped by tsup.
  */
 import type { ReactNode } from 'react';
-import styles from './ErrorMessage.module.css';
+
+const styles = {
+  container: 'container',
+  icon: 'icon',
+  message: 'message',
+  content: 'content',
+  retryButton: 'retryButton',
+};
 
 export interface ErrorMessageProps {
   /** Error message to display */

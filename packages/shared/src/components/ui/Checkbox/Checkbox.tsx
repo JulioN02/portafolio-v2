@@ -1,8 +1,15 @@
 /**
  * Checkbox component with label support
+ *
+ * NOTE: Class names defined inline — CSS module maps are stripped by tsup.
  */
 import type { InputHTMLAttributes } from 'react';
-import styles from './Checkbox.module.css';
+
+const styles = {
+  wrapper: 'wrapper',
+  checkbox: 'checkbox',
+  label: 'label',
+};
 
 export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
   /** Label text displayed next to the checkbox */

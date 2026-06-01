@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HelmetProvider } from 'react-helmet-async';
 import { ErrorBoundary } from '@jsoft/shared';
 import App from './App';
+import '@jsoft/shared/styles/variables.css';
+import '@jsoft/shared/dist/index.css';
 import './index.css';
 
 const queryClient = new QueryClient({

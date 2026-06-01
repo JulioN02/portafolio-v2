@@ -1,8 +1,17 @@
 /**
  * Input component with label, error message, and type support
+ *
+ * NOTE: Class names defined inline — CSS module maps are stripped by tsup.
  */
 import type { InputHTMLAttributes } from 'react';
-import styles from './Input.module.css';
+
+const styles = {
+  wrapper: 'wrapper',
+  label: 'label',
+  input: 'input',
+  inputError: 'inputError',
+  error: 'error',
+};
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   /** Label text displayed above the input */

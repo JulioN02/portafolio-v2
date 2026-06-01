@@ -1,8 +1,17 @@
 /**
  * Textarea component with label, error message, and support
+ *
+ * NOTE: Class names defined inline — CSS module maps are stripped by tsup.
  */
 import type { TextareaHTMLAttributes } from 'react';
-import styles from './Textarea.module.css';
+
+const styles = {
+  wrapper: 'wrapper',
+  label: 'label',
+  textarea: 'textarea',
+  textareaError: 'textareaError',
+  error: 'error',
+};
 
 export interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   /** Label text displayed above the textarea */

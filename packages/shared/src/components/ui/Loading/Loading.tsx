@@ -1,7 +1,16 @@
 /**
  * Loading spinner component
+ *
+ * NOTE: Class names defined inline — CSS module maps are stripped by tsup.
  */
-import styles from './Loading.module.css';
+const styles = {
+  container: 'container',
+  spinner: 'spinner',
+  sm: 'sm',
+  md: 'md',
+  lg: 'lg',
+  srOnly: 'srOnly',
+};
 
 export interface LoadingProps {
   /** Size of the spinner */

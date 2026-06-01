@@ -1,8 +1,26 @@
 /**
  * Button component with variants, sizes, and loading state
+ *
+ * NOTE: Class names defined inline — CSS module maps are stripped by tsup.
+ * Corresponding styles are in Button.module.css → bundled into dist/index.css.
  */
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
-import styles from './Button.module.css';
+
+const styles = {
+  button: 'button',
+  primary: 'primary',
+  secondary: 'secondary',
+  danger: 'danger',
+  whatsapp: 'whatsapp',
+  sm: 'sm',
+  md: 'md',
+  lg: 'lg',
+  large: 'large',
+  full: 'full',
+  loading: 'loading',
+  spinner: 'spinner',
+  hiddenContent: 'hiddenContent',
+};
 
 export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'whatsapp';
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'large';

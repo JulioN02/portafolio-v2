@@ -1,8 +1,21 @@
 /**
  * Modal component with overlay, close on backdrop click, and ESC key
+ *
+ * NOTE: Class names are defined inline instead of CSS module import
+ * because tsup strips CSS module mappings during build.
+ * The corresponding styles live in Modal.module.css and are bundled
+ * into dist/index.css — import '@jsoft/shared/dist/index.css' to load them.
  */
 import { useEffect, useCallback, type ReactNode } from 'react';
-import styles from './Modal.module.css';
+
+const styles = {
+  overlay: 'overlay',
+  modal: 'modal',
+  header: 'header',
+  title: 'title',
+  closeButton: 'closeButton',
+  body: 'body',
+};
 
 export interface ModalProps {
   /** Whether the modal is visible */

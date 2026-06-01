@@ -1,8 +1,17 @@
 /**
  * Badge component with color variants
+ *
+ * NOTE: Class names defined inline — CSS module maps are stripped by tsup.
  */
 import type { ReactNode } from 'react';
-import styles from './Badge.module.css';
+
+const styles = {
+  badge: 'badge',
+  default: 'default',
+  developing: 'developing',
+  available: 'available',
+  coming: 'coming',
+};
 
 export interface BadgeProps {
   children: ReactNode;

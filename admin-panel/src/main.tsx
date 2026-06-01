@@ -3,6 +3,8 @@ import { createRoot } from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { LanguageProvider } from './i18n/LanguageContext';
 import App from './App';
+import '@jsoft/shared/styles/variables.css';
+import '@jsoft/shared/dist/index.css';
 import './index.css';
 
 const queryClient = new QueryClient({

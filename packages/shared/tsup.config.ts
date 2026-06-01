@@ -11,7 +11,6 @@ export default defineConfig({
   outDir: 'dist',
   mainFields: ['module', 'main'],
   platform: 'neutral',
-  loader: {
-    '.css': 'css',
-  },
+  esbuildPlugins: [],
+  css: true,
 });

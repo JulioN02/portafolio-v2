@@ -16,7 +16,8 @@
         "default": "./dist/index.js"
       }
     },
-    "./styles/*": "./src/styles/*"
+    "./styles/*": "./src/styles/*",
+    "./dist/index.css": "./dist/index.css"
   },
   "scripts": {
     "build": "tsup",

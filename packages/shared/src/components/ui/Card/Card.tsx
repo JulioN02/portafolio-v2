@@ -1,8 +1,18 @@
 /**
  * Card component with optional header, body, footer, badge, and image slots
+ *
+ * NOTE: Class names defined inline — CSS module maps are stripped by tsup.
  */
 import type { ReactNode } from 'react';
-import styles from './Card.module.css';
+
+const styles = {
+  card: 'card',
+  image: 'image',
+  badge: 'badge',
+  header: 'header',
+  body: 'body',
+  footer: 'footer',
+};
 
 export interface CardProps {
   /** Header content */

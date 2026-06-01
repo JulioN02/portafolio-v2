@@ -1,8 +1,18 @@
 /**
  * Select component with label, error message, and option support
+ *
+ * NOTE: Class names defined inline — CSS module maps are stripped by tsup.
+ * Corresponding styles are in Select.module.css → bundled into dist/index.css.
  */
 import type { SelectHTMLAttributes } from 'react';
-import styles from './Select.module.css';
+
+const styles = {
+  wrapper: 'wrapper',
+  label: 'label',
+  select: 'select',
+  selectError: 'selectError',
+  error: 'error',
+};
 
 export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   /** Label text displayed above the select */

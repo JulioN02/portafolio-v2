@@ -6,6 +6,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import { ErrorBoundary } from '@jsoft/shared';
 import App from './App';
 import '@jsoft/shared/styles/variables.css';
+import '@jsoft/shared/dist/index.css';
 import './styles/globals.css';
 
 const queryClient = new QueryClient({
