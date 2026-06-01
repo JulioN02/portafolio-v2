@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Button } from '@jsoft/shared';
 import { useSubmitContact } from '../../hooks/useContact';
 import { Spinner } from '../common/Spinner';
 import styles from './ContactForm.module.css';
@@ -8,6 +7,22 @@ interface ContactFormProps {
   source?: string;
   onSuccess?: () => void;
 }
+
+/** Formats source string for display, e.g. "service:Desarrollo Web" → "Servicio: Desarrollo Web" */
+const formatSourceLabel = (source: string): string => {
+  const [type, ...rest] = source.split(':');
+  const title = rest.join(':');
+  const typeLabels: Record<string, string> = {
+    service: 'Servicio',
+    product: 'Producto',
+    tool: 'Herramienta',
+    successCase: 'Caso de Éxito',
+    recruiter: 'Reclutador',
+    general: 'General',
+  };
+  const label = typeLabels[type] || type;
+  return title ? `${label}: ${title}` : label;
+};
 
 export function ContactForm({ source = 'general', onSuccess }: ContactFormProps) {
   const [formData, setFormData] = useState({
@@ -125,6 +140,13 @@ export function ContactForm({ source = 'general', onSuccess }: ContactFormProps)
 
   return (
     <form onSubmit={handleSubmit} className={styles.form} noValidate>
+      {source && source !== 'general' && (
+        <div className={styles.sourceTag}>
+          <span className={styles.sourceLabel}>Consultando sobre</span>
+          <span className={styles.sourceValue}>{formatSourceLabel(source)}</span>
+        </div>
+      )}
+
       <div className={styles.row}>
         {renderField({ id: 'firstName', label: 'Nombre', value: formData.firstName, placeholder: 'Tu nombre', autoComplete: 'given-name', error: errors.firstName })}
         {renderField({ id: 'lastName', label: 'Apellido', value: formData.lastName, placeholder: 'Tu apellido', autoComplete: 'family-name', error: errors.lastName })}
@@ -158,7 +180,7 @@ export function ContactForm({ source = 'general', onSuccess }: ContactFormProps)
         <div className={styles.submitError}>{errors.submit}</div>
       )}
 
-      <Button type="submit" disabled={isPending} className={styles.submitButton}>
+      <button type="submit" disabled={isPending} className={styles.submitButton}>
         {isPending ? (
           <>
             <Spinner size="sm" /> Enviando...
@@ -166,7 +188,7 @@ export function ContactForm({ source = 'general', onSuccess }: ContactFormProps)
         ) : (
           'Enviar mensaje'
         )}
-      </Button>
+      </button>
     </form>
   );
 }

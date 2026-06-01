@@ -3,6 +3,22 @@ import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from '@/i18n/LanguageContext';
 import { useContactForms } from '@/hooks/useContactForms';
 
+/** Formats source string for display, e.g. "service:Desarrollo Web" → "Servicio: Desarrollo Web" */
+const formatSourceLabel = (source: string): string => {
+  const [type, ...rest] = source.split(':');
+  const title = rest.join(':');
+  const typeLabels: Record<string, string> = {
+    service: 'Servicio',
+    product: 'Producto',
+    tool: 'Herramienta',
+    successCase: 'Caso de Éxito',
+    recruiter: 'Reclutador',
+    general: 'General',
+  };
+  const label = typeLabels[type] || type;
+  return title ? `${label}: ${title}` : label;
+};
+
 const formatDate = (date: Date | string) => {
   const d = date instanceof Date ? date : new Date(date);
   return d.toLocaleDateString('es', {
@@ -182,7 +198,21 @@ export function ContactMessageDetailPage() {
           <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.25rem', textTransform: 'uppercase', fontWeight: 600 }}>
             Source
           </div>
-          <div style={{ fontSize: '0.9375rem', color: '#111827' }}>{message.source}</div>
+          <div
+            style={{
+              fontSize: '0.8125rem',
+              color: '#1e40af',
+              background: '#dbeafe',
+              padding: '0.25rem 0.75rem',
+              borderRadius: '6px',
+              display: 'inline-block',
+              fontWeight: 500,
+            }}
+          >
+            {message.source && message.source !== 'general'
+              ? formatSourceLabel(message.source)
+              : 'General'}
+          </div>
         </div>
 
         {/* Origin Type */}

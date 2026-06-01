@@ -12,6 +12,7 @@ export interface ContactMessage {
   isRead: boolean;
   archived: boolean;
   labels: string[];
+  source: string;
 }
 
 interface ContactMessageListProps {
@@ -112,6 +113,28 @@ export function ContactMessageList({ messages, selectedId, onSelect, onArchive }
               <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.125rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {message.email}
               </div>
+
+              {/* Source (if not general/recruiter) */}
+              {message.source && message.source !== 'general' && message.source !== 'recruiter' && (
+                <div
+                  style={{
+                    fontSize: '0.6875rem',
+                    color: '#2563eb',
+                    background: '#eff6ff',
+                    padding: '0.0625rem 0.375rem',
+                    borderRadius: '4px',
+                    marginBottom: '0.125rem',
+                    display: 'inline-block',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    maxWidth: '100%',
+                  }}
+                >
+                  {message.source
+                    .replace(/^(service|product|tool|successCase):/, '')}
+                </div>
+              )}
 
               {/* Message preview */}
               <div

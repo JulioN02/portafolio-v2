@@ -5,6 +5,22 @@ import { useContactForms } from '@/hooks/useContactForms';
 import { ContactMessageList, type ContactMessage } from '@/components/contact-messages/ContactMessageList';
 import type { ContactFormFilterInput, ContactFormResponse } from '@jsoft/shared';
 
+/** Formats source string for display, e.g. "service:Desarrollo Web" → "Servicio: Desarrollo Web" */
+const formatSourceLabel = (source: string): string => {
+  const [type, ...rest] = source.split(':');
+  const title = rest.join(':');
+  const typeLabels: Record<string, string> = {
+    service: 'Servicio',
+    product: 'Producto',
+    tool: 'Herramienta',
+    successCase: 'Caso de Éxito',
+    recruiter: 'Reclutador',
+    general: 'General',
+  };
+  const label = typeLabels[type] || type;
+  return title ? `${label}: ${title}` : label;
+};
+
 /**
  * Filter type for contact messages
  */
@@ -125,6 +141,7 @@ export function ContactMessagesListPage() {
       isRead: !!form.readAt,
       archived: form.archived,
       labels: form.labels,
+      source: form.source,
     }),
     [],
   );
@@ -613,8 +630,19 @@ export function ContactMessagesListPage() {
                     >
                       Source
                     </div>
-                    <div style={{ fontSize: '0.875rem', color: '#111827' }}>
-                      {selectedMessage.source}
+                    <div
+                      style={{
+                        fontSize: '0.8125rem',
+                        color: '#1e40af',
+                        background: '#dbeafe',
+                        padding: '0.1875rem 0.5rem',
+                        borderRadius: '6px',
+                        display: 'inline-block',
+                      }}
+                    >
+                      {selectedMessage.source && selectedMessage.source !== 'general'
+                        ? formatSourceLabel(selectedMessage.source)
+                        : 'General'}
                     </div>
                   </div>
                   <div>

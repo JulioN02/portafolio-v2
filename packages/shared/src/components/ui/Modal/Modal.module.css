@@ -13,9 +13,9 @@
 .modal {
   background-color: var(--color-neutral-0);
   border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
   width: 100%;
-  max-width: 32rem;
+  max-width: 36rem;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
@@ -26,15 +26,15 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--spacing-md) var(--spacing-lg);
-  border-bottom: 1px solid var(--color-secondary-200);
+  padding: var(--spacing-lg) var(--spacing-xl);
+  border-bottom: 1px solid var(--color-neutral-200);
 }
 
 .title {
   margin: 0;
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-secondary-900);
+  color: var(--color-neutral-900);
 }
 
 .closeButton {
@@ -46,21 +46,21 @@
   padding: 0;
   background: none;
   border: none;
-  border-radius: var(--radius-md);
-  font-size: var(--font-size-2xl);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xl);
   line-height: 1;
-  color: var(--color-secondary-500);
+  color: var(--color-neutral-400);
   cursor: pointer;
-  transition: background-color var(--transition-fast);
+  transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
 .closeButton:hover {
-  background-color: var(--color-secondary-100);
-  color: var(--color-secondary-700);
+  background-color: var(--color-neutral-100);
+  color: var(--color-neutral-600);
 }
 
 .body {
-  padding: var(--spacing-lg);
+  padding: var(--spacing-xl);
   overflow-y: auto;
 }
 
@@ -77,6 +77,39 @@
   from {
     opacity: 0;
     transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Full-screen on small screens ── */
+@media (max-width: 640px) {
+  .overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .modal {
+    max-height: 95vh;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    animation: slideUpMobile 0.25s ease-out;
+  }
+
+  .header {
+    padding: var(--spacing-md) var(--spacing-lg);
+  }
+
+  .body {
+    padding: var(--spacing-lg);
+  }
+}
+
+@keyframes slideUpMobile {
+  from {
+    opacity: 0;
+    transform: translateY(2rem);
   }
   to {
     opacity: 1;
