@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
-import { Button } from '@jsoft/shared';
 import type { ProductInput } from '@jsoft/shared';
 import formStyles from '../../styles/form.module.css';
 
@@ -54,12 +53,12 @@ export function ProductForm({ initialData, onSubmit, isLoading }: ProductFormPro
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
-    if (!title || title.length < 3) newErrors.title = 'Title must be at least 3 characters';
-    if (!slug || slug.length < 3) newErrors.slug = 'Slug must be at least 3 characters';
-    if (!classification || classification.length < 2) newErrors.classification = 'Classification must be at least 2 characters';
-    if (!shortDescription || shortDescription.length < 10) newErrors.shortDescription = 'Short description must be at least 10 characters';
-    if (!fullDescription || fullDescription.length < 50) newErrors.fullDescription = 'Full description must be at least 50 characters';
-    if (images.length === 0) newErrors.images = 'At least one image is required';
+    if (!title || title.length < 3) newErrors.title = t('validation.titleMin');
+    if (!slug || slug.length < 3) newErrors.slug = t('validation.slugMin');
+    if (!classification || classification.length < 2) newErrors.classification = t('validation.classificationMin');
+    if (!shortDescription || shortDescription.length < 10) newErrors.shortDescription = t('validation.shortDescriptionMin');
+    if (!fullDescription || fullDescription.length < 50) newErrors.fullDescription = t('validation.fullDescriptionMin');
+    if (images.length === 0) newErrors.images = t('validation.imageRequired');
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -85,12 +84,13 @@ export function ProductForm({ initialData, onSubmit, isLoading }: ProductFormPro
 
   return (
     <form onSubmit={handleSubmit}>
-      {/* Basic Info Section */}
+      {/* Section 1: Basic Information */}
       <fieldset className={formStyles.formSection}>
-        <legend className={formStyles.sectionTitle}>Basic Information</legend>
-        <div className={formStyles.gridTwoCols}>
+        <legend className={formStyles.sectionTitle}>{t('products.basicInfo')}</legend>
+
+        <div className={formStyles.fieldRow}>
           <div className={formStyles.formGroup}>
-            <label className={formStyles.formLabel} htmlFor="title">Title</label>
+            <label className={formStyles.formLabel} htmlFor="title">{t('form.title')}</label>
             <input
               id="title"
               className={`${formStyles.formInput} ${errors.title ? formStyles.inputError : ''}`}
@@ -101,7 +101,7 @@ export function ProductForm({ initialData, onSubmit, isLoading }: ProductFormPro
             {errors.title && <span className={formStyles.formError}>{errors.title}</span>}
           </div>
           <div className={formStyles.formGroup}>
-            <label className={formStyles.formLabel} htmlFor="slug">Slug</label>
+            <label className={formStyles.formLabel} htmlFor="slug">{t('form.slug')}</label>
             <input
               id="slug"
               className={`${formStyles.formInput} ${errors.slug ? formStyles.inputError : ''}`}
@@ -109,11 +109,13 @@ export function ProductForm({ initialData, onSubmit, isLoading }: ProductFormPro
               onChange={(e) => setSlug(e.target.value)}
               required
             />
+            <p className={formStyles.hint}>{t('form.slugHint')}</p>
             {errors.slug && <span className={formStyles.formError}>{errors.slug}</span>}
           </div>
         </div>
+
         <div className={formStyles.formGroup}>
-          <label className={formStyles.formLabel} htmlFor="classification">Classification</label>
+          <label className={formStyles.formLabel} htmlFor="classification">{t('form.classification')}</label>
           <input
             id="classification"
             className={`${formStyles.formInput} ${errors.classification ? formStyles.inputError : ''}`}
@@ -123,24 +125,27 @@ export function ProductForm({ initialData, onSubmit, isLoading }: ProductFormPro
           />
           {errors.classification && <span className={formStyles.formError}>{errors.classification}</span>}
         </div>
-      </fieldset>
 
-      {/* Description Section */}
-      <fieldset className={formStyles.formSection}>
-        <legend className={formStyles.sectionTitle}>Description</legend>
         <div className={formStyles.formGroup}>
-          <label className={formStyles.formLabel} htmlFor="shortDescription">Short Description</label>
+          <label className={formStyles.formLabel} htmlFor="shortDescription">{t('form.shortDescription')}</label>
           <textarea
             id="shortDescription"
             className={`${formStyles.formInput} ${formStyles.formTextarea} ${errors.shortDescription ? formStyles.inputError : ''}`}
             value={shortDescription}
             onChange={(e) => setShortDescription(e.target.value)}
             required
+            placeholder={t('form.shortDescriptionPlaceholder')}
           />
           {errors.shortDescription && <span className={formStyles.formError}>{errors.shortDescription}</span>}
         </div>
+      </fieldset>
+
+      {/* Section 2: Description */}
+      <fieldset className={formStyles.formSection}>
+        <legend className={formStyles.sectionTitle}>{t('products.description')}</legend>
+
         <div className={formStyles.formGroup}>
-          <label className={formStyles.formLabel} htmlFor="fullDescription">Full Description</label>
+          <label className={formStyles.formLabel} htmlFor="fullDescription">{t('form.fullDescription')}</label>
           <textarea
             id="fullDescription"
             className={`${formStyles.formInput} ${formStyles.formTextarea} ${errors.fullDescription ? formStyles.inputError : ''}`}
@@ -148,49 +153,79 @@ export function ProductForm({ initialData, onSubmit, isLoading }: ProductFormPro
             onChange={(e) => setFullDescription(e.target.value)}
             required
             style={{ minHeight: '200px' }}
+            placeholder={t('form.fullDescriptionPlaceholder')}
           />
           {errors.fullDescription && <span className={formStyles.formError}>{errors.fullDescription}</span>}
         </div>
+
+        <div className={formStyles.formGroup}>
+          <label className={formStyles.formLabel} htmlFor="externalLink">{t('form.externalLink')}</label>
+          <input
+            id="externalLink"
+            type="url"
+            className={formStyles.formInput}
+            value={externalLink}
+            onChange={(e) => setExternalLink(e.target.value)}
+            placeholder={t('form.externalLinkPlaceholder')}
+          />
+          <p className={formStyles.hint}>{t('form.externalLinkHint')}</p>
+        </div>
       </fieldset>
 
-      {/* Images Section */}
+      {/* Section 3: Images */}
       <fieldset className={formStyles.formSection}>
-        <legend className={formStyles.sectionTitle}>Images</legend>
+        <legend className={formStyles.sectionTitle}>{t('products.imagesSection')}</legend>
+
         <div className={formStyles.formGroup}>
-          <label className={formStyles.formLabel}>{t('products.images')} <span className={formStyles.optional}>(at least one required)</span></label>
+          <label className={formStyles.formLabel}>
+            {t('form.images')} <span className={formStyles.optional}>({t('form.imageRequired')})</span>
+          </label>
+
           <div className={formStyles.inputActionGroup}>
             <input
               id="newImageUrl"
               type="url"
-              placeholder="https://example.com/image.jpg"
+              placeholder={t('form.addImagePlaceholder')}
               value={newImageUrl}
               onChange={(e) => setNewImageUrl(e.target.value)}
               className={`${formStyles.formInput} ${errors.images ? formStyles.inputError : ''}`}
             />
-            <Button type="button" className={formStyles.btnAction} onClick={handleAddImage}>Add</Button>
+            <button type="button" className={formStyles.btnAction} onClick={handleAddImage}>
+              {t('form.addImage')}
+            </button>
           </div>
+
           {errors.images && <span className={formStyles.formError}>{errors.images}</span>}
+
           {images.length > 0 && (
-            <ul style={{ listStyle: 'none', padding: 0, margin: '0.5rem 0 0 0' }}>
+            <div className={formStyles.imageGallery}>
               {images.map((url, index) => (
-                <li key={url} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.25rem 0' }}>
-                  <img src={url} alt={`Image ${index + 1}`} loading="lazy" style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 4 }} />
-                  <span style={{ flex: 1, fontSize: '0.75rem', wordBreak: 'break-all' }}>{url}</span>
-                  <Button type="button" className={formStyles.btnAction} onClick={() => handleRemoveImage(index)}>Remove</Button>
-                </li>
+                <div key={url} className={formStyles.imageItem}>
+                  <img src={url} alt={`${t('form.images')} ${index + 1}`} loading="lazy" />
+                  <button
+                    type="button"
+                    className={formStyles.imageRemove}
+                    onClick={() => handleRemoveImage(index)}
+                    title={t('form.remove')}
+                  >
+                    &times;
+                  </button>
+                </div>
               ))}
-            </ul>
+            </div>
           )}
         </div>
       </fieldset>
 
-      {/* Settings Section */}
+      {/* Section 4: Settings */}
       <fieldset className={formStyles.formSection}>
-        <legend className={formStyles.sectionTitle}>Settings</legend>
+        <legend className={formStyles.sectionTitle}>{t('products.settings')}</legend>
+
         <div className={formStyles.gridTwoCols}>
           <div className={formStyles.formGroup}>
-            <label className={formStyles.formLabel}>{t('blog.status')}</label>
+            <label className={formStyles.formLabel} htmlFor="status">{t('form.status')}</label>
             <select
+              id="status"
               value={status}
               onChange={(e) => setStatus(e.target.value)}
               className={formStyles.formInput}
@@ -201,36 +236,34 @@ export function ProductForm({ initialData, onSubmit, isLoading }: ProductFormPro
               <option value="ARCHIVED">{t('blog.archived')}</option>
             </select>
           </div>
-          <div className={formStyles.formGroup} style={{ flexDirection: 'row', alignItems: 'center', gap: '0.5rem' }}>
-            <input type="checkbox" id="featured" checked={featured} onChange={(e) => setFeatured(e.target.checked)} style={{ width: '16px', height: '16px', cursor: 'pointer' }} />
-            <label className={formStyles.formLabel} htmlFor="featured" style={{ margin: 0, cursor: 'pointer' }}>Featured</label>
+          <div className={formStyles.checkboxGroup}>
+            <input
+              type="checkbox"
+              id="featured"
+              checked={featured}
+              onChange={(e) => setFeatured(e.target.checked)}
+            />
+            <label className={formStyles.checkboxLabel} htmlFor="featured">{t('form.featured')}</label>
           </div>
         </div>
+
         <div className={formStyles.formGroup}>
-          <label className={formStyles.formLabel} htmlFor="externalLink">External Link (optional)</label>
-          <input
-            id="externalLink"
-            type="url"
-            className={formStyles.formInput}
-            value={externalLink}
-            onChange={(e) => setExternalLink(e.target.value)}
-          />
-        </div>
-        <div className={formStyles.formGroup}>
-          <label className={formStyles.formLabel} htmlFor="technicalExplanation">Technical Explanation (optional)</label>
+          <label className={formStyles.formLabel} htmlFor="technicalExplanation">{t('form.technicalExplanation')}</label>
           <textarea
             id="technicalExplanation"
             className={`${formStyles.formInput} ${formStyles.formTextarea}`}
             value={technicalExplanation}
             onChange={(e) => setTechnicalExplanation(e.target.value)}
+            placeholder={t('form.technicalExplanationPlaceholder')}
           />
+          <p className={formStyles.hint}>{t('form.technicalExplanationHint')}</p>
         </div>
       </fieldset>
 
-      <div className={formStyles.formActions}>
-        <Button type="submit" className={formStyles.btnPrimary} disabled={isLoading}>
-          {isLoading ? t('products.saving') : t('products.save')}
-        </Button>
+      <div className={formStyles.buttonRow}>
+        <button type="submit" className={formStyles.btnPrimary} disabled={isLoading}>
+          {isLoading ? t('form.saving') : t('form.save')}
+        </button>
       </div>
     </form>
   );

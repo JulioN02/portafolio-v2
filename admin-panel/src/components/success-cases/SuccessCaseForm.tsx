@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
-import { Button } from '@jsoft/shared';
 import type { SuccessCaseInput } from '@jsoft/shared';
 import formStyles from '../../styles/form.module.css';
 
@@ -27,6 +26,8 @@ export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCas
       .replace(/^-|-$/g, '');
   };
 
+  const slug = initialData?.slug || generateSlug(title);
+
   const handleTitleChange = (newTitle: string) => {
     setTitle(newTitle);
   };
@@ -34,10 +35,10 @@ export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCas
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!title || title.length < 3) {
-      newErrors.title = 'Title must be at least 3 characters';
+      newErrors.title = t('validation.titleMin');
     }
     if (!description || description.length < 10) {
-      newErrors.description = 'Description must be at least 10 characters';
+      newErrors.description = t('validation.shortDescriptionMin');
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -48,7 +49,7 @@ export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCas
       setImages([...images, imageInput]);
       setImageInput('');
     } else if (imageInput) {
-      setErrors({ ...errors, images: 'Please enter a valid URL' });
+      setErrors({ ...errors, images: t('validation.imageUrl') });
     }
   };
 
@@ -71,11 +72,13 @@ export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCas
 
   return (
     <form onSubmit={handleSubmit}>
-      {/* Basic Info Section */}
+      {/* Section 1: Basic Information */}
       <fieldset className={formStyles.formSection}>
-        <legend className={formStyles.sectionTitle}>Basic Information</legend>
+        <legend className={formStyles.sectionTitle}>{t('successCases.basicInfo')}</legend>
         <div className={formStyles.formGroup}>
-          <label className={formStyles.formLabel} htmlFor="title">Title</label>
+          <label className={formStyles.formLabel} htmlFor="title">
+            {t('form.title')}
+          </label>
           <input
             id="title"
             className={`${formStyles.formInput} ${errors.title ? formStyles.inputError : ''}`}
@@ -84,75 +87,77 @@ export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCas
             required
           />
           {errors.title && <span className={formStyles.formError}>{errors.title}</span>}
+          {slug && (
+            <p className={formStyles.hint}>
+              {t('form.slug')}: {slug}
+            </p>
+          )}
         </div>
       </fieldset>
 
-      {/* Description Section */}
+      {/* Section 2: Description */}
       <fieldset className={formStyles.formSection}>
-        <legend className={formStyles.sectionTitle}>Description</legend>
+        <legend className={formStyles.sectionTitle}>{t('successCases.description')}</legend>
         <div className={formStyles.formGroup}>
-          <label className={formStyles.formLabel} htmlFor="description">Description</label>
+          <label className={formStyles.formLabel} htmlFor="description">
+            {t('successCases.description')}
+          </label>
           <textarea
             id="description"
             className={`${formStyles.formInput} ${formStyles.formTextarea} ${errors.description ? formStyles.inputError : ''}`}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            placeholder={t('successCases.descriptionPlaceholder')}
             required
           />
           {errors.description && <span className={formStyles.formError}>{errors.description}</span>}
         </div>
       </fieldset>
 
-      {/* Images Section */}
+      {/* Section 3: Images */}
       <fieldset className={formStyles.formSection}>
-        <legend className={formStyles.sectionTitle}>Images</legend>
+        <legend className={formStyles.sectionTitle}>{t('successCases.images')}</legend>
         <div className={formStyles.formGroup}>
-          <label className={formStyles.formLabel}>Images <span className={formStyles.optional}>(optional)</span></label>
+          <label className={formStyles.formLabel} htmlFor="imageInput">
+            {t('successCases.images')} <span className={formStyles.optional}>({t('form.images')})</span>
+          </label>
           <div className={formStyles.inputActionGroup}>
             <input
               id="imageInput"
-              placeholder="Enter image URL"
+              className={`${formStyles.formInput} ${errors.images ? formStyles.inputError : ''}`}
+              placeholder={t('form.addImagePlaceholder')}
               value={imageInput}
               onChange={(e) => setImageInput(e.target.value)}
-              className={`${formStyles.formInput} ${errors.images ? formStyles.inputError : ''}`}
             />
-            <Button type="button" className={formStyles.btnAction} onClick={addImage}>
-              Add
-            </Button>
+            <button
+              type="button"
+              className={formStyles.btnAction}
+              onClick={addImage}
+            >
+              {t('form.addImage')}
+            </button>
           </div>
+          {errors.images && <span className={formStyles.formError}>{errors.images}</span>}
           {images.length > 0 && (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
+            <div className={formStyles.imageGallery}>
               {images.map((img, index) => (
-                <div key={img} style={{ position: 'relative' }}>
+                <div key={img} className={formStyles.imageItem}>
                   <img
                     src={img}
-                    alt={`Image ${index + 1}`}
+                    alt={`${t('successCases.title')} ${index + 1}`}
                     loading="lazy"
-                    style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px' }}
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'https://placehold.co/80x80?text=Invalid';
+                      (e.target as HTMLImageElement).src = 'https://placehold.co/100x100?text=Error';
                     }}
                   />
-                  <Button
+                  <button
                     type="button"
-                    className={formStyles.btnAction}
+                    className={formStyles.imageRemove}
                     onClick={() => removeImage(index)}
-                    style={{
-                      position: 'absolute',
-                      top: '-5px',
-                      right: '-5px',
-                      borderRadius: '50%',
-                      width: '20px',
-                      height: '20px',
-                      fontSize: '0.75rem',
-                      padding: 0,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
+                    title={t('form.remove')}
                   >
                     ×
-                  </Button>
+                  </button>
                 </div>
               ))}
             </div>
@@ -160,12 +165,15 @@ export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCas
         </div>
       </fieldset>
 
-      {/* Settings Section */}
+      {/* Section 4: Settings */}
       <fieldset className={formStyles.formSection}>
-        <legend className={formStyles.sectionTitle}>Settings</legend>
+        <legend className={formStyles.sectionTitle}>{t('successCases.settings')}</legend>
         <div className={formStyles.formGroup}>
-          <label className={formStyles.formLabel}>{t('blog.status')}</label>
+          <label className={formStyles.formLabel} htmlFor="status">
+            {t('form.status')}
+          </label>
           <select
+            id="status"
             value={status}
             onChange={(e) => setStatus(e.target.value)}
             className={formStyles.formInput}
@@ -178,10 +186,11 @@ export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCas
         </div>
       </fieldset>
 
-      <div className={formStyles.formActions}>
-        <Button type="submit" className={formStyles.btnPrimary} disabled={isLoading}>
-          {isLoading ? t('successCases.saving') : t('successCases.save')}
-        </Button>
+      {/* Submit */}
+      <div className={formStyles.buttonRow}>
+        <button type="submit" className={formStyles.btnPrimary} disabled={isLoading}>
+          {isLoading ? t('form.saving') : t('successCases.save')}
+        </button>
       </div>
     </form>
   );

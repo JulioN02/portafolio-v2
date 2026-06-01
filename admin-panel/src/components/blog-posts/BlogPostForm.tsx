@@ -27,13 +27,17 @@ export function BlogPostForm({ initialData, onSubmit, isLoading }: BlogPostFormP
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
-    if (!title || title.length < 3) newErrors.title = 'Title must be at least 3 characters';
-    if (!slug || slug.length < 3) newErrors.slug = 'Slug must be at least 3 characters';
-    if (!category || category.length < 2) newErrors.category = 'Category must be at least 2 characters';
-    if (!shortDescription || shortDescription.length < 10) newErrors.shortDescription = 'Short description must be at least 10 characters';
-    if (!coverImage) newErrors.coverImage = 'Cover image URL is required';
+    if (!title || title.length < 3) newErrors.title = t('validation.titleMin');
+    if (!slug || slug.length < 3) newErrors.slug = t('validation.slugMin');
+    if (!category) {
+      newErrors.category = t('validation.categoryRequired');
+    } else if (category.length < 2) {
+      newErrors.category = t('validation.categoryMin');
+    }
+    if (!shortDescription || shortDescription.length < 10) newErrors.shortDescription = t('validation.shortDescriptionMin');
+    if (!coverImage) newErrors.coverImage = t('validation.coverImageRequired');
     const textContent = getTextFromHTML(body);
-    if (!body || textContent.length < 100) newErrors.body = 'Body must be at least 100 characters (plain text)';
+    if (!body || textContent.length < 100) newErrors.body = t('validation.bodyMin');
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -65,36 +69,38 @@ export function BlogPostForm({ initialData, onSubmit, isLoading }: BlogPostFormP
 
   return (
     <form onSubmit={handleSubmit}>
-      {/* Basic Info Section */}
+      {/* ════════════════════════════════════════════ */}
+      {/* Section 1 — Basic Information               */}
+      {/* ════════════════════════════════════════════ */}
       <fieldset className={formStyles.formSection}>
-        <legend className={formStyles.sectionTitle}>Basic Information</legend>
+        <legend className={formStyles.sectionTitle}>{t('blog.basicInfo')}</legend>
+
+        {/* Title + Generate Slug button */}
         <div className={formStyles.formGroup}>
+          <label className={formStyles.formLabel} htmlFor="title">{t('form.title')}</label>
           <div className={formStyles.inputActionGroup}>
-            <div style={{ flex: 1 }}>
-              <div className={formStyles.formGroup}>
-                <label className={formStyles.formLabel} htmlFor="title">Title</label>
-                <input
-                  id="title"
-                  className={`${formStyles.formInput} ${errors.title ? formStyles.inputError : ''}`}
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  required
-                />
-                {errors.title && <span className={formStyles.formError}>{errors.title}</span>}
-              </div>
-            </div>
-            <Button
+            <input
+              id="title"
+              className={`${formStyles.formInput} ${errors.title ? formStyles.inputError : ''}`}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+            />
+            <button
               type="button"
               className={formStyles.btnAction}
               onClick={generateSlug}
             >
-              Generate Slug
-            </Button>
+              {t('form.generateSlug')}
+            </button>
           </div>
+          {errors.title && <span className={formStyles.formError}>{errors.title}</span>}
         </div>
+
+        {/* Slug + Category */}
         <div className={formStyles.gridTwoCols}>
           <div className={formStyles.formGroup}>
-            <label className={formStyles.formLabel} htmlFor="slug">Slug</label>
+            <label className={formStyles.formLabel} htmlFor="slug">{t('form.slug')}</label>
             <input
               id="slug"
               className={`${formStyles.formInput} ${errors.slug ? formStyles.inputError : ''}`}
@@ -105,7 +111,7 @@ export function BlogPostForm({ initialData, onSubmit, isLoading }: BlogPostFormP
             {errors.slug && <span className={formStyles.formError}>{errors.slug}</span>}
           </div>
           <div className={formStyles.formGroup}>
-            <label className={formStyles.formLabel} htmlFor="category">Category</label>
+            <label className={formStyles.formLabel} htmlFor="category">{t('blog.category')}</label>
             <input
               id="category"
               className={`${formStyles.formInput} ${errors.category ? formStyles.inputError : ''}`}
@@ -118,89 +124,137 @@ export function BlogPostForm({ initialData, onSubmit, isLoading }: BlogPostFormP
         </div>
       </fieldset>
 
-      {/* Content Section */}
+      {/* ════════════════════════════════════════════ */}
+      {/* Section 2 — Content                         */}
+      {/* ════════════════════════════════════════════ */}
       <fieldset className={formStyles.formSection}>
-        <legend className={formStyles.sectionTitle}>Content</legend>
+        <legend className={formStyles.sectionTitle}>{t('blog.content')}</legend>
+
+        {/* Short Description */}
         <div className={formStyles.formGroup}>
-          <label className={formStyles.formLabel} htmlFor="shortDescription">Short Description</label>
+          <label className={formStyles.formLabel} htmlFor="shortDescription">{t('form.shortDescription')}</label>
           <textarea
             id="shortDescription"
             className={`${formStyles.formInput} ${formStyles.formTextarea} ${errors.shortDescription ? formStyles.inputError : ''}`}
             value={shortDescription}
             onChange={(e) => setShortDescription(e.target.value)}
+            placeholder={t('form.shortDescriptionPlaceholder')}
             required
           />
+          <p className={formStyles.hint}>{t('form.shortDescriptionPlaceholder')}</p>
           {errors.shortDescription && <span className={formStyles.formError}>{errors.shortDescription}</span>}
         </div>
+
+        {/* Rich Text Editor */}
         <div className={formStyles.formGroup}>
-          <label className={formStyles.formLabel}>Body Content (TipTap Rich Text Editor)</label>
-          <TipTapEditor
-            content={body}
-            onChange={setBody}
-          />
+          <label className={formStyles.formLabel}>{t('blog.bodyContent')}</label>
+          <TipTapEditor content={body} onChange={setBody} />
           {errors.body && <span className={formStyles.formError}>{errors.body}</span>}
         </div>
       </fieldset>
 
-      {/* Cover Image Section */}
+      {/* ════════════════════════════════════════════ */}
+      {/* Section 3 — Cover Image                     */}
+      {/* ════════════════════════════════════════════ */}
       <fieldset className={formStyles.formSection}>
-        <legend className={formStyles.sectionTitle}>Cover Image</legend>
+        <legend className={formStyles.sectionTitle}>{t('blog.coverImage')}</legend>
+
         <div className={formStyles.formGroup}>
-          <label className={formStyles.formLabel} htmlFor="coverImage">Cover Image URL</label>
+          <label className={formStyles.formLabel} htmlFor="coverImage">{t('blog.coverImage')}</label>
           <input
             id="coverImage"
             type="url"
             className={`${formStyles.formInput} ${errors.coverImage ? formStyles.inputError : ''}`}
             value={coverImage}
             onChange={(e) => setCoverImage(e.target.value)}
+            placeholder="https://..."
             required
           />
+          <p className={formStyles.hint}>{t('blog.coverImageHint')}</p>
           {errors.coverImage && <span className={formStyles.formError}>{errors.coverImage}</span>}
         </div>
+
+        {/* Image preview thumbnail when URL is valid */}
+        {coverImage && (
+          <div style={{ marginTop: '0.75rem' }}>
+            <img
+              src={coverImage}
+              alt={t('blog.coverImage')}
+              style={{
+                maxWidth: '100%',
+                maxHeight: 260,
+                borderRadius: 8,
+                objectFit: 'cover',
+                border: '1px solid var(--color-border)',
+              }}
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
+            />
+          </div>
+        )}
       </fieldset>
 
-      {/* Settings Section */}
+      {/* ════════════════════════════════════════════ */}
+      {/* Section 4 — Advanced                        */}
+      {/* ════════════════════════════════════════════ */}
       <fieldset className={formStyles.formSection}>
-        <legend className={formStyles.sectionTitle}>Settings</legend>
-        <div className={formStyles.gridTwoCols}>
-          <div className={formStyles.formGroup}>
-            <Select
-              id="status"
-              label="Status"
-              value={status}
-              onChange={(e) => setStatus(e.target.value as PostStatus)}
-              options={[
-                { value: 'DRAFT', label: t('blog.draft') },
-                { value: 'PUBLISHED', label: t('blog.published') },
-                { value: 'PRIVATE', label: t('blog.private') },
-                { value: 'ARCHIVED', label: t('blog.archived') },
-              ]}
-            />
-          </div>
-          <div className={formStyles.formGroup}>
-            <label className={formStyles.formLabel} htmlFor="externalLink">External Link (optional)</label>
-            <input
-              id="externalLink"
-              type="url"
-              className={formStyles.formInput}
-              value={externalLink}
-              onChange={(e) => setExternalLink(e.target.value)}
-              placeholder="https://..."
-            />
-          </div>
-        </div>
+        <legend className={formStyles.sectionTitle}>{t('blog.advanced')}</legend>
+
+        {/* External Link */}
         <div className={formStyles.formGroup}>
-          <label className={formStyles.formLabel} htmlFor="lessonsLearned">Lessons Learned (optional)</label>
+          <label className={formStyles.formLabel} htmlFor="externalLink">{t('blog.externalLink')}</label>
+          <input
+            id="externalLink"
+            type="url"
+            className={formStyles.formInput}
+            value={externalLink}
+            onChange={(e) => setExternalLink(e.target.value)}
+            placeholder={t('form.externalLinkPlaceholder')}
+          />
+          <p className={formStyles.hint}>{t('blog.externalLinkHint')}</p>
+        </div>
+
+        {/* Lessons Learned */}
+        <div className={formStyles.formGroup}>
+          <label className={formStyles.formLabel} htmlFor="lessonsLearned">{t('blog.lessonsLearned')}</label>
           <textarea
             id="lessonsLearned"
             className={`${formStyles.formInput} ${formStyles.formTextarea}`}
             value={lessonsLearned}
             onChange={(e) => setLessonsLearned(e.target.value)}
+            placeholder={t('blog.lessonsLearnedHint')}
+          />
+          <p className={formStyles.hint}>{t('blog.lessonsLearnedHint')}</p>
+        </div>
+      </fieldset>
+
+      {/* ════════════════════════════════════════════ */}
+      {/* Section 5 — Settings                        */}
+      {/* ════════════════════════════════════════════ */}
+      <fieldset className={formStyles.formSection}>
+        <legend className={formStyles.sectionTitle}>{t('blog.settings')}</legend>
+
+        <div className={formStyles.formGroup}>
+          <Select
+            id="status"
+            label={t('blog.status')}
+            value={status}
+            onChange={(e) => setStatus(e.target.value as PostStatus)}
+            options={[
+              { value: 'DRAFT', label: t('blog.draft') },
+              { value: 'PUBLISHED', label: t('blog.published') },
+              { value: 'PRIVATE', label: t('blog.private') },
+              { value: 'ARCHIVED', label: t('blog.archived') },
+            ]}
           />
         </div>
       </fieldset>
 
-      <div className={formStyles.formActions}>
+      {/* ════════════════════════════════════════════ */}
+      {/* Submit Button                               */}
+      {/* ════════════════════════════════════════════ */}
+      <div className={formStyles.buttonRow}>
         <Button type="submit" className={formStyles.btnPrimary} disabled={isLoading}>
           {isLoading ? t('blog.saving') : t('blog.save')}
         </Button>

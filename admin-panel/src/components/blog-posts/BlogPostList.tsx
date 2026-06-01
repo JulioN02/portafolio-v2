@@ -69,13 +69,12 @@ export function BlogPostList({ posts, onEdit, onDelete, onStatusChange }: BlogPo
             <div style={{ flex: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <p style={{ fontWeight: '600', margin: 0 }}>{post.title}</p>
-                {onStatusChange ? (
-                  <select
-                    value={post.status}
-                    onChange={(e) => handleStatusChange(post.id, e.target.value)}
-                    className={badgeClass}
-                    style={{ border: 'none', cursor: 'pointer', appearance: 'none' }}
-                  >
+                  {onStatusChange ? (
+                    <select
+                      value={post.status}
+                      onChange={(e) => handleStatusChange(post.id, e.target.value)}
+                      className={`${badgeClass} ${formStyles.statusSelectInline}`}
+                    >
                     <option value="DRAFT">{t('blog.draft')}</option>
                     <option value="PUBLISHED">{t('blog.published')}</option>
                     <option value="PRIVATE">{t('blog.private')}</option>

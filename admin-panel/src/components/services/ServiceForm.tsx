@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
-import { Button } from '@jsoft/shared';
 import type { ServiceInput } from '@jsoft/shared';
 import formStyles from '../../styles/form.module.css';
 
@@ -38,11 +37,11 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
-    if (!title || title.length < 3) newErrors.title = 'Title must be at least 3 characters';
-    if (!slug || slug.length < 3) newErrors.slug = 'Slug must be at least 3 characters';
-    if (!classification || classification.length < 2) newErrors.classification = 'Classification must be at least 2 characters';
-    if (!shortDescription || shortDescription.length < 10) newErrors.shortDescription = 'Short description must be at least 10 characters';
-    if (!fullDescription || fullDescription.length < 50) newErrors.fullDescription = 'Full description must be at least 50 characters';
+    if (!title || title.length < 3) newErrors.title = t('validation.titleMin');
+    if (!slug || slug.length < 3) newErrors.slug = t('validation.slugMin');
+    if (!classification || classification.length < 2) newErrors.classification = t('validation.classificationRequired');
+    if (!shortDescription || shortDescription.length < 10) newErrors.shortDescription = t('validation.shortDescriptionMin');
+    if (!fullDescription || fullDescription.length < 50) newErrors.fullDescription = t('validation.fullDescriptionMin');
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -67,12 +66,12 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
 
   return (
     <form onSubmit={handleSubmit}>
-      {/* Basic Info Section */}
+      {/* Basic Information Section */}
       <fieldset className={formStyles.formSection}>
-        <legend className={formStyles.sectionTitle}>Basic Information</legend>
-        <div className={formStyles.gridTwoCols}>
+        <legend className={formStyles.sectionTitle}>{t('services.basicInfo')}</legend>
+        <div className={formStyles.fieldRow}>
           <div className={formStyles.formGroup}>
-            <label className={formStyles.formLabel} htmlFor="title">Title</label>
+            <label className={formStyles.formLabel} htmlFor="title">{t('form.title')}</label>
             <input
               id="title"
               className={`${formStyles.formInput} ${errors.title ? formStyles.inputError : ''}`}
@@ -83,7 +82,7 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
             {errors.title && <span className={formStyles.formError}>{errors.title}</span>}
           </div>
           <div className={formStyles.formGroup}>
-            <label className={formStyles.formLabel} htmlFor="slug">Slug</label>
+            <label className={formStyles.formLabel} htmlFor="slug">{t('form.slug')}</label>
             <input
               id="slug"
               className={`${formStyles.formInput} ${errors.slug ? formStyles.inputError : ''}`}
@@ -91,11 +90,12 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
               onChange={(e) => setSlug(e.target.value)}
               required
             />
+            <p className={formStyles.hint}>{t('form.slugHint')}</p>
             {errors.slug && <span className={formStyles.formError}>{errors.slug}</span>}
           </div>
         </div>
         <div className={formStyles.formGroup}>
-          <label className={formStyles.formLabel} htmlFor="classification">Classification</label>
+          <label className={formStyles.formLabel} htmlFor="classification">{t('form.classification')}</label>
           <input
             id="classification"
             className={`${formStyles.formInput} ${errors.classification ? formStyles.inputError : ''}`}
@@ -109,25 +109,27 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
 
       {/* Description Section */}
       <fieldset className={formStyles.formSection}>
-        <legend className={formStyles.sectionTitle}>Description</legend>
+        <legend className={formStyles.sectionTitle}>{t('services.description')}</legend>
         <div className={formStyles.formGroup}>
-          <label className={formStyles.formLabel} htmlFor="shortDescription">Short Description</label>
+          <label className={formStyles.formLabel} htmlFor="shortDescription">{t('form.shortDescription')}</label>
           <textarea
             id="shortDescription"
             className={`${formStyles.formInput} ${formStyles.formTextarea} ${errors.shortDescription ? formStyles.inputError : ''}`}
             value={shortDescription}
             onChange={(e) => setShortDescription(e.target.value)}
+            placeholder={t('form.shortDescriptionPlaceholder')}
             required
           />
           {errors.shortDescription && <span className={formStyles.formError}>{errors.shortDescription}</span>}
         </div>
         <div className={formStyles.formGroup}>
-          <label className={formStyles.formLabel} htmlFor="fullDescription">Full Description</label>
+          <label className={formStyles.formLabel} htmlFor="fullDescription">{t('form.fullDescription')}</label>
           <textarea
             id="fullDescription"
             className={`${formStyles.formInput} ${formStyles.formTextarea} ${errors.fullDescription ? formStyles.inputError : ''}`}
             value={fullDescription}
             onChange={(e) => setFullDescription(e.target.value)}
+            placeholder={t('form.fullDescriptionPlaceholder')}
             required
             style={{ minHeight: '200px' }}
           />
@@ -137,10 +139,11 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
 
       {/* Settings Section */}
       <fieldset className={formStyles.formSection}>
-        <legend className={formStyles.sectionTitle}>Settings</legend>
+        <legend className={formStyles.sectionTitle}>{t('services.settings')}</legend>
         <div className={formStyles.formGroup}>
-          <label className={formStyles.formLabel}>{t('blog.status')}</label>
+          <label className={formStyles.formLabel} htmlFor="status">{t('form.status')}</label>
           <select
+            id="status"
             value={status}
             onChange={(e) => setStatus(e.target.value)}
             className={formStyles.formInput}
@@ -153,10 +156,10 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
         </div>
       </fieldset>
 
-      <div className={formStyles.formActions}>
-        <Button type="submit" className={formStyles.btnPrimary} disabled={isLoading}>
-          {isLoading ? t('services.saving') : t('services.save')}
-        </Button>
+      <div className={formStyles.buttonRow}>
+        <button type="submit" className={formStyles.btnPrimary} disabled={isLoading}>
+          {isLoading ? t('form.saving') : t('services.save')}
+        </button>
       </div>
     </form>
   );
