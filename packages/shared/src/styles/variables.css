@@ -152,11 +152,11 @@
   --z-sticky: 200;
   --z-overlay: 300;
   --z-fixed: 300;
-  --z-modal-backdrop: 400;
-  --z-modal: 401;
-  --z-notification: 500;
-  --z-toast: 500;
-  --z-tooltip: 600;
+  --z-modal-backdrop: 1000;
+  --z-modal: 1050;
+  --z-notification: 1100;
+  --z-toast: 1100;
+  --z-tooltip: 1200;
 }
 
 /* ========================================
