@@ -3,8 +3,6 @@ import { useParams, Link } from 'react-router-dom';
 import { useSuccessCaseBySlug } from '../../hooks/useSuccessCases';
 import { Loading } from '../../components/common/Loading';
 import { MetaTags } from '../../components/seo/MetaTags';
-import { Modal } from '@jsoft/shared';
-import { ContactForm } from '../../components/forms/ContactForm';
 import styles from './SuccessCaseDetail.module.css';
 
 const FALLBACK_IMG = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="800" height="600" fill="%23e5e7eb"%3E%3Crect width="800" height="600"/%3E%3Ctext x="400" y="300" text-anchor="middle" dy=".3em" font-size="20" fill="%239ca3af"%3ESin imagen%3C/text%3E%3C/svg%3E';
@@ -13,7 +11,6 @@ export function SuccessCaseDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const { data: successCase, isLoading, error } = useSuccessCaseBySlug(slug || '');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
   if (isLoading) return <Loading fullPage message="Cargando caso de éxito..." />;
 
@@ -128,12 +125,6 @@ export function SuccessCaseDetailPage() {
               </div>
             )}
 
-            <button
-              onClick={() => setIsContactModalOpen(true)}
-              className={styles.ctaButton}
-            >
-              Solicitar información
-            </button>
           </div>
         </div>
 
@@ -158,17 +149,6 @@ export function SuccessCaseDetailPage() {
         )}
       </div>
 
-      {/* Contact Modal */}
-      <Modal
-        isOpen={isContactModalOpen}
-        onClose={() => setIsContactModalOpen(false)}
-        title="Solicitar información"
-      >
-        <ContactForm
-          source={`successCase:${successCase.title}`}
-          onSuccess={() => setIsContactModalOpen(false)}
-        />
-      </Modal>
     </div>
   );
 }
