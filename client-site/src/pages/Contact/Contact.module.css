@@ -53,7 +53,13 @@
 }
 
 .detailIcon {
-  font-size: var(--font-size-xl);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  color: var(--color-blue-ui);
 }
 
 .detailItem h3 {

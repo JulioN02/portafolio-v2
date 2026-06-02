@@ -7,3 +7,4 @@ export * from './blogPost.schema.js';
 export * from './contact.schema.js';
 export * from './login.schema.js';
 export * from './siteSection.schema.js';
+export * from './profile.schema.js';

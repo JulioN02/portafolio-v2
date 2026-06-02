@@ -3,7 +3,12 @@ import { useAuth } from '../../hooks/useAuth';
 import { useTranslation } from '../../i18n/LanguageContext';
 import styles from './Header.module.css';
 
-export function Header() {
+interface HeaderProps {
+  onToggleSidebar: () => void;
+  isSidebarOpen: boolean;
+}
+
+export function Header({ onToggleSidebar, isSidebarOpen }: HeaderProps) {
   const { t } = useTranslation();
   const { getUser, logout } = useAuth();
   const user = getUser();
@@ -22,6 +27,16 @@ export function Header() {
 
   return (
     <header className={styles.header}>
+      <button
+        className={styles.hamburger}
+        onClick={onToggleSidebar}
+        aria-label={isSidebarOpen ? 'Cerrar menú' : 'Abrir menú'}
+        aria-expanded={isSidebarOpen}
+      >
+        <span className={styles.hamburgerLine} />
+        <span className={styles.hamburgerLine} />
+        <span className={styles.hamburgerLine} />
+      </button>
       <div className={styles.dropdownWrapper} ref={dropdownRef}>
         <button
           className={styles.userToggle}

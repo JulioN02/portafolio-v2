@@ -52,6 +52,7 @@ export const contactFormFilterSchema = z.object({
   search: z.string().optional(),
   isRead: z.coerce.boolean().optional(),
   isArchived: z.coerce.boolean().optional(),
+  isStarred: z.coerce.boolean().optional(),
   label: z.string().optional(),
   originType: formOriginEnum.optional(),
   page: z.coerce.number().int().min(1).default(1),
@@ -74,6 +75,7 @@ export interface ContactFormResponse {
   originType: FormOrigin;
   readAt: Date | null;
   archived: boolean;
+  starred: boolean;
   labels: string[];
   createdAt: Date;
 }

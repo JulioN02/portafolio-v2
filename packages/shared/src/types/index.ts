@@ -62,6 +62,18 @@ export type {
   SiteSectionResponse,
 } from '../schemas/siteSection.schema.js';
 
+export type {
+  UpdateProfileInput,
+  SendVerificationCodeInput,
+  ChangePasswordInput,
+} from '../schemas/profile.schema.js';
+
+export type {
+  UpdateProfileResponse,
+  SendVerificationCodeResponse,
+  ChangePasswordResponse,
+} from '../schemas/profile.schema.js';
+
 // Common types
 export interface PaginationParams {
   page: number;

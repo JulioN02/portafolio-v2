@@ -167,7 +167,7 @@ export function DashboardPage() {
             background: '#fff',
             borderRadius: '8px',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-            overflow: 'hidden',
+            overflowX: 'auto',
           }}
         >
           {recentMessages.length > 0 ? (

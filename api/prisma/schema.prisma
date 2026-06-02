@@ -17,6 +17,7 @@ model User {
   id        String   @id @default(cuid())
   username  String   @unique
   password  String
+  email     String?  @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -190,12 +191,14 @@ model ContactForm {
   originType  FormOrigin
   readAt      DateTime?
   archived    Boolean     @default(false)
+  starred     Boolean     @default(false)
   labels      String[]
 
   createdAt DateTime @default(now())
 
   @@index([originType, createdAt])
   @@index([archived, createdAt])
+  @@index([starred, createdAt])
 }
 
 enum FormOrigin {

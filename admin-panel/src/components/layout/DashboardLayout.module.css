@@ -10,9 +10,22 @@
   min-width: 0;
 }
 
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: calc(var(--z-overlay, 300) - 1);
+}
+
 .main {
   flex: 1;
   padding: var(--spacing-xl);
   background-color: var(--color-neutral-50);
   overflow-y: auto;
+}
+
+@media (max-width: 639px) {
+  .main {
+    padding: 1rem;
+  }
 }

@@ -32,6 +32,18 @@
   box-sizing: border-box;
 }
 
+@media (max-width: 639px) {
+  .adminContainer {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 479px) {
+  .adminContainer {
+    padding: 0.75rem;
+  }
+}
+
 /* ── Card Container ── */
 .formCard {
   max-width: 880px;
@@ -647,7 +659,13 @@ select.formInput {
   background: var(--color-bg-card);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-card);
-  overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tableScrollWrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .tableHeader {

@@ -2,6 +2,22 @@ import { useCallback, useEffect, useState } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import styles from './Carousel.module.css';
 
+type Breakpoint = 'mobile' | 'tablet' | 'desktop';
+
+function getBreakpoint(): Breakpoint {
+  if (window.matchMedia('(max-width: 639px)').matches) return 'mobile';
+  if (window.matchMedia('(min-width: 640px) and (max-width: 1023px)').matches) return 'tablet';
+  return 'desktop';
+}
+
+function getSlidesToShow(breakpoint: Breakpoint): number {
+  switch (breakpoint) {
+    case 'mobile': return 1;
+    case 'tablet': return 2;
+    case 'desktop': return 3;
+  }
+}
+
 interface CarouselProps {
   children: React.ReactNode[];
   slidesToShow?: number;
@@ -11,7 +27,7 @@ interface CarouselProps {
 
 export function Carousel({ 
   children, 
-  slidesToShow = 3, 
+  slidesToShow: slidesToShowProp, 
   autoplay = true,
   autoplayInterval = 4000 
 }: CarouselProps) {
@@ -22,6 +38,26 @@ export function Carousel({
   
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
+  const [breakpoint, setBreakpoint] = useState<Breakpoint>('desktop');
+
+  // Responsive slidesToShow via matchMedia
+  useEffect(() => {
+    const mobile = window.matchMedia('(max-width: 639px)');
+    const tablet = window.matchMedia('(min-width: 640px) and (max-width: 1023px)');
+
+    const update = () => setBreakpoint(getBreakpoint());
+
+    update();
+    mobile.addEventListener('change', update);
+    tablet.addEventListener('change', update);
+
+    return () => {
+      mobile.removeEventListener('change', update);
+      tablet.removeEventListener('change', update);
+    };
+  }, []);
+
+  const slidesToShow = slidesToShowProp ?? getSlidesToShow(breakpoint);
 
   const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
@@ -65,7 +101,7 @@ export function Carousel({
         <div 
           className={styles.embla__container}
           style={{ 
-            '--slides-to-show': slidesToShow 
+            '--slides-to-show': slidesToShow
           } as React.CSSProperties}
         >
           {children.map((child, index) => (

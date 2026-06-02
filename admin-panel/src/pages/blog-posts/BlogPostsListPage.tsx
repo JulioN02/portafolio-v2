@@ -71,12 +71,14 @@ export function BlogPostsListPage() {
         </button>
       </div>
 
-      <BlogPostList
-        posts={filteredPosts}
-        onEdit={(id) => navigate(`/blog-posts/edit/${id}`)}
-        onDelete={handleDelete}
-        onStatusChange={handleStatusChange}
-      />
+      <div className={formStyles.tableWrapper}>
+        <BlogPostList
+          posts={filteredPosts}
+          onEdit={(id) => navigate(`/blog-posts/edit/${id}`)}
+          onDelete={handleDelete}
+          onStatusChange={handleStatusChange}
+        />
+      </div>
 
       <ConfirmDeleteModal
         isOpen={deleteTarget !== null}

@@ -11,6 +11,7 @@ export interface ContactMessage {
   createdAt: string;
   isRead: boolean;
   archived: boolean;
+  starred: boolean;
   labels: string[];
   source: string;
 }
@@ -20,6 +21,8 @@ interface ContactMessageListProps {
   selectedId?: string | null;
   onSelect?: (id: string) => void;
   onArchive?: (id: string) => void;
+  onToggleStar?: (id: string) => void;
+  onDelete?: (message: ContactMessage) => void;
 }
 
 const formatDate = (dateString: string) => {
@@ -50,7 +53,7 @@ const truncate = (text: string, max = 100) => {
  * Contact Message List Component — Gmail-like list
  * Each item: sender name, email, date, message preview, read/unread indicator, archive button, label badges
  */
-export function ContactMessageList({ messages, selectedId, onSelect, onArchive }: ContactMessageListProps) {
+export function ContactMessageList({ messages, selectedId, onSelect, onArchive, onToggleStar, onDelete }: ContactMessageListProps) {
   const { t } = useTranslation();
 
   if (messages.length === 0) {
@@ -86,6 +89,35 @@ export function ContactMessageList({ messages, selectedId, onSelect, onArchive }
               if (!isSelected) e.currentTarget.style.background = message.isRead ? '#fff' : '#f9fafb';
             }}
           >
+            {/* Star button */}
+            {onToggleStar && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleStar(message.id);
+                }}
+                title={message.starred ? t('contactMessages.unstar') : t('contactMessages.star')}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '0.25rem',
+                  marginRight: '0.5rem',
+                  flexShrink: 0,
+                  color: message.starred ? '#f59e0b' : '#d1d5db',
+                  fontSize: '1.125rem',
+                  lineHeight: 1,
+                  borderRadius: '4px',
+                  alignSelf: 'flex-start',
+                  marginTop: '0.125rem',
+                }}
+                onMouseEnter={(e) => { if (!message.starred) e.currentTarget.style.color = '#9ca3af'; }}
+                onMouseLeave={(e) => { if (!message.starred) e.currentTarget.style.color = '#d1d5db'; }}
+              >
+                {message.starred ? '★' : '☆'}
+              </button>
+            )}
+
             {/* Content */}
             <div style={{ flex: 1, minWidth: 0 }}>
               {/* Header row: name + date */}
@@ -173,32 +205,60 @@ export function ContactMessageList({ messages, selectedId, onSelect, onArchive }
               )}
             </div>
 
-            {/* Archive button */}
-            {onArchive && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onArchive(message.id);
-                }}
-                title={message.archived ? t('contactMessages.unarchive') : t('contactMessages.archive')}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: '0.25rem',
-                  marginLeft: '0.5rem',
-                  flexShrink: 0,
-                  color: '#9ca3af',
-                  fontSize: '1rem',
-                  lineHeight: 1,
-                  borderRadius: '4px',
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = '#e5e7eb'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = 'none'; }}
-              >
-                {message.archived ? '📂' : '📁'}
-              </button>
-            )}
+            {/* Action buttons */}
+            <div style={{ display: 'flex', gap: '0.25rem', flexShrink: 0, marginLeft: '0.5rem' }}>
+              {/* Archive button */}
+              {onArchive && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onArchive(message.id);
+                  }}
+                  title={message.archived ? t('contactMessages.unarchive') : t('contactMessages.archive')}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '0.25rem',
+                    flexShrink: 0,
+                    color: '#9ca3af',
+                    fontSize: '1rem',
+                    lineHeight: 1,
+                    borderRadius: '4px',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = '#e5e7eb'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'none'; }}
+                >
+                  {message.archived ? '📂' : '📁'}
+                </button>
+              )}
+
+              {/* Delete button */}
+              {onDelete && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(message);
+                  }}
+                  title={t('contactMessages.delete')}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '0.25rem',
+                    flexShrink: 0,
+                    color: '#9ca3af',
+                    fontSize: '1rem',
+                    lineHeight: 1,
+                    borderRadius: '4px',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = '#fee2e2'; e.currentTarget.style.color = '#ef4444'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = '#9ca3af'; }}
+                >
+                  🗑️
+                </button>
+              )}
+            </div>
           </div>
         );
       })}

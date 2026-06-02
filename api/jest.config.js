@@ -26,6 +26,7 @@ export default {
   },
   moduleNameMapper: {
     '^@jsoft/shared$': '<rootDir>/../packages/shared/dist/index.js',
+    '^(\\.{1,2}/.*)\\.js$': '$1',
   },
   setupFilesAfterEnv: ['<rootDir>/src/__tests__/setup.ts'],
 };

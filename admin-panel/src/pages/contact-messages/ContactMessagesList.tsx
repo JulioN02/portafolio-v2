@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from '@/i18n/LanguageContext';
 import { useContactForms } from '@/hooks/useContactForms';
 import { ContactMessageList, type ContactMessage } from '@/components/contact-messages/ContactMessageList';
+import { ConfirmDeleteModal } from '@/components/shared/ConfirmDeleteModal';
 import type { ContactFormFilterInput, ContactFormResponse } from '@jsoft/shared';
 
 /** Formats source string for display, e.g. "service:Desarrollo Web" → "Servicio: Desarrollo Web" */
@@ -24,7 +25,7 @@ const formatSourceLabel = (source: string): string => {
 /**
  * Filter type for contact messages
  */
-type MessageFilter = 'all' | 'unread' | 'read' | 'archived';
+type MessageFilter = 'all' | 'unread' | 'read' | 'archived' | 'starred';
 
 const ITEMS_PER_PAGE = 20;
 
@@ -51,9 +52,11 @@ const formatDetailDate = (date: Date | string) => {
 export function ContactMessagesListPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { useGetAll, useGetById, useMarkRead, useToggleArchive, useSetLabels } = useContactForms();
+  const { useGetAll, useGetById, useMarkRead, useToggleArchive, useToggleStar, useDelete, useSetLabels } = useContactForms();
   const markRead = useMarkRead();
   const toggleArchive = useToggleArchive();
+  const toggleStar = useToggleStar();
+  const deleteMutation = useDelete();
   const setLabels = useSetLabels();
 
   // ── URL search params ──────────────────────────────────────────
@@ -66,6 +69,7 @@ export function ContactMessagesListPage() {
   const [searchInput, setSearchInput] = useState(currentSearch);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [newLabel, setNewLabel] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState<ContactMessage | null>(null);
   const [isMobile, setIsMobile] = useState(false);
 
   // Responsive check
@@ -111,7 +115,10 @@ export function ContactMessagesListPage() {
       filters.isRead = true;
     }
 
-    if (currentFilter === 'archived') {
+    if (currentFilter === 'starred') {
+      filters.isStarred = true;
+      // Show all starred messages regardless of archive status
+    } else if (currentFilter === 'archived') {
       filters.isArchived = true;
     } else {
       filters.isArchived = false;
@@ -140,6 +147,7 @@ export function ContactMessagesListPage() {
           : String(form.createdAt),
       isRead: !!form.readAt,
       archived: form.archived,
+      starred: form.starred,
       labels: form.labels,
       source: form.source,
     }),
@@ -237,11 +245,63 @@ export function ContactMessagesListPage() {
     }
   }, [selectedMessage, toggleArchive]);
 
+  const handleToggleStar = useCallback(
+    (id: string) => {
+      toggleStar.mutate(id);
+    },
+    [toggleStar],
+  );
+
+  const handleStarFromDetail = useCallback(() => {
+    if (selectedMessage) {
+      toggleStar.mutate(selectedMessage.id);
+    }
+  }, [selectedMessage, toggleStar]);
+
+  const handleDeleteRequest = useCallback((message: ContactMessage) => {
+    setDeleteTarget(message);
+  }, []);
+
+  const handleDeleteConfirm = useCallback(() => {
+    if (!deleteTarget) return;
+    deleteMutation.mutate(deleteTarget.id, {
+      onSuccess: () => {
+        setDeleteTarget(null);
+        setSelectedId((prev) => (prev === deleteTarget.id ? null : prev));
+      },
+      onError: () => {
+        // Keep modal open on error for retry
+      },
+    });
+  }, [deleteTarget, deleteMutation]);
+
+  const handleDeleteFromDetail = useCallback(() => {
+    if (selectedMessage) {
+      setDeleteTarget({
+        id: selectedMessage.id,
+        name: selectedMessage.lastName
+          ? `${selectedMessage.firstName} ${selectedMessage.lastName}`
+          : selectedMessage.firstName,
+        email: selectedMessage.email,
+        message: selectedMessage.message,
+        createdAt: selectedMessage.createdAt instanceof Date
+          ? selectedMessage.createdAt.toISOString()
+          : String(selectedMessage.createdAt),
+        isRead: !!selectedMessage.readAt,
+        archived: selectedMessage.archived,
+        starred: selectedMessage.starred,
+        labels: selectedMessage.labels ?? [],
+        source: selectedMessage.source,
+      });
+    }
+  }, [selectedMessage]);
+
   // ── Filter chip definitions ─────────────────────────────────────
   const filters: { key: MessageFilter; label: string }[] = [
     { key: 'all', label: t('contactMessages.all') },
     { key: 'unread', label: t('contactMessages.unread') },
     { key: 'read', label: t('contactMessages.read') },
+    { key: 'starred', label: t('contactMessages.starred') },
     { key: 'archived', label: t('contactMessages.archived') },
   ];
 
@@ -394,6 +454,8 @@ export function ContactMessagesListPage() {
               selectedId={selectedId}
               onSelect={handleSelect}
               onArchive={handleArchiveToggle}
+              onToggleStar={handleToggleStar}
+              onDelete={handleDeleteRequest}
             />
           )}
 
@@ -589,25 +651,62 @@ export function ContactMessagesListPage() {
                       </div>
                     </div>
 
-                    {/* Archive/Unarchive button */}
-                    <button
-                      onClick={handleArchiveFromDetail}
-                      disabled={toggleArchive.isPending}
-                      style={{
-                        padding: '0.375rem 0.75rem',
-                        border: '1px solid #d1d5db',
-                        borderRadius: '6px',
-                        background: '#fff',
-                        cursor: 'pointer',
-                        fontSize: '0.8125rem',
-                        color: '#374151',
-                        flexShrink: 0,
-                      }}
-                    >
-                      {selectedMessage.archived
-                        ? t('contactMessages.unarchive')
-                        : t('contactMessages.archive')}
-                    </button>
+                    {/* Action buttons */}
+                    <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
+                      {/* Star toggle */}
+                      <button
+                        onClick={handleStarFromDetail}
+                        disabled={toggleStar.isPending}
+                        title={selectedMessage.starred ? t('contactMessages.unstar') : t('contactMessages.star')}
+                        style={{
+                          padding: '0.375rem 0.75rem',
+                          border: '1px solid #d1d5db',
+                          borderRadius: '6px',
+                          background: selectedMessage.starred ? '#fffbeb' : '#fff',
+                          cursor: 'pointer',
+                          fontSize: '1rem',
+                          color: selectedMessage.starred ? '#f59e0b' : '#9ca3af',
+                          lineHeight: 1,
+                        }}
+                      >
+                        {selectedMessage.starred ? '★' : '☆'}
+                      </button>
+
+                      {/* Delete button */}
+                      <button
+                        onClick={handleDeleteFromDetail}
+                        style={{
+                          padding: '0.375rem 0.75rem',
+                          border: '1px solid #d1d5db',
+                          borderRadius: '6px',
+                          background: '#fff',
+                          cursor: 'pointer',
+                          fontSize: '0.8125rem',
+                          color: '#ef4444',
+                        }}
+                      >
+                        🗑️
+                      </button>
+
+                      {/* Archive/Unarchive button */}
+                      <button
+                        onClick={handleArchiveFromDetail}
+                        disabled={toggleArchive.isPending}
+                        style={{
+                          padding: '0.375rem 0.75rem',
+                          border: '1px solid #d1d5db',
+                          borderRadius: '6px',
+                          background: '#fff',
+                          cursor: 'pointer',
+                          fontSize: '0.8125rem',
+                          color: '#374151',
+                        }}
+                      >
+                        {selectedMessage.archived
+                          ? t('contactMessages.unarchive')
+                          : t('contactMessages.archive')}
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -811,6 +910,16 @@ export function ContactMessagesListPage() {
           </div>
         )}
       </div>
+
+      {/* ── Confirm Delete Modal ── */}
+      <ConfirmDeleteModal
+        isOpen={deleteTarget !== null}
+        title={deleteTarget?.name || ''}
+        entityName={t('contactMessages.title')}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setDeleteTarget(null)}
+        isLoading={deleteMutation.isPending}
+      />
     </div>
   );
 }

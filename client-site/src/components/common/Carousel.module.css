@@ -18,13 +18,14 @@
   padding: 0.5rem;
 }
 
-@media (max-width: 768px) {
+/* Responsive fallback — JS matchMedia handles the primary control */
+@media (max-width: 639px) {
   .embla__slide {
     flex: 0 0 100%;
   }
 }
 
-@media (min-width: 769px) and (max-width: 1024px) {
+@media (min-width: 640px) and (max-width: 1023px) {
   .embla__slide {
     flex: 0 0 50%;
   }
@@ -38,7 +39,7 @@
 }
 
 .button {
-  background: var(--color-primary);
+  background: var(--color-blue-ui);
   color: white;
   border: none;
   width: 40px;
@@ -54,7 +55,7 @@
 
 @media (hover: hover) {
   .button:hover:not(:disabled) {
-    background: var(--color-primary-dark);
+    background: var(--color-blue-medium);
     transform: scale(1.1);
   }
 }

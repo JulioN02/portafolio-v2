@@ -112,6 +112,7 @@ export function BlogPage() {
 
   // Empty state
   if (posts.length === 0) {
+    const hasFilters = !!(search || category);
     return (
       <div className={styles.page}>
         <MetaTags
@@ -120,9 +121,23 @@ export function BlogPage() {
           noindex
         />
         <h1 className={styles.title}>Blog</h1>
-        <div className={styles.empty}>
-          <p className={styles.emptyMessage}>No hay artículos publicados aún. Vuelve pronto.</p>
-        </div>
+        {hasFilters ? (
+          <div className={styles.empty}>
+            <p className={styles.emptyMessage}>No se encontraron artículos con los filtros seleccionados.</p>
+            <p className={styles.emptySubtitle}>Intenta con otros términos o categorías.</p>
+            <button
+              className={styles.emptyLink}
+              onClick={() => setSearchParams({}, { replace: true })}
+            >
+              Limpiar filtros
+            </button>
+          </div>
+        ) : (
+          <div className={styles.empty}>
+            <p className={styles.emptyMessage}>No hay artículos publicados aún.</p>
+            <p className={styles.emptySubtitle}>Vuelve pronto para conocer las últimas novedades.</p>
+          </div>
+        )}
       </div>
     );
   }

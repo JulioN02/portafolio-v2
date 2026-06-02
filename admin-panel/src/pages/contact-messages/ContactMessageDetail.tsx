@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from '@/i18n/LanguageContext';
 import { useContactForms } from '@/hooks/useContactForms';
+import { ConfirmDeleteModal } from '@/components/shared/ConfirmDeleteModal';
 
 /** Formats source string for display, e.g. "service:Desarrollo Web" → "Servicio: Desarrollo Web" */
 const formatSourceLabel = (source: string): string => {
@@ -37,13 +38,17 @@ const formatDate = (date: Date | string) => {
 export function ContactMessageDetailPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
-  const { useGetById, useMarkRead, useToggleArchive, useSetLabels } = useContactForms();
+  const navigate = useNavigate();
+  const { useGetById, useMarkRead, useToggleArchive, useToggleStar, useDelete, useSetLabels } = useContactForms();
   const { data, isLoading, error } = useGetById(id || '');
   const markRead = useMarkRead();
   const toggleArchive = useToggleArchive();
+  const toggleStar = useToggleStar();
+  const deleteMutation = useDelete();
   const setLabels = useSetLabels();
 
   const [newLabel, setNewLabel] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // Auto mark as read when detail opens
   useEffect(() => {
@@ -69,6 +74,26 @@ export function ContactMessageDetailPage() {
     if (data) {
       toggleArchive.mutate(data.id);
     }
+  };
+
+  const handleToggleStar = () => {
+    if (data) {
+      toggleStar.mutate(data.id);
+    }
+  };
+
+  const handleDeleteConfirm = () => {
+    if (!data) return;
+    deleteMutation.mutate(data.id, {
+      onSuccess: () => {
+        setShowDeleteModal(false);
+        navigate('/contact-messages');
+      },
+      onError: () => {
+        // Keep modal open on error so user can retry
+        // The deleteMutation error state will show feedback
+      },
+    });
   };
 
   if (!id) {
@@ -164,6 +189,41 @@ export function ContactMessageDetailPage() {
 
           {/* Actions */}
           <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
+            {/* Star toggle */}
+            <button
+              onClick={handleToggleStar}
+              disabled={toggleStar.isPending}
+              title={message.starred ? t('contactMessages.unstar') : t('contactMessages.star')}
+              style={{
+                padding: '0.375rem 0.75rem',
+                border: '1px solid #d1d5db',
+                borderRadius: '6px',
+                background: message.starred ? '#fffbeb' : '#fff',
+                cursor: 'pointer',
+                fontSize: '1rem',
+                color: message.starred ? '#f59e0b' : '#9ca3af',
+                lineHeight: 1,
+              }}
+            >
+              {message.starred ? '★' : '☆'}
+            </button>
+
+            {/* Delete button */}
+            <button
+              onClick={() => setShowDeleteModal(true)}
+              style={{
+                padding: '0.375rem 0.75rem',
+                border: '1px solid #d1d5db',
+                borderRadius: '6px',
+                background: '#fff',
+                cursor: 'pointer',
+                fontSize: '0.8125rem',
+                color: '#ef4444',
+              }}
+            >
+              {t('contactMessages.delete')}
+            </button>
+
             <button
               onClick={handleToggleArchive}
               disabled={toggleArchive.isPending}
@@ -344,6 +404,16 @@ export function ContactMessageDetailPage() {
           </button>
         </div>
       </div>
+
+      {/* ── Confirm Delete Modal ── */}
+      <ConfirmDeleteModal
+        isOpen={showDeleteModal}
+        title={message.lastName ? `${message.firstName} ${message.lastName}` : message.firstName}
+        entityName={t('contactMessages.title')}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setShowDeleteModal(false)}
+        isLoading={deleteMutation.isPending}
+      />
     </div>
   );
 }

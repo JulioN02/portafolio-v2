@@ -146,6 +146,11 @@
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
 
   /* ========================================
+   * Header Height
+   * ======================================== */
+  --header-height: 80px;
+
+  /* ========================================
    * Z-Index Scale
    * ======================================== */
   --z-dropdown: 100;
@@ -157,6 +162,27 @@
   --z-notification: 1100;
   --z-toast: 1100;
   --z-tooltip: 1200;
+}
+
+/* ========================================
+ * Header height breakpoints
+ * ======================================== */
+@media (max-width: 1024px) {
+  :root {
+    --header-height: 70px;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --header-height: 64px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --header-height: 56px;
+  }
 }
 
 /* ========================================

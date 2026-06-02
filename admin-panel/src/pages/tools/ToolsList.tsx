@@ -76,13 +76,15 @@ export function ToolsListPage() {
         </button>
       </div>
 
-      <ToolList
-        tools={filteredTools}
-        onEdit={(id) => navigate(`/tools/edit/${id}`)}
-        onDelete={handleDelete}
-        onToggleFeatured={handleToggleFeatured}
-        onStatusChange={handleStatusChange}
-      />
+      <div className={formStyles.tableWrapper}>
+        <ToolList
+          tools={filteredTools}
+          onEdit={(id) => navigate(`/tools/edit/${id}`)}
+          onDelete={handleDelete}
+          onToggleFeatured={handleToggleFeatured}
+          onStatusChange={handleStatusChange}
+        />
+      </div>
 
       <ConfirmDeleteModal
         isOpen={deleteTarget !== null}

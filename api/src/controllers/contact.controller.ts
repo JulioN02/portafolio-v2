@@ -72,9 +72,10 @@ export const contactController = {
       const search = req.query.search as string | undefined;
       const isRead = req.query.isRead !== undefined ? req.query.isRead === 'true' : undefined;
       const isArchived = req.query.isArchived !== undefined ? req.query.isArchived === 'true' : undefined;
+      const isStarred = req.query.isStarred !== undefined ? req.query.isStarred === 'true' : undefined;
       const label = req.query.label as string | undefined;
       
-      const result = await contactService.findAll({ page, limit, originType, search, isRead, isArchived, label });
+      const result = await contactService.findAll({ page, limit, originType, search, isRead, isArchived, isStarred, label });
       
       res.json(result);
     } catch (error) {
@@ -156,6 +157,22 @@ export const contactController = {
       res.json(result);
     } catch (error) {
       console.error('Toggle contact archive error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  /**
+   * PATCH /api/contact/:id/star
+   * Toggle starred status of a contact form (admin only)
+   */
+  async toggleStar(req: Request, res: Response): Promise<void> {
+    try {
+      const id = req.params.id as string;
+      const result = await contactService.toggleStar(id);
+
+      res.json(result);
+    } catch (error) {
+      console.error('Toggle contact star error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   },

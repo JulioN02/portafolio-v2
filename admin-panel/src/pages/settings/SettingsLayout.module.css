@@ -1,0 +1,11 @@
+.layout {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 2rem;
+}
+
+@media (max-width: 639px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}

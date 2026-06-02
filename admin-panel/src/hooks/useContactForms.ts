@@ -42,6 +42,14 @@ export function useContactForms() {
       },
     });
 
+  const useToggleStar = () =>
+    useMutation({
+      mutationFn: (id: string) => contactFormsApi.toggleStar(id),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['contactForms'] });
+      },
+    });
+
   const useSetLabels = () =>
     useMutation({
       mutationFn: ({ id, labels }: { id: string; labels: string[] }) =>
@@ -57,6 +65,7 @@ export function useContactForms() {
     useDelete,
     useMarkRead,
     useToggleArchive,
+    useToggleStar,
     useSetLabels,
   };
 }

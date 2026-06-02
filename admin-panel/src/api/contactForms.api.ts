@@ -19,6 +19,7 @@ export const contactFormsApi = {
     if (filters?.search) params.append('search', filters.search);
     if (filters?.isRead !== undefined) params.append('isRead', String(filters.isRead));
     if (filters?.isArchived !== undefined) params.append('isArchived', String(filters.isArchived));
+    if (filters?.isStarred !== undefined) params.append('isStarred', String(filters.isStarred));
     if (filters?.label) params.append('label', filters.label);
     if (filters?.page) params.append('page', String(filters.page));
     if (filters?.limit) params.append('limit', String(filters.limit));
@@ -43,6 +44,10 @@ export const contactFormsApi = {
 
   toggleArchive: async (id: string): Promise<void> => {
     await apiClient.patch(`/contact/${id}/archive`);
+  },
+
+  toggleStar: async (id: string): Promise<void> => {
+    await apiClient.patch(`/contact/${id}/star`);
   },
 
   setLabels: async (id: string, labels: string[]): Promise<void> => {

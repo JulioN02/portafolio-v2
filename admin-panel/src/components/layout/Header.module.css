@@ -1,3 +1,40 @@
+/* ── Hamburger ── */
+.hamburger {
+  display: none;
+  width: 44px;
+  height: 44px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  transition: background var(--transition-base);
+  margin-right: auto;
+}
+
+.hamburger:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.hamburgerLine {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: #fff;
+  border-radius: 2px;
+  transition: transform var(--transition-base);
+}
+
+@media (max-width: 767px) {
+  .hamburger {
+    display: flex;
+  }
+}
+
 .header {
   height: 64px;
   background: linear-gradient(135deg, var(--color-blue-base), var(--color-blue-medium));
@@ -8,6 +45,12 @@
   padding: 0 var(--spacing-xl);
   position: relative;
   z-index: 100;
+}
+
+@media (max-width: 639px) {
+  .header {
+    padding: 0 var(--spacing-md);
+  }
 }
 
 /* ── User Toggle ── */

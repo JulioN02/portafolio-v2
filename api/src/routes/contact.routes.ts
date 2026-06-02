@@ -20,6 +20,9 @@ router.get('/', contactController.findAll);
 // GET /api/contact/stats/summary - Get contact statistics
 router.get('/stats/summary', contactController.getStats);
 
+// PATCH /api/contact/:id/star - Toggle star status
+router.patch('/:id/star', contactController.toggleStar);
+
 // GET /api/contact/:id - Get single contact form
 router.get('/:id', contactController.findById);
 

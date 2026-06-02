@@ -43,65 +43,78 @@ export function Header() {
     setIsMenuOpen(false);
   }, [location.pathname]);
 
+  // Close menu on scroll
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const handleScroll = () => setIsMenuOpen(false);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isMenuOpen]);
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
   return (
-    <header
-      className={`${styles.header} ${isHidden ? styles.hidden : ''}`}
-    >
-      <div className={styles.container}>
-        <Link to="/" className={styles.logo}>
-          <img src="/uploads/LogoJSS.png" alt="J Soft Solutions" className={styles.logoIcon} />
-          <span className={styles.logoText}>J Soft Solutions</span>
-        </Link>
+    <>
+      <header
+        className={`${styles.header} ${isHidden ? styles.hidden : ''}`}
+      >
+        <div className={styles.container}>
+          <Link to="/" className={styles.logo}>
+            <img src="/uploads/LogoJSS.png" alt="J Soft Solutions" className={styles.logoIcon} />
+            <span className={styles.logoText}>J Soft Solutions</span>
+          </Link>
 
-        {/* Desktop Navigation */}
-        <nav className={styles.navDesktop}>
-          {navLinks.map((link) => (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              className={({ isActive }) =>
-                `${styles.navLink} ${isActive ? styles.active : ''}`
-              }
-              end={link.to === '/'}
-            >
-              {link.label}
-            </NavLink>
-          ))}
-        </nav>
+          {/* Desktop Navigation */}
+          <nav className={styles.navDesktop}>
+            {navLinks.map((link) => (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                className={({ isActive }) =>
+                  `${styles.navLink} ${isActive ? styles.active : ''}`
+                }
+                end={link.to === '/'}
+              >
+                {link.label}
+              </NavLink>
+            ))}
+          </nav>
 
-        {/* Hamburger Button */}
-        <button
-          className={styles.hamburger}
-          onClick={toggleMenu}
-          aria-label="Toggle menu"
-          aria-expanded={isMenuOpen}
-        >
-          <span className={`${styles.hamburgerLine} ${isMenuOpen ? styles.open : ''}`} />
-          <span className={`${styles.hamburgerLine} ${isMenuOpen ? styles.open : ''}`} />
-          <span className={`${styles.hamburgerLine} ${isMenuOpen ? styles.open : ''}`} />
-        </button>
+          {/* Hamburger Button */}
+          <button
+            className={styles.hamburger}
+            onClick={toggleMenu}
+            aria-label="Toggle menu"
+            aria-expanded={isMenuOpen}
+          >
+            <span className={`${styles.hamburgerLine} ${isMenuOpen ? styles.open : ''}`} />
+            <span className={`${styles.hamburgerLine} ${isMenuOpen ? styles.open : ''}`} />
+            <span className={`${styles.hamburgerLine} ${isMenuOpen ? styles.open : ''}`} />
+          </button>
+        </div>
+      </header>
 
-        {/* Mobile Navigation */}
-        <nav className={`${styles.navMobile} ${isMenuOpen ? styles.open : ''}`}>
-          {navLinks.map((link) => (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              className={({ isActive }) =>
-                `${styles.navLinkMobile} ${isActive ? styles.active : ''}`
-              }
-              end={link.to === '/'}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              {link.label}
-            </NavLink>
-          ))}
-        </nav>
-      </div>
-    </header>
+      {/* Mobile Navigation — outside <header> to avoid containing-block issues with backdrop-filter */}
+      <nav
+        className={`${styles.navMobile} ${isMenuOpen ? styles.open : ''}`}
+        onClick={isMenuOpen ? () => setIsMenuOpen(false) : undefined}
+      >
+        {navLinks.map((link) => (
+          <NavLink
+            key={link.to}
+            to={link.to}
+            className={({ isActive }) =>
+              `${styles.navLinkMobile} ${isActive ? styles.active : ''}`
+            }
+            end={link.to === '/'}
+            onClick={() => setIsMenuOpen(false)}
+          >
+            {link.label}
+          </NavLink>
+        ))}
+      </nav>
+    </>
   );
 }

@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { ClientContactInput, RecruiterContactInput, FormOrigin } from '@jsoft/shared';
-import { NotFoundError } from '../utils/errors.js';
+import { NotFoundError } from '../utils/errors';
 
 const prisma = new PrismaClient();
 
@@ -15,6 +15,7 @@ const CONTACT_SELECT = {
   originType: true,
   readAt: true,
   archived: true,
+  starred: true,
   labels: true,
   createdAt: true,
 };
@@ -26,6 +27,7 @@ export interface ContactFilterInput {
   search?: string;
   isRead?: boolean;
   isArchived?: boolean;
+  isStarred?: boolean;
   label?: string;
 }
 
@@ -60,7 +62,7 @@ export const contactService = {
   },
 
   async findAll(filter?: ContactFilterInput) {
-    const { originType, page = 1, limit = 10, search, isRead, isArchived, label } = filter || {};
+    const { originType, page = 1, limit = 10, search, isRead, isArchived, isStarred, label } = filter || {};
     const skip = (page - 1) * limit;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -68,6 +70,7 @@ export const contactService = {
       ...(originType && { originType }),
       ...(isRead !== undefined && { readAt: isRead ? { not: null } : null }),
       ...(isArchived !== undefined && { archived: isArchived }),
+      ...(isStarred !== undefined && { starred: isStarred }),
       ...(label && { labels: { has: label } }),
     };
 
@@ -144,6 +147,19 @@ export const contactService = {
       where: { id },
       data: { archived: !current.archived },
       select: { id: true, archived: true },
+    });
+  },
+
+  /**
+   * Toggle starred status of a contact form
+   */
+  async toggleStar(id: string) {
+    const current = await prisma.contactForm.findUnique({ where: { id }, select: { starred: true } });
+    if (!current) throw new NotFoundError('Contact form not found');
+    return prisma.contactForm.update({
+      where: { id },
+      data: { starred: !current.starred },
+      select: { id: true, starred: true },
     });
   },
 

@@ -1,5 +1,6 @@
 import { Outlet, NavLink } from 'react-router-dom';
 import { useTranslation } from '../../i18n/LanguageContext';
+import styles from './SettingsLayout.module.css';
 
 export function SettingsLayout() {
   const { t } = useTranslation();
@@ -23,7 +24,7 @@ export function SettingsLayout() {
         {t('settings.title')}
       </h1>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '200px 1fr', gap: '1.5rem' }}>
+      <div className={styles.layout}>
         {/* Sidebar */}
         <div
           style={{

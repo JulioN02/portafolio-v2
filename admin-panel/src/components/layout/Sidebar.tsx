@@ -3,7 +3,13 @@ import { useState } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
 import styles from './Sidebar.module.css';
 
-export function Sidebar() {
+interface SidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+  isMobile: boolean;
+}
+
+export function Sidebar({ isOpen, onClose, isMobile }: SidebarProps) {
   const { t } = useTranslation();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -19,24 +25,35 @@ export function Sidebar() {
     { label: t('nav.settings'), path: '/settings', icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z' },
   ];
 
+  const handleNavClick = () => {
+    if (isMobile) {
+      onClose();
+    }
+  };
+
   return (
-    <aside className={`${styles.sidebar} ${isCollapsed ? styles.collapsed : ''}`}>
+    <aside
+      className={`${styles.sidebar} ${isCollapsed ? styles.collapsed : ''} ${isOpen ? styles.open : ''}`}
+    >
       <div className={styles.top}>
         <span className={styles.brand}>Admin Panel</span>
         <span className={styles.brandShort}>JS</span>
-        <button
-          className={styles.toggleButton}
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          aria-label={isCollapsed ? 'Expandir menú' : 'Colapsar menú'}
-        >
-          ◀
-        </button>
+        {!isMobile && (
+          <button
+            className={styles.toggleButton}
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            aria-label={isCollapsed ? 'Expandir menú' : 'Colapsar menú'}
+          >
+            ◀
+          </button>
+        )}
       </div>
       <nav className={styles.nav}>
         {navItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
+            onClick={handleNavClick}
             className={({ isActive }) =>
               `${styles.navLink} ${isActive ? styles.navLinkActive : ''}`
             }

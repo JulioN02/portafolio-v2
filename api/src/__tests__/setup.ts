@@ -2,6 +2,14 @@
 // Mock Prisma Client
 jest.mock('@prisma/client', () => {
   const mockPrismaClient = {
+    user: {
+      findMany: jest.fn(),
+      findFirst: jest.fn(),
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      count: jest.fn(),
+    },
     product: {
       findMany: jest.fn(),
       findFirst: jest.fn(),

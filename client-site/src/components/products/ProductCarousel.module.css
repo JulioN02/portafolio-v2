@@ -1,34 +1,34 @@
 .section {
-  padding: 4rem 0;
+  padding: var(--spacing-3xl) 0;
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 var(--spacing-lg);
 }
 
 .header {
   text-align: center;
-  margin-bottom: 2.5rem;
+  margin-bottom: var(--spacing-xl);
 }
 
 .title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--color-text-primary, #1a1a2e);
-  margin-bottom: 0.5rem;
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-neutral-800);
+  margin-bottom: var(--spacing-sm);
 }
 
 .subtitle {
-  font-size: 1.1rem;
-  color: var(--color-text-secondary, #666);
+  font-size: var(--font-size-base);
+  color: var(--color-neutral-500);
 }
 
 .grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 1rem;
+  gap: var(--spacing-md);
 }
 
 @media (max-width: 1024px) {
@@ -37,24 +37,30 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
   .grid {
     grid-template-columns: 1fr;
   }
 }
 
 .card {
-  background: white;
-  border-radius: 12px;
+  background: var(--color-neutral-0);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: var(--shadow-md);
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
 }
 
 @media (hover: hover) {
   .card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-lg);
   }
 }
 
@@ -72,46 +78,46 @@
 
 .badge {
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  background: var(--color-primary, #0066cc);
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  background: var(--color-blue-ui);
   color: white;
-  font-size: 0.75rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-weight: 500;
+  font-size: var(--font-size-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-weight: var(--font-weight-medium);
 }
 
 .content {
-  padding: 1rem;
+  padding: var(--spacing-md);
 }
 
 .classification {
-  font-size: 0.75rem;
-  color: var(--color-text-tertiary, #888);
+  font-size: var(--font-size-xs);
+  color: var(--color-neutral-400);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .cardTitle {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--color-text-primary, #1a1a2e);
-  margin: 0.25rem 0 0.5rem;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-neutral-800);
+  margin: var(--spacing-xs) 0 var(--spacing-sm);
 }
 
 .description {
-  font-size: 0.875rem;
-  color: var(--color-text-secondary, #666);
-  line-height: 1.4;
-  margin-bottom: 0.75rem;
+  font-size: var(--font-size-sm);
+  color: var(--color-neutral-600);
+  line-height: var(--line-height-normal);
+  margin-bottom: var(--spacing-sm);
 }
 
 .link {
-  font-size: 0.875rem;
-  color: var(--color-primary, #0066cc);
+  font-size: var(--font-size-sm);
+  color: var(--color-blue-ui);
   text-decoration: none;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 
 @media (hover: hover) {
@@ -122,14 +128,14 @@
 
 .cta {
   text-align: center;
-  margin-top: 2rem;
+  margin-top: var(--spacing-xl);
 }
 
 .viewAll {
-  font-size: 1rem;
-  color: var(--color-primary, #0066cc);
+  font-size: var(--font-size-base);
+  color: var(--color-blue-ui);
   text-decoration: none;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 
 @media (hover: hover) {
@@ -140,6 +146,6 @@
 
 .error {
   text-align: center;
-  color: var(--color-error, #dc3545);
-  padding: 2rem;
+  color: var(--color-danger-500);
+  padding: var(--spacing-xl);
 }
