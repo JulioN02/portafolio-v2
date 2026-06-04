@@ -265,6 +265,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'common.no': 'No',
     'common.previous': 'Anterior',
     'common.next': 'Siguiente',
+    'common.add': 'Añadir',
 
     // Auth
     'auth.login': 'Iniciar Sesión',
@@ -538,12 +539,6 @@ export const translations: Record<Language, Record<string, string>> = {
     'common.no': 'No',
     'common.previous': 'Previous',
     'common.next': 'Next',
+    'common.add': 'Add',
 
-    // Auth
-    'auth.login': 'Login',
-    'auth.username': 'Username',
-    'auth.password': 'Password',
-    'auth.loggingIn': 'Logging in...',
-    'auth.loginError': 'Invalid credentials',
-  },
 };

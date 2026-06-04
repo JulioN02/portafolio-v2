@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from '@/i18n/LanguageContext';
 import { useContactForms } from '@/hooks/useContactForms';
 import { ContactMessageList, type ContactMessage } from '@/components/contact-messages/ContactMessageList';
+import inboxStyles from './Inbox.module.css';
 import { ConfirmDeleteModal } from '@/components/shared/ConfirmDeleteModal';
 import type { ContactFormFilterInput, ContactFormResponse } from '@jsoft/shared';
 
@@ -307,7 +308,7 @@ export function ContactMessagesListPage() {
 
   // ── Render ──────────────────────────────────────────────────────
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <div className={inboxStyles.inboxContainer}>
       {/* ── Header + Filter Bar ─────────────────────────────────── */}
       <div style={{ marginBottom: '1rem' }}>
         <h1
@@ -366,27 +367,10 @@ export function ContactMessagesListPage() {
       </div>
 
       {/* ── Two-panel layout ────────────────────────────────────── */}
-      <div
-        style={{
-          display: 'flex',
-          flex: 1,
-          gap: '1rem',
-          minHeight: 0,
-          overflow: 'hidden',
-        }}
-      >
+      <div className={inboxStyles.splitView}>
         {/* ══ Left panel: message list ════════════════════════════ */}
         <div
-          style={{
-            width: isMobile ? '100%' : '40%',
-            minWidth: isMobile ? '100%' : '320px',
-            background: '#fff',
-            borderRadius: '8px',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-            overflow: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
-          }}
+          className={`${inboxStyles.listPanel} ${isMobile && selectedMessageId ? inboxStyles.hideOnMobile : ''}`}
         >
           {/* Loading skeleton */}
           {isLoading ? (
@@ -511,16 +495,7 @@ export function ContactMessagesListPage() {
 
         {/* ══ Right panel: detail (desktop only) ═══════════════════ */}
         {!isMobile && (
-          <div
-            style={{
-              flex: 1,
-              background: '#fff',
-              borderRadius: '8px',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-              overflow: 'auto',
-              padding: '1.5rem',
-            }}
-          >
+          <div className={inboxStyles.detailPanel} style={{ padding: '1.5rem' }}>
             {!selectedId ? (
               /* ── Empty state ── */
               <div

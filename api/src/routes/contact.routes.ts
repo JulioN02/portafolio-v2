@@ -23,12 +23,6 @@ router.get('/stats/summary', contactController.getStats);
 // PATCH /api/contact/:id/star - Toggle star status
 router.patch('/:id/star', contactController.toggleStar);
 
-// GET /api/contact/:id - Get single contact form
-router.get('/:id', contactController.findById);
-
-// DELETE /api/contact/:id - Delete contact form
-router.delete('/:id', contactController.delete);
-
 // PATCH /api/contact/:id/read - Mark contact as read
 router.patch('/:id/read', contactController.markRead);
 
@@ -37,5 +31,11 @@ router.patch('/:id/archive', contactController.toggleArchive);
 
 // POST /api/contact/:id/labels - Set labels
 router.post('/:id/labels', contactController.setLabels);
+
+// GET /api/contact/:id - Get single contact form
+router.get('/:id', contactController.findById);
+
+// DELETE /api/contact/:id - Delete contact form
+router.delete('/:id', contactController.delete);
 
 export default router;

@@ -1,0 +1,50 @@
+/* ── Inbox Split View ── */
+
+.inboxContainer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.splitView {
+  display: flex;
+  flex: 1;
+  gap: 0;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--color-neutral-0);
+  box-shadow: var(--shadow-sm);
+}
+
+.listPanel {
+  width: 40%;
+  min-width: 320px;
+  border-right: 1px solid var(--color-neutral-200);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.detailPanel {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 767px) {
+  .splitView {
+    flex-direction: column;
+  }
+
+  .listPanel {
+    width: 100%;
+    min-width: 0;
+    border-right: none;
+    border-bottom: 1px solid var(--color-neutral-200);
+  }
+
+  .listPanel.hideOnMobile {
+    display: none;
+  }
+}

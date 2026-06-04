@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { ZodError } from 'zod';
 import { contactService } from '../services/contact.service.js';
 import { clientContactSchema, recruiterContactSchema, FormOrigin } from '@jsoft/shared';
+import { NotFoundError } from '../utils/errors';
 
 export const contactController = {
   /**
@@ -156,6 +157,10 @@ export const contactController = {
 
       res.json(result);
     } catch (error) {
+      if (error instanceof NotFoundError) {
+        res.status(404).json({ error: error.message });
+        return;
+      }
       console.error('Toggle contact archive error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
@@ -172,6 +177,10 @@ export const contactController = {
 
       res.json(result);
     } catch (error) {
+      if (error instanceof NotFoundError) {
+        res.status(404).json({ error: error.message });
+        return;
+      }
       console.error('Toggle contact star error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }

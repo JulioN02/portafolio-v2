@@ -197,7 +197,8 @@ model ContactForm {
   createdAt DateTime @default(now())
 
   @@index([originType, createdAt])
-  @@index([archived, createdAt])
+  @@index([readAt])
+  @@index([archived, readAt])
   @@index([starred, createdAt])
 }
 
