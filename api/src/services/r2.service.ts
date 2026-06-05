@@ -40,7 +40,7 @@ export const r2Service = {
       {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${config.secretKey}`,
+          'apikey': config.secretKey,
           'Content-Type': mimetype,
           'x-upsert': 'true',
         },
@@ -67,7 +67,7 @@ export const r2Service = {
       {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${config.secretKey}`,
+          'apikey': config.secretKey,
         },
       },
     );
