@@ -19,7 +19,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.1063.0",
     "@jsoft/shared": "workspace:*",
     "@prisma/client": "6.3.1",
     "bcrypt": "^5.1.1",

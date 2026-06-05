@@ -57,26 +57,11 @@ app.use('/uploads', async (req: Request, res: Response, next) => {
     return res.sendFile(localPath);
   }
 
-  // 2. Try R2 (production)
+  // 2. Try Supabase Storage (production)
   if (r2Service.isConfigured()) {
-    try {
-      const publicUrl = process.env.R2_PUBLIC_URL;
-      if (publicUrl) {
-        // Redirect to R2 public URL
-        return res.redirect(`${publicUrl}/${filename}`);
-      }
-
-      // Fallback: proxy the file through the API
-      const file = await r2Service.getFile(filename);
-      if (file && file.body) {
-        res.setHeader('Content-Type', file.contentType);
-        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
-        // Convert Readable stream to pipe through response
-        const nodeStream = file.body as unknown as NodeJS.ReadableStream;
-        return nodeStream.pipe(res);
-      }
-    } catch {
-      // R2 fetch failed, continue to 404
+    const storageUrl = r2Service.getPublicUrl(filename);
+    if (storageUrl) {
+      return res.redirect(storageUrl);
     }
   }
 

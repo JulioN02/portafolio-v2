@@ -1,50 +1,28 @@
-import {
-  S3Client,
-  PutObjectCommand,
-  DeleteObjectCommand,
-  GetObjectCommand,
-  NoSuchKey,
-} from '@aws-sdk/client-s3';
-
-interface R2Config {
-  endpoint: string;
-  accessKeyId: string;
-  secretAccessKey: string;
-  bucket: string;
-  publicUrl: string;
+interface StorageConfig {
+  apiUrl: string;      // Supabase Storage API URL
+  bucket: string;      // Bucket name
+  publicUrl: string;   // Public base URL for the bucket
+  secretKey: string;   // service_role key for admin ops
 }
 
-function getConfig(): R2Config | null {
-  const endpoint = process.env.R2_ENDPOINT;
-  const accessKeyId = process.env.R2_ACCESS_KEY_ID;
-  const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
-  const bucket = process.env.R2_BUCKET;
-  const publicUrl = process.env.R2_PUBLIC_URL;
+function getConfig(): StorageConfig | null {
+  const projectId = process.env.SUPABASE_PROJECT_ID;
+  const secretKey = process.env.SUPABASE_SERVICE_KEY;
+  const bucket = process.env.SUPABASE_BUCKET || 'portafolio-v2-images';
 
-  if (!endpoint || !accessKeyId || !secretAccessKey || !bucket) {
-    return null;
-  }
+  if (!projectId || !secretKey) return null;
 
-  return { endpoint, accessKeyId, secretAccessKey, bucket, publicUrl: publicUrl || '' };
-}
-
-function createClient(config: R2Config): S3Client {
-  return new S3Client({
-    region: 'auto',
-    endpoint: config.endpoint,
-    credentials: {
-      accessKeyId: config.accessKeyId,
-      secretAccessKey: config.secretAccessKey,
-    },
-    requestHandler: {
-      requestTimeout: 10_000,
-    },
-  });
+  return {
+    apiUrl: `https://${projectId}.supabase.co/storage/v1`,
+    bucket,
+    publicUrl: `https://${projectId}.supabase.co/storage/v1/object/public/${bucket}`,
+    secretKey,
+  };
 }
 
 export const r2Service = {
   /**
-   * Upload a file buffer to R2
+   * Upload a file to Supabase Storage
    */
   async uploadFile(
     buffer: Buffer,
@@ -53,75 +31,63 @@ export const r2Service = {
   ): Promise<{ url: string; filename: string }> {
     const config = getConfig();
     if (!config) {
-      // Fallback: no R2 configured, return relative URL for local dev
+      // No storage configured — return relative URL for local dev
       return { url: `/uploads/${filename}`, filename };
     }
 
-    const client = createClient(config);
+    const response = await fetch(
+      `${config.apiUrl}/object/${config.bucket}/${filename}`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${config.secretKey}`,
+          'Content-Type': mimetype,
+          'x-upsert': 'true',
+        },
+        body: buffer,
+      },
+    );
 
-    const command = new PutObjectCommand({
-      Bucket: config.bucket,
-      Key: filename,
-      Body: buffer,
-      ContentType: mimetype,
-    });
+    if (!response.ok) {
+      throw new Error(`Failed to upload to Supabase Storage: ${response.statusText}`);
+    }
 
-    await client.send(command);
-
-    const url = config.publicUrl
-      ? `${config.publicUrl}/${filename}`
-      : `/uploads/${filename}`;
-
-    return { url, filename };
+    return { url: `${config.publicUrl}/${filename}`, filename };
   },
 
   /**
-   * Delete a file from R2
+   * Delete a file from Supabase Storage
    */
   async deleteFile(filename: string): Promise<void> {
     const config = getConfig();
     if (!config) return;
 
-    const client = createClient(config);
+    const response = await fetch(
+      `${config.apiUrl}/object/${config.bucket}/${filename}`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${config.secretKey}`,
+        },
+      },
+    );
 
-    const command = new DeleteObjectCommand({
-      Bucket: config.bucket,
-      Key: filename,
-    });
-
-    await client.send(command);
-  },
-
-  /**
-   * Get a readable stream of a file from R2 (for proxying)
-   */
-  async getFile(filename: string): Promise<{ body: ReadableStream | undefined; contentType: string } | null> {
-    const config = getConfig();
-    if (!config) return null;
-
-    const client = createClient(config);
-
-    try {
-      const command = new GetObjectCommand({
-        Bucket: config.bucket,
-        Key: filename,
-      });
-
-      const response = await client.send(command);
-      return {
-        body: response.Body as ReadableStream | undefined,
-        contentType: response.ContentType || 'application/octet-stream',
-      };
-    } catch (error) {
-      if (error instanceof NoSuchKey || (error as { name?: string })?.name === 'NoSuchKey') {
-        return null;
-      }
-      throw error;
+    if (!response.ok) {
+      console.warn(`Failed to delete ${filename} from Supabase Storage:`, response.statusText);
     }
   },
 
   /**
-   * Check if R2 is configured
+   * Get the public URL for a file (no API call needed — URL is deterministic)
+   */
+  getPublicUrl(filename: string): string | null {
+    const config = getConfig();
+    if (!config) return null;
+    return `${config.publicUrl}/${filename}`;
+  },
+
+  /**
+   * Check if remote storage is configured
    */
   isConfigured(): boolean {
     return getConfig() !== null;
