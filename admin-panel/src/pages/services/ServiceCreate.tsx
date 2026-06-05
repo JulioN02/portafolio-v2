@@ -3,6 +3,7 @@ import { useTranslation } from '../../i18n/LanguageContext';
 import { ServiceForm } from '../../components/services/ServiceForm';
 import { useServices } from '../../hooks/useServices';
 import { FormLayout } from '@/components/shared/FormLayout';
+import { toast } from 'sonner';
 import type { ServiceInput } from '@jsoft/shared';
 
 export function ServiceCreatePage() {
@@ -14,6 +15,7 @@ export function ServiceCreatePage() {
   const handleSubmit = (data: ServiceInput) => {
     createMutation.mutate(data, {
       onSuccess: () => {
+        toast.success('Servicio creado exitosamente');
         navigate('/services');
       },
     });

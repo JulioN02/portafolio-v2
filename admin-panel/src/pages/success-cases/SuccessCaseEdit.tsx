@@ -3,6 +3,7 @@ import { useTranslation } from '../../i18n/LanguageContext';
 import { useSuccessCases } from '../../hooks/useSuccessCases';
 import { SuccessCaseForm } from '../../components/success-cases/SuccessCaseForm';
 import { FormLayout } from '@/components/shared/FormLayout';
+import { toast } from 'sonner';
 import type { SuccessCaseInput, SuccessCaseUpdateInput } from '@jsoft/shared';
 
 export function SuccessCaseEdit() {
@@ -20,10 +21,11 @@ export function SuccessCaseEdit() {
         id: id!,
         data: data as Partial<SuccessCaseUpdateInput>
       });
+      toast.success('Caso de éxito actualizado exitosamente');
       navigate('/success-cases');
     } catch (err) {
       console.error('Error updating success case:', err);
-      alert('Failed to update success case');
+      toast.error('Error al actualizar el caso de éxito');
     }
   };
 

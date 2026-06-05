@@ -3,6 +3,7 @@ import { useTranslation } from '../../i18n/LanguageContext';
 import { BlogPostForm } from '../../components/blog-posts/BlogPostForm';
 import { useBlogPosts } from '../../hooks/useBlogPosts';
 import { FormLayout } from '@/components/shared/FormLayout';
+import { toast } from 'sonner';
 import type { BlogPostInput } from '@jsoft/shared';
 
 export function BlogPostCreatePage() {
@@ -14,6 +15,7 @@ export function BlogPostCreatePage() {
   const handleSubmit = (data: BlogPostInput) => {
     createMutation.mutate(data, {
       onSuccess: () => {
+        toast.success('Artículo creado exitosamente');
         navigate('/blog-posts');
       },
     });

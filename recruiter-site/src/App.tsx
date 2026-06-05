@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import { Layout } from './components/layout/Layout';
 import { HomePage } from './pages/HomePage';
 import { ProjectsPage } from './pages/ProjectsPage';
@@ -10,16 +11,24 @@ import { ErrorBoundary } from '@jsoft/shared';
 
 function App() {
   return (
-    <Routes>
-      <Route element={<Layout />}>
-        <Route path="/" element={<ErrorBoundary><HomePage /></ErrorBoundary>} />
-        <Route path="/proyectos" element={<ErrorBoundary><ProjectsPage /></ErrorBoundary>} />
-        <Route path="/blog" element={<ErrorBoundary><BlogPage /></ErrorBoundary>} />
-        <Route path="/blog/:slug" element={<ErrorBoundary><BlogPostPage /></ErrorBoundary>} />
-        <Route path="/contacto" element={<ErrorBoundary><ContactPage /></ErrorBoundary>} />
-        <Route path="*" element={<ErrorBoundary><NotFoundPage /></ErrorBoundary>} />
-      </Route>
-    </Routes>
+    <>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/" element={<ErrorBoundary><HomePage /></ErrorBoundary>} />
+          <Route path="/proyectos" element={<ErrorBoundary><ProjectsPage /></ErrorBoundary>} />
+          <Route path="/blog" element={<ErrorBoundary><BlogPage /></ErrorBoundary>} />
+          <Route path="/blog/:slug" element={<ErrorBoundary><BlogPostPage /></ErrorBoundary>} />
+          <Route path="/contacto" element={<ErrorBoundary><ContactPage /></ErrorBoundary>} />
+          <Route path="*" element={<ErrorBoundary><NotFoundPage /></ErrorBoundary>} />
+        </Route>
+      </Routes>
+      <Toaster
+        richColors
+        position="top-right"
+        closeButton
+        duration={4000}
+      />
+    </>
   );
 }
 

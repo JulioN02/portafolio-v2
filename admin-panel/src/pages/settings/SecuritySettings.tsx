@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useSendVerificationCode, useChangePassword } from '../../hooks/useAuth';
+import { toast } from 'sonner';
 
 type Step = 'credentials' | 'verification' | 'success';
 
@@ -48,6 +49,7 @@ export function SecuritySettings() {
   // Reset to Step 1 after success (3s delay)
   useEffect(() => {
     if (changeSuccess) {
+      toast.success('Contraseña actualizada');
       setStep('success');
       const timer = setTimeout(() => {
         resetForm();
@@ -55,6 +57,12 @@ export function SecuritySettings() {
       return () => clearTimeout(timer);
     }
   }, [changeSuccess]);
+
+  useEffect(() => {
+    if (changeError) {
+      toast.error(changeError);
+    }
+  }, [changeError]);
 
   const resetForm = () => {
     setStep('credentials');

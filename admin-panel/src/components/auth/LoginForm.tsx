@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { Input, Button, ErrorMessage } from '@jsoft/shared';
+import { toast } from 'sonner';
 
 export function LoginForm() {
   const { t } = useTranslation();
@@ -15,9 +16,16 @@ export function LoginForm() {
     e.preventDefault();
     const success = await login({ username, password });
     if (success) {
+      toast.success('Inicio de sesión exitoso');
       navigate('/dashboard');
     }
   };
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error || 'Error al iniciar sesión');
+    }
+  }, [error]);
 
   return (
     <form onSubmit={handleSubmit}>

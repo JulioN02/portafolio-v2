@@ -3,6 +3,7 @@ import { useTranslation } from '../../i18n/LanguageContext';
 import { ToolForm } from '../../components/tools/ToolForm';
 import { useTools } from '../../hooks/useTools';
 import { FormLayout } from '@/components/shared/FormLayout';
+import { toast } from 'sonner';
 import type { ToolInput } from '@jsoft/shared';
 
 export function ToolCreatePage() {
@@ -14,6 +15,7 @@ export function ToolCreatePage() {
   const handleSubmit = (data: ToolInput) => {
     createMutation.mutate(data, {
       onSuccess: () => {
+        toast.success('Herramienta creada exitosamente');
         navigate('/tools');
       },
     });

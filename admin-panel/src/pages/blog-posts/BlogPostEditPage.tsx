@@ -3,6 +3,7 @@ import { useTranslation } from '../../i18n/LanguageContext';
 import { BlogPostForm } from '../../components/blog-posts/BlogPostForm';
 import { useBlogPosts } from '../../hooks/useBlogPosts';
 import { FormLayout } from '@/components/shared/FormLayout';
+import { toast } from 'sonner';
 import type { BlogPostInput } from '@jsoft/shared';
 
 export function BlogPostEditPage() {
@@ -18,6 +19,7 @@ export function BlogPostEditPage() {
       { id: id!, data },
       {
         onSuccess: () => {
+          toast.success('Artículo actualizado exitosamente');
           navigate('/blog-posts');
         },
       }

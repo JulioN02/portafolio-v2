@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { useSubmitContact } from '../../hooks/useContactForm';
 import { useTranslation } from '../../i18n/LanguageContext';
+import { toast } from 'sonner';
 import type { RecruiterContactFormData } from '../../hooks/useContactForm';
 import styles from './RecruiterContactForm.module.css';
 
@@ -121,6 +122,7 @@ export function RecruiterContactForm() {
 
     mutate(formData, {
       onSuccess: () => {
+        toast.success('¡Mensaje enviado con éxito!');
         // Reset form
         setFormData({
           name: '',
@@ -133,6 +135,9 @@ export function RecruiterContactForm() {
           preferredContact: 'EMAIL',
         });
         setFieldErrors({});
+      },
+      onError: () => {
+        toast.error('Error al enviar el mensaje');
       },
     });
   };

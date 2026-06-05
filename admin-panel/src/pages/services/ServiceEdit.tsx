@@ -3,6 +3,7 @@ import { useTranslation } from '../../i18n/LanguageContext';
 import { ServiceForm } from '../../components/services/ServiceForm';
 import { useServices } from '../../hooks/useServices';
 import { FormLayout } from '@/components/shared/FormLayout';
+import { toast } from 'sonner';
 import type { ServiceInput } from '@jsoft/shared';
 
 export function ServiceEditPage() {
@@ -18,6 +19,7 @@ export function ServiceEditPage() {
       { id: id!, data },
       {
         onSuccess: () => {
+          toast.success('Servicio actualizado exitosamente');
           navigate('/services');
         },
       }

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useSubmitContact } from '../../hooks/useContact';
 import { Spinner } from '../common/Spinner';
+import { toast } from 'sonner';
 import styles from './ContactForm.module.css';
 
 interface ContactFormProps {
@@ -38,10 +39,12 @@ export function ContactForm({ source = 'general', onSuccess }: ContactFormProps)
   const { mutate: submitContact, isPending } = useSubmitContact({
     onSuccess: () => {
       setSuccess(true);
+      toast.success('¡Mensaje enviado con éxito!');
       setFormData({ firstName: '', lastName: '', email: '', whatsapp: '', message: '' });
       onSuccess?.();
     },
     onError: () => {
+      toast.error('Error al enviar el mensaje');
       setErrors({ submit: 'Error al enviar el formulario. Por favor, intenta de nuevo.' });
     },
   });

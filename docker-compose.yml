@@ -16,6 +16,72 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - portafolio-network
+
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    container_name: portafolio-api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://julion:julion123@postgres:5432/portafolio_v2
+      PORT: 3000
+      NODE_ENV: production
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - uploads_data:/app/api/uploads
+    networks:
+      - portafolio-network
+
+  admin-panel:
+    build:
+      context: .
+      dockerfile: admin-panel/Dockerfile
+    container_name: portafolio-admin
+    restart: unless-stopped
+    ports:
+      - "5175:80"
+    depends_on:
+      - api
+    networks:
+      - portafolio-network
+
+  client-site:
+    build:
+      context: .
+      dockerfile: client-site/Dockerfile
+    container_name: portafolio-client
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      - api
+    networks:
+      - portafolio-network
+
+  recruiter-site:
+    build:
+      context: .
+      dockerfile: recruiter-site/Dockerfile
+    container_name: portafolio-recruiter
+    restart: unless-stopped
+    ports:
+      - "5174:80"
+    depends_on:
+      - api
+    networks:
+      - portafolio-network
 
 volumes:
   postgres_data:
+  uploads_data:
+
+networks:
+  portafolio-network:
+    driver: bridge

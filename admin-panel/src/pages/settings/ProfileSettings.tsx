@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth, useProfile, useUpdateProfile } from '../../hooks/useAuth';
 import { useTranslation } from '../../i18n/LanguageContext';
+import { toast } from 'sonner';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -33,9 +34,16 @@ export function ProfileSettings() {
   // Clear password field after successful save
   useEffect(() => {
     if (updateSuccess) {
+      toast.success('Perfil actualizado');
       setCurrentPassword('');
     }
   }, [updateSuccess]);
+
+  useEffect(() => {
+    if (updateError) {
+      toast.error(updateError);
+    }
+  }, [updateError]);
 
   const hasChanges = username !== (profile?.username || '') || email !== (profile?.email || '');
 

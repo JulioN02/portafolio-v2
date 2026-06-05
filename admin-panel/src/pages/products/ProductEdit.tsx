@@ -3,6 +3,7 @@ import { useTranslation } from '../../i18n/LanguageContext';
 import { ProductForm } from '../../components/products/ProductForm';
 import { useProducts } from '../../hooks/useProducts';
 import { FormLayout } from '@/components/shared/FormLayout';
+import { toast } from 'sonner';
 import type { ProductInput } from '@jsoft/shared';
 
 export function ProductEditPage() {
@@ -18,6 +19,7 @@ export function ProductEditPage() {
       { id: id!, data },
       {
         onSuccess: () => {
+          toast.success('Producto actualizado exitosamente');
           navigate('/products');
         },
       }
