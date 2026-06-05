@@ -310,55 +310,29 @@ export function ContactMessagesListPage() {
   return (
     <div className={inboxStyles.inboxContainer}>
       {/* ── Header + Filter Bar ─────────────────────────────────── */}
-      <div style={{ marginBottom: '1rem' }}>
-        <h1
-          style={{
-            fontSize: '1.5rem',
-            fontWeight: 'bold',
-            color: '#111827',
-            margin: '0 0 0.75rem',
-          }}
-        >
+      <div className={inboxStyles.headerSection}>
+        <h1 className={inboxStyles.pageTitle}>
           {t('contactMessages.title')}
         </h1>
 
         {/* Search */}
-        <div style={{ marginBottom: '0.75rem' }}>
+        <div className={inboxStyles.searchContainer}>
           <input
             type="text"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder={t('contactMessages.search')}
-            style={{
-              width: '100%',
-              padding: '0.5rem 0.75rem',
-              border: '1px solid #d1d5db',
-              borderRadius: '8px',
-              fontSize: '0.875rem',
-              outline: 'none',
-              boxSizing: 'border-box',
-            }}
+            className={inboxStyles.searchInput}
           />
         </div>
 
         {/* Filter chips */}
-        <div style={{ display: 'flex', gap: '0.375rem', flexWrap: 'wrap' }}>
+        <div className={inboxStyles.filterRow}>
           {filters.map((f) => (
             <button
               key={f.key}
               onClick={() => handleFilterChange(f.key)}
-              style={{
-                padding: '0.25rem 0.75rem',
-                border: '1px solid',
-                borderColor: currentFilter === f.key ? '#3b82f6' : '#d1d5db',
-                borderRadius: '9999px',
-                background: currentFilter === f.key ? '#eff6ff' : '#fff',
-                color: currentFilter === f.key ? '#1e40af' : '#374151',
-                fontSize: '0.8125rem',
-                fontWeight: currentFilter === f.key ? 600 : 400,
-                cursor: 'pointer',
-                transition: 'all 0.15s',
-              }}
+              className={`${inboxStyles.filterChip} ${currentFilter === f.key ? inboxStyles.filterChipActive : ''}`}
             >
               {f.label}
             </button>
@@ -370,64 +344,28 @@ export function ContactMessagesListPage() {
       <div className={inboxStyles.splitView}>
         {/* ══ Left panel: message list ════════════════════════════ */}
         <div
-          className={`${inboxStyles.listPanel} ${isMobile && selectedMessageId ? inboxStyles.hideOnMobile : ''}`}
+          className={`${inboxStyles.listPanel} ${isMobile && selectedMessage?.id ? inboxStyles.hideOnMobile : ''}`}
         >
           {/* Loading skeleton */}
           {isLoading ? (
-            <div style={{ padding: '1rem' }}>
+            <div className={inboxStyles.loadingSkeleton}>
               {[1, 2, 3, 4, 5].map((i) => (
-                <div
-                  key={i}
-                  style={{
-                    padding: '0.75rem 1rem',
-                    borderBottom: '1px solid #e5e7eb',
-                  }}
-                >
-                  <div
-                    style={{
-                      height: '14px',
-                      background: '#e5e7eb',
-                      borderRadius: '4px',
-                      width: '60%',
-                      marginBottom: '0.5rem',
-                    }}
-                  />
-                  <div
-                    style={{
-                      height: '12px',
-                      background: '#e5e7eb',
-                      borderRadius: '4px',
-                      width: '40%',
-                      marginBottom: '0.375rem',
-                    }}
-                  />
-                  <div
-                    style={{
-                      height: '12px',
-                      background: '#e5e7eb',
-                      borderRadius: '4px',
-                      width: '80%',
-                    }}
-                  />
+                <div key={i} className={inboxStyles.skeletonItem}>
+                  <div className={inboxStyles.skeletonLine} />
+                  <div className={inboxStyles.skeletonLineSm} />
+                  <div className={inboxStyles.skeletonLineLg} />
                 </div>
               ))}
             </div>
           ) : error ? (
             /* Error state */
-            <div style={{ padding: '2rem', textAlign: 'center' }}>
-              <p style={{ color: '#ef4444', marginBottom: '0.75rem' }}>
+            <div className={inboxStyles.errorState}>
+              <p className={inboxStyles.errorText}>
                 {t('common.error')}
               </p>
               <button
                 onClick={() => refetch()}
-                style={{
-                  padding: '0.375rem 0.75rem',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '6px',
-                  background: '#fff',
-                  cursor: 'pointer',
-                  fontSize: '0.8125rem',
-                }}
+                className={inboxStyles.retryBtn}
               >
                 {t('common.retry')}
               </button>
@@ -445,47 +383,21 @@ export function ContactMessagesListPage() {
 
           {/* Pagination */}
           {pagination && pagination.totalPages > 1 && (
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                gap: '0.5rem',
-                padding: '0.75rem',
-                borderTop: '1px solid #e5e7eb',
-                flexShrink: 0,
-              }}
-            >
+            <div className={inboxStyles.pagination}>
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={!pagination.hasPrev}
-                style={{
-                  padding: '0.25rem 0.5rem',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '4px',
-                  background: '#fff',
-                  cursor: pagination.hasPrev ? 'pointer' : 'not-allowed',
-                  fontSize: '0.75rem',
-                  opacity: pagination.hasPrev ? 1 : 0.5,
-                }}
+                className={inboxStyles.pageBtn}
               >
                 {t('common.previous')}
               </button>
-              <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>
+              <span className={inboxStyles.pageInfo}>
                 {currentPage} / {pagination.totalPages}
               </span>
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={!pagination.hasNext}
-                style={{
-                  padding: '0.25rem 0.5rem',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '4px',
-                  background: '#fff',
-                  cursor: pagination.hasNext ? 'pointer' : 'not-allowed',
-                  fontSize: '0.75rem',
-                  opacity: pagination.hasNext ? 1 : 0.5,
-                }}
+                className={inboxStyles.pageBtn}
               >
                 {t('common.next')}
               </button>
@@ -495,17 +407,11 @@ export function ContactMessagesListPage() {
 
         {/* ══ Right panel: detail (desktop only) ═══════════════════ */}
         {!isMobile && (
-          <div className={inboxStyles.detailPanel} style={{ padding: '1.5rem' }}>
+          <div className={`${inboxStyles.detailPanel} ${inboxStyles.detailPadding}`}>
             {!selectedId ? (
               /* ── Empty state ── */
-              <div
-                style={{
-                  textAlign: 'center',
-                  padding: '3rem 1rem',
-                  color: '#9ca3af',
-                }}
-              >
-                <p style={{ fontSize: '0.9375rem' }}>
+              <div className={inboxStyles.noMessageSelected}>
+                <p className={inboxStyles.noMessageText}>
                   {t('contactMessages.selectMessage')}
                 </p>
               </div>
@@ -515,7 +421,7 @@ export function ContactMessagesListPage() {
                 <div
                   style={{
                     height: '20px',
-                    background: '#e5e7eb',
+                    background: 'var(--color-neutral-200)',
                     borderRadius: '4px',
                     width: '50%',
                     marginBottom: '1rem',
@@ -524,7 +430,7 @@ export function ContactMessagesListPage() {
                 <div
                   style={{
                     height: '14px',
-                    background: '#e5e7eb',
+                    background: 'var(--color-neutral-200)',
                     borderRadius: '4px',
                     width: '30%',
                     marginBottom: '0.5rem',
@@ -533,7 +439,7 @@ export function ContactMessagesListPage() {
                 <div
                   style={{
                     height: '14px',
-                    background: '#e5e7eb',
+                    background: 'var(--color-neutral-200)',
                     borderRadius: '4px',
                     width: '40%',
                     marginBottom: '2rem',
@@ -542,7 +448,7 @@ export function ContactMessagesListPage() {
                 <div
                   style={{
                     height: '200px',
-                    background: '#e5e7eb',
+                    background: 'var(--color-neutral-200)',
                     borderRadius: '8px',
                   }}
                 />
@@ -551,98 +457,42 @@ export function ContactMessagesListPage() {
               /* ── Full Detail ── */
               <div>
                 {/* ── Sender info header ── */}
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'flex-start',
-                    }}
-                  >
-                    <div style={{ flex: 1 }}>
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '0.5rem',
-                          marginBottom: '0.5rem',
-                        }}
-                      >
-                        <h2
-                          style={{
-                            fontSize: '1.125rem',
-                            fontWeight: 'bold',
-                            color: '#111827',
-                            margin: 0,
-                          }}
-                        >
+                <div className={inboxStyles.detailSection}>
+                  <div className={inboxStyles.detailHeader}>
+                    <div className={inboxStyles.detailSenderInfo}>
+                      <div className={inboxStyles.detailNameRow}>
+                        <h2 className={inboxStyles.detailName}>
                           {selectedMessage.lastName
                             ? `${selectedMessage.firstName} ${selectedMessage.lastName}`
                             : selectedMessage.firstName}
                         </h2>
                         {!selectedMessage.readAt && (
-                          <span
-                            style={{
-                              background: '#3b82f6',
-                              color: '#fff',
-                              fontSize: '0.625rem',
-                              fontWeight: 600,
-                              padding: '0.125rem 0.5rem',
-                              borderRadius: '9999px',
-                            }}
-                          >
+                          <span className={`${inboxStyles.badge} ${inboxStyles.badgeUnread}`}>
                             New
                           </span>
                         )}
                       </div>
-                      <div
-                        style={{
-                          color: '#6b7280',
-                          fontSize: '0.875rem',
-                          marginBottom: '0.25rem',
-                        }}
-                      >
+                      <div className={inboxStyles.detailEmail}>
                         {selectedMessage.email}
                       </div>
                       {selectedMessage.whatsapp && (
-                        <div
-                          style={{
-                            color: '#6b7280',
-                            fontSize: '0.875rem',
-                            marginBottom: '0.25rem',
-                          }}
-                        >
+                        <div className={inboxStyles.detailEmail}>
                           WhatsApp: {selectedMessage.whatsapp}
                         </div>
                       )}
-                      <div
-                        style={{
-                          color: '#9ca3af',
-                          fontSize: '0.75rem',
-                          marginTop: '0.25rem',
-                        }}
-                      >
+                      <div className={inboxStyles.messageMeta}>
                         {formatDetailDate(selectedMessage.createdAt)}
                       </div>
                     </div>
 
                     {/* Action buttons */}
-                    <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
+                    <div className={inboxStyles.detailActions}>
                       {/* Star toggle */}
                       <button
                         onClick={handleStarFromDetail}
                         disabled={toggleStar.isPending}
                         title={selectedMessage.starred ? t('contactMessages.unstar') : t('contactMessages.star')}
-                        style={{
-                          padding: '0.375rem 0.75rem',
-                          border: '1px solid #d1d5db',
-                          borderRadius: '6px',
-                          background: selectedMessage.starred ? '#fffbeb' : '#fff',
-                          cursor: 'pointer',
-                          fontSize: '1rem',
-                          color: selectedMessage.starred ? '#f59e0b' : '#9ca3af',
-                          lineHeight: 1,
-                        }}
+                        className={`${inboxStyles.starButton} ${selectedMessage.starred ? inboxStyles.starred : ''}`}
                       >
                         {selectedMessage.starred ? '★' : '☆'}
                       </button>
@@ -650,15 +500,7 @@ export function ContactMessagesListPage() {
                       {/* Delete button */}
                       <button
                         onClick={handleDeleteFromDetail}
-                        style={{
-                          padding: '0.375rem 0.75rem',
-                          border: '1px solid #d1d5db',
-                          borderRadius: '6px',
-                          background: '#fff',
-                          cursor: 'pointer',
-                          fontSize: '0.8125rem',
-                          color: '#ef4444',
-                        }}
+                        className={`${inboxStyles.actionBtn} ${inboxStyles.actionBtnDanger}`}
                       >
                         🗑️
                       </button>
@@ -667,15 +509,7 @@ export function ContactMessagesListPage() {
                       <button
                         onClick={handleArchiveFromDetail}
                         disabled={toggleArchive.isPending}
-                        style={{
-                          padding: '0.375rem 0.75rem',
-                          border: '1px solid #d1d5db',
-                          borderRadius: '6px',
-                          background: '#fff',
-                          cursor: 'pointer',
-                          fontSize: '0.8125rem',
-                          color: '#374151',
-                        }}
+                        className={inboxStyles.actionBtn}
                       >
                         {selectedMessage.archived
                           ? t('contactMessages.unarchive')
@@ -686,66 +520,23 @@ export function ContactMessagesListPage() {
                 </div>
 
                 {/* ── Source & Origin Type ── */}
-                <div
-                  style={{
-                    marginBottom: '1.5rem',
-                    display: 'flex',
-                    gap: '1.5rem',
-                  }}
-                >
+                <div className={inboxStyles.senderInfoRow}>
                   <div>
-                    <div
-                      style={{
-                        fontSize: '0.75rem',
-                        color: '#6b7280',
-                        marginBottom: '0.25rem',
-                        fontWeight: 600,
-                      }}
-                    >
+                    <div className={inboxStyles.detailLabel}>
                       Source
                     </div>
-                    <div
-                      style={{
-                        fontSize: '0.8125rem',
-                        color: '#1e40af',
-                        background: '#dbeafe',
-                        padding: '0.1875rem 0.5rem',
-                        borderRadius: '6px',
-                        display: 'inline-block',
-                      }}
-                    >
+                    <div className={inboxStyles.sourceBadge}>
                       {selectedMessage.source && selectedMessage.source !== 'general'
                         ? formatSourceLabel(selectedMessage.source)
                         : 'General'}
                     </div>
                   </div>
                   <div>
-                    <div
-                      style={{
-                        fontSize: '0.75rem',
-                        color: '#6b7280',
-                        marginBottom: '0.25rem',
-                        fontWeight: 600,
-                      }}
-                    >
+                    <div className={inboxStyles.detailLabel}>
                       Origin Type
                     </div>
                     <span
-                      style={{
-                        display: 'inline-block',
-                        background:
-                          selectedMessage.originType === 'CLIENT'
-                            ? '#dbeafe'
-                            : '#fce7f3',
-                        color:
-                          selectedMessage.originType === 'CLIENT'
-                            ? '#1e40af'
-                            : '#9d174d',
-                        padding: '0.1875rem 0.5rem',
-                        borderRadius: '9999px',
-                        fontSize: '0.75rem',
-                        fontWeight: 500,
-                      }}
+                      className={`${inboxStyles.originBadge} ${selectedMessage.originType === 'CLIENT' ? inboxStyles.originBadgeClient : inboxStyles.originBadgeOther}`}
                     >
                       {selectedMessage.originType}
                     </span>
@@ -753,29 +544,11 @@ export function ContactMessagesListPage() {
                 </div>
 
                 {/* ── Full message ── */}
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <div
-                    style={{
-                      fontSize: '0.75rem',
-                      color: '#6b7280',
-                      marginBottom: '0.375rem',
-                      fontWeight: 600,
-                      textTransform: 'uppercase',
-                    }}
-                  >
+                <div className={inboxStyles.detailBody}>
+                  <div className={inboxStyles.detailLabelUppercase}>
                     {t('contactMessages.subject')}
                   </div>
-                  <div
-                    style={{
-                      background: '#f9fafb',
-                      padding: '1rem',
-                      borderRadius: '8px',
-                      color: '#374151',
-                      lineHeight: '1.6',
-                      whiteSpace: 'pre-wrap',
-                      fontSize: '0.9375rem',
-                    }}
-                  >
+                  <div className={inboxStyles.detailBodyContent}>
                     {selectedMessage.message}
                   </div>
                 </div>
@@ -783,59 +556,25 @@ export function ContactMessagesListPage() {
                 {/* ── Labels ── */}
                 <div>
                   <div
-                    style={{
-                      fontSize: '0.75rem',
-                      color: '#6b7280',
-                      marginBottom: '0.5rem',
-                      fontWeight: 600,
-                      textTransform: 'uppercase',
-                    }}
+                    className={inboxStyles.detailLabelUppercase}
+                    style={{ marginBottom: '0.5rem' }}
                   >
                     {t('contactMessages.labels')}
                   </div>
 
                   {/* Existing labels */}
-                  <div
-                    style={{
-                      display: 'flex',
-                      gap: '0.375rem',
-                      flexWrap: 'wrap',
-                      marginBottom: '0.5rem',
-                    }}
-                  >
+                  <div className={inboxStyles.labelsRow}>
                     {(selectedMessage.labels ?? []).length === 0 ? (
-                      <span style={{ fontSize: '0.8125rem', color: '#9ca3af' }}>
+                      <span className={inboxStyles.emptyLabels}>
                         —
                       </span>
                     ) : (
                       (selectedMessage.labels ?? []).map((label) => (
-                        <span
-                          key={label}
-                          style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '0.25rem',
-                            padding: '0.125rem 0.5rem',
-                            borderRadius: '9999px',
-                            background: '#dbeafe',
-                            color: '#1e40af',
-                            fontSize: '0.75rem',
-                            fontWeight: 500,
-                          }}
-                        >
+                        <span key={label} className={inboxStyles.labelBadge}>
                           {label}
                           <button
                             onClick={() => handleRemoveLabel(label)}
-                            style={{
-                              background: 'none',
-                              border: 'none',
-                              cursor: 'pointer',
-                              padding: 0,
-                              fontSize: '0.875rem',
-                              lineHeight: 1,
-                              color: '#1e40af',
-                              opacity: 0.6,
-                            }}
+                            className={inboxStyles.labelRemoveBtn}
                           >
                             ×
                           </button>
@@ -845,7 +584,7 @@ export function ContactMessagesListPage() {
                   </div>
 
                   {/* Add label input */}
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <div className={inboxStyles.addLabelRow}>
                     <input
                       type="text"
                       value={newLabel}
@@ -854,27 +593,12 @@ export function ContactMessagesListPage() {
                         if (e.key === 'Enter') handleAddLabel();
                       }}
                       placeholder={t('contactMessages.addLabel')}
-                      style={{
-                        flex: 1,
-                        padding: '0.375rem 0.75rem',
-                        border: '1px solid #d1d5db',
-                        borderRadius: '6px',
-                        fontSize: '0.8125rem',
-                        outline: 'none',
-                      }}
+                      className={inboxStyles.addLabelInput}
                     />
                     <button
                       onClick={handleAddLabel}
                       disabled={!newLabel.trim() || setLabels.isPending}
-                      style={{
-                        padding: '0.375rem 0.75rem',
-                        border: '1px solid #3b82f6',
-                        borderRadius: '6px',
-                        background: '#3b82f6',
-                        color: '#fff',
-                        cursor: 'pointer',
-                        fontSize: '0.8125rem',
-                      }}
+                      className={inboxStyles.addLabelBtn}
                     >
                       +
                     </button>

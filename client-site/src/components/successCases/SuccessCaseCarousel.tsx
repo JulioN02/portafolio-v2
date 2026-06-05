@@ -1,21 +1,23 @@
+import { useTranslation } from '../../i18n/LanguageContext';
 import { useRecentSuccessCases } from '../../hooks/useSuccessCases';
 import { Loading } from '../common/Loading';
 import styles from './SuccessCaseCarousel.module.css';
 
 export function SuccessCaseCarousel() {
+  const { t } = useTranslation();
   const { data: cases, isLoading, error } = useRecentSuccessCases(3);
 
-  if (isLoading) return <Loading message="Cargando casos de éxito..." />;
-  if (error) return <p className={styles.error}>Error al cargar casos de éxito</p>;
+  if (isLoading) return <Loading message={t('successCaseCarousel.loading')} />;
+  if (error) return <p className={styles.error}>{t('successCaseCarousel.error')}</p>;
   if (!cases?.length) return null;
 
   return (
     <section className={styles.section}>
       <div className={styles.container}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Casos de Éxito</h2>
+          <h2 className={styles.title}>{t('successCaseCarousel.title')}</h2>
           <p className={styles.subtitle}>
-            Proyectos que han transformado negocios
+            {t('successCaseCarousel.subtitle')}
           </p>
         </div>
 
@@ -48,7 +50,7 @@ export function SuccessCaseCarousel() {
                       rel="noopener noreferrer"
                       className={styles.link}
                     >
-                      Ver proyecto
+                      {t('successCaseCarousel.viewProject')}
                     </a>
                   ))}
                 </div>

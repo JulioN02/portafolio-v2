@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from '../../i18n/LanguageContext';
 import styles from './Hero.module.css';
 
 interface HeroProps {
@@ -10,10 +11,14 @@ interface HeroProps {
 
 export function Hero({
   name = 'Julio Nieto',
-  title = 'Full Stack Developer',
-  summary = 'Desarrollador Full Stack con experiencia en React, Node.js y TypeScript. Apasionado por construir aplicaciones web escalables y de alto rendimiento. Enfocado en crear soluciones que generen valor real para los usuarios y las empresas.',
+  title,
+  summary,
   avatarUrl,
 }: HeroProps) {
+  const { t } = useTranslation();
+  const resolvedTitle = title ?? t('hero.title');
+  const resolvedSummary = summary ?? t('hero.summary');
+
   return (
     <section className={styles.hero}>
       <div className={styles.heroBgImage} aria-hidden="true" />
@@ -40,14 +45,14 @@ export function Hero({
           )}
         </div>
         <h1 className={styles.name}>{name}</h1>
-        <p className={styles.title}>{title}</p>
-        <p className={styles.summary}>{summary}</p>
+        <p className={styles.title}>{resolvedTitle}</p>
+        <p className={styles.summary}>{resolvedSummary}</p>
         <div className={styles.ctas}>
           <Link to="/proyectos" className={styles.ctaPrimary}>
-            Ver Proyectos
+            {t('hero.cta.primary')}
           </Link>
           <Link to="/contacto" className={styles.ctaSecondary}>
-            Contactar
+            {t('hero.cta.secondary')}
           </Link>
         </div>
       </div>

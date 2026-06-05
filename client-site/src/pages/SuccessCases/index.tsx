@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from '../../i18n/LanguageContext';
 import { useSuccessCases } from '../../hooks/useSuccessCases';
 import { SuccessCaseCard } from '../../components/successCases/SuccessCaseCard';
 import { Pagination } from '../../components/common/Pagination';
@@ -8,6 +9,7 @@ import { PageHeader } from '../../components/common/PageHeader';
 import styles from './SuccessCases.module.css';
 
 export function SuccessCasesPage() {
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [industry, setIndustry] = useState<string>('');
 
@@ -27,18 +29,18 @@ export function SuccessCasesPage() {
   return (
     <div className={styles.page}>
       <MetaTags
-        title="Casos de Éxito | J Soft Solutions"
-        description="Conoce cómo hemos ayudado a nuestros clientes a alcanzar sus objetivos con soluciones digitales."
+        title={t('successCases.meta.title')}
+        description={t('successCases.meta.description')}
       />
       <PageHeader
-        title="Casos de Éxito"
-        subtitle="Conoce cómo hemos ayudado a nuestros clientes a alcanzar sus objetivos"
+        title={t('successCases.pageHeader.title')}
+        subtitle={t('successCases.pageHeader.subtitle')}
       />
       <div className={styles.container}>
         {/* Filters */}
         <div className={styles.filters}>
           <label htmlFor="industry" className={styles.filterLabel}>
-            Filtrar por industria:
+            {t('successCases.filter.label')}
           </label>
           <select
             id="industry"
@@ -46,21 +48,21 @@ export function SuccessCasesPage() {
             onChange={(e) => handleIndustryChange(e.target.value)}
             className={styles.filterSelect}
           >
-            <option value="">Todas las industrias</option>
-            <option value="Tecnología">Tecnología</option>
-            <option value="Finanzas">Finanzas</option>
-            <option value="Salud">Salud</option>
-            <option value="Educación">Educación</option>
-            <option value="Comercio">Comercio</option>
+            <option value="">{t('successCases.filter.allIndustries')}</option>
+            <option value="Tecnología">{t('successCases.filter.technology')}</option>
+            <option value="Finanzas">{t('successCases.filter.finance')}</option>
+            <option value="Salud">{t('successCases.filter.health')}</option>
+            <option value="Educación">{t('successCases.filter.education')}</option>
+            <option value="Comercio">{t('successCases.filter.commerce')}</option>
           </select>
         </div>
 
         {/* Content */}
-        {isLoading && <Loading message="Cargando casos de éxito..." />}
+        {isLoading && <Loading message={t('successCases.loading')} />}
 
         {error && (
           <div className={styles.error}>
-            <p>Error al cargar los casos de éxito. Por favor, intenta de nuevo.</p>
+            <p>{t('successCases.error')}</p>
           </div>
         )}
 
@@ -83,7 +85,7 @@ export function SuccessCasesPage() {
 
         {data && data.data.length === 0 && (
           <div className={styles.empty}>
-            <p>No se encontraron casos de éxito.</p>
+            <p>{t('successCases.empty')}</p>
           </div>
         )}
       </div>

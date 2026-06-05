@@ -2,9 +2,11 @@ import { useState, useCallback } from 'react';
 import { MetaTags } from '../components/seo/MetaTags';
 import { ProjectList } from '../components/projects/ProjectList';
 import { ProjectDetailModal } from '../components/projects/ProjectDetailModal';
+import { useTranslation } from '../i18n/LanguageContext';
 import type { ProjectSummary } from '../types';
 
 export function ProjectsPage() {
+  const { t } = useTranslation();
   const [selectedProject, setSelectedProject] = useState<ProjectSummary | null>(
     null,
   );
@@ -20,8 +22,8 @@ export function ProjectsPage() {
   return (
     <>
       <MetaTags
-        title="Proyectos | Julio Nieto"
-        description="Explora los proyectos en los que he trabajado como desarrollador Full Stack."
+        title={t('projects.meta.title')}
+        description={t('projects.meta.description')}
       />
       <ProjectList onSelectProject={handleSelectProject} />
       {selectedProject && (

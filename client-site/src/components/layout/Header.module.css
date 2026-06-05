@@ -121,6 +121,13 @@
   }
 }
 
+/* Header Actions (lang + hamburger) */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 /* Hamburger Button */
 .hamburger {
   display: none;

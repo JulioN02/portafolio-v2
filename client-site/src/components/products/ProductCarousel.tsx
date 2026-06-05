@@ -1,22 +1,24 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from '../../i18n/LanguageContext';
 import { useFeaturedProducts } from '../../hooks/useProducts';
 import { Loading } from '../common/Loading';
 import styles from './ProductCarousel.module.css';
 
 export function ProductCarousel() {
+  const { t } = useTranslation();
   const { data: products, isLoading, error } = useFeaturedProducts(5);
 
-  if (isLoading) return <Loading message="Cargando productos..." />;
-  if (error) return <p className={styles.error}>Error al cargar productos</p>;
+  if (isLoading) return <Loading message={t('productCarousel.loading')} />;
+  if (error) return <p className={styles.error}>{t('productCarousel.error')}</p>;
   if (!products?.length) return null;
 
   return (
     <section className={styles.section}>
       <div className={styles.container}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Productos</h2>
+          <h2 className={styles.title}>{t('productCarousel.title')}</h2>
           <p className={styles.subtitle}>
-            Soluciones digitales listas para implementar
+            {t('productCarousel.subtitle')}
           </p>
         </div>
 
@@ -33,7 +35,7 @@ export function ProductCarousel() {
                   />
                 )}
                 {product.featured && (
-                  <span className={styles.badge}>Destacado</span>
+                  <span className={styles.badge}>{t('productCarousel.featured')}</span>
                 )}
               </div>
               <div className={styles.content}>
@@ -45,7 +47,7 @@ export function ProductCarousel() {
                     : product.shortDescription}
                 </p>
                 <Link to={`/productos/${product.slug}`} className={styles.link}>
-                  Ver más →
+                  {t('productCarousel.viewMore')}
                 </Link>
               </div>
             </div>
@@ -54,7 +56,7 @@ export function ProductCarousel() {
 
         <div className={styles.cta}>
           <Link to="/productos" className={styles.viewAll}>
-            Ver todos los productos →
+            {t('productCarousel.viewAll')}
           </Link>
         </div>
       </div>

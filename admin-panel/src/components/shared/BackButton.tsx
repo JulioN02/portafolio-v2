@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../../i18n/LanguageContext';
+import listStyles from './ListItem.module.css';
 
 interface BackButtonProps {
   to: string;
@@ -14,16 +15,7 @@ export function BackButton({ to, label }: BackButtonProps) {
   return (
     <button
       onClick={() => navigate(to)}
-      style={{
-        background: '#6b7280',
-        color: '#fff',
-        border: 'none',
-        borderRadius: '4px',
-        padding: '6px 12px',
-        fontSize: '0.875rem',
-        cursor: 'pointer',
-        marginBottom: '16px',
-      }}
+      className={listStyles.backButton}
     >
       {text}
     </button>

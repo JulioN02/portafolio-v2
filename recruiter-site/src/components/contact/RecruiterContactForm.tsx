@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useSubmitContact } from '../../hooks/useContactForm';
+import { useTranslation } from '../../i18n/LanguageContext';
 import type { RecruiterContactFormData } from '../../hooks/useContactForm';
 import styles from './RecruiterContactForm.module.css';
 
@@ -20,46 +21,48 @@ interface FieldErrors {
 }
 
 /**
- * Client-side validation. Returns an object with error messages only
- * for fields that fail validation.
+ * Creates validation errors using translation function.
  */
-function validateForm(data: RecruiterContactFormData): FieldErrors {
+function createValidationErrors(
+  t: (key: string) => string,
+  data: RecruiterContactFormData,
+): FieldErrors {
   const errors: FieldErrors = {};
 
   if (!data.name.trim()) {
-    errors.name = 'El nombre es obligatorio';
+    errors.name = t('contactForm.error.nameRequired');
   }
 
   if (!data.email.trim()) {
-    errors.email = 'El correo electrónico es obligatorio';
+    errors.email = t('contactForm.error.emailRequired');
   } else if (!emailRegex.test(data.email)) {
-    errors.email = 'Ingrese un correo electrónico válido';
+    errors.email = t('contactForm.error.emailInvalid');
   }
 
   if (!data.phone.trim()) {
-    errors.phone = 'El teléfono es obligatorio';
+    errors.phone = t('contactForm.error.phoneRequired');
   } else if (!phoneRegex.test(data.phone)) {
-    errors.phone = 'Ingrese un número de teléfono válido (ej. +57 300 123 4567)';
+    errors.phone = t('contactForm.error.phoneInvalid');
   }
 
   if (!data.company.trim()) {
-    errors.company = 'La empresa es obligatoria';
+    errors.company = t('contactForm.error.companyRequired');
   }
 
   if (!data.position.trim()) {
-    errors.position = 'El cargo es obligatorio';
+    errors.position = t('contactForm.error.positionRequired');
   }
 
   if (!data.budget.trim()) {
-    errors.budget = 'El presupuesto es obligatorio';
+    errors.budget = t('contactForm.error.budgetRequired');
   }
 
   if (!data.message.trim()) {
-    errors.message = 'El mensaje es obligatorio';
+    errors.message = t('contactForm.error.messageRequired');
   }
 
   if (!data.preferredContact) {
-    errors.preferredContact = 'Seleccione un medio de contacto preferido';
+    errors.preferredContact = t('contactForm.error.preferredContactRequired');
   }
 
   return errors;
@@ -75,6 +78,7 @@ function hasErrors(errors: FieldErrors): boolean {
 /* ── Component ── */
 
 export function RecruiterContactForm() {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<RecruiterContactFormData>({
     name: '',
     email: '',
@@ -110,7 +114,7 @@ export function RecruiterContactForm() {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
-    const errors = validateForm(formData);
+    const errors = createValidationErrors(t, formData);
     setFieldErrors(errors);
 
     if (hasErrors(errors)) return;
@@ -144,7 +148,7 @@ export function RecruiterContactForm() {
     return (
       <div className={styles.successCard}>
         <div className={styles.successIcon}>✓</div>
-        <h3 className={styles.successTitle}>¡Mensaje enviado!</h3>
+        <h3 className={styles.successTitle}>{t('contactForm.success.title')}</h3>
         <p className={styles.successMessage}>{data.message}</p>
       </div>
     );
@@ -155,7 +159,7 @@ export function RecruiterContactForm() {
       {/* ── Name ── */}
       <div className={styles.field}>
         <label className={styles.label} htmlFor="name">
-          Nombre completo *
+          {t('contactForm.nameLabel')}
         </label>
         <input
           id="name"
@@ -164,7 +168,7 @@ export function RecruiterContactForm() {
           className={`${styles.input} ${fieldErrors.name ? styles.inputError : ''}`}
           value={formData.name}
           onChange={handleChange}
-          placeholder="Ej. Juan Pérez"
+          placeholder={t('contactForm.namePlaceholder')}
           disabled={isPending}
           autoComplete="name"
         />
@@ -176,7 +180,7 @@ export function RecruiterContactForm() {
       {/* ── Email ── */}
       <div className={styles.field}>
         <label className={styles.label} htmlFor="email">
-          Correo electrónico *
+          {t('contactForm.emailLabel')}
         </label>
         <input
           id="email"
@@ -185,7 +189,7 @@ export function RecruiterContactForm() {
           className={`${styles.input} ${fieldErrors.email ? styles.inputError : ''}`}
           value={formData.email}
           onChange={handleChange}
-          placeholder="ejemplo@correo.com"
+          placeholder={t('contactForm.emailPlaceholder')}
           disabled={isPending}
           autoComplete="email"
         />
@@ -197,7 +201,7 @@ export function RecruiterContactForm() {
       {/* ── Phone ── */}
       <div className={styles.field}>
         <label className={styles.label} htmlFor="phone">
-          Teléfono *
+          {t('contactForm.phoneLabel')}
         </label>
         <input
           id="phone"
@@ -206,7 +210,7 @@ export function RecruiterContactForm() {
           className={`${styles.input} ${fieldErrors.phone ? styles.inputError : ''}`}
           value={formData.phone}
           onChange={handleChange}
-          placeholder="+57 300 123 4567"
+          placeholder={t('contactForm.phonePlaceholder')}
           disabled={isPending}
           autoComplete="tel"
         />
@@ -218,7 +222,7 @@ export function RecruiterContactForm() {
       {/* ── Company ── */}
       <div className={styles.field}>
         <label className={styles.label} htmlFor="company">
-          Empresa *
+          {t('contactForm.companyLabel')}
         </label>
         <input
           id="company"
@@ -227,7 +231,7 @@ export function RecruiterContactForm() {
           className={`${styles.input} ${fieldErrors.company ? styles.inputError : ''}`}
           value={formData.company}
           onChange={handleChange}
-          placeholder="Nombre de la empresa"
+          placeholder={t('contactForm.companyPlaceholder')}
           disabled={isPending}
           autoComplete="organization"
         />
@@ -239,7 +243,7 @@ export function RecruiterContactForm() {
       {/* ── Position ── */}
       <div className={styles.field}>
         <label className={styles.label} htmlFor="position">
-          Cargo *
+          {t('contactForm.positionLabel')}
         </label>
         <input
           id="position"
@@ -248,7 +252,7 @@ export function RecruiterContactForm() {
           className={`${styles.input} ${fieldErrors.position ? styles.inputError : ''}`}
           value={formData.position}
           onChange={handleChange}
-          placeholder="Ej. Tech Lead, HR Manager"
+          placeholder={t('contactForm.positionPlaceholder')}
           disabled={isPending}
         />
         {fieldErrors.position && (
@@ -259,7 +263,7 @@ export function RecruiterContactForm() {
       {/* ── Budget ── */}
       <div className={styles.field}>
         <label className={styles.label} htmlFor="budget">
-          Presupuesto / Rango salarial *
+          {t('contactForm.budgetLabel')}
         </label>
         <input
           id="budget"
@@ -268,7 +272,7 @@ export function RecruiterContactForm() {
           className={`${styles.input} ${fieldErrors.budget ? styles.inputError : ''}`}
           value={formData.budget}
           onChange={handleChange}
-          placeholder="$50k–$80k USD o Por definir"
+          placeholder={t('contactForm.budgetPlaceholder')}
           disabled={isPending}
         />
         {fieldErrors.budget && (
@@ -279,7 +283,7 @@ export function RecruiterContactForm() {
       {/* ── Preferred Contact ── */}
       <div className={styles.field}>
         <label className={styles.label} htmlFor="preferredContact">
-          Medio de contacto preferido *
+          {t('contactForm.preferredContactLabel')}
         </label>
         <select
           id="preferredContact"
@@ -289,9 +293,9 @@ export function RecruiterContactForm() {
           onChange={handleChange}
           disabled={isPending}
         >
-          <option value="EMAIL">Email</option>
-          <option value="PHONE">Teléfono</option>
-          <option value="WHATSAPP">WhatsApp</option>
+          <option value="EMAIL">{t('contactForm.option.email')}</option>
+          <option value="PHONE">{t('contactForm.option.phone')}</option>
+          <option value="WHATSAPP">{t('contactForm.option.whatsapp')}</option>
         </select>
         {fieldErrors.preferredContact && (
           <span className={styles.fieldError}>
@@ -303,7 +307,7 @@ export function RecruiterContactForm() {
       {/* ── Message ── */}
       <div className={styles.field}>
         <label className={styles.label} htmlFor="message">
-          Mensaje *
+          {t('contactForm.messageLabel')}
         </label>
         <textarea
           id="message"
@@ -311,7 +315,7 @@ export function RecruiterContactForm() {
           className={`${styles.textarea} ${fieldErrors.message ? styles.inputError : ''}`}
           value={formData.message}
           onChange={handleChange}
-          placeholder="Cuénteme sobre la oportunidad, requisitos, y cualquier detalle relevante..."
+          placeholder={t('contactForm.messagePlaceholder')}
           rows={5}
           disabled={isPending}
         />
@@ -324,8 +328,7 @@ export function RecruiterContactForm() {
       {isError && (
         <div className={styles.apiError}>
           <p className={styles.apiErrorText}>
-            {error?.message ??
-              'Ocurrió un error al enviar el formulario. Intente nuevamente.'}
+            {error?.message ?? t('contactForm.error.generic')}
           </p>
           <button
             type="button"
@@ -333,7 +336,7 @@ export function RecruiterContactForm() {
             onClick={handleRetry}
             disabled={isPending}
           >
-            Intentar de nuevo
+            {t('contactForm.error.retry')}
           </button>
         </div>
       )}
@@ -347,10 +350,10 @@ export function RecruiterContactForm() {
         {isPending ? (
           <span className={styles.loadingWrapper}>
             <span className={styles.spinner} />
-            Enviando...
+            {t('contactForm.submitting')}
           </span>
         ) : (
-          'Enviar mensaje'
+          t('contactForm.submit')
         )}
       </button>
     </form>

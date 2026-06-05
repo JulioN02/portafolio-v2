@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from '../../i18n/LanguageContext';
 import styles from './Footer.module.css';
 
 const socialLinks = [
@@ -41,9 +42,9 @@ const socialLinks = [
   },
 ];
 
-const legalLinks = [
-  { to: '/privacidad', label: 'Política de Privacidad' },
-  { to: '/terminos', label: 'Términos y Condiciones' },
+const LEGAL_LINKS = [
+  { to: '/privacidad', key: 'footer.privacy' },
+  { to: '/terminos', key: 'footer.terms' },
 ];
 
 const logoIcon = (
@@ -51,6 +52,7 @@ const logoIcon = (
 );
 
 export function Footer() {
+  const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
 
   return (
@@ -64,7 +66,7 @@ export function Footer() {
               <h3 className={styles.brandName}>J Soft Solutions</h3>
             </div>
             <p className={styles.brandTagline}>
-              Desarrollo web personalizado para tu negocio
+              {t('footer.tagline')}
             </p>
             {/* Social Links */}
             <div className={styles.socialLinks}>
@@ -87,17 +89,17 @@ export function Footer() {
 
           {/* Quick Links */}
           <div className={styles.links}>
-            <h4 className={styles.linksTitle}>Enlaces</h4>
+            <h4 className={styles.linksTitle}>{t('footer.links')}</h4>
             <nav className={styles.linksNav}>
-              <Link to="/">Inicio</Link>
-              <Link to="/servicios">Servicios</Link>
-              <Link to="/contacto">Contacto</Link>
+              <Link to="/">{t('nav.home')}</Link>
+              <Link to="/servicios">{t('nav.services')}</Link>
+              <Link to="/contacto">{t('nav.contact')}</Link>
             </nav>
           </div>
 
           {/* Contact */}
           <div className={styles.contact}>
-            <h4 className={styles.contactTitle}>Contacto</h4>
+            <h4 className={styles.contactTitle}>{t('footer.contact')}</h4>
             <address className={styles.contactInfo}>
               <a href="mailto:info@jsoftsolutions.com">info@jsoftsolutions.com</a>
               <a href="https://wa.me/573001234567">WhatsApp</a>
@@ -110,14 +112,14 @@ export function Footer() {
         <div className={styles.bottom}>
           <div className={styles.bottomLeft}>
             <p className={styles.copyright}>
-              &copy; {currentYear} J Soft Solutions. Todos los derechos reservados.
+              {t('footer.copyright', { year: currentYear })}
             </p>
-            <p className={styles.madeIn}>Hecho con ❤️ en Colombia</p>
+            <p className={styles.madeIn}>{t('footer.madeIn')}</p>
           </div>
           <nav className={styles.legalLinks}>
-            {legalLinks.map((link) => (
+            {LEGAL_LINKS.map((link) => (
               <Link key={link.to} to={link.to} className={styles.legalLink}>
-                {link.label}
+                {t(link.key)}
               </Link>
             ))}
           </nav>

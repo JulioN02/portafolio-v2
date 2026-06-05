@@ -1,18 +1,20 @@
+import { useTranslation } from '../../i18n/LanguageContext';
 import { MetaTags } from '../../components/seo/MetaTags';
 import { PageHeader } from '../../components/common/PageHeader';
 import { ContactForm } from '../../components/forms/ContactForm';
 import styles from './Contact.module.css';
 
 export function ContactPage() {
+  const { t } = useTranslation();
   return (
     <div className={styles.page}>
       <MetaTags
-        title="Contacto | J Soft Solutions"
-        description="Contáctanos para discutir tu proyecto. Estamos en Bogotá, Colombia."
+        title={t('contact.meta.title')}
+        description={t('contact.meta.description')}
       />
       <PageHeader
-        title="Contacto"
-        subtitle="¿Tienes un proyecto en mente? Me encantaría escuchar sobre él."
+        title={t('contact.pageHeader.title')}
+        subtitle={t('contact.pageHeader.subtitle')}
         backgroundImage="/uploads/contacto.png"
       />
       <div className={styles.container}>
@@ -28,7 +30,7 @@ export function ContactPage() {
                   </svg>
                 </span>
                 <div>
-                  <h3>Email</h3>
+                  <h3>{t('contact.email')}</h3>
                   <a href="mailto:info@jsoftsolutions.com">info@jsoftsolutions.com</a>
                 </div>
               </div>
@@ -40,7 +42,7 @@ export function ContactPage() {
                   </svg>
                 </span>
                 <div>
-                  <h3>WhatsApp</h3>
+                  <h3>{t('contact.whatsapp')}</h3>
                   <a href="https://wa.me/573001234567">+57 300 123 4567</a>
                 </div>
               </div>
@@ -52,16 +54,16 @@ export function ContactPage() {
                   </svg>
                 </span>
                 <div>
-                  <h3>Ubicación</h3>
-                  <p>Bogotá, Colombia</p>
+                  <h3>{t('contact.location')}</h3>
+                  <p>{t('contact.locationValue')}</p>
                 </div>
               </div>
             </div>
 
             <div className={styles.availability}>
-              <h3>Disponibilidad</h3>
-              <p>Lunes a Viernes: 9:00 AM - 6:00 PM (COT)</p>
-              <p>Respuesta en menos de 24 horas</p>
+              <h3>{t('contact.availability.title')}</h3>
+              <p>{t('contact.availability.schedule')}</p>
+              <p>{t('contact.availability.response')}</p>
             </div>
           </div>
 

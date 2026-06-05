@@ -1,5 +1,6 @@
 import { useState, type SyntheticEvent } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useTranslation } from '../../i18n/LanguageContext';
 import { useSuccessCaseBySlug } from '../../hooks/useSuccessCases';
 import { Loading } from '../../components/common/Loading';
 import { MetaTags } from '../../components/seo/MetaTags';
@@ -8,19 +9,20 @@ import styles from './SuccessCaseDetail.module.css';
 const FALLBACK_IMG = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="800" height="600" fill="%23e5e7eb"%3E%3Crect width="800" height="600"/%3E%3Ctext x="400" y="300" text-anchor="middle" dy=".3em" font-size="20" fill="%239ca3af"%3ESin imagen%3C/text%3E%3C/svg%3E';
 
 export function SuccessCaseDetailPage() {
+  const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const { data: successCase, isLoading, error } = useSuccessCaseBySlug(slug || '');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  if (isLoading) return <Loading fullPage message="Cargando caso de éxito..." />;
+  if (isLoading) return <Loading fullPage message={t('successCaseDetail.loading')} />;
 
   if (error || !successCase) {
     return (
       <div className={styles.error}>
-        <h2>Caso de éxito no encontrado</h2>
-        <p>El caso de éxito que buscas no existe o ha sido eliminado.</p>
+        <h2>{t('successCaseDetail.notFound.title')}</h2>
+        <p>{t('successCaseDetail.notFound.message')}</p>
         <Link to="/casos-de-exito" className={styles.backLink}>
-          ← Volver a casos de éxito
+          {t('successCaseDetail.backToCases')}
         </Link>
       </div>
     );
@@ -47,7 +49,7 @@ export function SuccessCaseDetailPage() {
       <div className={styles.container}>
         {/* Breadcrumb */}
         <nav className={styles.breadcrumb}>
-          <Link to="/casos-de-exito">Casos de Éxito</Link>
+          <Link to="/casos-de-exito">{t('successCaseDetail.breadcrumb.cases')}</Link>
           <span>/</span>
           <span>{successCase.title}</span>
         </nav>
@@ -58,7 +60,7 @@ export function SuccessCaseDetailPage() {
             <div className={styles.carousel}>
               <img
                 src={images[currentImageIndex]}
-                alt={`${successCase.title} - Imagen ${currentImageIndex + 1}`}
+                alt={t('successCaseDetail.imageAlt', { title: successCase.title, number: currentImageIndex + 1 })}
                 className={styles.carouselImage}
                 onError={(e: SyntheticEvent<HTMLImageElement>) => {
                   e.currentTarget.src = FALLBACK_IMG;
@@ -70,14 +72,14 @@ export function SuccessCaseDetailPage() {
                   <button
                     onClick={prevImage}
                     className={`${styles.carouselButton} ${styles.prev}`}
-                    aria-label="Imagen anterior"
+                    aria-label={t('successCaseDetail.prevImage')}
                   >
                     ‹
                   </button>
                   <button
                     onClick={nextImage}
                     className={`${styles.carouselButton} ${styles.next}`}
-                    aria-label="Siguiente imagen"
+                    aria-label={t('successCaseDetail.nextImage')}
                   >
                     ›
                   </button>
@@ -90,7 +92,7 @@ export function SuccessCaseDetailPage() {
                         className={`${styles.dot} ${
                           index === currentImageIndex ? styles.active : ''
                         }`}
-                        aria-label={`Ir a imagen ${index + 1}`}
+                        aria-label={t('successCaseDetail.goToImage', { number: index + 1 })}
                       />
                     ))}
                   </div>
@@ -107,7 +109,7 @@ export function SuccessCaseDetailPage() {
             {/* Links */}
             {successCase.links && successCase.links.length > 0 && (
               <div className={styles.linksSection}>
-                <h3 className={styles.linksTitle}>Enlaces relacionados</h3>
+                <h3 className={styles.linksTitle}>{t('successCaseDetail.relatedLinks')}</h3>
                 <ul className={styles.linksList}>
                   {successCase.links.map((link, index) => (
                     <li key={index}>
@@ -131,7 +133,7 @@ export function SuccessCaseDetailPage() {
         {/* Videos Section */}
         {successCase.videos && successCase.videos.length > 0 && (
           <div className={styles.videosSection}>
-            <h2>Videos</h2>
+            <h2>{t('successCaseDetail.videos')}</h2>
             <div className={styles.videosGrid}>
               {successCase.videos.map((video, index) => (
                 <div key={index} className={styles.videoWrapper}>
@@ -140,7 +142,7 @@ export function SuccessCaseDetailPage() {
                     className={styles.video}
                     src={video}
                   >
-                    Tu navegador no soporta la reproducción de video.
+                    {t('successCaseDetail.videoNotSupported')}
                   </video>
                 </div>
               ))}

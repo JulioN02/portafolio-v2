@@ -1,3 +1,4 @@
+import { useTranslation } from '../../i18n/LanguageContext';
 import { MetaTags } from '../../components/seo/MetaTags';
 import { Hero } from './Hero';
 import { FeaturedServices } from './FeaturedServices';
@@ -16,6 +17,7 @@ const SECTION_COMPONENTS: Record<string, React.FC> = {
 };
 
 export function HomePage() {
+  const { t } = useTranslation();
   const { sections, isLoading, error } = useVisibleSections();
 
   // Mientras carga o si hay error, mostramos todo en el orden por defecto
@@ -28,8 +30,8 @@ export function HomePage() {
   return (
     <>
       <MetaTags
-        title="J Soft Solutions | Desarrollo web profesional"
-        description="Desarrollo web personalizado en Bogotá. Creamos sitios web, aplicaciones y soluciones digitales para tu negocio."
+        title={t('home.meta.title')}
+        description={t('home.meta.description')}
       />
       <Hero />
       {orderedKeys.map((key) => {

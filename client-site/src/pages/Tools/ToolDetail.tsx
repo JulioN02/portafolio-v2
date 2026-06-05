@@ -1,6 +1,7 @@
 import { useState, type SyntheticEvent } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import DOMPurify from 'dompurify';
+import { useTranslation } from '../../i18n/LanguageContext';
 import { useToolBySlug } from '../../hooks/useTools';
 import { Loading } from '../../components/common/Loading';
 import { MetaTags } from '../../components/seo/MetaTags';
@@ -11,20 +12,21 @@ import styles from './ToolDetail.module.css';
 const FALLBACK_IMG = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="800" height="600" fill="%23e5e7eb"%3E%3Crect width="800" height="600"/%3E%3Ctext x="400" y="300" text-anchor="middle" dy=".3em" font-size="20" fill="%239ca3af"%3ESin imagen%3C/text%3E%3C/svg%3E';
 
 export function ToolDetailPage() {
+  const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const { data: tool, isLoading, error } = useToolBySlug(slug || '');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
-  if (isLoading) return <Loading fullPage message="Cargando herramienta..." />;
+  if (isLoading) return <Loading fullPage message={t('toolDetail.loading')} />;
 
   if (error || !tool) {
     return (
       <div className={styles.error}>
-        <h2>Herramienta no encontrada</h2>
-        <p>La herramienta que buscas no existe o ha sido eliminada.</p>
+        <h2>{t('toolDetail.notFound.title')}</h2>
+        <p>{t('toolDetail.notFound.message')}</p>
         <Link to="/herramientas" className={styles.backLink}>
-          ← Volver a herramientas
+          {t('toolDetail.backToTools')}
         </Link>
       </div>
     );
@@ -51,7 +53,7 @@ export function ToolDetailPage() {
       <div className={styles.container}>
         {/* Breadcrumb */}
         <nav className={styles.breadcrumb}>
-          <Link to="/herramientas">Herramientas</Link>
+          <Link to="/herramientas">{t('toolDetail.breadcrumb.tools')}</Link>
           <span>/</span>
           <span>{tool.title}</span>
         </nav>
@@ -62,7 +64,7 @@ export function ToolDetailPage() {
             <div className={styles.carousel}>
               <img
                 src={images[currentImageIndex]}
-                alt={`${tool.title} - Imagen ${currentImageIndex + 1}`}
+                alt={t('toolDetail.imageAlt', { title: tool.title, number: currentImageIndex + 1 })}
                 className={styles.carouselImage}
                 onError={(e: SyntheticEvent<HTMLImageElement>) => {
                   e.currentTarget.src = FALLBACK_IMG;
@@ -74,14 +76,14 @@ export function ToolDetailPage() {
                   <button
                     onClick={prevImage}
                     className={`${styles.carouselButton} ${styles.prev}`}
-                    aria-label="Imagen anterior"
+                    aria-label={t('toolDetail.prevImage')}
                   >
                     ‹
                   </button>
                   <button
                     onClick={nextImage}
                     className={`${styles.carouselButton} ${styles.next}`}
-                    aria-label="Siguiente imagen"
+                    aria-label={t('toolDetail.nextImage')}
                   >
                     ›
                   </button>
@@ -94,7 +96,7 @@ export function ToolDetailPage() {
                         className={`${styles.dot} ${
                           index === currentImageIndex ? styles.active : ''
                         }`}
-                        aria-label={`Ir a imagen ${index + 1}`}
+                        aria-label={t('toolDetail.goToImage', { number: index + 1 })}
                       />
                     ))}
                   </div>
@@ -112,7 +114,7 @@ export function ToolDetailPage() {
             {/* Requires Install badge */}
             {tool.requiresInstall && (
               <div className={styles.installBadge}>
-                ⚙️ Requiere instalación
+                {t('toolDetail.requiresInstall')}
               </div>
             )}
 
@@ -120,7 +122,7 @@ export function ToolDetailPage() {
               onClick={() => setIsContactModalOpen(true)}
               className={styles.ctaButton}
             >
-              Solicitar información
+              {t('toolDetail.requestInfo')}
             </button>
           </div>
         </div>
@@ -128,7 +130,7 @@ export function ToolDetailPage() {
         {/* Full Description */}
         {tool.fullDescription && (
           <div className={styles.fullDescription}>
-            <h2>Descripción completa</h2>
+            <h2>{t('toolDetail.fullDescription')}</h2>
             <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(tool.fullDescription) }} />
           </div>
         )}
@@ -138,7 +140,7 @@ export function ToolDetailPage() {
       <Modal
         isOpen={isContactModalOpen}
         onClose={() => setIsContactModalOpen(false)}
-        title="Solicitar información"
+        title={t('toolDetail.requestInfo')}
       >
         <ContactForm
           source={`tool:${tool.title}`}

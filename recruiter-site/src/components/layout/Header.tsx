@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react';
 import { Link, NavLink } from 'react-router-dom';
+import { useTranslation } from '../../i18n/LanguageContext';
+import { LanguageSwitcher } from '../common/LanguageSwitcher';
 import styles from './Header.module.css';
 
-const navLinks = [
-  { to: '/', label: 'Inicio' },
-  { to: '/proyectos', label: 'Proyectos' },
-  { to: '/blog', label: 'Blog' },
-  { to: '/contacto', label: 'Contacto' },
+const NAV_ITEMS = [
+  { to: '/', key: 'nav.home' },
+  { to: '/proyectos', key: 'nav.projects' },
+  { to: '/blog', key: 'nav.blog' },
+  { to: '/contacto', key: 'nav.contact' },
 ];
 
 export function Header() {
+  const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -48,7 +51,7 @@ export function Header() {
           </Link>
 
           <nav className={styles.navDesktop}>
-            {navLinks.map((link) => (
+            {NAV_ITEMS.map((link) => (
               <NavLink
                 key={link.to}
                 to={link.to}
@@ -57,21 +60,24 @@ export function Header() {
                 }
                 end={link.to === '/'}
               >
-                {link.label}
+                {t(link.key)}
               </NavLink>
             ))}
           </nav>
 
-          <button
-            className={styles.hamburger}
-            onClick={toggleMenu}
-            aria-label="Toggle menu"
-            aria-expanded={isMenuOpen}
-          >
-            <span className={`${styles.hamburgerLine} ${isMenuOpen ? styles.open : ''}`} />
-            <span className={`${styles.hamburgerLine} ${isMenuOpen ? styles.open : ''}`} />
-            <span className={`${styles.hamburgerLine} ${isMenuOpen ? styles.open : ''}`} />
-          </button>
+          <div className={styles.actions}>
+            <LanguageSwitcher />
+            <button
+              className={styles.hamburger}
+              onClick={toggleMenu}
+              aria-label={t('nav.toggleMenu')}
+              aria-expanded={isMenuOpen}
+            >
+              <span className={`${styles.hamburgerLine} ${isMenuOpen ? styles.open : ''}`} />
+              <span className={`${styles.hamburgerLine} ${isMenuOpen ? styles.open : ''}`} />
+              <span className={`${styles.hamburgerLine} ${isMenuOpen ? styles.open : ''}`} />
+            </button>
+          </div>
         </div>
       </header>
 
@@ -79,7 +85,7 @@ export function Header() {
         className={`${styles.navMobile} ${isMenuOpen ? styles.open : ''}`}
         onClick={isMenuOpen ? () => setIsMenuOpen(false) : undefined}
       >
-        {navLinks.map((link) => (
+        {NAV_ITEMS.map((link) => (
           <NavLink
             key={link.to}
             to={link.to}
@@ -89,7 +95,7 @@ export function Header() {
             end={link.to === '/'}
             onClick={() => setIsMenuOpen(false)}
           >
-            {link.label}
+            {t(link.key)}
           </NavLink>
         ))}
       </nav>

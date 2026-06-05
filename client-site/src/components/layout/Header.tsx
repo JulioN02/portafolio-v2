@@ -1,18 +1,21 @@
 import { useState, useEffect } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
+import { useTranslation } from '../../i18n/LanguageContext';
+import { LanguageSwitcher } from '../common/LanguageSwitcher';
 import styles from './Header.module.css';
 
-const navLinks = [
-  { to: '/', label: 'Inicio' },
-  { to: '/servicios', label: 'Servicios' },
-  { to: '/productos', label: 'Productos' },
-  { to: '/herramientas', label: 'Herramientas' },
-  { to: '/blog', label: 'Blog' },
-  { to: '/casos-de-exito', label: 'Casos de Éxito' },
-  { to: '/contacto', label: 'Contacto' },
+const NAV_ITEMS = [
+  { to: '/', key: 'nav.home' },
+  { to: '/servicios', key: 'nav.services' },
+  { to: '/productos', key: 'nav.products' },
+  { to: '/herramientas', key: 'nav.tools' },
+  { to: '/blog', key: 'nav.blog' },
+  { to: '/casos-de-exito', key: 'nav.successCases' },
+  { to: '/contacto', key: 'nav.contact' },
 ];
 
 export function Header() {
+  const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -68,7 +71,7 @@ export function Header() {
 
           {/* Desktop Navigation */}
           <nav className={styles.navDesktop}>
-            {navLinks.map((link) => (
+            {NAV_ITEMS.map((link) => (
               <NavLink
                 key={link.to}
                 to={link.to}
@@ -77,22 +80,25 @@ export function Header() {
                 }
                 end={link.to === '/'}
               >
-                {link.label}
+                {t(link.key)}
               </NavLink>
             ))}
           </nav>
 
-          {/* Hamburger Button */}
-          <button
-            className={styles.hamburger}
-            onClick={toggleMenu}
-            aria-label="Toggle menu"
-            aria-expanded={isMenuOpen}
-          >
-            <span className={`${styles.hamburgerLine} ${isMenuOpen ? styles.open : ''}`} />
-            <span className={`${styles.hamburgerLine} ${isMenuOpen ? styles.open : ''}`} />
-            <span className={`${styles.hamburgerLine} ${isMenuOpen ? styles.open : ''}`} />
-          </button>
+          <div className={styles.actions}>
+            <LanguageSwitcher />
+            {/* Hamburger Button */}
+            <button
+              className={styles.hamburger}
+              onClick={toggleMenu}
+              aria-label={t('nav.toggleMenu')}
+              aria-expanded={isMenuOpen}
+            >
+              <span className={`${styles.hamburgerLine} ${isMenuOpen ? styles.open : ''}`} />
+              <span className={`${styles.hamburgerLine} ${isMenuOpen ? styles.open : ''}`} />
+              <span className={`${styles.hamburgerLine} ${isMenuOpen ? styles.open : ''}`} />
+            </button>
+          </div>
         </div>
       </header>
 
@@ -101,7 +107,7 @@ export function Header() {
         className={`${styles.navMobile} ${isMenuOpen ? styles.open : ''}`}
         onClick={isMenuOpen ? () => setIsMenuOpen(false) : undefined}
       >
-        {navLinks.map((link) => (
+        {NAV_ITEMS.map((link) => (
           <NavLink
             key={link.to}
             to={link.to}
@@ -111,7 +117,7 @@ export function Header() {
             end={link.to === '/'}
             onClick={() => setIsMenuOpen(false)}
           >
-            {link.label}
+            {t(link.key)}
           </NavLink>
         ))}
       </nav>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from '../../i18n/LanguageContext';
 import { useTools, useClassifications } from '../../hooks/useTools';
 import { ToolCard } from '../../components/tools/ToolCard';
 import { Pagination } from '../../components/common/Pagination';
@@ -9,6 +10,7 @@ import { PageHeader } from '../../components/common/PageHeader';
 import styles from './Tools.module.css';
 
 export function ToolsPage() {
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [classification, setClassification] = useState<string>('');
 
@@ -30,12 +32,12 @@ export function ToolsPage() {
   return (
     <div className={styles.page}>
       <MetaTags
-        title="Herramientas | J Soft Solutions"
-        description="Herramientas y tecnologías que utilizamos para desarrollar soluciones innovadoras."
+        title={t('tools.meta.title')}
+        description={t('tools.meta.description')}
       />
       <PageHeader
-        title="Nuestras Herramientas"
-        subtitle="Tecnologías y herramientas que utilizamos para crear soluciones innovadoras"
+        title={t('tools.pageHeader.title')}
+        subtitle={t('tools.pageHeader.subtitle')}
       />
       <div className={styles.container}>
         {/* Filters */}
@@ -44,20 +46,20 @@ export function ToolsPage() {
             id="classification"
             value={classification}
             onChange={(e) => handleClassificationChange(e.target.value)}
-            label="Filtrar por:"
+            label={t('tools.filter.label')}
             options={[
-              { value: '', label: 'Todas las categorías' },
+              { value: '', label: t('tools.filter.allCategories') },
               ...(classifications?.map((cat) => ({ value: cat, label: cat })) ?? []),
             ]}
           />
         </div>
 
         {/* Content */}
-        {isLoading && <Loading message="Cargando herramientas..." />}
+        {isLoading && <Loading message={t('tools.loading')} />}
 
         {error && (
           <div className={styles.error}>
-            <p>Error al cargar las herramientas. Por favor, intenta de nuevo.</p>
+            <p>{t('tools.error')}</p>
           </div>
         )}
 
@@ -80,7 +82,7 @@ export function ToolsPage() {
 
         {data && data.data.length === 0 && (
           <div className={styles.empty}>
-            <p>No se encontraron herramientas.</p>
+            <p>{t('tools.empty')}</p>
           </div>
         )}
       </div>

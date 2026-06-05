@@ -32,6 +32,692 @@
   flex-direction: column;
 }
 
+/* ── Header Section ── */
+
+.headerSection {
+  margin-bottom: 1rem;
+}
+
+/* ── Page Title ── */
+
+.pageTitle {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-neutral-900);
+  margin: 0 0 0.75rem;
+}
+
+/* ── Search ── */
+
+.searchContainer {
+  margin-bottom: 0.75rem;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-neutral-300);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-sm);
+  outline: none;
+  box-sizing: border-box;
+}
+
+/* ── Filter Chips ── */
+
+.filterRow {
+  display: flex;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+}
+
+.filterChip {
+  padding: 0.25rem 0.75rem;
+  border: 1px solid var(--color-neutral-300);
+  border-radius: var(--radius-full);
+  background: var(--color-neutral-0);
+  color: var(--color-neutral-700);
+  font-size: 0.8125rem;
+  font-weight: var(--font-weight-normal);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.filterChip:hover {
+  background: var(--color-neutral-50);
+}
+
+.filterChipActive {
+  border-color: var(--color-primary-500);
+  background: var(--color-primary-50);
+  color: var(--color-primary-800);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* ── Loading / Skeleton ── */
+
+.loadingSkeleton {
+  padding: 1rem;
+}
+
+.skeletonItem {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--color-neutral-200);
+}
+
+.skeletonLine {
+  height: 14px;
+  background: var(--color-neutral-200);
+  border-radius: var(--radius-sm);
+  width: 60%;
+  margin-bottom: 0.5rem;
+}
+
+.skeletonLineSm {
+  height: 12px;
+  background: var(--color-neutral-200);
+  border-radius: var(--radius-sm);
+  width: 40%;
+  margin-bottom: 0.375rem;
+}
+
+.skeletonLineLg {
+  height: 12px;
+  background: var(--color-neutral-200);
+  border-radius: var(--radius-sm);
+  width: 80%;
+}
+
+/* ── Error State ── */
+
+.errorState {
+  padding: 2rem;
+  text-align: center;
+}
+
+.errorText {
+  color: var(--color-danger-500);
+  margin-bottom: 0.75rem;
+}
+
+.retryBtn {
+  padding: 0.375rem 0.75rem;
+  border: 1px solid var(--color-neutral-300);
+  border-radius: var(--radius-md);
+  background: var(--color-neutral-0);
+  cursor: pointer;
+  font-size: 0.8125rem;
+}
+
+.retryBtn:hover {
+  background: var(--color-neutral-50);
+}
+
+/* ── Empty State ── */
+
+.emptyState {
+  padding: 2rem;
+  text-align: center;
+  color: var(--color-neutral-500);
+}
+
+/* ── Pagination ── */
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-top: 1px solid var(--color-neutral-200);
+  flex-shrink: 0;
+}
+
+.pageBtn {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--color-neutral-300);
+  border-radius: var(--radius-sm);
+  background: var(--color-neutral-0);
+  cursor: pointer;
+  font-size: var(--font-size-xs);
+  line-height: 1;
+}
+
+.pageBtn:hover:not(:disabled) {
+  background: var(--color-neutral-50);
+}
+
+.pageBtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.pageInfo {
+  font-size: var(--font-size-xs);
+  color: var(--color-neutral-500);
+}
+
+/* ── Detail Panel Shared ── */
+
+.detailPadding {
+  padding: 1.5rem;
+}
+
+.noMessageSelected {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--color-neutral-400);
+}
+
+.noMessageText {
+  font-size: 0.9375rem;
+}
+
+/* ── Detail Section ── */
+
+.detailSection {
+  margin-bottom: 1.5rem;
+}
+
+.detailHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.detailSenderInfo {
+  flex: 1;
+}
+
+.detailNameRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.detailName {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-neutral-900);
+  margin: 0;
+}
+
+.detailEmail {
+  color: var(--color-neutral-500);
+  font-size: var(--font-size-sm);
+  margin-bottom: 0.25rem;
+}
+
+.messageMeta {
+  font-size: var(--font-size-xs);
+  color: var(--color-neutral-400);
+  margin-top: 0.25rem;
+}
+
+/* ── Badges ── */
+
+.badge {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-full);
+  font-size: 0.625rem;
+  font-weight: var(--font-weight-semibold);
+}
+
+.badgeRead {
+  background: var(--color-neutral-200);
+  color: var(--color-neutral-600);
+}
+
+.badgeUnread {
+  background: var(--color-primary-500);
+  color: var(--color-neutral-0);
+}
+
+/* ── Star Button (detail) ── */
+
+.starButton {
+  padding: 0.375rem 0.75rem;
+  border: 1px solid var(--color-neutral-300);
+  border-radius: var(--radius-md);
+  background: var(--color-neutral-0);
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--color-neutral-400);
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+}
+
+.starButton:hover {
+  background: var(--color-warning-50);
+  color: var(--color-warning-500);
+}
+
+.starred {
+  background: var(--color-warning-50);
+  color: var(--color-warning-500);
+}
+
+/* ── Action Buttons (detail) ── */
+
+.detailActions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.actionBtn {
+  padding: 0.375rem 0.75rem;
+  border: 1px solid var(--color-neutral-300);
+  border-radius: var(--radius-md);
+  background: var(--color-neutral-0);
+  cursor: pointer;
+  font-size: 0.8125rem;
+  color: var(--color-neutral-700);
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+}
+
+.actionBtn:hover {
+  background: var(--color-neutral-50);
+}
+
+.actionBtnDanger {
+  color: var(--color-danger-500);
+}
+
+.actionBtnDanger:hover {
+  background: var(--color-danger-100);
+}
+
+/* ── Source & Origin Badges ── */
+
+.sourceBadge {
+  background: var(--color-primary-100);
+  color: var(--color-primary-800);
+  padding: 0.1875rem 0.5rem;
+  border-radius: var(--radius-md);
+  display: inline-block;
+  font-size: 0.8125rem;
+}
+
+.originBadge {
+  display: inline-block;
+  padding: 0.1875rem 0.5rem;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.originBadgeClient {
+  background: var(--color-primary-100);
+  color: var(--color-primary-800);
+}
+
+.originBadgeOther {
+  background: #fce7f3;
+  color: #9d174d;
+}
+
+/* ── Detail Labels & Values ── */
+
+.detailLabel {
+  font-size: var(--font-size-xs);
+  color: var(--color-neutral-500);
+  margin-bottom: 0.25rem;
+  font-weight: var(--font-weight-semibold);
+}
+
+.detailLabelUppercase {
+  font-size: var(--font-size-xs);
+  color: var(--color-neutral-500);
+  margin-bottom: 0.375rem;
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+}
+
+.detailValue {
+  font-size: 0.8125rem;
+  color: var(--color-neutral-700);
+}
+
+/* ── Detail Body ── */
+
+.detailBody {
+  margin-bottom: 1.5rem;
+}
+
+.detailBodyContent {
+  background: var(--color-neutral-50);
+  padding: 1rem;
+  border-radius: var(--radius-lg);
+  color: var(--color-neutral-700);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  font-size: 0.9375rem;
+}
+
+/* ── Labels Section ── */
+
+.emptyLabels {
+  font-size: 0.8125rem;
+  color: var(--color-neutral-400);
+}
+
+.labelsRow {
+  display: flex;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+.labelBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-100);
+  color: var(--color-primary-800);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.labelRemoveBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-size: var(--font-size-sm);
+  line-height: 1;
+  color: var(--color-primary-800);
+  opacity: 0.6;
+}
+
+.labelRemoveBtn:hover {
+  opacity: 1;
+}
+
+.addLabelRow {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.addLabelInput {
+  flex: 1;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid var(--color-neutral-300);
+  border-radius: var(--radius-md);
+  font-size: 0.8125rem;
+  outline: none;
+}
+
+.addLabelBtn {
+  padding: 0.375rem 0.75rem;
+  border: 1px solid var(--color-primary-500);
+  border-radius: var(--radius-md);
+  background: var(--color-primary-500);
+  color: var(--color-neutral-0);
+  cursor: pointer;
+  font-size: 0.8125rem;
+}
+
+.addLabelBtn:hover {
+  background: var(--color-primary-600);
+}
+
+.addLabelBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Sender Info Row ── */
+
+.senderInfoRow {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ── Detail Back Button (mobile, future use) ── */
+
+.detailBackBtn {
+  padding: 0.375rem 0.75rem;
+  border: 1px solid var(--color-neutral-300);
+  border-radius: var(--radius-md);
+  background: var(--color-neutral-0);
+  cursor: pointer;
+  font-size: 0.8125rem;
+  color: var(--color-neutral-700);
+  margin-bottom: 0.75rem;
+}
+
+.detailBackBtn:hover {
+  background: var(--color-neutral-50);
+}
+
+/* ── Reply Area (future use) ── */
+
+.replyArea {
+  margin-top: 1rem;
+  border-top: 1px solid var(--color-neutral-200);
+  padding-top: 1rem;
+}
+
+.replyTextarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 0.75rem;
+  border: 1px solid var(--color-neutral-300);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  resize: vertical;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.sendBtn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-500);
+  color: var(--color-neutral-0);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  margin-top: 0.5rem;
+}
+
+.sendBtn:hover {
+  background: var(--color-primary-600);
+}
+
+/* ════════════════════════════════════════════
+   ContactMessageList (list item) styles
+   ════════════════════════════════════════════ */
+
+.listContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.listItem {
+  display: flex;
+  align-items: flex-start;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid var(--color-neutral-200);
+  border-left: 3px solid transparent;
+  background: var(--color-neutral-0);
+  transition: background var(--transition-fast);
+}
+
+.listItem:hover {
+  background: var(--color-neutral-100);
+}
+
+.listItemActive {
+  background: var(--color-primary-50) !important;
+}
+
+.listItemUnread {
+  background: var(--color-neutral-50);
+  border-left-color: var(--color-primary-500);
+}
+
+/* ── List Content ── */
+
+.listContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.listHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.125rem;
+}
+
+.listName {
+  font-size: var(--font-size-sm);
+  color: var(--color-neutral-900);
+  font-weight: var(--font-weight-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  margin-right: 0.5rem;
+}
+
+.listNameUnread {
+  font-weight: var(--font-weight-bold);
+}
+
+.listDate {
+  font-size: var(--font-size-xs);
+  color: var(--color-neutral-400);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.listEmail {
+  font-size: var(--font-size-xs);
+  color: var(--color-neutral-500);
+  margin-bottom: 0.125rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.listSourceBadge {
+  font-size: 0.6875rem;
+  color: var(--color-primary-600);
+  background: var(--color-primary-50);
+  padding: 0.0625rem 0.375rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.125rem;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.listPreview {
+  font-size: 0.8125rem;
+  color: var(--color-neutral-600);
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.listBadges {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.listBadge {
+  font-size: 0.625rem;
+  padding: 0.0625rem 0.375rem;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-100);
+  color: var(--color-primary-800);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ── List Actions ── */
+
+.listActions {
+  display: flex;
+  gap: 0.25rem;
+  flex-shrink: 0;
+  margin-left: 0.5rem;
+}
+
+.listActionBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  flex-shrink: 0;
+  color: var(--color-neutral-400);
+  font-size: 1rem;
+  line-height: 1;
+  border-radius: var(--radius-sm);
+}
+
+.listActionBtn:hover {
+  background: var(--color-neutral-200);
+}
+
+.listActionBtnDanger:hover {
+  background: var(--color-danger-100);
+  color: var(--color-danger-500);
+}
+
+.listActionBtnArchive:hover {
+  background: var(--color-neutral-200);
+}
+
+/* ── List Star Button ── */
+
+.listStarBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+  color: var(--color-neutral-300);
+  font-size: var(--font-size-lg);
+  line-height: 1;
+  border-radius: var(--radius-sm);
+  align-self: flex-start;
+  margin-top: 0.125rem;
+}
+
+.listStarBtn:hover {
+  color: var(--color-neutral-400);
+}
+
+.listStarBtnStarred {
+  color: var(--color-warning-500);
+}
+
+/* ── List Preview margin bottom when labels exist ── */
+
+.listPreviewWithLabels {
+  margin-bottom: 0.25rem;
+}
+
+/* ── Responsive ── */
+
 @media (max-width: 767px) {
   .splitView {
     flex-direction: column;

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from '../../i18n/LanguageContext';
 import type { ServiceResponse } from '@jsoft/shared';
 import formStyles from '../../styles/form.module.css';
+import listStyles from '../shared/ListItem.module.css';
 
 interface ServiceTableProps {
   services: ServiceResponse[];
@@ -28,26 +29,14 @@ export function ServiceTable({ services, onDelete, onStatusChange }: ServiceTabl
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', padding: '1rem' }}>
+    <div className={listStyles.listItem}>
       {services.map((service) => {
         const badgeClass = statusClassMap[service.status] || statusClassMap.DRAFT;
         return (
-          <div
-            key={service.id}
-            style={{
-              background: '#fff',
-              borderRadius: '8px',
-              padding: '1rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '1rem',
-              border: '1px solid #e5e7eb',
-              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
-            }}
-          >
-            <div style={{ flex: 1 }}>
-              <p style={{ fontWeight: '600', margin: 0 }}>{service.title}</p>
-              <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: '0.25rem 0 0' }}>
+          <div key={service.id} className={listStyles.listRow}>
+            <div className={listStyles.content}>
+              <p className={listStyles.title}>{service.title}</p>
+              <p className={listStyles.description}>
                 {service.classification}
               </p>
             </div>
@@ -65,7 +54,7 @@ export function ServiceTable({ services, onDelete, onStatusChange }: ServiceTabl
             ) : (
               <span className={badgeClass}>{service.status}</span>
             )}
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <div className={listStyles.actions}>
               <Link to={`/services/edit/${service.id}`}>
                 <button className={formStyles.btnEdit}>{t('services.edit')}</button>
               </Link>

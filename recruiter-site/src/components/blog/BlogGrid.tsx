@@ -1,6 +1,7 @@
 import { useSearchParams } from 'react-router-dom';
 import { useBlogPosts } from '../../hooks/useBlogPosts';
 import { BlogCard } from './BlogCard';
+import { useTranslation } from '../../i18n/LanguageContext';
 import styles from './BlogGrid.module.css';
 
 const ITEMS_PER_PAGE = 9;
@@ -11,6 +12,7 @@ interface BlogGridProps {
 }
 
 export function BlogGrid({ category, search }: BlogGridProps) {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const page = Number(searchParams.get('page')) || 1;
   const { data, isLoading, isError, error, refetch } = useBlogPosts(page, { category, search });
@@ -57,16 +59,16 @@ export function BlogGrid({ category, search }: BlogGridProps) {
         <div className={styles.errorState}>
           <div className={styles.errorIcon}>⚠️</div>
           <p className={styles.errorMessage}>
-            No se pudieron cargar los artículos.
+            {t('blogGrid.error')}
           </p>
           <p className={styles.errorDetail}>
-            {error instanceof Error ? error.message : 'Error de conexión'}
+            {error instanceof Error ? error.message : t('blogGrid.errorDetail')}
           </p>
           <button
             className={styles.retryButton}
             onClick={() => refetch()}
           >
-            Intentar de nuevo
+            {t('blogGrid.retry')}
           </button>
         </div>
       </div>
@@ -79,9 +81,9 @@ export function BlogGrid({ category, search }: BlogGridProps) {
       <div className={styles.container}>
         <div className={styles.emptyState}>
           <div className={styles.emptyIcon}>📝</div>
-          <p className={styles.emptyMessage}>No hay artículos publicados aún.</p>
+          <p className={styles.emptyMessage}>{t('blogGrid.empty')}</p>
           <p className={styles.emptyDetail}>
-            Vuelve pronto para leer las últimas publicaciones.
+            {t('blogGrid.emptyDetail')}
           </p>
         </div>
       </div>
@@ -104,29 +106,31 @@ export function BlogGrid({ category, search }: BlogGridProps) {
             className={styles.pageButton}
             onClick={() => handlePageChange(page - 1)}
             disabled={page <= 1}
-            aria-label="Página anterior"
+            aria-label={t('blogGrid.prevAria')}
           >
-            &laquo; Anterior
+            {t('blogGrid.prevPage')}
           </button>
 
           <div className={styles.pageInfo}>
-            {renderPageNumbers(page, totalPages, handlePageChange)}
+            {renderPageNumbers(page, totalPages, handlePageChange, t)}
           </div>
 
           <button
             className={styles.pageButton}
             onClick={() => handlePageChange(page + 1)}
             disabled={page >= totalPages}
-            aria-label="Página siguiente"
+            aria-label={t('blogGrid.nextAria')}
           >
-            Siguiente &raquo;
+            {t('blogGrid.nextPage')}
           </button>
         </div>
       )}
 
       {/* Results count */}
       <p className={styles.resultsCount}>
-        {totalItems} artículo{totalItems !== 1 ? 's' : ''} publicado{totalItems !== 1 ? 's' : ''}
+        {totalItems === 1
+          ? t('blogGrid.resultsCount.one', { count: totalItems })
+          : t('blogGrid.resultsCount.other', { count: totalItems })}
       </p>
     </div>
   );
@@ -137,6 +141,7 @@ function renderPageNumbers(
   current: number,
   total: number,
   onChange: (page: number) => void,
+  t: (key: string, params?: Record<string, string | number>) => string,
 ) {
   const pages: (number | 'ellipsis')[] = [];
 
@@ -167,7 +172,7 @@ function renderPageNumbers(
         key={p}
         className={`${styles.pageNumber} ${p === current ? styles.pageNumberActive : ''}`}
         onClick={() => onChange(p)}
-        aria-label={`Ir a página ${p}`}
+        aria-label={t('blogGrid.pageAria', { page: p })}
         aria-current={p === current ? 'page' : undefined}
       >
         {p}

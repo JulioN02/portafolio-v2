@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from '../../i18n/LanguageContext';
 import { useServices } from '../../hooks/useServices';
 import { ServiceCard } from '../../components/services/ServiceCard';
 import { Loading } from '../../components/common/Loading';
@@ -8,6 +9,7 @@ import { Select } from '@jsoft/shared';
 import styles from './Services.module.css';
 
 export function ServicesPage() {
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [classification, setClassification] = useState<string>('');
 
@@ -27,12 +29,12 @@ export function ServicesPage() {
   return (
     <div className={styles.page}>
       <MetaTags
-        title="Servicios | J Soft Solutions"
-        description="Ofrecemos desarrollo web, diseño UI/UX y consultoría tecnológica personalizada."
+        title={t('services.meta.title')}
+        description={t('services.meta.description')}
       />
       <PageHeader
-        title="Nuestros Servicios"
-        subtitle="Soluciones tecnológicas adaptadas a tus necesidades"
+        title={t('services.pageHeader.title')}
+        subtitle={t('services.pageHeader.subtitle')}
         backgroundImage="/uploads/servicios.png"
       />
       <div className={styles.container}>
@@ -43,22 +45,22 @@ export function ServicesPage() {
             id="classification"
             value={classification}
             onChange={(e) => handleClassificationChange(e.target.value)}
-            label="Filtrar por:"
+            label={t('services.filter.label')}
             options={[
-              { value: '', label: 'Todas las categorías' },
-              { value: 'Desarrollo', label: 'Desarrollo' },
-              { value: 'Diseño', label: 'Diseño' },
-              { value: 'Consultoría', label: 'Consultoría' },
+              { value: '', label: t('services.filter.allCategories') },
+              { value: 'Desarrollo', label: t('services.filter.development') },
+              { value: 'Diseño', label: t('services.filter.design') },
+              { value: 'Consultoría', label: t('services.filter.consulting') },
             ]}
           />
         </div>
 
         {/* Content */}
-        {isLoading && <Loading message="Cargando servicios..." />}
+        {isLoading && <Loading message={t('services.loading')} />}
 
         {error && (
           <div className={styles.error}>
-            <p>Error al cargar los servicios. Por favor, intenta de nuevo.</p>
+            <p>{t('services.error')}</p>
           </div>
         )}
 
@@ -72,17 +74,17 @@ export function ServicesPage() {
 
             {/* Pagination */}
             {data.pagination.totalPages > 1 && (
-              <nav className={styles.pagination} aria-label="Paginación">
+              <nav className={styles.pagination} aria-label={t('services.pagination.aria')}>
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={!data.pagination.hasPrev}
                   className={styles.pageButton}
                 >
-                  ← Anterior
+                  {t('services.pagination.previous')}
                 </button>
 
                 <span className={styles.pageInfo}>
-                  Página {data.pagination.page} de {data.pagination.totalPages}
+                  {t('services.pagination.info', { page: data.pagination.page, total: data.pagination.totalPages })}
                 </span>
 
                 <button
@@ -90,7 +92,7 @@ export function ServicesPage() {
                   disabled={!data.pagination.hasNext}
                   className={styles.pageButton}
                 >
-                  Siguiente →
+                  {t('services.pagination.next')}
                 </button>
               </nav>
             )}
@@ -99,7 +101,7 @@ export function ServicesPage() {
 
         {data && data.data.length === 0 && (
           <div className={styles.empty}>
-            <p>No se encontraron servicios.</p>
+            <p>{t('services.empty')}</p>
           </div>
         )}
       </div>

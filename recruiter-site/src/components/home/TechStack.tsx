@@ -2,11 +2,13 @@ import { useEffect, useCallback, useRef } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { techStack } from '../../data/tech-stack';
 import { SectionTitle } from '../common/SectionTitle';
+import { useTranslation } from '../../i18n/LanguageContext';
 import styles from './TechStack.module.css';
 
 const AUTOPLAY_INTERVAL = 4000;
 
 export function TechStack() {
+  const { t } = useTranslation();
   const autoplayTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
@@ -46,8 +48,8 @@ export function TechStack() {
     <section className={styles.section}>
       <div className={styles.container}>
         <SectionTitle
-          title="Tech Stack"
-          subtitle="Tecnologías con las que trabajo día a día"
+          title={t('techStack.title')}
+          subtitle={t('techStack.subtitle')}
         />
 
         <div className={styles.embla} ref={emblaRef}>
@@ -93,7 +95,7 @@ export function TechStack() {
               key={group.category}
               className={styles.dot}
               onClick={() => emblaApi?.scrollTo(index)}
-              aria-label={`Ir a ${group.category}`}
+              aria-label={t('techStack.slideAria', { category: group.category })}
             />
           ))}
         </div>

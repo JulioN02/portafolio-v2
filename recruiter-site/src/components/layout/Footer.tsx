@@ -1,3 +1,4 @@
+import { useTranslation } from '../../i18n/LanguageContext';
 import styles from './Footer.module.css';
 
 const socialLinks = [
@@ -33,6 +34,7 @@ const logoIcon = (
 );
 
 export function Footer() {
+  const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
 
   return (
@@ -45,22 +47,21 @@ export function Footer() {
               <h3 className={styles.title}>J Soft Solutions</h3>
             </div>
             <p className={styles.description}>
-              Desarrollo de software a medida. Transformamos tus ideas en soluciones
-              digitales escalables y de alto impacto.
+              {t('footer.tagline')}
             </p>
           </div>
 
           <div>
-            <h4 className={styles.colTitle}>Enlaces</h4>
+            <h4 className={styles.colTitle}>{t('footer.links')}</h4>
             <ul className={styles.links}>
-              <li><a href="/proyectos">Proyectos</a></li>
-              <li><a href="/blog">Blog</a></li>
-              <li><a href="/contacto">Contacto</a></li>
+              <li><a href="/proyectos">{t('nav.projects')}</a></li>
+              <li><a href="/blog">{t('nav.blog')}</a></li>
+              <li><a href="/contacto">{t('nav.contact')}</a></li>
             </ul>
           </div>
 
           <div>
-            <h4 className={styles.colTitle}>Redes</h4>
+            <h4 className={styles.colTitle}>{t('footer.social')}</h4>
             <div className={styles.socialLinks}>
               {socialLinks.map((link) => (
                 <a
@@ -93,12 +94,12 @@ export function Footer() {
       <div className={styles.container}>
         <div className={styles.bottom}>
           <div className={styles.bottomLeft}>
-            <p className={styles.copyright}>&copy; {currentYear} J Soft Solutions. Todos los derechos reservados.</p>
-            <p className={styles.madeIn}>Hecho con ❤️ en Colombia</p>
+            <p className={styles.copyright}>{t('footer.copyright', { year: currentYear })}</p>
+            <p className={styles.madeIn}>{t('footer.madeIn')}</p>
           </div>
           <div className={styles.legalLinks}>
-            <a href="/privacidad">Privacidad</a>
-            <a href="/terminos">Términos</a>
+            <a href="/privacidad">{t('footer.privacy')}</a>
+            <a href="/terminos">{t('footer.terms')}</a>
           </div>
         </div>
       </div>

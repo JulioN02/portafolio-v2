@@ -1,6 +1,7 @@
 import { useState, type SyntheticEvent } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import DOMPurify from 'dompurify';
+import { useTranslation } from '../../i18n/LanguageContext';
 import { useProductBySlug } from '../../hooks/useProducts';
 import { Loading } from '../../components/common/Loading';
 import { MetaTags } from '../../components/seo/MetaTags';
@@ -11,20 +12,21 @@ import styles from './ProductDetail.module.css';
 const FALLBACK_IMG = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="800" height="600" fill="%23e5e7eb"%3E%3Crect width="800" height="600"/%3E%3Ctext x="400" y="300" text-anchor="middle" dy=".3em" font-size="20" fill="%239ca3af"%3ESin imagen%3C/text%3E%3C/svg%3E';
 
 export function ProductDetailPage() {
+  const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const { data: product, isLoading, error } = useProductBySlug(slug || '');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
-  if (isLoading) return <Loading fullPage message="Cargando producto..." />;
+  if (isLoading) return <Loading fullPage message={t('productDetail.loading')} />;
 
   if (error || !product) {
     return (
       <div className={styles.error}>
-        <h2>Producto no encontrado</h2>
-        <p>El producto que buscas no existe o ha sido eliminado.</p>
+        <h2>{t('productDetail.notFound.title')}</h2>
+        <p>{t('productDetail.notFound.message')}</p>
         <Link to="/productos" className={styles.backLink}>
-          ← Volver a productos
+          {t('productDetail.backToProducts')}
         </Link>
       </div>
     );
@@ -51,7 +53,7 @@ export function ProductDetailPage() {
       <div className={styles.container}>
         {/* Breadcrumb */}
         <nav className={styles.breadcrumb}>
-          <Link to="/productos">Productos</Link>
+          <Link to="/productos">{t('productDetail.breadcrumb.products')}</Link>
           <span>/</span>
           <span>{product.title}</span>
         </nav>
@@ -62,7 +64,7 @@ export function ProductDetailPage() {
             <div className={styles.carousel}>
               <img
                 src={images[currentImageIndex]}
-                alt={`${product.title} - Imagen ${currentImageIndex + 1}`}
+                alt={t('productDetail.imageAlt', { title: product.title, number: currentImageIndex + 1 })}
                 className={styles.carouselImage}
                 onError={(e: SyntheticEvent<HTMLImageElement>) => {
                   e.currentTarget.src = FALLBACK_IMG;
@@ -74,14 +76,14 @@ export function ProductDetailPage() {
                   <button
                     onClick={prevImage}
                     className={`${styles.carouselButton} ${styles.prev}`}
-                    aria-label="Imagen anterior"
+                    aria-label={t('productDetail.prevImage')}
                   >
                     ‹
                   </button>
                   <button
                     onClick={nextImage}
                     className={`${styles.carouselButton} ${styles.next}`}
-                    aria-label="Siguiente imagen"
+                    aria-label={t('productDetail.nextImage')}
                   >
                     ›
                   </button>
@@ -94,7 +96,7 @@ export function ProductDetailPage() {
                         className={`${styles.dot} ${
                           index === currentImageIndex ? styles.active : ''
                         }`}
-                        aria-label={`Ir a imagen ${index + 1}`}
+                        aria-label={t('productDetail.goToImage', { number: index + 1 })}
                       />
                     ))}
                   </div>
@@ -120,7 +122,7 @@ export function ProductDetailPage() {
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                   <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
                 </svg>
-                Ver sitio web del producto
+                {t('productDetail.viewWebsite')}
               </a>
             )}
 
@@ -128,7 +130,7 @@ export function ProductDetailPage() {
               onClick={() => setIsContactModalOpen(true)}
               className={styles.ctaButton}
             >
-              Solicitar información
+              {t('productDetail.requestInfo')}
             </button>
           </div>
         </div>
@@ -136,7 +138,7 @@ export function ProductDetailPage() {
         {/* Full Description */}
         {product.fullDescription && (
           <div className={styles.fullDescription}>
-            <h2>Descripción completa</h2>
+            <h2>{t('productDetail.fullDescription')}</h2>
             <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.fullDescription) }} />
           </div>
         )}
@@ -146,7 +148,7 @@ export function ProductDetailPage() {
       <Modal
         isOpen={isContactModalOpen}
         onClose={() => setIsContactModalOpen(false)}
-        title="Solicitar información"
+        title={t('productDetail.requestInfo')}
       >
         <ContactForm
           source={`product:${product.title}`}

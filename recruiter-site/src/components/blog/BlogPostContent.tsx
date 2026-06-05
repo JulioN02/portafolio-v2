@@ -1,5 +1,6 @@
 import DOMPurify from 'dompurify';
 import type { BlogPostResponse } from '@jsoft/shared';
+import { useTranslation } from '../../i18n/LanguageContext';
 import styles from './BlogPostContent.module.css';
 
 interface BlogPostContentProps {
@@ -23,6 +24,7 @@ function formatDate(dateStr: string): string {
 }
 
 export function BlogPostContent({ post }: BlogPostContentProps) {
+  const { t } = useTranslation();
   const sanitizedBody = DOMPurify.sanitize(post.body);
   const sanitizedLessons = post.lessonsLearned
     ? DOMPurify.sanitize(post.lessonsLearned)
@@ -63,7 +65,7 @@ export function BlogPostContent({ post }: BlogPostContentProps) {
       {/* Media Gallery */}
       {hasMediaGallery && (
         <section className={styles.gallerySection}>
-          <h2 className={styles.galleryTitle}>Galería</h2>
+          <h2 className={styles.galleryTitle}>{t('blogPostContent.galleryTitle')}</h2>
           <div className={styles.galleryScroll}>
             {post.mediaGallery!.map((url, index) => (
               <img
@@ -81,7 +83,7 @@ export function BlogPostContent({ post }: BlogPostContentProps) {
       {/* Lessons Learned */}
       {sanitizedLessons && (
         <section className={styles.lessonsSection}>
-          <h2 className={styles.lessonsTitle}>Lecciones aprendidas</h2>
+          <h2 className={styles.lessonsTitle}>{t('blogPostContent.lessonsTitle')}</h2>
           <div
             className={styles.lessonsContent}
             dangerouslySetInnerHTML={{ __html: sanitizedLessons }}
@@ -99,7 +101,7 @@ export function BlogPostContent({ post }: BlogPostContentProps) {
             className={styles.externalLink}
           >
             <span className={styles.externalLinkIcon}>🔗</span>
-            Ver proyecto relacionado
+            {t('blogPostContent.externalLink')}
           </a>
         </div>
       )}

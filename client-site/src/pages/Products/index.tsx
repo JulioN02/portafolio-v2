@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from '../../i18n/LanguageContext';
 import { useProducts, useClassifications } from '../../hooks/useProducts';
 import { ProductCard } from '../../components/products/ProductCard';
 import { Pagination } from '../../components/common/Pagination';
@@ -9,6 +10,7 @@ import { PageHeader } from '../../components/common/PageHeader';
 import styles from './Products.module.css';
 
 export function ProductsPage() {
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [classification, setClassification] = useState<string>('');
 
@@ -30,12 +32,12 @@ export function ProductsPage() {
   return (
     <div className={styles.page}>
       <MetaTags
-        title="Productos | J Soft Solutions"
-        description="Conoce nuestras soluciones tecnológicas listas para implementar en tu negocio."
+        title={t('products.meta.title')}
+        description={t('products.meta.description')}
       />
       <PageHeader
-        title="Nuestros Productos"
-        subtitle="Soluciones tecnológicas diseñadas para potenciar tu negocio"
+        title={t('products.pageHeader.title')}
+        subtitle={t('products.pageHeader.subtitle')}
       />
       <div className={styles.container}>
         {/* Filters */}
@@ -44,20 +46,20 @@ export function ProductsPage() {
             id="classification"
             value={classification}
             onChange={(e) => handleClassificationChange(e.target.value)}
-            label="Filtrar por:"
+            label={t('products.filter.label')}
             options={[
-              { value: '', label: 'Todas las categorías' },
+              { value: '', label: t('products.filter.allCategories') },
               ...(classifications?.map((cat) => ({ value: cat, label: cat })) ?? []),
             ]}
           />
         </div>
 
         {/* Content */}
-        {isLoading && <Loading message="Cargando productos..." />}
+        {isLoading && <Loading message={t('products.loading')} />}
 
         {error && (
           <div className={styles.error}>
-            <p>Error al cargar los productos. Por favor, intenta de nuevo.</p>
+            <p>{t('products.error')}</p>
           </div>
         )}
 
@@ -80,7 +82,7 @@ export function ProductsPage() {
 
         {data && data.data.length === 0 && (
           <div className={styles.empty}>
-            <p>No se encontraron productos.</p>
+            <p>{t('products.empty')}</p>
           </div>
         )}
       </div>

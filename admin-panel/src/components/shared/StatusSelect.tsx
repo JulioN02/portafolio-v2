@@ -1,5 +1,6 @@
 import { useTranslation } from '../../i18n/LanguageContext';
 import formStyles from '../../styles/form.module.css';
+import listStyles from './ListItem.module.css';
 
 interface StatusSelectProps {
   value: string;
@@ -15,8 +16,7 @@ export function StatusSelect({ value, onChange }: StatusSelectProps) {
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className={formStyles.filterSelect}
-      style={{ fontSize: '0.75rem', padding: '0.2rem 0.5rem' }}
+      className={`${formStyles.filterSelect} ${listStyles.statusSelect}`}
     >
       {statusOptions.map((status) => (
         <option key={status} value={status}>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from '../../i18n/LanguageContext';
 import { MetaTags } from '../../components/seo/MetaTags';
 import { BlogCard } from '../../components/blog/BlogCard';
 import { useBlogPosts, useBlogCategories } from '../../hooks/useBlogPosts';
@@ -8,6 +9,7 @@ import styles from './Blog.module.css';
 const ITEMS_PER_PAGE = 9;
 
 export function BlogPage() {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const category = searchParams.get('category') || undefined;
   const search = searchParams.get('search') || undefined;
@@ -72,11 +74,11 @@ export function BlogPage() {
     return (
       <div className={styles.page}>
         <MetaTags
-          title="Blog | J Soft Solutions"
-          description="Artículos sobre desarrollo web, tecnología y tendencias del sector."
+          title={t('blog.meta.title')}
+          description={t('blog.meta.description')}
         />
-        <h1 className={styles.title}>Blog</h1>
-        <p className={styles.subtitle}>Artículos, tutoriales y reflexiones sobre tecnología</p>
+        <h1 className={styles.title}>{t('blog.title')}</h1>
+        <p className={styles.subtitle}>{t('blog.subtitle')}</p>
         <div className={styles.skeletonGrid}>
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={`skel-${i}`} className={styles.skeleton}>
@@ -97,13 +99,13 @@ export function BlogPage() {
   if (isError) {
     return (
       <div className={styles.page}>
-        <MetaTags title="Blog | J Soft Solutions" noindex />
+        <MetaTags title={t('blog.meta.title')} noindex />
         <div className={styles.error}>
           <p className={styles.errorMessage}>
-            {error instanceof Error ? error.message : 'No se pudieron cargar los artículos.'}
+            {error instanceof Error ? error.message : t('blog.error.message')}
           </p>
           <button className={styles.retryButton} onClick={() => refetch()}>
-            Intentar de nuevo
+            {t('blog.error.retry')}
           </button>
         </div>
       </div>
@@ -116,26 +118,26 @@ export function BlogPage() {
     return (
       <div className={styles.page}>
         <MetaTags
-          title="Blog | J Soft Solutions"
-          description="Artículos sobre desarrollo web, tecnología y tendencias del sector."
+          title={t('blog.meta.title')}
+          description={t('blog.meta.description')}
           noindex
         />
-        <h1 className={styles.title}>Blog</h1>
+        <h1 className={styles.title}>{t('blog.title')}</h1>
         {hasFilters ? (
           <div className={styles.empty}>
-            <p className={styles.emptyMessage}>No se encontraron artículos con los filtros seleccionados.</p>
-            <p className={styles.emptySubtitle}>Intenta con otros términos o categorías.</p>
+            <p className={styles.emptyMessage}>{t('blog.empty.withFilters')}</p>
+            <p className={styles.emptySubtitle}>{t('blog.empty.tryDifferent')}</p>
             <button
               className={styles.emptyLink}
               onClick={() => setSearchParams({}, { replace: true })}
             >
-              Limpiar filtros
+              {t('blog.empty.clearFilters')}
             </button>
           </div>
         ) : (
           <div className={styles.empty}>
-            <p className={styles.emptyMessage}>No hay artículos publicados aún.</p>
-            <p className={styles.emptySubtitle}>Vuelve pronto para conocer las últimas novedades.</p>
+            <p className={styles.emptyMessage}>{t('blog.empty.noPosts')}</p>
+            <p className={styles.emptySubtitle}>{t('blog.empty.comeBack')}</p>
           </div>
         )}
       </div>
@@ -146,21 +148,21 @@ export function BlogPage() {
   return (
     <div className={styles.page}>
       <MetaTags
-        title="Blog | J Soft Solutions"
-        description="Artículos sobre desarrollo web, tecnología y tendencias del sector."
+        title={t('blog.meta.title')}
+        description={t('blog.meta.description')}
       />
-      <h1 className={styles.title}>Blog</h1>
-      <p className={styles.subtitle}>Artículos, tutoriales y reflexiones sobre tecnología</p>
+      <h1 className={styles.title}>{t('blog.title')}</h1>
+      <p className={styles.subtitle}>{t('blog.subtitle')}</p>
 
       <div className={styles.filters}>
         <div className={styles.searchWrapper}>
           <input
             type="search"
             className={styles.searchInput}
-            placeholder="Buscar artículos…"
+            placeholder={t('blog.search.placeholder')}
             value={searchInput}
             onChange={(e) => handleSearchInputChange(e.target.value)}
-            aria-label="Buscar artículos"
+            aria-label={t('blog.search.ariaLabel')}
           />
         </div>
 
@@ -168,9 +170,9 @@ export function BlogPage() {
           className={styles.categorySelect}
           value={category || ''}
           onChange={(e) => handleCategoryChange(e.target.value)}
-          aria-label="Filtrar por categoría"
+          aria-label={t('blog.filter.ariaLabel')}
         >
-          <option value="">Todas las categorías</option>
+          <option value="">{t('blog.filter.allCategories')}</option>
           {categories?.map((cat) => (
             <option key={cat} value={cat}>
               {cat}
@@ -191,9 +193,9 @@ export function BlogPage() {
             className={styles.pageButton}
             onClick={() => handlePageChange(page - 1)}
             disabled={page <= 1}
-            aria-label="Página anterior"
+            aria-label={t('blog.pagination.prevAria')}
           >
-            &laquo; Anterior
+            {t('blog.pagination.previous')}
           </button>
 
           <div className={styles.pageInfo}>
@@ -202,7 +204,7 @@ export function BlogPage() {
                 key={p}
                 className={`${styles.pageNumber} ${p === page ? styles.pageNumberActive : ''}`}
                 onClick={() => handlePageChange(p)}
-                aria-label={`Ir a página ${p}`}
+                aria-label={t('blog.pagination.goToPage', { number: p })}
                 aria-current={p === page ? 'page' : undefined}
               >
                 {p}
@@ -214,9 +216,9 @@ export function BlogPage() {
             className={styles.pageButton}
             onClick={() => handlePageChange(page + 1)}
             disabled={page >= totalPages}
-            aria-label="Página siguiente"
+            aria-label={t('blog.pagination.nextAria')}
           >
-            Siguiente &raquo;
+            {t('blog.pagination.next')}
           </button>
         </div>
       )}

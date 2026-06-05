@@ -2,9 +2,11 @@ import { Link } from 'react-router-dom';
 import useEmblaCarousel from 'embla-carousel-react';
 import { useRecentProjects } from '../../hooks/useProjects';
 import { SectionTitle } from '../common/SectionTitle';
+import { useTranslation } from '../../i18n/LanguageContext';
 import styles from './RecentProjects.module.css';
 
 export function RecentProjects() {
+  const { t } = useTranslation();
   const [emblaRef] = useEmblaCarousel({
     loop: true,
     align: 'start',
@@ -19,10 +21,10 @@ export function RecentProjects() {
     return (
       <section className={styles.section}>
         <div className={styles.container}>
-          <SectionTitle title="Proyectos Recientes" />
+          <SectionTitle title={t('recentProjects.title')} />
           <div className={styles.loadingState}>
             <div className={styles.spinner} />
-            <p>Cargando proyectos...</p>
+            <p>{t('recentProjects.loading')}</p>
           </div>
         </div>
       </section>
@@ -33,11 +35,11 @@ export function RecentProjects() {
     return (
       <section className={styles.section}>
         <div className={styles.container}>
-          <SectionTitle title="Proyectos Recientes" />
+          <SectionTitle title={t('recentProjects.title')} />
           <div className={styles.errorState}>
-            <p>No se pudieron cargar los proyectos.</p>
+            <p>{t('recentProjects.error')}</p>
             <p className={styles.errorDetail}>
-              {error instanceof Error ? error.message : 'Error de conexión'}
+              {error instanceof Error ? error.message : t('recentProjects.errorDetail')}
             </p>
           </div>
         </div>
@@ -49,9 +51,9 @@ export function RecentProjects() {
     return (
       <section className={styles.section}>
         <div className={styles.container}>
-          <SectionTitle title="Proyectos Recientes" />
+          <SectionTitle title={t('recentProjects.title')} />
           <div className={styles.emptyState}>
-            <p>Aún no hay proyectos publicados.</p>
+            <p>{t('recentProjects.empty')}</p>
           </div>
         </div>
       </section>
@@ -62,8 +64,8 @@ export function RecentProjects() {
     <section className={styles.section}>
       <div className={styles.container}>
         <SectionTitle
-          title="Proyectos Recientes"
-          subtitle="Conoce algunos de los proyectos en los que he trabajado"
+          title={t('recentProjects.title')}
+          subtitle={t('recentProjects.subtitle')}
         />
 
         <div className={styles.embla} ref={emblaRef}>
@@ -100,7 +102,7 @@ export function RecentProjects() {
 
         <div className={styles.footer}>
           <Link to="/proyectos" className={styles.viewAll}>
-            Ver todos los proyectos &rarr;
+            {t('recentProjects.viewAll')}
           </Link>
         </div>
       </div>

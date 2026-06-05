@@ -3,9 +3,11 @@ import { useSearchParams } from 'react-router-dom';
 import { MetaTags } from '../components/seo/MetaTags';
 import { BlogGrid } from '../components/blog/BlogGrid';
 import { useBlogCategories } from '../hooks/useBlogPosts';
+import { useTranslation } from '../i18n/LanguageContext';
 import styles from './BlogPage.module.css';
 
 export function BlogPage() {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const category = searchParams.get('category') || undefined;
   const search = searchParams.get('search') || undefined;
@@ -46,18 +48,18 @@ export function BlogPage() {
   return (
     <main>
       <MetaTags
-        title="Blog | Julio Nieto"
-        description="Artículos sobre desarrollo web, tecnología y experiencia como desarrollador."
+        title={t('blog.meta.title')}
+        description={t('blog.meta.description')}
       />
       <div className={styles.filters}>
         <div className={styles.searchWrapper}>
           <input
             type="search"
             className={styles.searchInput}
-            placeholder="Buscar artículos…"
+            placeholder={t('blog.searchPlaceholder')}
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            aria-label="Buscar artículos"
+            aria-label={t('blog.searchAriaLabel')}
           />
         </div>
 
@@ -65,9 +67,9 @@ export function BlogPage() {
           className={styles.categorySelect}
           value={category || ''}
           onChange={(e) => handleCategoryChange(e.target.value)}
-          aria-label="Filtrar por categoría"
+          aria-label={t('blog.categoryAriaLabel')}
         >
-          <option value="">Todas las categorías</option>
+          <option value="">{t('blog.categoryAll')}</option>
           {categories?.map((cat) => (
             <option key={cat} value={cat}>
               {cat}

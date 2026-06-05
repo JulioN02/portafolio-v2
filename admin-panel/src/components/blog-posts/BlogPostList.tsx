@@ -1,6 +1,7 @@
 import { BlogPostResponse } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import formStyles from '../../styles/form.module.css';
+import listStyles from '../shared/ListItem.module.css';
 
 interface BlogPostListProps {
   posts: BlogPostResponse[];
@@ -41,34 +42,22 @@ export function BlogPostList({ posts, onEdit, onDelete, onStatusChange }: BlogPo
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', padding: '1rem' }}>
+    <div className={listStyles.listItem}>
       {posts.map((post) => {
         const badgeClass = statusClassMap[post.status] || statusClassMap.DRAFT;
         return (
-          <div
-            key={post.id}
-            style={{
-              background: '#fff',
-              borderRadius: '8px',
-              padding: '1rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '1rem',
-              border: '1px solid #e5e7eb',
-              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
-            }}
-          >
+          <div key={post.id} className={listStyles.listRow}>
             {post.coverImage && (
               <img
                 src={post.coverImage}
                 alt={post.title}
                 loading="lazy"
-                style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '4px' }}
+                className={listStyles.image}
               />
             )}
-            <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <p style={{ fontWeight: '600', margin: 0 }}>{post.title}</p>
+            <div className={listStyles.content}>
+              <div className={listStyles.titleRow}>
+                <p className={listStyles.title}>{post.title}</p>
                   {onStatusChange ? (
                     <select
                       value={post.status}
@@ -86,15 +75,15 @@ export function BlogPostList({ posts, onEdit, onDelete, onStatusChange }: BlogPo
                   </span>
                 )}
               </div>
-              <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: '0.25rem 0 0' }}>
+              <p className={listStyles.description}>
                 {post.shortDescription.substring(0, 100)}...
               </p>
-              <div style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: '0.25rem' }}>
+              <div className={listStyles.meta}>
                 {post.category && <span>{post.category} • </span>}
                 {formatDate(post.createdAt)}
               </div>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <div className={listStyles.actionsColumn}>
               <button className={formStyles.btnEdit} onClick={() => onEdit(post.id)}>{t('blog.edit')}</button>
               <button className={formStyles.btnDelete} onClick={() => onDelete(post.id)}>{t('blog.delete')}</button>
             </div>

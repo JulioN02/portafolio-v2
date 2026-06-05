@@ -6,6 +6,7 @@ import { useTools } from '../hooks/useTools';
 import { useBlogPosts } from '../hooks/useBlogPosts';
 import { useContactForms } from '../hooks/useContactForms';
 import { SummaryCard } from '../components/dashboard/SummaryCard';
+import styles from './Dashboard.module.css';
 
 function formatDate(date: Date | string): string {
   const d = new Date(date);
@@ -42,25 +43,12 @@ export function DashboardPage() {
   const recentMessages = contactFormsData?.data || [];
 
   return (
-    <div>
-      <h1
-        style={{
-          fontSize: '1.5rem',
-          fontWeight: 'bold',
-          marginBottom: '1.5rem',
-          color: '#111827',
-        }}
-      >
+    <div className={styles.page}>
+      <h1 className={styles.pageTitle}>
         {t('dashboard.title')}
       </h1>
 
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-          gap: '1.5rem',
-        }}
-      >
+      <div className={styles.statsGrid}>
         <SummaryCard title={t('services.title')} value={stats.services} icon="🛠️" color="#3b82f6" />
         <SummaryCard title={t('products.title')} value={stats.products} icon="📦" color="#8b5cf6" />
         <SummaryCard title={t('tools.title')} value={stats.tools} icon="🔧" color="#f59e0b" />
@@ -69,121 +57,55 @@ export function DashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <div style={{ marginTop: '2rem' }}>
-        <h2
-          style={{
-            fontSize: '1.125rem',
-            fontWeight: '600',
-            marginBottom: '1rem',
-            color: '#111827',
-          }}
-        >
+      <div className={styles.section}>
+        <h2 className={styles.sectionTitle}>
           {t('dashboard.quickActions')}
         </h2>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-            gap: '1rem',
-          }}
-        >
+        <div className={styles.quickActions}>
           <Link
             to="/blog-posts/create"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              background: '#fff',
-              borderRadius: '8px',
-              padding: '1rem',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-              textDecoration: 'none',
-              color: '#111827',
-              fontWeight: '500',
-              fontSize: '0.875rem',
-              transition: 'box-shadow 0.2s',
-            }}
+            className={styles.quickActionLink}
           >
-            <span style={{ fontSize: '1.25rem' }}>📝</span>
+            <span className={styles.quickActionIcon}>📝</span>
             {t('dashboard.createBlogPost')}
           </Link>
           <Link
             to="/services/create"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              background: '#fff',
-              borderRadius: '8px',
-              padding: '1rem',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-              textDecoration: 'none',
-              color: '#111827',
-              fontWeight: '500',
-              fontSize: '0.875rem',
-              transition: 'box-shadow 0.2s',
-            }}
+            className={styles.quickActionLink}
           >
-            <span style={{ fontSize: '1.25rem' }}>🛠️</span>
+            <span className={styles.quickActionIcon}>🛠️</span>
             {t('dashboard.createService')}
           </Link>
           <Link
             to="/contact-messages"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              background: '#fff',
-              borderRadius: '8px',
-              padding: '1rem',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-              textDecoration: 'none',
-              color: '#111827',
-              fontWeight: '500',
-              fontSize: '0.875rem',
-              transition: 'box-shadow 0.2s',
-            }}
+            className={styles.quickActionLink}
           >
-            <span style={{ fontSize: '1.25rem' }}>📧</span>
+            <span className={styles.quickActionIcon}>📧</span>
             {t('dashboard.viewMessages')}
           </Link>
         </div>
       </div>
 
       {/* Recent Contact Messages */}
-      <div style={{ marginTop: '2rem' }}>
-        <h2
-          style={{
-            fontSize: '1.125rem',
-            fontWeight: '600',
-            marginBottom: '1rem',
-            color: '#111827',
-          }}
-        >
+      <div className={styles.section}>
+        <h2 className={styles.sectionTitle}>
           {t('dashboard.recentActivity')}
         </h2>
-        <div
-          style={{
-            background: '#fff',
-            borderRadius: '8px',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-            overflowX: 'auto',
-          }}
-        >
+        <div className={styles.activityTable}>
           {recentMessages.length > 0 ? (
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <table className={styles.table}>
               <thead>
-                <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase' }}>
+                <tr className={styles.tableHeader}>
+                  <th className={styles.th}>
                     {t('contactMessages.name')}
                   </th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase' }}>
+                  <th className={styles.th}>
                     {t('contactMessages.email')}
                   </th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase' }}>
+                  <th className={styles.th}>
                     {t('contactMessages.subject')}
                   </th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase' }}>
+                  <th className={styles.th}>
                     {t('contactMessages.date')}
                   </th>
                 </tr>
@@ -192,25 +114,23 @@ export function DashboardPage() {
                 {recentMessages.map((msg) => (
                   <tr
                     key={msg.id}
-                    style={{ borderBottom: '1px solid #e5e7eb', transition: 'background 0.15s' }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = '#f9fafb'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = ''; }}
+                    className={styles.tableRow}
                   >
-                    <td style={{ padding: '0.75rem 1rem' }}>
+                    <td className={styles.td}>
                       <Link
                         to={`/contact-messages/${msg.id}`}
-                        style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: '500' }}
+                        className={styles.messageLink}
                       >
                         {msg.lastName ? `${msg.firstName} ${msg.lastName}` : msg.firstName}
                       </Link>
                     </td>
-                    <td style={{ padding: '0.75rem 1rem', color: '#6b7280', fontSize: '0.875rem' }}>
+                    <td className={`${styles.td} ${styles.tdSecondary}`}>
                       {msg.email}
                     </td>
-                    <td style={{ padding: '0.75rem 1rem', color: '#6b7280', fontSize: '0.875rem' }}>
+                    <td className={`${styles.td} ${styles.tdSecondary}`}>
                       {msg.source}
                     </td>
-                    <td style={{ padding: '0.75rem 1rem', color: '#6b7280', fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
+                    <td className={`${styles.td} ${styles.tdSecondary} ${styles.tdNowrap}`}>
                       {formatDate(msg.createdAt)}
                     </td>
                   </tr>
@@ -218,7 +138,7 @@ export function DashboardPage() {
               </tbody>
             </table>
           ) : (
-            <p style={{ color: '#6b7280', textAlign: 'center', padding: '2rem' }}>
+            <p className={styles.emptyState}>
               {t('dashboard.noMessages')}
             </p>
           )}

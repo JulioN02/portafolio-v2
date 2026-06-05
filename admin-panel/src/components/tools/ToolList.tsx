@@ -1,6 +1,7 @@
 import { useTranslation } from '../../i18n/LanguageContext';
 import type { ToolResponse } from '@jsoft/shared';
 import formStyles from '../../styles/form.module.css';
+import listStyles from '../shared/ListItem.module.css';
 
 interface ToolListProps {
   tools: ToolResponse[];
@@ -29,26 +30,14 @@ export function ToolList({ tools, onEdit, onDelete, onToggleFeatured, onStatusCh
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', padding: '1rem' }}>
+    <div className={listStyles.listItem}>
       {tools.map((tool) => {
         const badgeClass = statusClassMap[tool.status] || statusClassMap.DRAFT;
         return (
-          <div
-            key={tool.id}
-            style={{
-              background: '#fff',
-              borderRadius: '8px',
-              padding: '1rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '1rem',
-              border: '1px solid #e5e7eb',
-              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
-            }}
-          >
-            <div style={{ flex: 1 }}>
-              <p style={{ fontWeight: '600', margin: 0 }}>{tool.title}</p>
-              <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: '0.25rem 0 0' }}>
+          <div key={tool.id} className={listStyles.listRow}>
+            <div className={listStyles.content}>
+              <p className={listStyles.title}>{tool.title}</p>
+              <p className={listStyles.description}>
                 {tool.classification}
               </p>
             </div>
@@ -74,7 +63,7 @@ export function ToolList({ tools, onEdit, onDelete, onToggleFeatured, onStatusCh
                 {tool.featured ? t('common.yes') : t('common.no')}
               </button>
             )}
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <div className={listStyles.actions}>
               <button className={formStyles.btnEdit} onClick={() => onEdit(tool.id)}>{t('tools.edit')}</button>
               <button className={formStyles.btnDelete} onClick={() => onDelete(tool.id)}>{t('tools.delete')}</button>
             </div>

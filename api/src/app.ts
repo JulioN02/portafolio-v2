@@ -1,4 +1,4 @@
-import express, { Express, Request, Response, NextFunction } from 'express';
+import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
@@ -14,6 +14,7 @@ import uploadRoutes from './routes/upload.routes.js';
 import contactRoutes from './routes/contact.routes.js';
 import blogPostRoutes from './routes/blog-post.routes.js';
 import siteSectionRoutes from './routes/siteSection.routes.js';
+import { errorHandler } from './middleware/errorHandler.middleware.js';
 
 dotenv.config();
 
@@ -66,18 +67,12 @@ app.use('/api/site-sections', siteSectionRoutes);
 // All routes under /api/admin need authentication
 // app.use('/api/admin', authMiddleware, adminRoutes);
 
-// Error handling middleware
-app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
-  console.error('Error:', err.message);
-  res.status(500).json({
-    error: 'Internal Server Error',
-    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong',
-  });
-});
+// Centralized error handler (must be registered after all routes)
+app.use(errorHandler);
 
 // 404 handler
 app.use((_req: Request, res: Response) => {
-  res.status(404).json({ error: 'Not Found' });
+  res.status(404).json({ message: 'Not Found', code: 'NOT_FOUND' });
 });
 
 export default app;

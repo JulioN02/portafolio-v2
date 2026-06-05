@@ -1,6 +1,38 @@
-export class NotFoundError extends Error {
-  constructor(message: string) {
+export class AppError extends Error {
+  constructor(
+    message: string,
+    public statusCode: number = 500,
+    public code?: string,
+  ) {
     super(message);
+    this.name = 'AppError';
+  }
+}
+
+export class NotFoundError extends AppError {
+  constructor(message: string = 'Resource not found') {
+    super(message, 404, 'NOT_FOUND');
     this.name = 'NotFoundError';
+  }
+}
+
+export class ValidationError extends AppError {
+  constructor(message: string = 'Validation failed', public details?: Record<string, string[]>) {
+    super(message, 400, 'VALIDATION_ERROR');
+    this.name = 'ValidationError';
+  }
+}
+
+export class AuthError extends AppError {
+  constructor(message: string = 'Authentication required') {
+    super(message, 401, 'AUTH_ERROR');
+    this.name = 'AuthError';
+  }
+}
+
+export class ForbiddenError extends AppError {
+  constructor(message: string = 'Access denied') {
+    super(message, 403, 'FORBIDDEN');
+    this.name = 'ForbiddenError';
   }
 }

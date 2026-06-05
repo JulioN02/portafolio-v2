@@ -1,6 +1,7 @@
 import type { SuccessCaseResponse } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import formStyles from '../../styles/form.module.css';
+import listStyles from '../shared/ListItem.module.css';
 
 interface SuccessCaseListProps {
   successCases: SuccessCaseResponse[];
@@ -35,26 +36,14 @@ export function SuccessCaseList({ successCases, onEdit, onDelete, onStatusChange
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', padding: '1rem' }}>
+    <div className={listStyles.listItem}>
       {cases.map((successCase) => {
         const badgeClass = statusClassMap[successCase.status] || statusClassMap.DRAFT;
         return (
-          <div
-            key={successCase.id}
-            style={{
-              background: '#fff',
-              borderRadius: '8px',
-              padding: '1rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '1rem',
-              border: '1px solid #e5e7eb',
-              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
-            }}
-          >
-            <div style={{ flex: 1 }}>
-              <p style={{ fontWeight: '600', margin: 0 }}>{successCase.title}</p>
-              <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: '0.25rem 0 0' }}>
+          <div key={successCase.id} className={listStyles.listRow}>
+            <div className={listStyles.content}>
+              <p className={listStyles.title}>{successCase.title}</p>
+              <p className={listStyles.description}>
                 {successCase.clientName || 'No client name'}
                 {successCase.classification && ` • ${successCase.classification}`}
               </p>
@@ -78,12 +67,12 @@ export function SuccessCaseList({ successCases, onEdit, onDelete, onStatusChange
                 href={successCase.link} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                style={{ fontSize: '0.75rem', color: '#3b82f6', textDecoration: 'none' }}
+                className={listStyles.statusLink}
               >
                 Link ↗
               </a>
             )}
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <div className={listStyles.actions}>
               <button className={formStyles.btnEdit} onClick={() => onEdit(successCase.id)}>{t('successCases.edit')}</button>
               <button className={formStyles.btnDelete} onClick={() => onDelete(successCase.id)}>{t('successCases.delete')}</button>
             </div>

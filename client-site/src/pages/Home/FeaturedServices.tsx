@@ -1,27 +1,29 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from '../../i18n/LanguageContext';
 import { useFeaturedServices } from '../../hooks/useServices';
 import { ServiceCard } from '../../components/services/ServiceCard';
 import { Loading } from '../../components/common/Loading';
 import styles from './FeaturedServices.module.css';
 
 export function FeaturedServices() {
+  const { t } = useTranslation();
   const { data: services, isLoading, error } = useFeaturedServices(3);
 
   return (
     <section className={styles.section}>
       <div className={styles.container}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Servicios Destacados</h2>
+          <h2 className={styles.title}>{t('featuredServices.title')}</h2>
           <p className={styles.subtitle}>
-            Soluciones personalizadas para cada necesidad
+            {t('featuredServices.subtitle')}
           </p>
         </div>
 
-        {isLoading && <Loading message="Cargando servicios..." />}
+        {isLoading && <Loading message={t('featuredServices.loading')} />}
 
         {error && (
           <p className={styles.error}>
-            Error al cargar los servicios. Por favor, intenta de nuevo.
+            {t('featuredServices.error')}
           </p>
         )}
 
@@ -35,13 +37,13 @@ export function FeaturedServices() {
 
         {services && services.length === 0 && (
           <p className={styles.empty}>
-            No hay servicios destacados en este momento.
+            {t('featuredServices.empty')}
           </p>
         )}
 
         <div className={styles.cta}>
           <Link to="/servicios" className={styles.link}>
-            Ver todos los servicios →
+            {t('featuredServices.viewAll')}
           </Link>
         </div>
       </div>

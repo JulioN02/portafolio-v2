@@ -1,3 +1,5 @@
+/* ── Settings Layout ── */
+
 .layout {
   display: grid;
   grid-template-columns: 200px 1fr;
@@ -8,4 +10,54 @@
   .layout {
     grid-template-columns: 1fr;
   }
+}
+
+.pageTitle {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--spacing-lg);
+  color: var(--color-neutral-900);
+}
+
+.sidebarCard {
+  background: var(--color-neutral-0);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+  height: fit-content;
+}
+
+.nav {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.navLink {
+  display: block;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-md);
+  color: var(--color-neutral-500);
+  background: transparent;
+  font-weight: var(--font-weight-normal);
+  text-decoration: none;
+  transition: background var(--transition-base), color var(--transition-base);
+}
+
+.navLink:hover {
+  background: var(--color-primary-50);
+  color: var(--color-primary-500);
+}
+
+.navLinkActive {
+  color: var(--color-primary-500);
+  background: var(--color-primary-50);
+  font-weight: var(--font-weight-medium);
+}
+
+.contentCard {
+  background: var(--color-neutral-0);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  min-width: 0;
 }

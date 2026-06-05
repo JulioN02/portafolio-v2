@@ -2,11 +2,13 @@ import { lazy, Suspense } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useBlogPostBySlug } from '../hooks/useBlogPosts';
 import { MetaTags } from '../components/seo/MetaTags';
+import { useTranslation } from '../i18n/LanguageContext';
 import styles from './BlogPostPage.module.css';
 
 const BlogPostContent = lazy(() => import('../components/blog/BlogPostContent').then(m => ({ default: m.BlogPostContent })));
 
 export function BlogPostPage() {
+  const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const { data: post, isLoading, isError, error } = useBlogPostBySlug(slug ?? '');
 
@@ -16,7 +18,7 @@ export function BlogPostPage() {
       <main className={styles.page}>
         <div className={styles.container}>
           <div className={styles.backLink}>
-            <Link to="/blog">&larr; Volver al blog</Link>
+            <Link to="/blog">{t('blogPost.backLink')}</Link>
           </div>
           <div className={styles.loadingState}>
             <div className={styles.skeleton} />
@@ -32,18 +34,18 @@ export function BlogPostPage() {
       <main className={styles.page}>
         <div className={styles.container}>
           <div className={styles.backLink}>
-            <Link to="/blog">&larr; Volver al blog</Link>
+            <Link to="/blog">{t('blogPost.backLink')}</Link>
           </div>
           <div className={styles.errorState}>
             <div className={styles.errorIcon}>🔍</div>
-            <h1 className={styles.errorTitle}>Artículo no encontrado</h1>
+            <h1 className={styles.errorTitle}>{t('blogPost.notFound.title')}</h1>
             <p className={styles.errorMessage}>
               {isError
-                ? (error instanceof Error ? error.message : 'Error al cargar el artículo.')
-                : 'El artículo que buscas no existe o ha sido eliminado.'}
+                ? (error instanceof Error ? error.message : t('blogPost.error.message'))
+                : t('blogPost.notFound.message')}
             </p>
             <Link to="/blog" className={styles.backButton}>
-              Ver todos los artículos
+              {t('blogPost.viewAll')}
             </Link>
           </div>
         </div>
@@ -62,7 +64,7 @@ export function BlogPostPage() {
       />
       <div className={styles.container}>
         <div className={styles.backLink}>
-          <Link to="/blog">&larr; Volver al blog</Link>
+          <Link to="/blog">{t('blogPost.backLink')}</Link>
         </div>
         <Suspense fallback={<div className={styles.loadingState}><div className={styles.skeleton} /></div>}>
           <BlogPostContent post={post} />

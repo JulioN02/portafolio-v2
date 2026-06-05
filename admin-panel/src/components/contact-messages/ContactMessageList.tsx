@@ -1,4 +1,5 @@
 import { useTranslation } from '@/i18n/LanguageContext';
+import listStyles from '../../pages/contact-messages/Inbox.module.css';
 
 /**
  * Contact message interface for the list display
@@ -58,36 +59,21 @@ export function ContactMessageList({ messages, selectedId, onSelect, onArchive, 
 
   if (messages.length === 0) {
     return (
-      <div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>
+      <div className={listStyles.emptyState}>
         <p>{t('contactMessages.empty')}</p>
       </div>
     );
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
+    <div className={listStyles.listContainer}>
       {messages.map((message) => {
         const isSelected = message.id === selectedId;
         return (
           <div
             key={message.id}
             onClick={() => onSelect?.(message.id)}
-            style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              padding: '0.75rem 1rem',
-              cursor: 'pointer',
-              borderBottom: '1px solid #e5e7eb',
-              borderLeft: message.isRead ? '3px solid transparent' : '3px solid #3b82f6',
-              background: isSelected ? '#eff6ff' : message.isRead ? '#fff' : '#f9fafb',
-              transition: 'background 0.15s',
-            }}
-            onMouseEnter={(e) => {
-              if (!isSelected) e.currentTarget.style.background = '#f3f4f6';
-            }}
-            onMouseLeave={(e) => {
-              if (!isSelected) e.currentTarget.style.background = message.isRead ? '#fff' : '#f9fafb';
-            }}
+            className={`${listStyles.listItem} ${isSelected ? listStyles.listItemActive : ''} ${!message.isRead ? listStyles.listItemUnread : ''}`}
           >
             {/* Star button */}
             {onToggleStar && (
@@ -97,72 +83,34 @@ export function ContactMessageList({ messages, selectedId, onSelect, onArchive, 
                   onToggleStar(message.id);
                 }}
                 title={message.starred ? t('contactMessages.unstar') : t('contactMessages.star')}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: '0.25rem',
-                  marginRight: '0.5rem',
-                  flexShrink: 0,
-                  color: message.starred ? '#f59e0b' : '#d1d5db',
-                  fontSize: '1.125rem',
-                  lineHeight: 1,
-                  borderRadius: '4px',
-                  alignSelf: 'flex-start',
-                  marginTop: '0.125rem',
-                }}
-                onMouseEnter={(e) => { if (!message.starred) e.currentTarget.style.color = '#9ca3af'; }}
-                onMouseLeave={(e) => { if (!message.starred) e.currentTarget.style.color = '#d1d5db'; }}
+                className={`${listStyles.listStarBtn} ${message.starred ? listStyles.listStarBtnStarred : ''}`}
               >
                 {message.starred ? '★' : '☆'}
               </button>
             )}
 
             {/* Content */}
-            <div style={{ flex: 1, minWidth: 0 }}>
+            <div className={listStyles.listContent}>
               {/* Header row: name + date */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.125rem' }}>
+              <div className={listStyles.listHeader}>
                 <span
-                  style={{
-                    fontWeight: message.isRead ? '500' : '700',
-                    fontSize: '0.875rem',
-                    color: '#111827',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    flex: 1,
-                    marginRight: '0.5rem',
-                  }}
+                  className={`${listStyles.listName} ${!message.isRead ? listStyles.listNameUnread : ''}`}
                 >
                   {message.name}
                 </span>
-                <span style={{ fontSize: '0.75rem', color: '#9ca3af', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                <span className={listStyles.listDate}>
                   {formatDate(message.createdAt)}
                 </span>
               </div>
 
               {/* Email */}
-              <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.125rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <div className={listStyles.listEmail}>
                 {message.email}
               </div>
 
               {/* Source (if not general/recruiter) */}
               {message.source && message.source !== 'general' && message.source !== 'recruiter' && (
-                <div
-                  style={{
-                    fontSize: '0.6875rem',
-                    color: '#2563eb',
-                    background: '#eff6ff',
-                    padding: '0.0625rem 0.375rem',
-                    borderRadius: '4px',
-                    marginBottom: '0.125rem',
-                    display: 'inline-block',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    maxWidth: '100%',
-                  }}
-                >
+                <div className={listStyles.listSourceBadge}>
                   {message.source
                     .replace(/^(service|product|tool|successCase):/, '')}
                 </div>
@@ -170,34 +118,16 @@ export function ContactMessageList({ messages, selectedId, onSelect, onArchive, 
 
               {/* Message preview */}
               <div
-                style={{
-                  fontSize: '0.8125rem',
-                  color: '#4b5563',
-                  lineHeight: '1.4',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  marginBottom: (message.labels ?? []).length > 0 ? '0.25rem' : 0,
-                }}
+                className={`${listStyles.listPreview} ${(message.labels ?? []).length > 0 ? listStyles.listPreviewWithLabels : ''}`}
               >
                 {truncate(message.message, 80)}
               </div>
 
               {/* Label badges */}
               {(message.labels ?? []).length > 0 && (
-                <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
+                <div className={listStyles.listBadges}>
                   {message.labels.map((label) => (
-                    <span
-                      key={label}
-                      style={{
-                        fontSize: '0.625rem',
-                        padding: '0.0625rem 0.375rem',
-                        borderRadius: '9999px',
-                        background: '#dbeafe',
-                        color: '#1e40af',
-                        fontWeight: 500,
-                      }}
-                    >
+                    <span key={label} className={listStyles.listBadge}>
                       {label}
                     </span>
                   ))}
@@ -206,7 +136,7 @@ export function ContactMessageList({ messages, selectedId, onSelect, onArchive, 
             </div>
 
             {/* Action buttons */}
-            <div style={{ display: 'flex', gap: '0.25rem', flexShrink: 0, marginLeft: '0.5rem' }}>
+            <div className={listStyles.listActions}>
               {/* Archive button */}
               {onArchive && (
                 <button
@@ -215,19 +145,7 @@ export function ContactMessageList({ messages, selectedId, onSelect, onArchive, 
                     onArchive(message.id);
                   }}
                   title={message.archived ? t('contactMessages.unarchive') : t('contactMessages.archive')}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    padding: '0.25rem',
-                    flexShrink: 0,
-                    color: '#9ca3af',
-                    fontSize: '1rem',
-                    lineHeight: 1,
-                    borderRadius: '4px',
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = '#e5e7eb'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = 'none'; }}
+                  className={listStyles.listActionBtn}
                 >
                   {message.archived ? '📂' : '📁'}
                 </button>
@@ -241,19 +159,7 @@ export function ContactMessageList({ messages, selectedId, onSelect, onArchive, 
                     onDelete(message);
                   }}
                   title={t('contactMessages.delete')}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    padding: '0.25rem',
-                    flexShrink: 0,
-                    color: '#9ca3af',
-                    fontSize: '1rem',
-                    lineHeight: 1,
-                    borderRadius: '4px',
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = '#fee2e2'; e.currentTarget.style.color = '#ef4444'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = '#9ca3af'; }}
+                  className={`${listStyles.listActionBtn} ${listStyles.listActionBtnDanger}`}
                 >
                   🗑️
                 </button>

@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HelmetProvider } from 'react-helmet-async';
 import { ErrorBoundary } from '@jsoft/shared';
+import { LanguageProvider } from './i18n/LanguageContext';
 import App from './App';
 import '@jsoft/shared/styles/variables.css';
 import '@jsoft/shared/dist/index.css';
@@ -24,7 +25,9 @@ createRoot(document.getElementById('root')!).render(
       <BrowserRouter>
         <HelmetProvider>
           <ErrorBoundary>
-            <App />
+            <LanguageProvider>
+              <App />
+            </LanguageProvider>
           </ErrorBoundary>
         </HelmetProvider>
       </BrowserRouter>

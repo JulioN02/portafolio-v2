@@ -7,8 +7,8 @@ on:
     branches: [main]
 
 jobs:
-  build:
-    name: Build
+  test-and-build:
+    name: Test & Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -31,6 +31,21 @@ jobs:
 
       - name: Typecheck
         run: pnpm -r run typecheck
+
+      - name: Test API
+        run: pnpm -F @jsoft/api test
+
+      - name: Test shared
+        run: pnpm -F @jsoft/shared test
+
+      - name: Test admin-panel
+        run: pnpm -F admin-panel test
+
+      - name: Test client-site
+        run: pnpm -F client-site test
+
+      - name: Test recruiter-site
+        run: pnpm -F recruiter-site test
 
       - name: Build
         run: pnpm -r run build

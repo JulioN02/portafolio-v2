@@ -4,14 +4,17 @@ import { Hero } from '../components/home/Hero';
 import { ProfileToggle } from '../components/home/ProfileToggle';
 import { TechStack } from '../components/home/TechStack';
 import { RecentProjects } from '../components/home/RecentProjects';
+import { useTranslation } from '../i18n/LanguageContext';
 import styles from './HomePage.module.css';
 
 export function HomePage() {
+  const { t } = useTranslation();
+
   return (
     <div className={styles.page}>
       <MetaTags
-        title="Julio Nieto | Desarrollador Full Stack"
-        description="Desarrollador Full Stack especializado en React, Node.js y TypeScript. Conoce mi portafolio y experiencia."
+        title={t('home.meta.title')}
+        description={t('home.meta.description')}
       />
       {/* Hero Section */}
       <Hero avatarUrl="/uploads/sobremi.png" />
@@ -28,14 +31,10 @@ export function HomePage() {
       {/* CTA Section */}
       <section className={styles.ctaSection}>
         <div className={styles.ctaContainer}>
-          <h2 className={styles.ctaTitle}>¿Listo para trabajar juntos?</h2>
-          <p className={styles.ctaText}>
-            Estoy abierto a nuevas oportunidades laborales y proyectos
-            desafiantes. Si buscas un desarrollador comprometido con la calidad
-            y los resultados, hablemos.
-          </p>
+          <h2 className={styles.ctaTitle}>{t('home.cta.title')}</h2>
+          <p className={styles.ctaText}>{t('home.cta.text')}</p>
           <Link to="/contacto" className={styles.ctaButton}>
-            Contáctame
+            {t('home.cta.button')}
           </Link>
         </div>
       </section>

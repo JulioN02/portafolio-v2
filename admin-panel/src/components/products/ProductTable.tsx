@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from '../../i18n/LanguageContext';
 import type { ProductResponse } from '@jsoft/shared';
 import formStyles from '../../styles/form.module.css';
+import listStyles from '../shared/ListItem.module.css';
 
 interface ProductTableProps {
   products: ProductResponse[];
@@ -29,26 +30,14 @@ export function ProductTable({ products, onDelete, onToggleFeatured, onStatusCha
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', padding: '1rem' }}>
+    <div className={listStyles.listItem}>
       {products.map((product) => {
         const badgeClass = statusClassMap[product.status] || statusClassMap.DRAFT;
         return (
-          <div
-            key={product.id}
-            style={{
-              background: '#fff',
-              borderRadius: '8px',
-              padding: '1rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '1rem',
-              border: '1px solid #e5e7eb',
-              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
-            }}
-          >
-            <div style={{ flex: 1 }}>
-              <p style={{ fontWeight: '600', margin: 0 }}>{product.title}</p>
-              <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: '0.25rem 0 0' }}>
+          <div key={product.id} className={listStyles.listRow}>
+            <div className={listStyles.content}>
+              <p className={listStyles.title}>{product.title}</p>
+              <p className={listStyles.description}>
                 {product.classification} • {product.images.length} {t('products.images')?.toLowerCase()}
               </p>
             </div>
@@ -74,7 +63,7 @@ export function ProductTable({ products, onDelete, onToggleFeatured, onStatusCha
                 {product.featured ? t('common.yes') : t('common.no')}
               </button>
             )}
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <div className={listStyles.actions}>
               <Link to={`/products/edit/${product.id}`}>
                 <button className={formStyles.btnEdit}>{t('products.edit')}</button>
               </Link>

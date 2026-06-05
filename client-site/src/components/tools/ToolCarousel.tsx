@@ -1,22 +1,24 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from '../../i18n/LanguageContext';
 import { useFeaturedTools } from '../../hooks/useTools';
 import { Loading } from '../common/Loading';
 import styles from './ToolCarousel.module.css';
 
 export function ToolCarousel() {
+  const { t } = useTranslation();
   const { data: tools, isLoading, error } = useFeaturedTools(3);
 
-  if (isLoading) return <Loading message="Cargando herramientas..." />;
-  if (error) return <p className={styles.error}>Error al cargar herramientas</p>;
+  if (isLoading) return <Loading message={t('toolCarousel.loading')} />;
+  if (error) return <p className={styles.error}>{t('toolCarousel.error')}</p>;
   if (!tools?.length) return null;
 
   return (
     <section className={styles.section}>
       <div className={styles.container}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Herramientas</h2>
+          <h2 className={styles.title}>{t('toolCarousel.title')}</h2>
           <p className={styles.subtitle}>
-            Recursos que aceleran tu desarrollo
+            {t('toolCarousel.subtitle')}
           </p>
         </div>
 
@@ -33,7 +35,7 @@ export function ToolCarousel() {
                   />
                 )}
                 {tool.requiresInstall && (
-                  <span className={styles.badge}>Requiere instalación</span>
+                  <span className={styles.badge}>{t('toolCarousel.requiresInstall')}</span>
                 )}
               </div>
               <div className={styles.content}>
@@ -45,7 +47,7 @@ export function ToolCarousel() {
                     : tool.shortDescription}
                 </p>
                 <Link to={`/herramientas/${tool.slug}`} className={styles.link}>
-                  Ver detalles →
+                  {t('toolCarousel.viewDetails')}
                 </Link>
               </div>
             </div>
@@ -54,7 +56,7 @@ export function ToolCarousel() {
 
         <div className={styles.cta}>
           <Link to="/herramientas" className={styles.viewAll}>
-            Ver todas las herramientas →
+            {t('toolCarousel.viewAll')}
           </Link>
         </div>
       </div>

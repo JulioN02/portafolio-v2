@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { RecruiterContactForm } from '../components/contact/RecruiterContactForm';
+import { useTranslation } from '../i18n/LanguageContext';
 
 const socialLinks = [
   {
@@ -25,6 +26,7 @@ const socialLinks = [
 ];
 
 export function ContactPage() {
+  const { t } = useTranslation();
   return (
     <main>
       {/* ── Banner ── */}
@@ -67,7 +69,7 @@ export function ContactPage() {
               marginBottom: 'var(--spacing-sm)',
             }}
           >
-            Contacto
+            {t('contact.title')}
           </h1>
           <p
             style={{
@@ -78,8 +80,7 @@ export function ContactPage() {
               margin: '0 auto',
             }}
           >
-            ¿Interesado en mis servicios? Complete el formulario y me pondré en
-            contacto a la brevedad.
+            {t('contact.subtitle')}
           </p>
         </div>
       </section>
@@ -106,7 +107,7 @@ export function ContactPage() {
               textDecoration: 'none',
             }}
           >
-            ← Volver al inicio
+            {t('contact.backLink')}
           </Link>
         </div>
 
@@ -132,7 +133,7 @@ export function ContactPage() {
               marginBottom: 'var(--spacing-md)',
             }}
           >
-            También puedes contactarme por
+            {t('contact.alternative')}
           </h2>
           <div
             style={{

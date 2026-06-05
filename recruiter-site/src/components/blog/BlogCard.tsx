@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import type { BlogPostResponse } from '@jsoft/shared';
+import { useTranslation } from '../../i18n/LanguageContext';
 import styles from './BlogCard.module.css';
 
 interface BlogCardProps {
@@ -23,6 +24,7 @@ function formatDate(dateStr: string): string {
 }
 
 export function BlogCard({ post }: BlogCardProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -43,7 +45,7 @@ export function BlogCard({ post }: BlogCardProps) {
       onKeyDown={handleKeyDown}
       role="link"
       tabIndex={0}
-      aria-label={`Leer artículo: ${post.title}`}
+      aria-label={t('blogCard.readArticle', { title: post.title })}
     >
       <div className={styles.imageWrapper}>
         <img

@@ -540,5 +540,5 @@ export const translations: Record<Language, Record<string, string>> = {
     'common.previous': 'Previous',
     'common.next': 'Next',
     'common.add': 'Add',
-
+  },
 };
