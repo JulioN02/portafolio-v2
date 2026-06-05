@@ -5,31 +5,17 @@ RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 
 WORKDIR /app
 
-# Copy dependency files
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json tsconfig.root.json ./
-COPY packages/shared/package.json ./packages/shared/
-COPY admin-panel/package.json admin-panel/tsconfig.json admin-panel/vite.config.ts admin-panel/index.html ./admin-panel/
+COPY . .
 
-# Install dependencies
-RUN pnpm install --frozen-lockfile
-
-# Copy source code
-COPY packages/shared/ ./packages/shared/
-COPY admin-panel/ ./admin-panel/
-
-# Build shared package
-RUN pnpm --filter @jsoft/shared build
-
-# Build admin-panel
-RUN pnpm --filter @jsoft/admin-panel build
+RUN pnpm install --frozen-lockfile && \
+    pnpm --filter @jsoft/shared build && \
+    pnpm --filter @jsoft/admin-panel build
 
 # Stage 2: Serve with nginx
-FROM nginx:alpine AS runner
+FROM nginx:alpine
 
-# Copy built assets
 COPY --from=builder /app/admin-panel/dist /usr/share/nginx/html
 
-# Nginx config for SPA with fallback
 RUN rm /etc/nginx/conf.d/default.conf
 COPY admin-panel/nginx.conf /etc/nginx/conf.d/default.conf
 
