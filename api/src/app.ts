@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs';
 
 import authRoutes from './routes/auth.routes.js';
 import serviceRoutes from './routes/service.routes.js';
@@ -15,6 +16,7 @@ import contactRoutes from './routes/contact.routes.js';
 import blogPostRoutes from './routes/blog-post.routes.js';
 import siteSectionRoutes from './routes/siteSection.routes.js';
 import { errorHandler } from './middleware/errorHandler.middleware.js';
+import { r2Service } from './services/r2.service.js';
 
 dotenv.config();
 
@@ -27,7 +29,7 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "'unsafe-inline'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https:", "http:"],
+      imgSrc: ["'self'", "data:", "https:", "http:", "blob:"],
     },
   },
 }));
@@ -43,8 +45,44 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Static files (uploads)
-app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+// Serve uploaded images — local disk or proxy from R2
+const uploadsDir = path.join(process.cwd(), 'uploads');
+app.use('/uploads', async (req: Request, res: Response, next) => {
+  const filename = req.path.replace(/^\//, '');
+  if (!filename) return next();
+
+  // 1. Try local disk (dev mode)
+  const localPath = path.join(uploadsDir, filename);
+  if (fs.existsSync(localPath)) {
+    return res.sendFile(localPath);
+  }
+
+  // 2. Try R2 (production)
+  if (r2Service.isConfigured()) {
+    try {
+      const publicUrl = process.env.R2_PUBLIC_URL;
+      if (publicUrl) {
+        // Redirect to R2 public URL
+        return res.redirect(`${publicUrl}/${filename}`);
+      }
+
+      // Fallback: proxy the file through the API
+      const file = await r2Service.getFile(filename);
+      if (file && file.body) {
+        res.setHeader('Content-Type', file.contentType);
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        // Convert Readable stream to pipe through response
+        const nodeStream = file.body as unknown as NodeJS.ReadableStream;
+        return nodeStream.pipe(res);
+      }
+    } catch {
+      // R2 fetch failed, continue to 404
+    }
+  }
+
+  // 3. Not found
+  res.status(404).json({ error: 'File not found' });
+});
 
 // Health check
 app.get('/api/health', (_req: Request, res: Response) => {

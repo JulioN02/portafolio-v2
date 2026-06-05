@@ -1,9 +1,10 @@
-import fs from 'fs';
 import path from 'path';
+import fs from 'fs';
+import { r2Service } from './r2.service.js';
 
 const UPLOAD_DIR = path.join(process.cwd(), 'uploads');
 
-// Ensure upload directory exists
+// Ensure local upload directory exists (for local dev fallback)
 if (!fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 }
@@ -17,16 +18,26 @@ export interface UploadResult {
 
 export const uploadService = {
   /**
-   * Save uploaded file to local storage (development)
-   * In production, this would upload to Cloudinary
+   * Save uploaded file — uploads to R2 in production, local disk in dev
    */
   async saveFile(file: Express.Multer.File): Promise<UploadResult> {
     const timestamp = Date.now();
     const safeName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
     const filename = `${timestamp}-${safeName}`;
-    const filepath = path.join(UPLOAD_DIR, filename);
 
-    // Move file from temp to uploads directory
+    if (r2Service.isConfigured()) {
+      // Production: upload to Cloudflare R2
+      const result = await r2Service.uploadFile(file.buffer, filename, file.mimetype);
+      return {
+        filename: result.filename,
+        url: result.url,
+        size: file.size,
+        mimetype: file.mimetype,
+      };
+    }
+
+    // Local dev: save to disk
+    const filepath = path.join(UPLOAD_DIR, filename);
     fs.writeFileSync(filepath, file.buffer);
 
     return {
@@ -38,9 +49,15 @@ export const uploadService = {
   },
 
   /**
-   * Delete a file from local storage
+   * Delete a file — from R2 or local disk
    */
   async deleteFile(filename: string): Promise<void> {
+    if (r2Service.isConfigured()) {
+      await r2Service.deleteFile(filename);
+      return;
+    }
+
+    // Local dev: delete from disk
     const filepath = path.join(UPLOAD_DIR, filename);
     if (fs.existsSync(filepath)) {
       fs.unlinkSync(filepath);
