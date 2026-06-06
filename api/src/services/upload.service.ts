@@ -4,8 +4,8 @@ import { r2Service } from './r2.service.js';
 
 const UPLOAD_DIR = path.join(process.cwd(), 'uploads');
 
-// Ensure local upload directory exists (for local dev fallback)
-if (!fs.existsSync(UPLOAD_DIR)) {
+// Ensure local upload directory exists (for local dev fallback, skip on Vercel)
+if (!process.env.VERCEL && !fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 }
 
