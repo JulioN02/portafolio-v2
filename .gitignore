@@ -15,8 +15,7 @@ build/
 api/dist/
 
 # Shared package
-packages/shared/dist/
-
+!packages/shared/dist/
 # Frontends
 client-site/dist/
 admin-panel/dist/
@@ -84,3 +83,4 @@ temp/
 # =============================================================================
 .cache/
 .parcel-cache/
+.vercel
