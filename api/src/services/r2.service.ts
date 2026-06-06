@@ -44,8 +44,9 @@ export const r2Service = {
       },
     );
 
-    if (!response.ok) {
-      throw new Error(`Failed to upload to Supabase Storage: ${response.statusText}`);
+    const resp = response as { ok: boolean; statusText: string };
+    if (!resp.ok) {
+      throw new Error(`Failed to upload to Supabase Storage: ${resp.statusText}`);
     }
 
     const publicUrl = `${config.apiUrl}/object/public/${config.bucket}/${filename}`;
@@ -69,8 +70,9 @@ export const r2Service = {
       },
     );
 
-    if (!response.ok) {
-      console.warn(`Failed to delete ${filename} from Supabase Storage:`, response.statusText);
+    const resp = response as { ok: boolean; statusText: string };
+    if (!resp.ok) {
+      console.warn(`Failed to delete ${filename} from Supabase Storage:`, resp.statusText);
     }
   },
 
