@@ -11,7 +11,7 @@ async function main() {
     await prisma.$connect();
     console.log('✅ Database connected successfully');
 
-    // Start the server
+    // Start the server (local dev / non-Vercel)
     app.listen(PORT, () => {
       console.log(`🚀 Server running on http://localhost:${PORT}`);
       console.log(`📚 Health check: http://localhost:${PORT}/api/health`);
@@ -22,7 +22,10 @@ async function main() {
   }
 }
 
-main();
+// Run locally only, not on Vercel serverless
+if (!process.env.VERCEL) {
+  main();
+}
 
 // Graceful shutdown
 process.on('SIGINT', async () => {
@@ -36,3 +39,6 @@ process.on('SIGTERM', async () => {
   console.log('Database disconnected');
   process.exit(0);
 });
+
+// Export for Vercel serverless
+export default app;

@@ -1,7 +1,9 @@
 import { createApiClient } from '@jsoft/shared';
 
+const API_URL = import.meta.env.VITE_API_URL || '/api';
+
 export const apiClient = createApiClient({
-  baseUrl: '/api',
+  baseUrl: API_URL,
   onUnauthorized: () => {
     // Client site is public, no special handling needed
     console.warn('API returned 401');
