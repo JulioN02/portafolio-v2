@@ -1,0 +1,156 @@
+import { ZodError } from 'zod';
+import { serviceService } from '../services/service.service.js';
+import { serviceSchema, serviceUpdateSchema, serviceFilterSchema, serviceStatusSchema } from '@jsoft/shared';
+// Helper to ensure param is a string (Express 5 types can be string | string[])
+const getStringParam = (param) => {
+    if (Array.isArray(param))
+        return param[0];
+    return param || '';
+};
+export const serviceController = {
+    async findAll(req, res) {
+        try {
+            const filter = serviceFilterSchema.parse(req.query);
+            const result = await serviceService.findAll(filter);
+            res.json(result);
+        }
+        catch (error) {
+            if (error instanceof ZodError) {
+                res.status(400).json({ error: 'Invalid filter parameters', details: error.flatten().fieldErrors });
+                return;
+            }
+            console.error('Service findAll error:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    },
+    async findBySlug(req, res) {
+        try {
+            const slug = getStringParam(req.params.slug);
+            const service = await serviceService.findBySlug(slug);
+            if (!service) {
+                res.status(404).json({ error: 'Service not found' });
+                return;
+            }
+            res.json(service);
+        }
+        catch (error) {
+            console.error('Service findBySlug error:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    },
+    async findById(req, res) {
+        try {
+            const id = getStringParam(req.params.id);
+            const service = await serviceService.findById(id);
+            if (!service) {
+                res.status(404).json({ error: 'Service not found' });
+                return;
+            }
+            res.json(service);
+        }
+        catch (error) {
+            console.error('Service findById error:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    },
+    async create(req, res) {
+        try {
+            const data = serviceSchema.parse(req.body);
+            const service = await serviceService.create(data);
+            res.status(201).json(service);
+        }
+        catch (error) {
+            if (error instanceof ZodError) {
+                res.status(400).json({ error: 'Validation Error', details: error.flatten().fieldErrors });
+                return;
+            }
+            console.error('Service create error:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    },
+    async update(req, res) {
+        try {
+            const id = getStringParam(req.params.id);
+            const data = serviceUpdateSchema.parse(req.body);
+            const existing = await serviceService.findById(id);
+            if (!existing) {
+                res.status(404).json({ error: 'Service not found' });
+                return;
+            }
+            const service = await serviceService.update(id, data);
+            res.json(service);
+        }
+        catch (error) {
+            if (error instanceof ZodError) {
+                res.status(400).json({ error: 'Validation Error', details: error.flatten().fieldErrors });
+                return;
+            }
+            console.error('Service update error:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    },
+    async delete(req, res) {
+        try {
+            const id = getStringParam(req.params.id);
+            const existing = await serviceService.findById(id);
+            if (!existing) {
+                res.status(404).json({ error: 'Service not found' });
+                return;
+            }
+            await serviceService.softDelete(id);
+            res.json({ message: 'Service deleted successfully' });
+        }
+        catch (error) {
+            console.error('Service delete error:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    },
+    async restore(req, res) {
+        try {
+            const id = getStringParam(req.params.id);
+            const existing = await serviceService.findById(id);
+            if (!existing) {
+                res.status(404).json({ error: 'Service not found' });
+                return;
+            }
+            const service = await serviceService.restore(id);
+            res.json(service);
+        }
+        catch (error) {
+            console.error('Service restore error:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    },
+    async updateStatus(req, res) {
+        try {
+            const id = getStringParam(req.params.id);
+            const { status } = serviceStatusSchema.parse(req.body);
+            const existing = await serviceService.findById(id);
+            if (!existing) {
+                res.status(404).json({ error: 'Service not found' });
+                return;
+            }
+            const service = await serviceService.updateStatus(id, status);
+            res.json(service);
+        }
+        catch (error) {
+            if (error instanceof ZodError) {
+                res.status(400).json({ error: 'Validation Error', details: error.flatten().fieldErrors });
+                return;
+            }
+            console.error('Service updateStatus error:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    },
+    async getClassifications(_req, res) {
+        try {
+            const classifications = await serviceService.getClassifications();
+            res.json(classifications);
+        }
+        catch (error) {
+            console.error('Service getClassifications error:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    },
+};
+//# sourceMappingURL=service.controller.js.map

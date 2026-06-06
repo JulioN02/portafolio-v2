@@ -12,7 +12,7 @@ build/
 *.tsbuildinfo
 
 # API
-api/dist/
+!api/dist/
 
 # Shared package
 !packages/shared/dist/

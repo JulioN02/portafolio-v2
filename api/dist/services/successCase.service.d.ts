@@ -1,0 +1,141 @@
+import { PostStatus } from '@prisma/client';
+import { SuccessCaseInput, SuccessCaseUpdateInput, SuccessCaseFilterInput } from '@jsoft/shared';
+export declare const successCaseService: {
+    findAll(filter?: SuccessCaseFilterInput): Promise<{
+        data: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            title: string;
+            slug: string;
+            images: string[];
+            status: import("@prisma/client").$Enums.PostStatus;
+            deletedAt: Date | null;
+            publishedAt: Date | null;
+            description: string;
+            videos: string[];
+            links: string[];
+        }[];
+        pagination: {
+            page: number;
+            limit: number;
+            total: number;
+            totalPages: number;
+            hasNext: boolean;
+            hasPrev: boolean;
+        };
+    }>;
+    findBySlug(slug: string): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        title: string;
+        slug: string;
+        images: string[];
+        status: import("@prisma/client").$Enums.PostStatus;
+        deletedAt: Date | null;
+        publishedAt: Date | null;
+        description: string;
+        videos: string[];
+        links: string[];
+    } | null>;
+    findRecent(limit?: number): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        title: string;
+        slug: string;
+        images: string[];
+        status: import("@prisma/client").$Enums.PostStatus;
+        deletedAt: Date | null;
+        publishedAt: Date | null;
+        description: string;
+        videos: string[];
+        links: string[];
+    }[]>;
+    findById(id: string): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        title: string;
+        slug: string;
+        images: string[];
+        status: import("@prisma/client").$Enums.PostStatus;
+        deletedAt: Date | null;
+        publishedAt: Date | null;
+        description: string;
+        videos: string[];
+        links: string[];
+    } | null>;
+    create(data: SuccessCaseInput): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        title: string;
+        slug: string;
+        images: string[];
+        status: import("@prisma/client").$Enums.PostStatus;
+        deletedAt: Date | null;
+        publishedAt: Date | null;
+        description: string;
+        videos: string[];
+        links: string[];
+    }>;
+    update(id: string, data: SuccessCaseUpdateInput): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        title: string;
+        slug: string;
+        images: string[];
+        status: import("@prisma/client").$Enums.PostStatus;
+        deletedAt: Date | null;
+        publishedAt: Date | null;
+        description: string;
+        videos: string[];
+        links: string[];
+    }>;
+    softDelete(id: string): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        title: string;
+        slug: string;
+        images: string[];
+        status: import("@prisma/client").$Enums.PostStatus;
+        deletedAt: Date | null;
+        publishedAt: Date | null;
+        description: string;
+        videos: string[];
+        links: string[];
+    }>;
+    restore(id: string): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        title: string;
+        slug: string;
+        images: string[];
+        status: import("@prisma/client").$Enums.PostStatus;
+        deletedAt: Date | null;
+        publishedAt: Date | null;
+        description: string;
+        videos: string[];
+        links: string[];
+    }>;
+    updateStatus(id: string, status: PostStatus): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        title: string;
+        slug: string;
+        images: string[];
+        status: import("@prisma/client").$Enums.PostStatus;
+        deletedAt: Date | null;
+        publishedAt: Date | null;
+        description: string;
+        videos: string[];
+        links: string[];
+    }>;
+};
+//# sourceMappingURL=successCase.service.d.ts.map
