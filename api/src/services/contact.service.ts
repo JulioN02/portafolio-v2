@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { ClientContactInput, RecruiterContactInput, FormOrigin } from '@jsoft/shared';
-import { NotFoundError } from '../utils/errors';
+import { NotFoundError } from '../utils/errors.js';
 
 const prisma = new PrismaClient();
 

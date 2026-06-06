@@ -1,6 +1,7 @@
 {
   "name": "@jsoft/api",
   "version": "1.0.0",
+  "type": "module",
   "description": "Portafolio Web v2.0 - Express API",
   "main": "dist/index.js",
   "scripts": {

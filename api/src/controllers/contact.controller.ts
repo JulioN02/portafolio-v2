@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { ZodError } from 'zod';
 import { contactService } from '../services/contact.service.js';
 import { clientContactSchema, recruiterContactSchema, FormOrigin } from '@jsoft/shared';
-import { NotFoundError } from '../utils/errors';
+import { NotFoundError } from '../utils/errors.js';
 
 export const contactController = {
   /**
