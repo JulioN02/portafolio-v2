@@ -17,7 +17,7 @@ export function HomePage() {
         description={t('home.meta.description')}
       />
       {/* Hero Section */}
-      <Hero avatarUrl="/uploads/sobremi.png" />
+      <Hero avatarUrl="/images/sobremi.png" />
 
       {/* Profile Toggle Section */}
       <ProfileToggle />

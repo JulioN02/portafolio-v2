@@ -46,7 +46,7 @@ export function Header() {
       <header className={`${styles.header} ${isHidden ? styles.hidden : ''}`}>
         <div className={styles.container}>
           <Link to="/" className={styles.logo}>
-            <img src="/uploads/LogoJSS.png" alt="J Soft Solutions" className={styles.logoIcon} />
+            <img src="/images/LogoJSS.png" alt="J Soft Solutions" className={styles.logoIcon} />
             <span className={styles.logoText}>J Soft Solutions</span>
           </Link>
 

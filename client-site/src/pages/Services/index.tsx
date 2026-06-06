@@ -35,7 +35,7 @@ export function ServicesPage() {
       <PageHeader
         title={t('services.pageHeader.title')}
         subtitle={t('services.pageHeader.subtitle')}
-        backgroundImage="/uploads/servicios.png"
+        backgroundImage="/images/servicios.png"
       />
       <div className={styles.container}>
 

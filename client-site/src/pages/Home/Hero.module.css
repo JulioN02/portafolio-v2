@@ -18,7 +18,7 @@
 .heroBgImage {
   position: absolute;
   inset: 0;
-  background: url('/uploads/heroinicio.png') center/cover no-repeat;
+  background: url('/images/heroinicio.png') center/cover no-repeat;
   opacity: 0.15;
   pointer-events: none;
 }

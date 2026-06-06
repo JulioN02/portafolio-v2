@@ -48,7 +48,7 @@ export function ContactPage() {
           style={{
             position: 'absolute',
             inset: 0,
-            background: "url('/uploads/contacto.png') center/cover no-repeat",
+            background: "url('/images/contacto.png') center/cover no-repeat",
             opacity: 0.2,
             pointerEvents: 'none',
           }}

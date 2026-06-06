@@ -1,21 +1,14 @@
-interface StorageConfig {
-  apiUrl: string;      // Supabase Storage API URL
-  bucket: string;      // Bucket name
-  publicUrl: string;   // Public base URL for the bucket
-  secretKey: string;   // service_role key for admin ops
-}
+const DEFAULT_BUCKET = 'general';
 
-function getConfig(): StorageConfig | null {
+function getConfig(bucket?: string): { apiUrl: string; bucket: string; secretKey: string } | null {
   const projectId = process.env.SUPABASE_PROJECT_ID;
   const secretKey = process.env.SUPABASE_SERVICE_KEY;
-  const bucket = process.env.SUPABASE_BUCKET || 'portafolio-v2-images';
 
   if (!projectId || !secretKey) return null;
 
   return {
     apiUrl: `https://${projectId}.supabase.co/storage/v1`,
-    bucket,
-    publicUrl: `https://${projectId}.supabase.co/storage/v1/object/public/${bucket}`,
+    bucket: bucket || process.env.SUPABASE_BUCKET || DEFAULT_BUCKET,
     secretKey,
   };
 }
@@ -23,16 +16,19 @@ function getConfig(): StorageConfig | null {
 export const r2Service = {
   /**
    * Upload a file to Supabase Storage
+   * @param bucket - Module bucket (servicios, productos, herramientas, blog, proyectos, casos-exito, general)
    */
   async uploadFile(
     buffer: Buffer,
     filename: string,
     mimetype: string,
+    bucket?: string,
   ): Promise<{ url: string; filename: string }> {
-    const config = getConfig();
+    const config = getConfig(bucket);
     if (!config) {
       // No storage configured — return relative URL for local dev
-      return { url: `/uploads/${filename}`, filename };
+      const prefix = bucket ? `/uploads/${bucket}` : '/uploads';
+      return { url: `${prefix}/${filename}`, filename };
     }
 
     const response = await fetch(
@@ -52,14 +48,15 @@ export const r2Service = {
       throw new Error(`Failed to upload to Supabase Storage: ${response.statusText}`);
     }
 
-    return { url: `${config.publicUrl}/${filename}`, filename };
+    const publicUrl = `${config.apiUrl}/object/public/${config.bucket}/${filename}`;
+    return { url: publicUrl, filename };
   },
 
   /**
    * Delete a file from Supabase Storage
    */
-  async deleteFile(filename: string): Promise<void> {
-    const config = getConfig();
+  async deleteFile(filename: string, bucket?: string): Promise<void> {
+    const config = getConfig(bucket);
     if (!config) return;
 
     const response = await fetch(
@@ -80,10 +77,10 @@ export const r2Service = {
   /**
    * Get the public URL for a file (no API call needed — URL is deterministic)
    */
-  getPublicUrl(filename: string): string | null {
-    const config = getConfig();
+  getPublicUrl(filename: string, bucket?: string): string | null {
+    const config = getConfig(bucket);
     if (!config) return null;
-    return `${config.publicUrl}/${filename}`;
+    return `${config.apiUrl}/object/public/${config.bucket}/${filename}`;
   },
 
   /**

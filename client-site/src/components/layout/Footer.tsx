@@ -48,7 +48,7 @@ const LEGAL_LINKS = [
 ];
 
 const logoIcon = (
-  <img src="/uploads/LogoJSS.png" alt="J Soft Solutions" width="36" height="36" style={{ borderRadius: 'var(--radius-sm)' }} />
+  <img src="/images/LogoJSS.png" alt="J Soft Solutions" width="36" height="36" style={{ borderRadius: 'var(--radius-sm)' }} />
 );
 
 export function Footer() {

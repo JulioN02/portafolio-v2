@@ -45,7 +45,7 @@ export function Header({ onToggleSidebar, isSidebarOpen }: HeaderProps) {
           aria-expanded={isOpen}
         >
           <img
-            src="/uploads/LogoJSS.png"
+            src="/images/LogoJSS.png"
             alt="J Soft Solutions"
             className={styles.logoAvatar}
           />
@@ -71,7 +71,7 @@ export function Header({ onToggleSidebar, isSidebarOpen }: HeaderProps) {
           <div className={styles.dropdown}>
             <div className={styles.dropdownHeader}>
               <img
-                src="/uploads/LogoJSS.png"
+                src="/images/LogoJSS.png"
                 alt="J Soft Solutions"
                 className={styles.dropdownLogo}
               />

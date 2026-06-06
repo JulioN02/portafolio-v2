@@ -15,7 +15,7 @@ export function ContactPage() {
       <PageHeader
         title={t('contact.pageHeader.title')}
         subtitle={t('contact.pageHeader.subtitle')}
-        backgroundImage="/uploads/contacto.png"
+        backgroundImage="/images/contacto.png"
       />
       <div className={styles.container}>
         <div className={styles.grid}>

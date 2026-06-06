@@ -18,7 +18,7 @@ describe('Header', () => {
     renderWithProviders(<Header />);
     const logo = screen.getByAltText('J Soft Solutions');
     expect(logo).toBeInTheDocument();
-    expect(logo).toHaveAttribute('src', '/uploads/LogoJSS.png');
+    expect(logo).toHaveAttribute('src', '/images/LogoJSS.png');
   });
 
   it('renders the logo text', () => {
