@@ -133,6 +133,9 @@ importers:
       prisma:
         specifier: 6.3.1
         version: 6.3.1(typescript@5.9.3)
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
       zod:
         specifier: ^3.24.1
         version: 3.25.76
@@ -167,9 +170,6 @@ importers:
       tsx:
         specifier: ^4.19.2
         version: 4.21.0
-      typescript:
-        specifier: ^5.7.3
-        version: 5.9.3
 
   client-site:
     dependencies:
