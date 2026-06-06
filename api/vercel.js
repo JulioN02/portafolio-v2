@@ -1,14 +1,17 @@
-// Vercel serverless entry point
-// CommonJS wrapper for the ESM Express app
-async function createHandler() {
-  const { default: app } = await import('./dist/index.js');
+// Vercel serverless entry point (CommonJS)
+// Dynamically import the ESM Express app
+let app;
+
+async function init() {
+  if (!app) {
+    const mod = await import('./dist/index.js');
+    app = mod.default;
+  }
   return app;
 }
 
-const appPromise = createHandler();
-
-// Vercel serverless handler
+// Vercel Lambda handler
 module.exports = async (req, res) => {
-  const app = await appPromise;
-  return app(req, res);
+  const expressApp = await init();
+  expressApp(req, res);
 };
