@@ -1,3 +1,5 @@
+import styles from './ErrorBoundary.module.css';
+
 export interface ErrorFallbackProps {
   onReset?: () => void;
   title?: string;
@@ -10,38 +12,16 @@ export function ErrorFallback({
   message = 'Ocurrió un error inesperado. Por favor, intenta de nuevo.',
 }: ErrorFallbackProps) {
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '48px 24px',
-      textAlign: 'center',
-      minHeight: '300px',
-    }}>
-      <h2 style={{ fontSize: '1.5rem', marginBottom: '8px', color: '#333' }}>
-        {title}
-      </h2>
-      <p style={{ fontSize: '1rem', color: '#666', marginBottom: '24px' }}>
-        {message}
-      </p>
-      {onReset && (
-        <button
-          onClick={onReset}
-          style={{
-            padding: '12px 32px',
-            fontSize: '1rem',
-            fontWeight: 600,
-            color: '#fff',
-            backgroundColor: '#2563eb',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-          }}
-        >
-          Reintentar
-        </button>
-      )}
+    <div className={styles.container}>
+      <div className={styles.card}>
+        <h2 className={styles.title}>{title}</h2>
+        <p className={styles.message}>{message}</p>
+        {onReset && (
+          <button className={styles.retryButton} onClick={onReset}>
+            Reintentar
+          </button>
+        )}
+      </div>
     </div>
   );
 }

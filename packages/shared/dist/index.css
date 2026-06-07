@@ -1,3 +1,76 @@
+/* src/components/ui/ErrorBoundary/ErrorBoundary.module.css */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  min-height: 300px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 40px 32px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  width: 100%;
+}
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 8px;
+  color: #1a1a2e;
+  line-height: 1.3;
+}
+.message {
+  font-size: 1rem;
+  color: #64748b;
+  margin: 0 0 28px;
+  line-height: 1.5;
+}
+.retryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 32px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #2563eb;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  min-height: 44px;
+  min-width: 44px;
+  transition: background-color 0.2s ease;
+}
+.retryButton:hover {
+  background-color: #1d4ed8;
+}
+.retryButton:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .retryButton {
+    transition: none;
+  }
+}
+@media (max-width: 480px) {
+  .container {
+    padding: 32px 16px;
+    min-height: 200px;
+  }
+  .card {
+    padding: 28px 20px;
+  }
+  .title {
+    font-size: 1.25rem;
+  }
+}
+
 /* src/styles/variables.css */
 :root {
   --color-primary-50: #eff6ff;

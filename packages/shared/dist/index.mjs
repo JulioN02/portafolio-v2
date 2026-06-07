@@ -661,7 +661,26 @@ function ProtectedRoute({
 
 // src/components/ui/ErrorBoundary/ErrorBoundary.tsx
 import React from "react";
+
+// src/components/ui/ErrorBoundary/ErrorBoundary.module.css
+var ErrorBoundary_default = {};
+
+// src/components/ui/ErrorBoundary/ErrorFallback.tsx
 import { jsx as jsx12, jsxs as jsxs10 } from "react/jsx-runtime";
+function ErrorFallback({
+  onReset,
+  title = "Algo sali\xF3 mal",
+  message = "Ocurri\xF3 un error inesperado. Por favor, intenta de nuevo."
+}) {
+  return /* @__PURE__ */ jsx12("div", { className: ErrorBoundary_default.container, children: /* @__PURE__ */ jsxs10("div", { className: ErrorBoundary_default.card, children: [
+    /* @__PURE__ */ jsx12("h2", { className: ErrorBoundary_default.title, children: title }),
+    /* @__PURE__ */ jsx12("p", { className: ErrorBoundary_default.message, children: message }),
+    onReset && /* @__PURE__ */ jsx12("button", { className: ErrorBoundary_default.retryButton, onClick: onReset, children: "Reintentar" })
+  ] }) });
+}
+
+// src/components/ui/ErrorBoundary/ErrorBoundary.tsx
+import { jsx as jsx13 } from "react/jsx-runtime";
 var ErrorBoundary = class extends React.Component {
   constructor(props) {
     super(props);
@@ -683,77 +702,11 @@ var ErrorBoundary = class extends React.Component {
       if (this.props.fallback) {
         return this.props.fallback;
       }
-      return /* @__PURE__ */ jsxs10("div", { style: {
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "48px 24px",
-        textAlign: "center",
-        minHeight: "300px"
-      }, children: [
-        /* @__PURE__ */ jsx12("h2", { style: { fontSize: "1.5rem", marginBottom: "8px", color: "#333" }, children: "Algo sali\xF3 mal" }),
-        /* @__PURE__ */ jsx12("p", { style: { fontSize: "1rem", color: "#666", marginBottom: "24px" }, children: "Ocurri\xF3 un error inesperado. Por favor, intenta de nuevo." }),
-        /* @__PURE__ */ jsx12(
-          "button",
-          {
-            onClick: this.handleReset,
-            style: {
-              padding: "12px 32px",
-              fontSize: "1rem",
-              fontWeight: 600,
-              color: "#fff",
-              backgroundColor: "#2563eb",
-              border: "none",
-              borderRadius: "8px",
-              cursor: "pointer"
-            },
-            children: "Reintentar"
-          }
-        )
-      ] });
+      return /* @__PURE__ */ jsx13(ErrorFallback, { onReset: this.handleReset });
     }
     return this.props.children;
   }
 };
-
-// src/components/ui/ErrorBoundary/ErrorFallback.tsx
-import { jsx as jsx13, jsxs as jsxs11 } from "react/jsx-runtime";
-function ErrorFallback({
-  onReset,
-  title = "Algo sali\xF3 mal",
-  message = "Ocurri\xF3 un error inesperado. Por favor, intenta de nuevo."
-}) {
-  return /* @__PURE__ */ jsxs11("div", { style: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "48px 24px",
-    textAlign: "center",
-    minHeight: "300px"
-  }, children: [
-    /* @__PURE__ */ jsx13("h2", { style: { fontSize: "1.5rem", marginBottom: "8px", color: "#333" }, children: title }),
-    /* @__PURE__ */ jsx13("p", { style: { fontSize: "1rem", color: "#666", marginBottom: "24px" }, children: message }),
-    onReset && /* @__PURE__ */ jsx13(
-      "button",
-      {
-        onClick: onReset,
-        style: {
-          padding: "12px 32px",
-          fontSize: "1rem",
-          fontWeight: 600,
-          color: "#fff",
-          backgroundColor: "#2563eb",
-          border: "none",
-          borderRadius: "8px",
-          cursor: "pointer"
-        },
-        children: "Reintentar"
-      }
-    )
-  ] });
-}
 
 // src/components/ui/ErrorBoundary/withBoundary.tsx
 import { jsx as jsx14 } from "react/jsx-runtime";

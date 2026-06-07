@@ -31,10 +31,12 @@ Implementation checklist following the design's 3-phase implementation order. Ea
   - "Reintentar" button that calls `onReset`
   - Error details logged to console (not displayed to user)
 
-- [ ] **Create `ErrorBoundary.module.css`** — `packages/shared/src/components/ui/ErrorBoundary/ErrorBoundary.module.css`
+- [x] **Create `ErrorBoundary.module.css`** — `packages/shared/src/components/ui/ErrorBoundary/ErrorBoundary.module.css`
   - Centered card with padding, border-radius, shadow
   - Button styling
   - Responsive-friendly
+  - Refactored ErrorFallback.tsx to use CSS classes instead of inline styles
+  - Refactored ErrorBoundary.tsx default fallback to use `<ErrorFallback>` component
 
 - [x] **Create `ErrorBoundary/index.ts` barrel export** — `packages/shared/src/components/ui/ErrorBoundary/index.ts`
 

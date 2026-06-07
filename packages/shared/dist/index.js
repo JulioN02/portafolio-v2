@@ -745,7 +745,26 @@ function ProtectedRoute({
 
 // src/components/ui/ErrorBoundary/ErrorBoundary.tsx
 var import_react2 = __toESM(require("react"));
+
+// src/components/ui/ErrorBoundary/ErrorBoundary.module.css
+var ErrorBoundary_default = {};
+
+// src/components/ui/ErrorBoundary/ErrorFallback.tsx
 var import_jsx_runtime12 = require("react/jsx-runtime");
+function ErrorFallback({
+  onReset,
+  title = "Algo sali\xF3 mal",
+  message = "Ocurri\xF3 un error inesperado. Por favor, intenta de nuevo."
+}) {
+  return /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("div", { className: ErrorBoundary_default.container, children: /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("div", { className: ErrorBoundary_default.card, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("h2", { className: ErrorBoundary_default.title, children: title }),
+    /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("p", { className: ErrorBoundary_default.message, children: message }),
+    onReset && /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("button", { className: ErrorBoundary_default.retryButton, onClick: onReset, children: "Reintentar" })
+  ] }) });
+}
+
+// src/components/ui/ErrorBoundary/ErrorBoundary.tsx
+var import_jsx_runtime13 = require("react/jsx-runtime");
 var ErrorBoundary = class extends import_react2.default.Component {
   constructor(props) {
     super(props);
@@ -767,77 +786,11 @@ var ErrorBoundary = class extends import_react2.default.Component {
       if (this.props.fallback) {
         return this.props.fallback;
       }
-      return /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("div", { style: {
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "48px 24px",
-        textAlign: "center",
-        minHeight: "300px"
-      }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("h2", { style: { fontSize: "1.5rem", marginBottom: "8px", color: "#333" }, children: "Algo sali\xF3 mal" }),
-        /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("p", { style: { fontSize: "1rem", color: "#666", marginBottom: "24px" }, children: "Ocurri\xF3 un error inesperado. Por favor, intenta de nuevo." }),
-        /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
-          "button",
-          {
-            onClick: this.handleReset,
-            style: {
-              padding: "12px 32px",
-              fontSize: "1rem",
-              fontWeight: 600,
-              color: "#fff",
-              backgroundColor: "#2563eb",
-              border: "none",
-              borderRadius: "8px",
-              cursor: "pointer"
-            },
-            children: "Reintentar"
-          }
-        )
-      ] });
+      return /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(ErrorFallback, { onReset: this.handleReset });
     }
     return this.props.children;
   }
 };
-
-// src/components/ui/ErrorBoundary/ErrorFallback.tsx
-var import_jsx_runtime13 = require("react/jsx-runtime");
-function ErrorFallback({
-  onReset,
-  title = "Algo sali\xF3 mal",
-  message = "Ocurri\xF3 un error inesperado. Por favor, intenta de nuevo."
-}) {
-  return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { style: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "48px 24px",
-    textAlign: "center",
-    minHeight: "300px"
-  }, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("h2", { style: { fontSize: "1.5rem", marginBottom: "8px", color: "#333" }, children: title }),
-    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("p", { style: { fontSize: "1rem", color: "#666", marginBottom: "24px" }, children: message }),
-    onReset && /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
-      "button",
-      {
-        onClick: onReset,
-        style: {
-          padding: "12px 32px",
-          fontSize: "1rem",
-          fontWeight: 600,
-          color: "#fff",
-          backgroundColor: "#2563eb",
-          border: "none",
-          borderRadius: "8px",
-          cursor: "pointer"
-        },
-        children: "Reintentar"
-      }
-    )
-  ] });
-}
 
 // src/components/ui/ErrorBoundary/withBoundary.tsx
 var import_jsx_runtime14 = require("react/jsx-runtime");
