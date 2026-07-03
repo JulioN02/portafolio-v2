@@ -6,7 +6,7 @@
       "use": "@vercel/node",
       "config": {
         "esbuild": {
-          "external": ["@prisma/client", "@prisma/client/*"]
+          "external": ["@prisma/client", "@prisma/client/*", "@jsoft/shared"]
         }
       }
     }
