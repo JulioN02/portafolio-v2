@@ -15,7 +15,7 @@
   "dependencies": {
     "@jsoft/shared": "workspace:*",
     "@tanstack/react-query": "^5.62.8",
-    "dompurify": "^3.2.4",
+    "dompurify": "^3.4.11",
     "embla-carousel-react": "^8.6.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
