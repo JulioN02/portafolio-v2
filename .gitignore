@@ -7,15 +7,11 @@ node_modules/
 # =============================================================================
 # Build outputs
 # =============================================================================
+# Build outputs (Vercel compiles from src; dist is never deployed from git)
 dist/
 build/
 *.tsbuildinfo
 
-# API
-!api/dist/
-
-# Shared package
-!packages/shared/dist/
 # Frontends
 client-site/dist/
 admin-panel/dist/
@@ -29,6 +25,8 @@ recruiter-site/dist/
 .env.*.local
 .env.production
 .env.production.local
+.env.bak*
+.env.new-project*
 
 # =============================================================================
 # IDE
