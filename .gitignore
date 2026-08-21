@@ -82,3 +82,4 @@ temp/
 .cache/
 .parcel-cache/
 .vercel
+api/uploads/
