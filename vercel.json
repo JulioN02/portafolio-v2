@@ -1,12 +1,18 @@
 {
   "version": 2,
+  "buildCommand": "cd api && npx prisma generate",
+  "installCommand": "pnpm install",
   "builds": [
     {
       "src": "api/src/index.ts",
       "use": "@vercel/node",
       "config": {
+        "includeFiles": [
+          "packages/shared/**",
+          "api/prisma/**"
+        ],
         "esbuild": {
-          "external": ["@prisma/client", "@prisma/client/*", "@jsoft/shared"]
+          "external": ["@prisma/client", "@prisma/client/*"]
         }
       }
     }
