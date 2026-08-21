@@ -86,7 +86,7 @@ export const successCaseService = {
         images: data.images,
         videos: data.videos ?? [],
         links: data.links ?? [],
-        status: data.status || 'DRAFT',
+        status: (data.status && data.status !== 'ALL') ? data.status : 'DRAFT',
         ...(data.status === 'PUBLISHED' && { publishedAt: new Date() }),
       },
       select: SUCCESS_CASE_SELECT,

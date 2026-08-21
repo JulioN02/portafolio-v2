@@ -95,6 +95,7 @@ export const productController = {
   updateStatus: asyncHandler(async (req: Request, res: Response) => {
     const id = getStringParam(req.params.id);
     const { status } = productStatusSchema.parse(req.body);
+    if (status === 'ALL') { res.status(400).json({ error: 'ALL is not a valid status' }); return; }
     await getExistingProduct(id);
     const product = await productService.updateStatus(id, status);
     res.json(product);

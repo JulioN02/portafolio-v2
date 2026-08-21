@@ -92,7 +92,7 @@ export const blogPostService = {
         body: data.body,
         externalLink: data.externalLink,
         lessonsLearned: data.lessonsLearned,
-        status: data.status || 'DRAFT',
+        status: (data.status && data.status !== 'ALL') ? data.status : 'DRAFT',
         ...(data.status === 'PUBLISHED' && { publishedAt: new Date() }),
       },
       select: BLOG_POST_SELECT,

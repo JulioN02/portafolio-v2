@@ -82,7 +82,7 @@ export const serviceService = {
         fullDescription: data.fullDescription,
         includedItems: data.includedItems,
         images: data.images,
-        status: data.status || 'DRAFT',
+        status: (data.status && data.status !== 'ALL') ? data.status : 'DRAFT',
         ...(data.status === 'PUBLISHED' && { publishedAt: new Date() }),
         technicalExplanation: data.technicalExplanation,
         technicalImages: data.technicalImages,

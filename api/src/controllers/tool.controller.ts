@@ -95,6 +95,7 @@ export const toolController = {
   updateStatus: asyncHandler(async (req: Request, res: Response) => {
     const id = getStringParam(req.params.id);
     const { status } = toolStatusSchema.parse(req.body);
+    if (status === 'ALL') { res.status(400).json({ error: 'ALL is not a valid status' }); return; }
     await getExistingTool(id);
     const tool = await toolService.updateStatus(id, status);
     res.json(tool);

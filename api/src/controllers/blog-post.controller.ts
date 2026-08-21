@@ -82,6 +82,7 @@ export const blogPostController = {
     if (!parsedStatus.success) {
       throw new ValidationError('Invalid status value');
     }
+    if (parsedStatus.data === 'ALL') { res.status(400).json({ error: 'ALL is not a valid status' }); return; }
     await getExistingPost(id);
     const post = await blogPostService.updateStatus(id, parsedStatus.data);
     res.json(post);

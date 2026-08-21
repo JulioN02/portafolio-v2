@@ -94,7 +94,7 @@ export const toolService = {
         images: data.images,
         requiresInstall: data.requiresInstall ?? false,
         featured: data.featured ?? false,
-        status: data.status || 'DRAFT',
+        status: (data.status && data.status !== 'ALL') ? data.status : 'DRAFT',
         ...(data.status === 'PUBLISHED' && { publishedAt: new Date() }),
         technicalExplanation: data.technicalExplanation,
         technicalImages: data.technicalImages ?? [],

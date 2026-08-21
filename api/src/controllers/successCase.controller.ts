@@ -84,6 +84,7 @@ export const successCaseController = {
   updateStatus: asyncHandler(async (req: Request, res: Response) => {
     const id = getStringParam(req.params.id);
     const { status } = successCaseStatusSchema.parse(req.body);
+    if (status === 'ALL') { res.status(400).json({ error: 'ALL is not a valid status' }); return; }
     await getExistingCase(id);
     const successCase = await successCaseService.updateStatus(id, status);
     res.json(successCase);

@@ -94,7 +94,7 @@ export const productService = {
         images: data.images,
         externalLink: data.externalLink,
         featured: data.featured ?? false,
-        status: data.status || 'DRAFT',
+        status: (data.status && data.status !== 'ALL') ? data.status : 'DRAFT',
         ...(data.status === 'PUBLISHED' && { publishedAt: new Date() }),
         technicalExplanation: data.technicalExplanation,
         technicalImages: data.technicalImages ?? [],
