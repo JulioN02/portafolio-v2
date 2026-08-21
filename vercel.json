@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "installCommand": "pnpm install",
-  "buildCommand": "pnpm --filter @jsoft/api exec prisma generate",
+  "installCommand": "pnpm install && chmod +x scripts/link-shared-for-vercel.sh && bash scripts/link-shared-for-vercel.sh",
+  "buildCommand": "cd api && npx prisma generate",
   "builds": [
     {
       "src": "api/src/index.ts",
@@ -11,10 +11,7 @@
           "api/prisma/**"
         ],
         "esbuild": {
-          "external": ["@prisma/client", "@prisma/client/*"],
-          "alias": {
-            "@jsoft/shared": "../packages/shared/src/server.ts"
-          }
+          "external": ["@prisma/client", "@prisma/client/*"]
         }
       }
     }
