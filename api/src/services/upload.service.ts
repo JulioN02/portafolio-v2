@@ -1,6 +1,6 @@
 import path from 'path';
 import fs from 'fs';
-import { r2Service } from './r2.service.js';
+import { storageService } from './storage.service.js';
 
 const UPLOAD_DIR = path.join(process.cwd(), 'uploads');
 
@@ -18,16 +18,16 @@ export interface UploadResult {
 
 export const uploadService = {
   /**
-   * Save uploaded file — uploads to R2 in production, local disk in dev
+   * Save uploaded file — uploads to remote storage in production, local disk in dev
    */
   async saveFile(file: Express.Multer.File): Promise<UploadResult> {
     const timestamp = Date.now();
     const safeName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
     const filename = `${timestamp}-${safeName}`;
 
-    if (r2Service.isConfigured()) {
-      // Production: upload to Cloudflare R2
-      const result = await r2Service.uploadFile(file.buffer, filename, file.mimetype);
+    if (storageService.isConfigured()) {
+      // Production: upload to Supabase Storage
+      const result = await storageService.uploadFile(file.buffer, filename, file.mimetype);
       return {
         filename: result.filename,
         url: result.url,
@@ -49,11 +49,11 @@ export const uploadService = {
   },
 
   /**
-   * Delete a file — from R2 or local disk
+   * Delete a file — from remote storage or local disk
    */
   async deleteFile(filename: string): Promise<void> {
-    if (r2Service.isConfigured()) {
-      await r2Service.deleteFile(filename);
+    if (storageService.isConfigured()) {
+      await storageService.deleteFile(filename);
       return;
     }
 
@@ -65,7 +65,11 @@ export const uploadService = {
   },
 
   /**
-   * Validate file type and size
+   * Validate file type and size.
+   *
+   * SVG is intentionally rejected: SVG files can embed scripts and are a
+   * classic stored-XSS vector when served from the same origin. If SVG upload
+   * is ever needed, sanitize it server-side (e.g. svgo/sanitize-svg) first.
    */
   validateFile(file: Express.Multer.File): { valid: boolean; error?: string } {
     const allowedMimeTypes = [
@@ -73,10 +77,19 @@ export const uploadService = {
       'image/png',
       'image/gif',
       'image/webp',
-      'image/svg+xml',
     ];
 
+    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
+
     const maxSize = 5 * 1024 * 1024; // 5MB
+
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (!allowedExtensions.includes(ext)) {
+      return {
+        valid: false,
+        error: `Invalid file extension: ${ext || '(none)'}. Allowed: ${allowedExtensions.join(', ')} (SVG is rejected for XSS safety)`,
+      };
+    }
 
     if (!allowedMimeTypes.includes(file.mimetype)) {
       return {

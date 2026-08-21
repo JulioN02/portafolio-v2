@@ -27,11 +27,12 @@ export const toolService = {
     const { featured, status, classification, page = 1, limit = 10 } = filter || {};
     const skip = (page - 1) * limit;
 
+    const resolvedStatus = (status as string) === 'ALL' ? undefined : (status || 'PUBLISHED');
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const where: Record<string, any> = {
       deletedAt: null,
       ...(featured !== undefined && { featured }),
-      ...(status && { status: status as PostStatus }),
+      ...(resolvedStatus && { status: resolvedStatus as PostStatus }),
       ...(classification && { classification }),
     };
 
@@ -68,7 +69,7 @@ export const toolService = {
 
   async findFeatured(limit = 3) {
     return prisma.tool.findMany({
-      where: { featured: true, deletedAt: null },
+      where: { featured: true, deletedAt: null, status: 'PUBLISHED' as PostStatus },
       select: TOOL_SELECT,
       orderBy: [{ createdAt: 'desc' }],
       take: limit,

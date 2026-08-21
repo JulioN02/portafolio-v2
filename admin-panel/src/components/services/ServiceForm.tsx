@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
 import type { ServiceInput } from '@jsoft/shared';
+import { ImageUploader } from '../uploads/ImageUploader';
 import formStyles from '../../styles/form.module.css';
 
 interface ServiceFormProps {
@@ -25,6 +26,8 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
   const [shortDescription, setShortDescription] = useState(initialData?.shortDescription || '');
   const [fullDescription, setFullDescription] = useState(initialData?.fullDescription || '');
   const [status, setStatus] = useState<string>(initialData?.status || 'DRAFT');
+  const [images, setImages] = useState<string[]>(initialData?.images || []);
+  const [technicalImages, setTechnicalImages] = useState<string[]>(initialData?.technicalImages || []);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleTitleChange = (newTitle: string) => {
@@ -35,6 +38,14 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
     }
   };
 
+  const handleImagesChange = (value: string | string[]): void => {
+    setImages(Array.isArray(value) ? value : value ? [value] : []);
+  };
+
+  const handleTechnicalImagesChange = (value: string | string[]): void => {
+    setTechnicalImages(Array.isArray(value) ? value : value ? [value] : []);
+  };
+
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!title || title.length < 3) newErrors.title = t('validation.titleMin');
@@ -42,6 +53,7 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
     if (!classification || classification.length < 2) newErrors.classification = t('validation.classificationRequired');
     if (!shortDescription || shortDescription.length < 10) newErrors.shortDescription = t('validation.shortDescriptionMin');
     if (!fullDescription || fullDescription.length < 50) newErrors.fullDescription = t('validation.fullDescriptionMin');
+    if (images.length === 0) newErrors.images = t('validation.imageRequired');
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -56,10 +68,10 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
         shortDescription,
         fullDescription,
         includedItems: initialData?.includedItems || [],
-        images: initialData?.images || [],
+        images,
         status: status as ServiceInput['status'],
         technicalExplanation: initialData?.technicalExplanation,
-        technicalImages: initialData?.technicalImages,
+        technicalImages,
       });
     }
   };
@@ -134,6 +146,30 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
             style={{ minHeight: '200px' }}
           />
           {errors.fullDescription && <span className={formStyles.formError}>{errors.fullDescription}</span>}
+        </div>
+      </fieldset>
+
+      {/* Images Section */}
+      <fieldset className={formStyles.formSection}>
+        <legend className={formStyles.sectionTitle}>{t('form.images')}</legend>
+        <div className={formStyles.formGroup}>
+          <ImageUploader
+            id="serviceImages"
+            value={images}
+            onChange={handleImagesChange}
+            multiple
+            label={t('form.images')}
+            error={errors.images}
+          />
+        </div>
+        <div className={formStyles.formGroup}>
+          <ImageUploader
+            id="serviceTechnicalImages"
+            value={technicalImages}
+            onChange={handleTechnicalImagesChange}
+            multiple
+            label={t('form.technicalImages')}
+          />
         </div>
       </fieldset>
 

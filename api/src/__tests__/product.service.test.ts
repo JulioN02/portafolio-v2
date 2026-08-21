@@ -97,7 +97,7 @@ describe('Product Service', () => {
       expect(result).toHaveLength(2);
       expect(mockPrisma.product.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { featured: true, deletedAt: null },
+          where: { featured: true, deletedAt: null, status: 'PUBLISHED' },
           take: 3,
         })
       );

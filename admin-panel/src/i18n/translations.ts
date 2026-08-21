@@ -170,6 +170,19 @@ export const translations: Record<Language, Record<string, string>> = {
     'successCases.settings': 'Configuración',
     'successCases.descriptionPlaceholder': 'Describe el caso de éxito en detalle',
 
+    // Uploads
+    'upload.dragDrop': 'Arrastra y suelta imágenes aquí, o haz clic para seleccionar',
+    'upload.dropActive': 'Suelta las imágenes para subirlas',
+    'upload.hint': 'JPG, PNG, GIF, WebP o SVG',
+    'upload.maxSize': 'Tamaño máximo: {size}MB',
+    'upload.failed': 'Error al subir: {name}. Inténtalo de nuevo.',
+    'upload.unsupportedType': 'Tipo de archivo no soportado: {name}',
+    'upload.fileTooLarge': 'El archivo supera el tamaño máximo: {name}',
+    'blog.mediaGallery': 'Galería de Medios',
+    'blog.mediaGalleryHint': 'Imágenes adicionales que se muestran en el artículo (opcional)',
+    'form.technicalImages': 'Imágenes Técnicas (opcional)',
+    'form.technicalImagesHint': 'Capturas o diagramas técnicos del proyecto',
+
     // Contact Messages
     'contactMessages.title': 'Mensajes de Contacto',
     'contactMessages.name': 'Nombre',
@@ -266,6 +279,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'common.previous': 'Anterior',
     'common.next': 'Siguiente',
     'common.add': 'Añadir',
+    'common.optional': 'Opcional',
 
     // Auth
     'auth.login': 'Iniciar Sesión',
@@ -444,6 +458,19 @@ export const translations: Record<Language, Record<string, string>> = {
     'successCases.settings': 'Settings',
     'successCases.descriptionPlaceholder': 'Describe the success case in detail',
 
+    // Uploads
+    'upload.dragDrop': 'Drag and drop images here, or click to select',
+    'upload.dropActive': 'Drop the images to upload them',
+    'upload.hint': 'JPG, PNG, GIF, WebP or SVG',
+    'upload.maxSize': 'Max size: {size}MB',
+    'upload.failed': 'Failed to upload: {name}. Please try again.',
+    'upload.unsupportedType': 'Unsupported file type: {name}',
+    'upload.fileTooLarge': 'File exceeds the maximum size: {name}',
+    'blog.mediaGallery': 'Media Gallery',
+    'blog.mediaGalleryHint': 'Additional images shown in the article (optional)',
+    'form.technicalImages': 'Technical Images (optional)',
+    'form.technicalImagesHint': 'Screenshots or technical diagrams of the project',
+
     // Contact Messages
     'contactMessages.title': 'Contact Messages',
     'contactMessages.name': 'Name',
@@ -539,6 +566,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'common.no': 'No',
     'common.previous': 'Previous',
     'common.next': 'Next',
+    'common.optional': 'Optional',
     'common.add': 'Add',
   },
 };

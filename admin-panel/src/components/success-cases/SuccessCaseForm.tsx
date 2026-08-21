@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
 import type { SuccessCaseInput } from '@jsoft/shared';
+import { ImageUploader } from '../uploads/ImageUploader';
 import formStyles from '../../styles/form.module.css';
 
 interface SuccessCaseFormProps {
@@ -14,7 +15,6 @@ export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCas
   const [title, setTitle] = useState(initialData?.title || '');
   const [description, setDescription] = useState(initialData?.description || '');
   const [images, setImages] = useState<string[]>(initialData?.images || []);
-  const [imageInput, setImageInput] = useState('');
   const [status, setStatus] = useState<string>(initialData?.status || 'DRAFT');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -40,21 +40,13 @@ export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCas
     if (!description || description.length < 10) {
       newErrors.description = t('validation.shortDescriptionMin');
     }
+    if (images.length === 0) newErrors.images = t('validation.imageRequired');
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const addImage = () => {
-    if (imageInput && imageInput.startsWith('http')) {
-      setImages([...images, imageInput]);
-      setImageInput('');
-    } else if (imageInput) {
-      setErrors({ ...errors, images: t('validation.imageUrl') });
-    }
-  };
-
-  const removeImage = (index: number) => {
-    setImages(images.filter((_, i) => i !== index));
+  const handleImagesChange = (value: string | string[]): void => {
+    setImages(Array.isArray(value) ? value : value ? [value] : []);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -64,7 +56,7 @@ export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCas
         title,
         slug: initialData?.slug || generateSlug(title),
         description,
-        images: images.length > 0 ? images : ['https://placehold.co/600x400'],
+        images,
         status: status as 'DRAFT' | 'PUBLISHED' | 'PRIVATE' | 'ARCHIVED',
       });
     }
@@ -118,50 +110,14 @@ export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCas
       <fieldset className={formStyles.formSection}>
         <legend className={formStyles.sectionTitle}>{t('successCases.images')}</legend>
         <div className={formStyles.formGroup}>
-          <label className={formStyles.formLabel} htmlFor="imageInput">
-            {t('successCases.images')} <span className={formStyles.optional}>({t('form.images')})</span>
-          </label>
-          <div className={formStyles.inputActionGroup}>
-            <input
-              id="imageInput"
-              className={`${formStyles.formInput} ${errors.images ? formStyles.inputError : ''}`}
-              placeholder={t('form.addImagePlaceholder')}
-              value={imageInput}
-              onChange={(e) => setImageInput(e.target.value)}
-            />
-            <button
-              type="button"
-              className={formStyles.btnAction}
-              onClick={addImage}
-            >
-              {t('form.addImage')}
-            </button>
-          </div>
-          {errors.images && <span className={formStyles.formError}>{errors.images}</span>}
-          {images.length > 0 && (
-            <div className={formStyles.imageGallery}>
-              {images.map((img, index) => (
-                <div key={img} className={formStyles.imageItem}>
-                  <img
-                    src={img}
-                    alt={`${t('successCases.title')} ${index + 1}`}
-                    loading="lazy"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'https://placehold.co/100x100?text=Error';
-                    }}
-                  />
-                  <button
-                    type="button"
-                    className={formStyles.imageRemove}
-                    onClick={() => removeImage(index)}
-                    title={t('form.remove')}
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
+          <ImageUploader
+            id="successCaseImages"
+            value={images}
+            onChange={handleImagesChange}
+            multiple
+            label={t('successCases.images')}
+            error={errors.images}
+          />
         </div>
       </fieldset>
 

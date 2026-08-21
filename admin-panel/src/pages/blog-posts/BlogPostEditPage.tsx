@@ -39,6 +39,7 @@ export function BlogPostEditPage() {
           body: post.body,
           status: post.status,
           coverImage: post.coverImage,
+          mediaGallery: post.mediaGallery,
           category: post.category,
           externalLink: post.externalLink,
           lessonsLearned: post.lessonsLearned,

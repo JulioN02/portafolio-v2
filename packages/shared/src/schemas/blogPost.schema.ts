@@ -3,7 +3,7 @@ import { z } from 'zod';
 /**
  * Enum for blog post status
  */
-export const postStatusEnum = z.enum(['DRAFT', 'PUBLISHED', 'PRIVATE', 'ARCHIVED']);
+export const postStatusEnum = z.enum(['DRAFT', 'PUBLISHED', 'PRIVATE', 'ARCHIVED', 'ALL']);
 export type PostStatus = z.infer<typeof postStatusEnum>;
 
 /**

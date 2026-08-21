@@ -1,44 +1,39 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { JwtPayload } from '@jsoft/shared';
+import { AuthError } from '../utils/errors.js';
 
 export interface AuthRequest extends Request {
   user?: JwtPayload;
 }
 
+/**
+ * Verifies the Bearer JWT and attaches the decoded payload to `req.user`.
+ *
+ * NOTE ON `requireAdmin`: This middleware was removed because it was a no-op.
+ * The JWT payload is ALWAYS issued with `role: 'ADMIN'` by the login service,
+ * so the `role !== 'ADMIN'` check could never fail. authMiddleware (signature
+ * verification) is the only guard that can actually reject a request.
+ */
 export const authMiddleware = (
   req: AuthRequest,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): void => {
   const authHeader = req.headers.authorization;
 
-  if (!authHeader) {
-    res.status(401).json({ error: 'No token provided' });
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    next(new AuthError('No token provided'));
     return;
   }
 
-  const token = authHeader.startsWith('Bearer ')
-    ? authHeader.slice(7)
-    : authHeader;
+  const token = authHeader.slice(7);
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || '') as JwtPayload;
     req.user = decoded;
     next();
-  } catch (error) {
-    res.status(401).json({ error: 'Invalid or expired token' });
+  } catch {
+    next(new AuthError('Invalid or expired token'));
   }
-};
-
-export const requireAdmin = (
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction
-): void => {
-  if (!req.user || req.user.role !== 'ADMIN') {
-    res.status(403).json({ error: 'Forbidden: Admin access required' });
-    return;
-  }
-  next();
 };

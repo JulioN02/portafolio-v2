@@ -14,22 +14,42 @@ import contactRoutes from './routes/contact.routes.js';
 import blogPostRoutes from './routes/blog-post.routes.js';
 import siteSectionRoutes from './routes/siteSection.routes.js';
 import { errorHandler } from './middleware/errorHandler.middleware.js';
+import { apiLimiter } from './middleware/rateLimit.middleware.js';
 
 dotenv.config();
 
 const app: Express = express();
+
+// Verify JWT configuration at startup
+// Fail fast: a missing/empty JWT_SECRET would silently accept forged tokens
+// (jwt.verify with an empty secret), so we refuse to boot without one.
+if (!process.env.JWT_SECRET && process.env.NODE_ENV === 'production') {
+  throw new Error('JWT_SECRET must be set in production');
+}
 
 // Security middleware
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
+      // This API only serves JSON/HAL, never HTML documents, so inline scripts
+      // are never needed. Removed 'unsafe-inline' from script-src.
+      scriptSrc: ["'self'"],
+      // style-src keeps 'unsafe-inline' because TipTap content carries
+      // inline style attributes rendered by the admin-panel frontend.
       styleSrc: ["'self'", "'unsafe-inline'"],
       imgSrc: ["'self'", "data:", "https:", "http:", "blob:"],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      frameAncestors: ["'self'"],
+      // HSTS/frame options etc. come from helmet defaults.
     },
   },
 }));
+
+// General per-IP API limiter. Applied before the routes so ALL /api traffic
+// (including the public endpoints) is throttled.
+app.use('/api', apiLimiter);
 
 // CORS configuration
 const corsOptions = {

@@ -6,7 +6,7 @@ export const blogPostsApi = {
     const params = new URLSearchParams();
     if (filter?.page) params.append('page', String(filter.page));
     if (filter?.limit) params.append('limit', String(filter.limit));
-    if (filter?.status) params.append('status', filter.status);
+    params.append('status', filter?.status || 'ALL');
     if (filter?.category) params.append('category', filter.category);
 
     const { data } = await apiClient.get(`/blog-posts?${params}`);

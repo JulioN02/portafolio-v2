@@ -26,10 +26,11 @@ export const blogPostService = {
     const { status, category, page = 1, limit = 10 } = filter || {};
     const skip = (page - 1) * limit;
 
+    const resolvedStatus = (status as string) === 'ALL' ? undefined : (status || 'PUBLISHED');
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const where: Record<string, any> = {
       deletedAt: null,
-      ...(status && { status: status as PostStatus }),
+      ...(resolvedStatus && { status: resolvedStatus as PostStatus }),
       ...(category && { category }),
     };
 
@@ -136,15 +137,6 @@ export const blogPostService = {
     return prisma.blogPost.update({
       where: { id },
       data: { deletedAt: null },
-      select: BLOG_POST_SELECT,
-    });
-  },
-
-  async reorder(id: string, _newOrder: number) {
-    // Note: BlogPost model doesn't have an order field in Prisma schema
-    // This function is kept for API consistency but would need schema modification
-    return prisma.blogPost.findUnique({
-      where: { id },
       select: BLOG_POST_SELECT,
     });
   },

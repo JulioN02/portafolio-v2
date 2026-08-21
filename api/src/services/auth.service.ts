@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import { LoginInput, JwtPayload, LoginResponse, UpdateProfileInput, ChangePasswordInput } from '@jsoft/shared';
 import { verificationCodeService } from './verification-code.service.js';
+import { AuthError, NotFoundError, ValidationError, AppError } from '../utils/errors.js';
 
 const prisma = new PrismaClient();
 
@@ -14,12 +15,12 @@ export const login = async (credentials: LoginInput): Promise<LoginResponse> => 
   });
 
   if (!user) {
-    throw new Error('Invalid credentials');
+    throw new AuthError('Invalid username or password');
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
   if (!isPasswordValid) {
-    throw new Error('Invalid credentials');
+    throw new AuthError('Invalid username or password');
   }
 
   const payload: JwtPayload = {
@@ -71,13 +72,13 @@ export const updateProfile = async (userId: string, data: UpdateProfileInput): P
   });
 
   if (!user) {
-    throw new Error('User not found');
+    throw new NotFoundError('User not found');
   }
 
   // Verify currentPassword
   const isPasswordValid = await bcrypt.compare(data.currentPassword, user.password);
   if (!isPasswordValid) {
-    throw new Error('Invalid credentials');
+    throw new AuthError('Current password is incorrect');
   }
 
   // Build update data
@@ -89,7 +90,7 @@ export const updateProfile = async (userId: string, data: UpdateProfileInput): P
       where: { username: data.username },
     });
     if (existingUser && existingUser.id !== userId) {
-      throw new Error('Username already taken');
+      throw new AppError('Username already taken', 409, 'CONFLICT');
     }
     updateData.username = data.username;
   }
@@ -101,7 +102,7 @@ export const updateProfile = async (userId: string, data: UpdateProfileInput): P
         where: { email: data.email },
       });
       if (existingEmail && existingEmail.id !== userId) {
-        throw new Error('Email already taken');
+        throw new AppError('Email already taken', 409, 'CONFLICT');
       }
     }
     updateData.email = data.email;
@@ -109,7 +110,7 @@ export const updateProfile = async (userId: string, data: UpdateProfileInput): P
 
   // Ensure at least one field is being updated
   if (Object.keys(updateData).length === 0) {
-    throw new Error('No fields to update');
+    throw new ValidationError('No fields to update');
   }
 
   const updatedUser = await prisma.user.update({
@@ -129,7 +130,7 @@ export const updateProfile = async (userId: string, data: UpdateProfileInput): P
  * Change password using verification code.
  */
 export const changePassword = async (userId: string, data: ChangePasswordInput): Promise<{ message: string }> => {
-  // Validate verification code
+  // Validate verification code (throws ValidationError on invalid/expired/used)
   verificationCodeService.validate(userId, data.verificationCode);
 
   // Hash new password

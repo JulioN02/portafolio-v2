@@ -8,7 +8,7 @@ export const productsApi = {
     if (filters?.limit) params.append('limit', String(filters.limit));
     if (filters?.classification) params.append('classification', filters.classification);
     if (filters?.featured !== undefined) params.append('featured', String(filters.featured));
-    if (filters?.status) params.append('status', filters.status);
+    params.append('status', filters?.status || 'ALL');
 
     const { data } = await apiClient.get(`/products?${params}`);
     return data;

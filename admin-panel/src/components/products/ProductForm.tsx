@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
 import type { ProductInput } from '@jsoft/shared';
+import { ImageUploader } from '../uploads/ImageUploader';
 import formStyles from '../../styles/form.module.css';
 
 // Helper to generate slug from title
@@ -25,11 +26,11 @@ export function ProductForm({ initialData, onSubmit, isLoading }: ProductFormPro
   const [shortDescription, setShortDescription] = useState(initialData?.shortDescription || '');
   const [fullDescription, setFullDescription] = useState(initialData?.fullDescription || '');
   const [images, setImages] = useState<string[]>(initialData?.images || []);
-  const [newImageUrl, setNewImageUrl] = useState('');
   const [externalLink, setExternalLink] = useState(initialData?.externalLink || '');
   const [featured, setFeatured] = useState(initialData?.featured || false);
   const [status, setStatus] = useState<string>(initialData?.status || 'DRAFT');
   const [technicalExplanation, setTechnicalExplanation] = useState(initialData?.technicalExplanation || '');
+  const [technicalImages, setTechnicalImages] = useState<string[]>(initialData?.technicalImages || []);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleTitleChange = (newTitle: string) => {
@@ -38,17 +39,6 @@ export function ProductForm({ initialData, onSubmit, isLoading }: ProductFormPro
     if (!initialData?.slug || slug === generateSlug(initialData.title || '')) {
       setSlug(generateSlug(newTitle));
     }
-  };
-
-  const handleAddImage = () => {
-    if (newImageUrl && newImageUrl.startsWith('http')) {
-      setImages([...images, newImageUrl]);
-      setNewImageUrl('');
-    }
-  };
-
-  const handleRemoveImage = (index: number) => {
-    setImages(images.filter((_, i) => i !== index));
   };
 
   const validate = () => {
@@ -77,7 +67,7 @@ export function ProductForm({ initialData, onSubmit, isLoading }: ProductFormPro
         externalLink: externalLink || undefined,
         featured,
         technicalExplanation: technicalExplanation || undefined,
-        technicalImages: initialData?.technicalImages,
+        technicalImages: technicalImages.length > 0 ? technicalImages : undefined,
       });
     }
   };
@@ -177,43 +167,14 @@ export function ProductForm({ initialData, onSubmit, isLoading }: ProductFormPro
         <legend className={formStyles.sectionTitle}>{t('products.imagesSection')}</legend>
 
         <div className={formStyles.formGroup}>
-          <label className={formStyles.formLabel}>
-            {t('form.images')} <span className={formStyles.optional}>({t('form.imageRequired')})</span>
-          </label>
-
-          <div className={formStyles.inputActionGroup}>
-            <input
-              id="newImageUrl"
-              type="url"
-              placeholder={t('form.addImagePlaceholder')}
-              value={newImageUrl}
-              onChange={(e) => setNewImageUrl(e.target.value)}
-              className={`${formStyles.formInput} ${errors.images ? formStyles.inputError : ''}`}
-            />
-            <button type="button" className={formStyles.btnAction} onClick={handleAddImage}>
-              {t('form.addImage')}
-            </button>
-          </div>
-
-          {errors.images && <span className={formStyles.formError}>{errors.images}</span>}
-
-          {images.length > 0 && (
-            <div className={formStyles.imageGallery}>
-              {images.map((url, index) => (
-                <div key={url} className={formStyles.imageItem}>
-                  <img src={url} alt={`${t('form.images')} ${index + 1}`} loading="lazy" />
-                  <button
-                    type="button"
-                    className={formStyles.imageRemove}
-                    onClick={() => handleRemoveImage(index)}
-                    title={t('form.remove')}
-                  >
-                    &times;
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
+          <ImageUploader
+            value={images}
+            onChange={(value) => setImages(value as string[])}
+            multiple
+            label={t('form.images')}
+            bucket="productos"
+            error={errors.images}
+          />
         </div>
       </fieldset>
 
@@ -257,6 +218,17 @@ export function ProductForm({ initialData, onSubmit, isLoading }: ProductFormPro
             placeholder={t('form.technicalExplanationPlaceholder')}
           />
           <p className={formStyles.hint}>{t('form.technicalExplanationHint')}</p>
+        </div>
+
+        <div className={formStyles.formGroup}>
+          <ImageUploader
+            value={technicalImages}
+            onChange={(value) => setTechnicalImages(value as string[])}
+            multiple
+            label={t('form.technicalImages')}
+            bucket="productos"
+          />
+          <p className={formStyles.hint}>{t('form.technicalImagesHint')}</p>
         </div>
       </fieldset>
 

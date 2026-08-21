@@ -1,3 +1,10 @@
+/**
+ * Storage Service
+ *
+ * Abstraction over object storage. Uploads files to Supabase Storage when
+ * configured (SUPABASE_PROJECT_ID + SUPABASE_SERVICE_KEY); otherwise falls
+ * back to a local `/uploads` directory for local development.
+ */
 const DEFAULT_BUCKET = 'general';
 
 function getConfig(bucket?: string): { apiUrl: string; bucket: string; secretKey: string } | null {
@@ -13,7 +20,7 @@ function getConfig(bucket?: string): { apiUrl: string; bucket: string; secretKey
   };
 }
 
-export const r2Service = {
+export const storageService = {
   /**
    * Upload a file to Supabase Storage
    * @param bucket - Module bucket (servicios, productos, herramientas, blog, proyectos, casos-exito, general)

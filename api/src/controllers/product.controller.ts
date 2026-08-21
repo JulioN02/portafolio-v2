@@ -1,199 +1,107 @@
 import { Request, Response } from 'express';
-import { ZodError } from 'zod';
 import { productService } from '../services/product.service.js';
-import { productSchema, productUpdateSchema, productFilterSchema, productStatusSchema } from '@jsoft/shared';
+import {
+  productSchema,
+  productUpdateSchema,
+  productFilterSchema,
+  productStatusSchema,
+} from '@jsoft/shared';
+import { asyncHandler } from '../utils/asyncHandler.js';
+import { NotFoundError, ValidationError } from '../utils/errors.js';
 
-// Helper to ensure param is a string (Express 5 types can be string | string[])
 const getStringParam = (param: string | string[] | undefined): string => {
   if (Array.isArray(param)) return param[0];
   return param || '';
 };
 
+const getExistingProduct = async (id: string) => {
+  const existing = await productService.findById(id);
+  if (!existing) {
+    throw new NotFoundError('Product not found');
+  }
+  return existing;
+};
+
 export const productController = {
-  async findAll(req: Request, res: Response): Promise<void> {
-    try {
-      const filter = productFilterSchema.parse(req.query);
-      const result = await productService.findAll(filter);
-      res.json(result);
-    } catch (error) {
-      if (error instanceof ZodError) {
-        res.status(400).json({ error: 'Invalid filter parameters', details: error.flatten().fieldErrors });
-        return;
-      }
-      console.error('Product findAll error:', error);
-      res.status(500).json({ error: 'Internal server error' });
+  findAll: asyncHandler(async (req: Request, res: Response) => {
+    const filter = productFilterSchema.parse(req.query);
+    const result = await productService.findAll(filter);
+    res.json(result);
+  }),
+
+  findBySlug: asyncHandler(async (req: Request, res: Response) => {
+    const slug = getStringParam(req.params.slug);
+    const product = await productService.findBySlug(slug);
+    if (!product) {
+      throw new NotFoundError('Product not found');
     }
-  },
+    res.json(product);
+  }),
 
-  async findBySlug(req: Request, res: Response): Promise<void> {
-    try {
-      const slug = getStringParam(req.params.slug);
-      const product = await productService.findBySlug(slug);
-      if (!product) {
-        res.status(404).json({ error: 'Product not found' });
-        return;
-      }
-      res.json(product);
-    } catch (error) {
-      console.error('Product findBySlug error:', error);
-      res.status(500).json({ error: 'Internal server error' });
+  findFeatured: asyncHandler(async (req: Request, res: Response) => {
+    const limit = parseInt(req.query.limit as string) || 3;
+    const products = await productService.findFeatured(limit);
+    res.json(products);
+  }),
+
+  findById: asyncHandler(async (req: Request, res: Response) => {
+    const id = getStringParam(req.params.id);
+    const product = await productService.findById(id);
+    if (!product) {
+      throw new NotFoundError('Product not found');
     }
-  },
+    res.json(product);
+  }),
 
-  async findFeatured(req: Request, res: Response): Promise<void> {
-    try {
-      const limit = parseInt(req.query.limit as string) || 3;
-      const products = await productService.findFeatured(limit);
-      res.json(products);
-    } catch (error) {
-      console.error('Product findFeatured error:', error);
-      res.status(500).json({ error: 'Internal server error' });
+  create: asyncHandler(async (req: Request, res: Response) => {
+    const data = productSchema.parse(req.body);
+    const product = await productService.create(data);
+    res.status(201).json(product);
+  }),
+
+  update: asyncHandler(async (req: Request, res: Response) => {
+    const id = getStringParam(req.params.id);
+    const data = productUpdateSchema.parse(req.body);
+    await getExistingProduct(id);
+    const product = await productService.update(id, data);
+    res.json(product);
+  }),
+
+  delete: asyncHandler(async (req: Request, res: Response) => {
+    const id = getStringParam(req.params.id);
+    await getExistingProduct(id);
+    await productService.softDelete(id);
+    res.json({ message: 'Product deleted successfully' });
+  }),
+
+  restore: asyncHandler(async (req: Request, res: Response) => {
+    const id = getStringParam(req.params.id);
+    await getExistingProduct(id);
+    const product = await productService.restore(id);
+    res.json(product);
+  }),
+
+  toggleFeatured: asyncHandler(async (req: Request, res: Response) => {
+    const id = getStringParam(req.params.id);
+    const { featured } = req.body;
+    if (typeof featured !== 'boolean') {
+      throw new ValidationError('Featured must be a boolean');
     }
-  },
+    await getExistingProduct(id);
+    const product = await productService.update(id, { featured });
+    res.json(product);
+  }),
 
-  async findById(req: Request, res: Response): Promise<void> {
-    try {
-      const id = getStringParam(req.params.id);
-      const product = await productService.findById(id);
-      if (!product) {
-        res.status(404).json({ error: 'Product not found' });
-        return;
-      }
-      res.json(product);
-    } catch (error) {
-      console.error('Product findById error:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  },
+  updateStatus: asyncHandler(async (req: Request, res: Response) => {
+    const id = getStringParam(req.params.id);
+    const { status } = productStatusSchema.parse(req.body);
+    await getExistingProduct(id);
+    const product = await productService.updateStatus(id, status);
+    res.json(product);
+  }),
 
-  async create(req: Request, res: Response): Promise<void> {
-    try {
-      const data = productSchema.parse(req.body);
-      const product = await productService.create(data);
-      res.status(201).json(product);
-    } catch (error) {
-      if (error instanceof ZodError) {
-        res.status(400).json({ error: 'Validation Error', details: error.flatten().fieldErrors });
-        return;
-      }
-      console.error('Product create error:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  },
-
-  async update(req: Request, res: Response): Promise<void> {
-    try {
-      const id = getStringParam(req.params.id);
-      const data = productUpdateSchema.parse(req.body);
-      
-      const existing = await productService.findById(id);
-      if (!existing) {
-        res.status(404).json({ error: 'Product not found' });
-        return;
-      }
-      
-      const product = await productService.update(id, data);
-      res.json(product);
-    } catch (error) {
-      if (error instanceof ZodError) {
-        res.status(400).json({ error: 'Validation Error', details: error.flatten().fieldErrors });
-        return;
-      }
-      console.error('Product update error:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  },
-
-  async delete(req: Request, res: Response): Promise<void> {
-    try {
-      const id = getStringParam(req.params.id);
-      
-      const existing = await productService.findById(id);
-      if (!existing) {
-        res.status(404).json({ error: 'Product not found' });
-        return;
-      }
-      
-      await productService.softDelete(id);
-      res.json({ message: 'Product deleted successfully' });
-    } catch (error) {
-      console.error('Product delete error:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  },
-
-  async restore(req: Request, res: Response): Promise<void> {
-    try {
-      const id = getStringParam(req.params.id);
-      
-      const existing = await productService.findById(id);
-      if (!existing) {
-        res.status(404).json({ error: 'Product not found' });
-        return;
-      }
-      
-      const product = await productService.restore(id);
-      res.json(product);
-    } catch (error) {
-      console.error('Product restore error:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  },
-
-  async toggleFeatured(req: Request, res: Response): Promise<void> {
-    try {
-      const id = getStringParam(req.params.id);
-      const { featured } = req.body;
-      
-      if (typeof featured !== 'boolean') {
-        res.status(400).json({ error: 'Featured must be a boolean' });
-        return;
-      }
-      
-      const existing = await productService.findById(id);
-      if (!existing) {
-        res.status(404).json({ error: 'Product not found' });
-        return;
-      }
-      
-      const product = await productService.update(id, { featured });
-      res.json(product);
-    } catch (error) {
-      console.error('Product toggleFeatured error:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  },
-
-  async updateStatus(req: Request, res: Response): Promise<void> {
-    try {
-      const id = getStringParam(req.params.id);
-      const { status } = productStatusSchema.parse(req.body);
-
-      const existing = await productService.findById(id);
-      if (!existing) {
-        res.status(404).json({ error: 'Product not found' });
-        return;
-      }
-
-      const product = await productService.updateStatus(id, status);
-      res.json(product);
-    } catch (error) {
-      if (error instanceof ZodError) {
-        res.status(400).json({ error: 'Validation Error', details: error.flatten().fieldErrors });
-        return;
-      }
-      console.error('Product updateStatus error:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  },
-
-  async getClassifications(_req: Request, res: Response): Promise<void> {
-    try {
-      const classifications = await productService.getClassifications();
-      res.json(classifications);
-    } catch (error) {
-      console.error('Product getClassifications error:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  },
+  getClassifications: asyncHandler(async (_req: Request, res: Response) => {
+    const classifications = await productService.getClassifications();
+    res.json(classifications);
+  }),
 };

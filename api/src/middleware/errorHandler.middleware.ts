@@ -1,11 +1,13 @@
 import { type Request, type Response, type NextFunction } from 'express';
 import { ZodError } from 'zod';
+import multer from 'multer';
 import { AppError, ValidationError } from '../utils/errors.js';
 
 /**
  * Centralized error handler middleware.
  * Converts known error types into structured JSON responses
- * matching the ApiError interface from @jsoft/shared.
+ * matching the ApiError interface from @jsoft/shared:
+ * `{ message: string; code?: string; details?: Record<string, string[]> }`
  */
 export function errorHandler(
   err: Error,
@@ -38,6 +40,15 @@ export function errorHandler(
       message: 'Validation failed',
       code: 'VALIDATION_ERROR',
       details: flattened.fieldErrors,
+    } satisfies Record<string, unknown>);
+    return;
+  }
+
+  // Handle multer errors (e.g. file exceeds 5MB limit) as 400, not 500
+  if (err instanceof multer.MulterError) {
+    res.status(400).json({
+      message: `Upload error: ${err.message}`,
+      code: 'UPLOAD_ERROR',
     } satisfies Record<string, unknown>);
     return;
   }

@@ -7,7 +7,7 @@ export const servicesApi = {
     if (filters?.page) params.append('page', String(filters.page));
     if (filters?.limit) params.append('limit', String(filters.limit));
     if (filters?.classification) params.append('classification', filters.classification);
-    if (filters?.status) params.append('status', filters.status);
+    params.append('status', filters?.status || 'ALL');
 
     const { data } = await apiClient.get(`/services?${params}`);
     return data;

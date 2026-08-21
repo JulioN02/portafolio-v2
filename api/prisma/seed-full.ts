@@ -25,7 +25,7 @@ async function main() {
       fullDescription: '<h2>Desarrollo Web Full Stack</h2><p>Creamos aplicaciones web completas desde cero, usando las tecnologías más modernas del mercado. Nuestro stack incluye <strong>React 19</strong> para el frontend, <strong>Node.js + Express</strong> para el backend, <strong>TypeScript</strong> para type safety, y <strong>PostgreSQL</strong> como base de datos.</p><h3>¿Qué incluye?</h3><ul><li>Arquitectura modular y escalable</li><li>API RESTful documentada</li><li>Autenticación JWT</li><li>Panel administrativo</li><li>Despliegue en producción</li></ul><p>Ideal para negocios que quieren tener presencia web profesional con funcionalidades avanzadas.</p>',
       includedItems: ['Frontend React/Next.js', 'Backend Node.js + Express', 'Base de datos PostgreSQL', 'API REST documentada', 'Panel admin'],
       images: ['https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop', 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop'],
-      order: 1, featured: true,
+      status: PostStatus.PUBLISHED,
       technicalExplanation: '<p>Arquitectura cliente-servidor con React 19 + Vite en frontend, Express + Prisma ORM en backend. Comunicación vía REST API con TanStack Query para cache y estado. JWT para autenticación stateless. Despliegue en Railway con PostgreSQL integrado.</p>',
       technicalImages: ['https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=600&fit=crop'],
     },
@@ -37,7 +37,7 @@ async function main() {
       fullDescription: '<h2>Diseño UI/UX Profesional</h2><p>El diseño de tu aplicación es la primera impresión que tus usuarios tienen de tu negocio. Nos especializamos en crear interfaces <strong>intuitivas</strong>, <strong>accesibles</strong> y <strong>visualmente atractivas</strong> que guían al usuario hacia sus objetivos.</p><h3>Nuestro proceso</h3><ol><li><strong>Investigación:</strong> Entendemos a tus usuarios y sus necesidades</li><li><strong>Wireframes:</strong> Estructuramos la información y el flujo</li><li><strong>Prototipos:</strong> Diseñamos interacciones reales</li><li><strong>Testing:</strong> Validamos con usuarios reales</li><li><strong>Implementación:</strong> Entregamos en Figma o código</li></ol>',
       includedItems: ['Investigación de usuarios', 'Wireframes interactivos', 'Prototipos en Figma', 'Design System', 'Guía de estilos'],
       images: ['https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&h=600&fit=crop', 'https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=800&h=600&fit=crop'],
-      order: 2, featured: true,
+      status: PostStatus.PUBLISHED,
       technicalExplanation: '<p>Metodología Design Thinking con entregables en Figma. Componentes diseñados con atomic design. Sistema de diseño con tokens (colores, tipografía, spacing) implementado como CSS variables para consistencia entre frontends.</p>',
     },
     {
@@ -48,7 +48,7 @@ async function main() {
       fullDescription: '<h2>Consultoría Tecnológica</h2><p>¿No estás seguro de qué tecnología usar para tu próximo proyecto? Te ayudamos a tomar las mejores decisiones técnicas basadas en años de experiencia en la industria.</p><p>Ofrecemos:</p><ul><li>Auditoría de código y arquitectura</li><li>Selección de stack tecnológico</li><li>Revisión de seguridad</li><li>Optimización de performance</li><li>Code reviews</li></ul>',
       includedItems: ['Auditoría técnica', 'Recomendación de stack', 'Revisión de seguridad', 'Code review'],
       images: ['https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&h=600&fit=crop'],
-      order: 3, featured: false,
+      status: PostStatus.PUBLISHED,
     },
     {
       title: 'Desarrollo de APIs y Microservicios',
@@ -58,7 +58,7 @@ async function main() {
       fullDescription: '<h2>Desarrollo de APIs</h2><p>Construimos APIs RESTful y GraphQL siguiendo las mejores prácticas de la industria: <strong>validación</strong>, <strong>autenticación</strong>, <strong>documentación OpenAPI</strong> y <strong>tests automatizados</strong>.</p>',
       includedItems: ['API REST/GraphQL', 'Documentación OpenAPI', 'Autenticación JWT', 'Tests automatizados', 'Rate limiting'],
       images: ['https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&h=600&fit=crop'],
-      order: 4, featured: false,
+      status: PostStatus.PUBLISHED,
     },
   ];
 
@@ -81,7 +81,8 @@ async function main() {
       fullDescription: '<h2>ERP JSoft</h2><p>Solución completa de gestión empresarial que integra <strong>facturación</strong>, <strong>inventario</strong>, <strong>RRHH</strong> y <strong>contabilidad</strong> en una sola plataforma.</p>',
       images: ['https://images.unsplash.com/photo-1556761175-4b46a572b786?w=800&h=600&fit=crop'],
       externalLink: 'https://github.com/jsoftsolutions/erp',
-      order: 1, featured: true,
+      featured: true,
+      status: PostStatus.PUBLISHED,
       technicalExplanation: '<p>Monolito modular con Node.js + Express. Frontend React con dashboard administrativo. PostgreSQL con Prisma ORM. Despliegue on-premise o cloud.</p>',
     },
     {
@@ -92,7 +93,8 @@ async function main() {
       fullDescription: '<h2>CRM Comercial</h2><p>Administra tu relación con clientes de principio a fin. Desde la captación de leads hasta el seguimiento post-venta.</p>',
       images: ['https://images.unsplash.com/photo-1553729459-afe8f2e2c2b7?w=800&h=600&fit=crop'],
       externalLink: 'https://github.com/jsoftsolutions/crm',
-      order: 2, featured: true,
+      featured: true,
+      status: PostStatus.PUBLISHED,
     },
     {
       title: 'E-commerce Platform',
@@ -102,7 +104,8 @@ async function main() {
       fullDescription: '<h2>E-commerce Platform</h2><p>Tu tienda online lista para vender. Con <strong>carrito de compras</strong>, <strong>pasarela de pago</strong>, <strong>panel de administración</strong> y <strong>reportes de ventas</strong>.</p>',
       images: ['https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=600&fit=crop'],
       externalLink: null,
-      order: 3, featured: false,
+      featured: false,
+      status: PostStatus.PUBLISHED,
     },
   ];
 
@@ -125,7 +128,8 @@ async function main() {
       fullDescription: '<h2>JSoft CLI</h2><p>Genera proyectos con nuestra arquitectura probada en segundos. Incluye configuración de TypeScript, ESLint, Prettier, Prisma y testing.</p>',
       images: ['https://images.unsplash.com/photo-1629654297299-c8506221ca97?w=800&h=600&fit=crop'],
       requiresInstall: true,
-      order: 1, featured: true,
+      featured: true,
+      status: PostStatus.PUBLISHED,
     },
     {
       title: 'Component Library',
@@ -135,7 +139,8 @@ async function main() {
       fullDescription: '<h2>Component Library</h2><p>Colección de componentes UI diseñados para ser reutilizados en todos tus proyectos React. Incluye Button, Input, Card, Modal, Table, Pagination, Carousel y más.</p>',
       images: ['https://images.unsplash.com/photo-1617042370283-2b4c2c1a8f1f?w=800&h=600&fit=crop'],
       requiresInstall: false,
-      order: 2, featured: true,
+      featured: true,
+      status: PostStatus.PUBLISHED,
     },
     {
       title: 'API Template',
@@ -145,7 +150,8 @@ async function main() {
       fullDescription: '<h2>API Template</h2><p>Punto de partida para tus APIs con todo lo necesario: autenticación, base de datos, validación, tests y documentación OpenAPI.</p>',
       images: ['https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=800&h=600&fit=crop'],
       requiresInstall: true,
-      order: 3, featured: false,
+      featured: false,
+      status: PostStatus.PUBLISHED,
     },
   ];
 
@@ -167,6 +173,7 @@ async function main() {
       images: ['https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop', 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&h=600&fit=crop'],
       videos: [],
       links: ['https://ejemplo.com/caso1'],
+      status: PostStatus.PUBLISHED,
     },
     {
       title: 'Plataforma E-learning - EducaPro',
@@ -175,6 +182,7 @@ async function main() {
       images: ['https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&h=600&fit=crop'],
       videos: [],
       links: [],
+      status: PostStatus.PUBLISHED,
     },
     {
       title: 'App Financiera - FinTech CR',
@@ -183,6 +191,7 @@ async function main() {
       images: ['https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800&h=600&fit=crop', 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=800&h=600&fit=crop'],
       videos: [],
       links: [],
+      status: PostStatus.PUBLISHED,
     },
   ];
 

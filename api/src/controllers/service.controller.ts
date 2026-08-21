@@ -1,164 +1,90 @@
 import { Request, Response } from 'express';
-import { ZodError } from 'zod';
 import { serviceService } from '../services/service.service.js';
-import { serviceSchema, serviceUpdateSchema, serviceFilterSchema, serviceStatusSchema } from '@jsoft/shared';
+import {
+  serviceSchema,
+  serviceUpdateSchema,
+  serviceFilterSchema,
+  serviceStatusSchema,
+} from '@jsoft/shared';
+import { asyncHandler } from '../utils/asyncHandler.js';
+import { NotFoundError } from '../utils/errors.js';
 
-// Helper to ensure param is a string (Express 5 types can be string | string[])
 const getStringParam = (param: string | string[] | undefined): string => {
   if (Array.isArray(param)) return param[0];
   return param || '';
 };
 
+const getExistingService = async (id: string) => {
+  const existing = await serviceService.findById(id);
+  if (!existing) {
+    throw new NotFoundError('Service not found');
+  }
+  return existing;
+};
+
 export const serviceController = {
-  async findAll(req: Request, res: Response): Promise<void> {
-    try {
-      const filter = serviceFilterSchema.parse(req.query);
-      const result = await serviceService.findAll(filter);
-      res.json(result);
-    } catch (error) {
-      if (error instanceof ZodError) {
-        res.status(400).json({ error: 'Invalid filter parameters', details: error.flatten().fieldErrors });
-        return;
-      }
-      console.error('Service findAll error:', error);
-      res.status(500).json({ error: 'Internal server error' });
+  findAll: asyncHandler(async (req: Request, res: Response) => {
+    const filter = serviceFilterSchema.parse(req.query);
+    const result = await serviceService.findAll(filter);
+    res.json(result);
+  }),
+
+  findBySlug: asyncHandler(async (req: Request, res: Response) => {
+    const slug = getStringParam(req.params.slug);
+    const service = await serviceService.findBySlug(slug);
+    if (!service) {
+      throw new NotFoundError('Service not found');
     }
-  },
+    res.json(service);
+  }),
 
-  async findBySlug(req: Request, res: Response): Promise<void> {
-    try {
-      const slug = getStringParam(req.params.slug);
-      const service = await serviceService.findBySlug(slug);
-      if (!service) {
-        res.status(404).json({ error: 'Service not found' });
-        return;
-      }
-      res.json(service);
-    } catch (error) {
-      console.error('Service findBySlug error:', error);
-      res.status(500).json({ error: 'Internal server error' });
+  findById: asyncHandler(async (req: Request, res: Response) => {
+    const id = getStringParam(req.params.id);
+    const service = await serviceService.findById(id);
+    if (!service) {
+      throw new NotFoundError('Service not found');
     }
-  },
+    res.json(service);
+  }),
 
-  async findById(req: Request, res: Response): Promise<void> {
-    try {
-      const id = getStringParam(req.params.id);
-      const service = await serviceService.findById(id);
-      if (!service) {
-        res.status(404).json({ error: 'Service not found' });
-        return;
-      }
-      res.json(service);
-    } catch (error) {
-      console.error('Service findById error:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  },
+  create: asyncHandler(async (req: Request, res: Response) => {
+    const data = serviceSchema.parse(req.body);
+    const service = await serviceService.create(data);
+    res.status(201).json(service);
+  }),
 
-  async create(req: Request, res: Response): Promise<void> {
-    try {
-      const data = serviceSchema.parse(req.body);
-      const service = await serviceService.create(data);
-      res.status(201).json(service);
-    } catch (error) {
-      if (error instanceof ZodError) {
-        res.status(400).json({ error: 'Validation Error', details: error.flatten().fieldErrors });
-        return;
-      }
-      console.error('Service create error:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  },
+  update: asyncHandler(async (req: Request, res: Response) => {
+    const id = getStringParam(req.params.id);
+    const data = serviceUpdateSchema.parse(req.body);
+    await getExistingService(id);
+    const service = await serviceService.update(id, data);
+    res.json(service);
+  }),
 
-  async update(req: Request, res: Response): Promise<void> {
-    try {
-      const id = getStringParam(req.params.id);
-      const data = serviceUpdateSchema.parse(req.body);
-      
-      const existing = await serviceService.findById(id);
-      if (!existing) {
-        res.status(404).json({ error: 'Service not found' });
-        return;
-      }
-      
-      const service = await serviceService.update(id, data);
-      res.json(service);
-    } catch (error) {
-      if (error instanceof ZodError) {
-        res.status(400).json({ error: 'Validation Error', details: error.flatten().fieldErrors });
-        return;
-      }
-      console.error('Service update error:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  },
+  delete: asyncHandler(async (req: Request, res: Response) => {
+    const id = getStringParam(req.params.id);
+    await getExistingService(id);
+    await serviceService.softDelete(id);
+    res.json({ message: 'Service deleted successfully' });
+  }),
 
-  async delete(req: Request, res: Response): Promise<void> {
-    try {
-      const id = getStringParam(req.params.id);
-      
-      const existing = await serviceService.findById(id);
-      if (!existing) {
-        res.status(404).json({ error: 'Service not found' });
-        return;
-      }
-      
-      await serviceService.softDelete(id);
-      res.json({ message: 'Service deleted successfully' });
-    } catch (error) {
-      console.error('Service delete error:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  },
+  restore: asyncHandler(async (req: Request, res: Response) => {
+    const id = getStringParam(req.params.id);
+    await getExistingService(id);
+    const service = await serviceService.restore(id);
+    res.json(service);
+  }),
 
-  async restore(req: Request, res: Response): Promise<void> {
-    try {
-      const id = getStringParam(req.params.id);
-      
-      const existing = await serviceService.findById(id);
-      if (!existing) {
-        res.status(404).json({ error: 'Service not found' });
-        return;
-      }
-      
-      const service = await serviceService.restore(id);
-      res.json(service);
-    } catch (error) {
-      console.error('Service restore error:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  },
+  updateStatus: asyncHandler(async (req: Request, res: Response) => {
+    const id = getStringParam(req.params.id);
+    const { status } = serviceStatusSchema.parse(req.body);
+    await getExistingService(id);
+    const service = await serviceService.updateStatus(id, status);
+    res.json(service);
+  }),
 
-  async updateStatus(req: Request, res: Response): Promise<void> {
-    try {
-      const id = getStringParam(req.params.id);
-      const { status } = serviceStatusSchema.parse(req.body);
-
-      const existing = await serviceService.findById(id);
-      if (!existing) {
-        res.status(404).json({ error: 'Service not found' });
-        return;
-      }
-
-      const service = await serviceService.updateStatus(id, status);
-      res.json(service);
-    } catch (error) {
-      if (error instanceof ZodError) {
-        res.status(400).json({ error: 'Validation Error', details: error.flatten().fieldErrors });
-        return;
-      }
-      console.error('Service updateStatus error:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  },
-
-  async getClassifications(_req: Request, res: Response): Promise<void> {
-    try {
-      const classifications = await serviceService.getClassifications();
-      res.json(classifications);
-    } catch (error) {
-      console.error('Service getClassifications error:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  },
+  getClassifications: asyncHandler(async (_req: Request, res: Response) => {
+    const classifications = await serviceService.getClassifications();
+    res.json(classifications);
+  }),
 };

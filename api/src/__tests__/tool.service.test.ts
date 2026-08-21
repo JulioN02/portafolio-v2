@@ -70,7 +70,7 @@ describe('Tool Service', () => {
       expect(result).toHaveLength(1);
       expect(mockPrisma.tool.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { featured: true, deletedAt: null },
+          where: { featured: true, deletedAt: null, status: 'PUBLISHED' },
           take: 3,
         })
       );
@@ -169,6 +169,34 @@ describe('Tool Service', () => {
       const result = await toolService.restore('1');
 
       expect(result.deletedAt).toBeNull();
+    });
+  });
+
+  describe('updateStatus', () => {
+    it('updates status and sets publishedAt when publishing', async () => {
+      const mockTool = { id: '1', title: 'Tool', status: 'PUBLISHED', publishedAt: new Date() };
+      (mockPrisma.tool.update as jest.Mock).mockResolvedValue(mockTool);
+
+      const result = await toolService.updateStatus('1', 'PUBLISHED');
+
+      expect(mockPrisma.tool.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: '1' },
+          data: expect.objectContaining({ status: 'PUBLISHED', publishedAt: expect.any(Date) }),
+        }),
+      );
+      expect(result.status).toBe('PUBLISHED');
+    });
+
+    it('updates status without publishedAt when not publishing', async () => {
+      const mockTool = { id: '1', title: 'Tool', status: 'ARCHIVED' };
+      (mockPrisma.tool.update as jest.Mock).mockResolvedValue(mockTool);
+
+      await toolService.updateStatus('1', 'ARCHIVED');
+
+      expect(mockPrisma.tool.update).toHaveBeenCalledWith(
+        expect.objectContaining({ data: { status: 'ARCHIVED' } }),
+      );
     });
   });
 });

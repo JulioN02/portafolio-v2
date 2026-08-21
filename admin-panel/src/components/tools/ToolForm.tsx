@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
 import type { ToolInput } from '@jsoft/shared';
+import { ImageUploader } from '../uploads/ImageUploader';
 import formStyles from '../../styles/form.module.css';
 
 interface ToolFormProps {
@@ -17,11 +18,11 @@ export function ToolForm({ initialData, onSubmit, isLoading }: ToolFormProps) {
   const [shortDescription, setShortDescription] = useState(initialData?.shortDescription || '');
   const [fullDescription, setFullDescription] = useState(initialData?.fullDescription || '');
   const [images, setImages] = useState<string[]>(initialData?.images || []);
-  const [newImageUrl, setNewImageUrl] = useState('');
   const [requiresInstall, setRequiresInstall] = useState(initialData?.requiresInstall || false);
   const [featured, setFeatured] = useState(initialData?.featured || false);
   const [status, setStatus] = useState<string>(initialData?.status || 'DRAFT');
   const [technicalExplanation, setTechnicalExplanation] = useState(initialData?.technicalExplanation || '');
+  const [technicalImages, setTechnicalImages] = useState<string[]>(initialData?.technicalImages || []);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Helper to generate slug from title
@@ -40,17 +41,12 @@ export function ToolForm({ initialData, onSubmit, isLoading }: ToolFormProps) {
     }
   };
 
-  const handleAddImage = () => {
-    if (newImageUrl && newImageUrl.startsWith('http')) {
-      setImages([...images, newImageUrl]);
-      setNewImageUrl('');
-    } else if (newImageUrl) {
-      setErrors({ ...errors, images: t('validation.imageUrl') });
-    }
+  const handleImagesChange = (value: string | string[]): void => {
+    setImages(Array.isArray(value) ? value : value ? [value] : []);
   };
 
-  const handleRemoveImage = (index: number) => {
-    setImages(images.filter((_, i) => i !== index));
+  const handleTechnicalImagesChange = (value: string | string[]): void => {
+    setTechnicalImages(Array.isArray(value) ? value : value ? [value] : []);
   };
 
   const validate = () => {
@@ -79,7 +75,7 @@ export function ToolForm({ initialData, onSubmit, isLoading }: ToolFormProps) {
         featured,
         status: status as 'DRAFT' | 'PUBLISHED' | 'PRIVATE' | 'ARCHIVED',
         technicalExplanation: technicalExplanation || undefined,
-        technicalImages: initialData?.technicalImages,
+        technicalImages,
       });
     }
   };
@@ -161,38 +157,14 @@ export function ToolForm({ initialData, onSubmit, isLoading }: ToolFormProps) {
       <fieldset className={formStyles.formSection}>
         <legend className={formStyles.sectionTitle}>{t('products.imagesSection')}</legend>
         <div className={formStyles.formGroup}>
-          <div className={formStyles.inputActionGroup}>
-            <input
-              id="newImageUrl"
-              type="url"
-              placeholder={t('form.addImagePlaceholder')}
-              value={newImageUrl}
-              onChange={(e) => setNewImageUrl(e.target.value)}
-              className={`${formStyles.formInput} ${errors.images ? formStyles.inputError : ''}`}
-              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddImage(); } }}
-            />
-            <button type="button" className={formStyles.btnAction} onClick={handleAddImage}>
-              {t('form.addImage')}
-            </button>
-          </div>
-          {errors.images && <span className={formStyles.formError}>{errors.images}</span>}
-          {images.length > 0 && (
-            <div className={formStyles.imageGallery}>
-              {images.map((url, index) => (
-                <div key={url} className={formStyles.imageItem}>
-                  <img src={url} alt={`${t('form.images')} ${index + 1}`} loading="lazy" />
-                  <button
-                    type="button"
-                    className={formStyles.imageRemove}
-                    onClick={() => handleRemoveImage(index)}
-                    title={t('form.remove')}
-                  >
-                    &times;
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
+          <ImageUploader
+            id="toolImages"
+            value={images}
+            onChange={handleImagesChange}
+            multiple
+            label={t('products.imagesSection')}
+            error={errors.images}
+          />
         </div>
       </fieldset>
 
@@ -222,6 +194,15 @@ export function ToolForm({ initialData, onSubmit, isLoading }: ToolFormProps) {
             placeholder={t('form.technicalExplanationPlaceholder')}
           />
           <p className={formStyles.hint}>{t('form.technicalExplanationHint')}</p>
+        </div>
+        <div className={formStyles.formGroup}>
+          <ImageUploader
+            id="toolTechnicalImages"
+            value={technicalImages}
+            onChange={handleTechnicalImagesChange}
+            multiple
+            label={t('tools.technicalDetails')}
+          />
         </div>
       </fieldset>
 

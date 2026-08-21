@@ -23,10 +23,11 @@ export const successCaseService = {
     const { status, page = 1, limit = 10 } = filter || {};
     const skip = (page - 1) * limit;
 
+    const resolvedStatus = (status as string) === 'ALL' ? undefined : (status || 'PUBLISHED');
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const where: Record<string, any> = {
       deletedAt: null,
-      ...(status && { status: status as PostStatus }),
+      ...(resolvedStatus && { status: resolvedStatus as PostStatus }),
     };
 
     const [successCases, total] = await Promise.all([
@@ -62,7 +63,7 @@ export const successCaseService = {
 
   async findRecent(limit = 3) {
     return prisma.successCase.findMany({
-      where: { deletedAt: null },
+      where: { deletedAt: null, status: 'PUBLISHED' as PostStatus },
       select: SUCCESS_CASE_SELECT,
       orderBy: [{ createdAt: 'desc' }],
       take: limit,

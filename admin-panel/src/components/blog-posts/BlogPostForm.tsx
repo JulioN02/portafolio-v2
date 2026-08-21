@@ -4,6 +4,7 @@ import { Select, Button } from '@jsoft/shared';
 import type { BlogPostInput, PostStatus } from '@jsoft/shared';
 import { TipTapEditor } from './TipTapEditor';
 import { getTextFromHTML } from '../../utils/getTextFromHTML';
+import { ImageUploader } from '../uploads/ImageUploader';
 import formStyles from '../../styles/form.module.css';
 
 interface BlogPostFormProps {
@@ -20,6 +21,7 @@ export function BlogPostForm({ initialData, onSubmit, isLoading }: BlogPostFormP
   const [body, setBody] = useState(initialData?.body || '');
   const [status, setStatus] = useState<PostStatus>(initialData?.status || 'DRAFT');
   const [coverImage, setCoverImage] = useState(initialData?.coverImage || '');
+  const [mediaGallery, setMediaGallery] = useState<string[]>(initialData?.mediaGallery || []);
   const [category, setCategory] = useState(initialData?.category || '');
   const [externalLink, setExternalLink] = useState(initialData?.externalLink || '');
   const [lessonsLearned, setLessonsLearned] = useState(initialData?.lessonsLearned || '');
@@ -60,6 +62,7 @@ export function BlogPostForm({ initialData, onSubmit, isLoading }: BlogPostFormP
         body,
         status,
         coverImage,
+        mediaGallery,
         category,
         externalLink: externalLink || undefined,
         lessonsLearned: lessonsLearned || undefined,
@@ -154,45 +157,32 @@ export function BlogPostForm({ initialData, onSubmit, isLoading }: BlogPostFormP
       </fieldset>
 
       {/* ════════════════════════════════════════════ */}
-      {/* Section 3 — Cover Image                     */}
+      {/* Section 3 — Cover Image & Media Gallery      */}
       {/* ════════════════════════════════════════════ */}
       <fieldset className={formStyles.formSection}>
         <legend className={formStyles.sectionTitle}>{t('blog.coverImage')}</legend>
 
         <div className={formStyles.formGroup}>
-          <label className={formStyles.formLabel} htmlFor="coverImage">{t('blog.coverImage')}</label>
-          <input
+          <ImageUploader
             id="coverImage"
-            type="url"
-            className={`${formStyles.formInput} ${errors.coverImage ? formStyles.inputError : ''}`}
             value={coverImage}
-            onChange={(e) => setCoverImage(e.target.value)}
-            placeholder="https://..."
-            required
+            onChange={(value) => setCoverImage(value as string)}
+            label={t('blog.coverImage')}
+            bucket="blog"
+            error={errors.coverImage}
           />
-          <p className={formStyles.hint}>{t('blog.coverImageHint')}</p>
-          {errors.coverImage && <span className={formStyles.formError}>{errors.coverImage}</span>}
         </div>
 
-        {/* Image preview thumbnail when URL is valid */}
-        {coverImage && (
-          <div style={{ marginTop: '0.75rem' }}>
-            <img
-              src={coverImage}
-              alt={t('blog.coverImage')}
-              style={{
-                maxWidth: '100%',
-                maxHeight: 260,
-                borderRadius: 8,
-                objectFit: 'cover',
-                border: '1px solid var(--color-border)',
-              }}
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = 'none';
-              }}
-            />
-          </div>
-        )}
+        <div className={formStyles.formGroup}>
+          <ImageUploader
+            value={mediaGallery}
+            onChange={(value) => setMediaGallery(value as string[])}
+            multiple
+            label={t('blog.mediaGallery')}
+            bucket="blog"
+          />
+          <p className={formStyles.hint}>{t('blog.mediaGalleryHint')}</p>
+        </div>
       </fieldset>
 
       {/* ════════════════════════════════════════════ */}

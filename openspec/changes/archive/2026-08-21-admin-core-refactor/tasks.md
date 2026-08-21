@@ -2,7 +2,8 @@
 
 **Change**: `admin-core-refactor`
 **Date**: 2026-05-30
-**Total tasks**: 34 tasks across 7 phases
+**Verified**: 2026-08-19 — all 29 tasks verified by sdd-verify (code implemented; see verify-report.md for test-coverage gaps)
+**Total tasks**: 29 tasks across 7 phases
 
 ---
 
@@ -12,7 +13,7 @@ Deploy order prerequisite: Shared types must be available before Prisma/API/Admi
 
 ---
 
-### [1.1] Update Service Zod schema — add status, remove featured/order
+### [1.1] Update Service Zod schema — add status, remove featured/order [x] (verified by sdd-verify)
 **Package**: `packages/shared`
 **Files**:
 - `packages/shared/src/schemas/service.schema.ts`
@@ -33,7 +34,7 @@ Deploy order prerequisite: Shared types must be available before Prisma/API/Admi
 
 ---
 
-### [1.2] Update Product Zod schema — add status, remove order
+### [1.2] Update Product Zod schema — add status, remove order [x] (verified by sdd-verify)
 **Package**: `packages/shared`
 **Files**:
 - `packages/shared/src/schemas/product.schema.ts`
@@ -52,7 +53,7 @@ Deploy order prerequisite: Shared types must be available before Prisma/API/Admi
 
 ---
 
-### [1.3] Update Tool Zod schema — add status, remove order
+### [1.3] Update Tool Zod schema — add status, remove order [x] (verified by sdd-verify)
 **Package**: `packages/shared`
 **Files**:
 - `packages/shared/src/schemas/tool.schema.ts`
@@ -71,7 +72,7 @@ Deploy order prerequisite: Shared types must be available before Prisma/API/Admi
 
 ---
 
-### [1.4] Update SuccessCase Zod schema — add status, remove featured/order
+### [1.4] Update SuccessCase Zod schema — add status, remove featured/order [x] (verified by sdd-verify)
 **Package**: `packages/shared`
 **Files**:
 - `packages/shared/src/schemas/successCase.schema.ts`
@@ -90,7 +91,7 @@ Deploy order prerequisite: Shared types must be available before Prisma/API/Admi
 
 ---
 
-### [1.5] Create SiteSection Zod schema + update index.ts
+### [1.5] Create SiteSection Zod schema + update index.ts [x] (verified by sdd-verify)
 **Package**: `packages/shared`
 **Files**:
 - `packages/shared/src/schemas/siteSection.schema.ts` (NEW)
@@ -117,7 +118,7 @@ Deploy order: After shared schemas, before API.
 
 ---
 
-### [2.1] Update Prisma schema — all model changes
+### [2.1] Update Prisma schema — all model changes [x] (verified by sdd-verify)
 **Package**: `api`
 **Files**:
 - `api/prisma/schema.prisma`
@@ -172,7 +173,7 @@ model SiteSection {
 
 ---
 
-### [2.2] Run Prisma migration and update seed
+### [2.2] Run Prisma migration and update seed [x] (verified by sdd-verify)
 **Package**: `api`
 **Files**:
 - `api/prisma/` (migration generated)
@@ -202,7 +203,7 @@ Deploy order: After Prisma migration, before Admin UI.
 
 ---
 
-### [3.1] Update Service API — service + controller + routes
+### [3.1] Update Service API — service + controller + routes [x] (verified by sdd-verify)
 **Package**: `api`
 **Files**:
 - `api/src/services/service.service.ts`
@@ -239,7 +240,7 @@ Deploy order: After Prisma migration, before Admin UI.
 
 ---
 
-### [3.2] Update Product API — service + controller + routes
+### [3.2] Update Product API — service + controller + routes [x] (verified by sdd-verify)
 **Package**: `api`
 **Files**:
 - `api/src/services/product.service.ts`
@@ -274,7 +275,7 @@ Deploy order: After Prisma migration, before Admin UI.
 
 ---
 
-### [3.3] Update Tool API — service + controller + routes
+### [3.3] Update Tool API — service + controller + routes [x] (verified by sdd-verify)
 **Package**: `api`
 **Files**:
 - `api/src/services/tool.service.ts`
@@ -309,7 +310,7 @@ Deploy order: After Prisma migration, before Admin UI.
 
 ---
 
-### [3.4] Update SuccessCase API — service + controller + routes
+### [3.4] Update SuccessCase API — service + controller + routes [x] (verified by sdd-verify)
 **Package**: `api`
 **Files**:
 - `api/src/services/successCase.service.ts`
@@ -346,7 +347,7 @@ Deploy order: After Prisma migration, before Admin UI.
 
 ---
 
-### [3.5] Create SiteSection API — service + controller + routes + app registration
+### [3.5] Create SiteSection API — service + controller + routes + app registration [x] (verified by sdd-verify)
 **Package**: `api`
 **Files**:
 - `api/src/services/siteSection.service.ts` (NEW)
@@ -390,7 +391,7 @@ Deploy order: After API endpoints exist, before UI components.
 
 ---
 
-### [4.1] Update services API client + hooks ✓\n**Package**: `admin-panel`
+### [4.1] Update services API client + hooks [x] (verified by sdd-verify)
 **Files**:
 - `admin-panel/src/api/services.api.ts`
 - `admin-panel/src/hooks/useServices.ts`
@@ -414,7 +415,7 @@ Deploy order: After API endpoints exist, before UI components.
 
 ---
 
-### [4.2] Update products API client + hooks ✓\n**Package**: `admin-panel`
+### [4.2] Update products API client + hooks [x] (verified by sdd-verify)
 **Files**:
 - `admin-panel/src/api/products.api.ts`
 - `admin-panel/src/hooks/useProducts.ts`
@@ -438,7 +439,7 @@ Deploy order: After API endpoints exist, before UI components.
 
 ---
 
-### [4.3] Update tools API client + hooks ✓\n**Package**: `admin-panel`
+### [4.3] Update tools API client + hooks [x] (verified by sdd-verify)
 **Files**:
 - `admin-panel/src/api/tools.api.ts`
 - `admin-panel/src/hooks/useTools.ts`
@@ -462,7 +463,7 @@ Deploy order: After API endpoints exist, before UI components.
 
 ---
 
-### [4.4] Update successCases API client + hooks ✓\n**Package**: `admin-panel`
+### [4.4] Update successCases API client + hooks [x] (verified by sdd-verify)
 **Files**:
 - `admin-panel/src/api/successCases.api.ts`
 - `admin-panel/src/hooks/useSuccessCases.ts`
@@ -485,7 +486,7 @@ Deploy order: After API endpoints exist, before UI components.
 
 ---
 
-### [4.5] Create siteSections API client + replace useSiteSections hook ✓\n**Package**: `admin-panel`
+### [4.5] Create siteSections API client + replace useSiteSections hook [x] (verified by sdd-verify)
 **Files**:
 - `admin-panel/src/api/siteSections.api.ts` (NEW)
 - `admin-panel/src/hooks/useSiteSections.ts` (REPLACE — was localStorage-based)
@@ -521,7 +522,7 @@ Deploy order: Before pages that consume them.
 
 ---
 
-### [5.1] Create StatusBadge and StatusSelect shared components
+### [5.1] Create StatusBadge and StatusSelect shared components [x] (verified by sdd-verify)
 **Package**: `admin-panel`
 **Files**:
 - `admin-panel/src/components/shared/StatusBadge.tsx` (NEW)
@@ -551,7 +552,7 @@ Deploy order: Before pages that consume them.
 
 ---
 
-### [5.2] Create BackButton component
+### [5.2] Create BackButton component [x] (verified by sdd-verify)
 **Package**: `admin-panel`
 **Files**:
 - `admin-panel/src/components/shared/BackButton.tsx` (NEW)
@@ -569,7 +570,7 @@ Deploy order: Before pages that consume them.
 
 ---
 
-### [5.3] Create ConfirmDeleteModal component
+### [5.3] Create ConfirmDeleteModal component [x] (verified by sdd-verify)
 **Package**: `admin-panel`
 **Files**:
 - `admin-panel/src/components/shared/ConfirmDeleteModal.tsx` (NEW)
@@ -595,7 +596,7 @@ Deploy order: After all hooks, API clients, and shared components exist.
 
 ---
 
-### [6.1] Update Services list page
+### [6.1] Update Services list page [x] (verified by sdd-verify)
 **Package**: `admin-panel`
 **Files**:
 - `admin-panel/src/pages/services/ServicesList.tsx`
@@ -627,7 +628,7 @@ Deploy order: After all hooks, API clients, and shared components exist.
 
 ---
 
-### [6.2] Update Products list page
+### [6.2] Update Products list page [x] (verified by sdd-verify)
 **Package**: `admin-panel`
 **Files**:
 - `admin-panel/src/pages/products/ProductsList.tsx`
@@ -653,7 +654,7 @@ Deploy order: After all hooks, API clients, and shared components exist.
 
 ---
 
-### [6.3] Update Tools list page — remove drag-drop, add status, fix SPA nav
+### [6.3] Update Tools list page — remove drag-drop, add status, fix SPA nav [x] (verified by sdd-verify)
 **Package**: `admin-panel`
 **Files**:
 - `admin-panel/src/pages/tools/ToolsList.tsx`
@@ -687,7 +688,7 @@ Deploy order: After all hooks, API clients, and shared components exist.
 
 ---
 
-### [6.4] Update SuccessCases list page — remove drag-drop/featured, add status
+### [6.4] Update SuccessCases list page — remove drag-drop/featured, add status [x] (verified by sdd-verify)
 **Package**: `admin-panel`
 **Files**:
 - `admin-panel/src/pages/success-cases/SuccessCasesList.tsx`
@@ -718,7 +719,7 @@ Deploy order: After all hooks, API clients, and shared components exist.
 
 ---
 
-### [6.5] Update BlogPosts list page — SPA nav + confirm delete modal
+### [6.5] Update BlogPosts list page — SPA nav + confirm delete modal [x] (verified by sdd-verify)
 **Package**: `admin-panel`
 **Files**:
 - `admin-panel/src/pages/blog-posts/BlogPostsListPage.tsx`
@@ -741,7 +742,7 @@ Deploy order: After all hooks, API clients, and shared components exist.
 
 ---
 
-### [6.6] Update PagesList — API-backed version
+### [6.6] Update PagesList — API-backed version [x] (verified by sdd-verify)
 **Package**: `admin-panel`
 **Files**:
 - `admin-panel/src/pages/pages/PagesList.tsx`
@@ -761,7 +762,7 @@ Deploy order: After all hooks, API clients, and shared components exist.
 
 ---
 
-### [6.7] Add BackButton to all edit/create pages + status field to forms
+### [6.7] Add BackButton to all edit/create pages + status field to forms [x] (verified by sdd-verify)
 **Package**: `admin-panel`
 **Files**:
 - `admin-panel/src/pages/services/ServiceEdit.tsx`
@@ -817,7 +818,7 @@ Deploy order: After all hooks, API clients, and shared components exist.
 
 ---
 
-### [6.8] Update translations
+### [6.8] Update translations [x] (verified by sdd-verify)
 **Package**: `admin-panel`
 **Files**:
 - `admin-panel/src/i18n/translations.ts`
@@ -853,7 +854,7 @@ Add new translation keys and remove old ones:
 
 ---
 
-### [7.1] Typecheck and build all packages
+### [7.1] Typecheck and build all packages [x] (verified by sdd-verify)
 **Package**: All
 **Files**: (all modified files)
 

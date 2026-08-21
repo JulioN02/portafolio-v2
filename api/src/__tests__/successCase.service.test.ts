@@ -34,7 +34,7 @@ describe('SuccessCase Service', () => {
 
       expect(mockPrisma.successCase.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { deletedAt: null },
+          where: { deletedAt: null, status: 'PUBLISHED' },
         })
       );
     });
@@ -196,6 +196,23 @@ describe('SuccessCase Service', () => {
   describe('reorder removed', () => {
     it('should not have reorder method (removed in admin-core-refactor)', () => {
       expect((successCaseService as any).reorder).toBeUndefined();
+    });
+  });
+
+  describe('updateStatus', () => {
+    it('updates status when valid', async () => {
+      const mockCase = { id: '1', title: 'Case', status: 'PUBLISHED' };
+      (mockPrisma.successCase.update as jest.Mock).mockResolvedValue(mockCase);
+
+      const result = await successCaseService.updateStatus('1', 'PUBLISHED');
+
+      expect(mockPrisma.successCase.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: '1' },
+          data: expect.objectContaining({ status: 'PUBLISHED', publishedAt: expect.any(Date) }),
+        }),
+      );
+      expect(result.status).toBe('PUBLISHED');
     });
   });
 });

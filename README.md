@@ -1,6 +1,9 @@
 # J Soft Solutions — Portafolio Web v2.0
 
-Portafolio web profesional con **tres superficies públicas** (clientes y reclutadores) y un **panel administrativo** completo. Monorepo con pnpm workspaces, API REST con Express/Prisma/PostgreSQL y frontends en React 19 + Vite.
+Portafolio web profesional con **dos superficies públicas** (clientes y reclutadores) y un **panel administrativo** completo. Monorepo pnpm con una **API REST** (Express/Prisma/PostgreSQL), **3 frontends** (React 19 + Vite) y un paquete **compartido**.
+
+- **Entorno de producción**: Vercel (4 proyectos estáticos) + **Supabase** (PostgreSQL + Storage).
+- **Monorepo**: 4 paquetes desplegables (`api`, `client-site`, `recruiter-site`, `admin-panel`) + `packages/shared` (`@jsoft/shared`).
 
 ---
 
@@ -9,6 +12,7 @@ Portafolio web profesional con **tres superficies públicas** (clientes y reclut
 | App | Puerto | URL |
 |-----|--------|-----|
 | **API REST** | `:3000` | http://localhost:3000 |
+| **Health check** | `:3000` | http://localhost:3000/api/health |
 | **Client Site** (público clientes) | `:5173` | http://localhost:5173 |
 | **Recruiter Site** (público reclutadores) | `:5174` | http://localhost:5174 |
 | **Admin Panel** (back-office) | `:5175` | http://localhost:5175 |
@@ -23,35 +27,31 @@ Portafolio web profesional con **tres superficies públicas** (clientes y reclut
 
 ---
 
-## 🏗️ Arquitectura
+## 🏗️ Arquitectura (Monorepo)
 
 ```
 portafolio-v2/
-├── api/                          # Express REST API (:3000)
-│   ├── prisma/                   # Schema + migraciones + seed
+├── api/                          # @jsoft/api — Express REST API (:3000)
+│   ├── prisma/                   # schema.prisma + migraciones + seeds (seed.ts, seed-full.ts)
 │   └── src/
-│       ├── controllers/          # 9 controladores
-│       ├── services/             # 7 servicios con lógica de negocio
-│       ├── routes/               # 9 grupos de rutas (~62 endpoints)
-│       ├── middleware/           # Auth, validación Zod, error handling
-│       └── __tests__/           # Tests con Jest
-├── client-site/                  # SPA pública para clientes (:5173)
-│   └── src/pages/               # Home, Services, Products, Tools, SuccessCases, Contact, Blog
-├── recruiter-site/               # SPA pública para reclutadores (:5174)
-│   └── src/pages/               # Home, Projects, Blog, BlogPost, Contact, NotFound
-├── admin-panel/                  # Panel administrativo (:5175)
-│   └── src/pages/               # Dashboard, CRUDs (5 entidades), Inbox, Settings
+│       ├── controllers/          # 10 controladores
+│       ├── services/             # 12 servicios con lógica de negocio
+│       ├── routes/               # 10 grupos de rutas (~76 API routes)
+│       ├── middleware/           # Auth JWT, validación Zod, error handling
+│       └── __tests__/            # Tests con Jest (~99 tests)
+├── client-site/                  # @jsoft/client-site — SPA pública para clientes (:5173)
+├── recruiter-site/               # @jsoft/recruiter-site — SPA pública para reclutadores (:5174)
+├── admin-panel/                  # @jsoft/admin-panel — panel administrativo (:5175)
 ├── packages/
-│   └── shared/                   # @jsoft/shared — Tipos, Zod schemas, API client, ErrorBoundary
-├── docs/
-│   ├── plans/                    # Plan de desarrollo completo (F0-F7)
-│   ├── specs/                    # Especificaciones técnicas
-│   └── analysis/                 # Análisis de arquitectura del sistema
-├── openspec/                     # Artefactos SDD (Spec-Driven Development)
-│   ├── config.yaml              # Configuración del proyecto
-│   ├── specs/                   # Especificaciones por dominio
-│   └── changes/                 # Cambios activos y archivados
-└── docker-compose.yml           # PostgreSQL 15 (puerto 5434)
+│   └── shared/                   # @jsoft/shared — Tipos, Zod schemas, API client, UI components
+├── docs/                         # Planes, specs, análisis y workflows (referencia)
+├── openspec/                     # Artefactos SDD (Spec-Driven Development) — planificación activa
+│   ├── config.yaml               # Configuración del proyecto
+│   ├── specs/                    # Especificaciones por dominio
+│   └── changes/                  # Cambios activos y archivados
+├── vercel.json                   # Configuración del build de la API en Vercel (esbuild desde src)
+├── docker-compose.yml            # PostgreSQL 15 (puerto 5434) — OPCIONAL, solo local
+└── .github/workflows/            # ci.yml (CI) + deploy.yml (placeholder intencional)
 ```
 
 ---
@@ -62,10 +62,11 @@ portafolio-v2/
 |------|-----------|---------|
 | **Runtime** | Node.js | 20+ LTS |
 | **Package Manager** | pnpm | 9.x |
-| **Base de Datos** | PostgreSQL + Prisma ORM | 15 / 5.x |
+| **Base de Datos** | PostgreSQL (Supabase) + Prisma ORM | 15 / 6.3 |
 | **API** | Express + TypeScript | 4.21 / 5.x |
 | **Autenticación** | JWT + bcrypt | — |
 | **Validación** | Zod | 3.x |
+| **Storage** | Supabase Storage (bucket público `general`) | — |
 | **Frontends** | React + Vite + TypeScript | 19 / 6 / 5 |
 | **Routing** | React Router | 7.x |
 | **Data Fetching** | TanStack Query | 5.x |
@@ -73,35 +74,23 @@ portafolio-v2/
 | **Editor Rich Text** | TipTap (admin) | 2.x |
 | **Sanitización HTML** | DOMPurify | 3.x |
 | **SEO** | react-helmet-async | 2.x |
-| **Testing** | Jest (API) | 30.x |
+| **Testing** | Jest (API) · Vitest (frontends + shared) | 30.x / 4.x |
 
 ---
 
 ## 📋 Estado del Proyecto (SDD)
 
-### Cambios Completados ✅
+La **planificación activa** vive en `openspec/` en formato SDD (Spec-Driven Development): `openspec/specs/` (especificaciones por dominio) y `openspec/changes/` (cambios activos) y `openspec/changes/archive/` (cambios archivados).
 
-| Cambio | Estado | Fases |
-|--------|--------|-------|
-| **implement-admin-panel** | ✅ Archivado | F1-F13 (CRUDs, Dashboard, Inbox, Settings, Login) |
-| **implement-recruiter-site** | ✅ Archivado | 7 fases, 33 tareas, 23/23 escenarios, 0 errores TS |
-| **polish-2 (Phase 1)** | ✅ En progreso | Foundation: ErrorBoundary + Sanitización + Deps |
-
-### Próximos Pasos
-
-- **Polish 2 Phase 2**: SEO (13 páginas) + Lazy Loading (React.lazy)
-- **Polish 2 Phase 3**: Consola limpia + Responsive refinements
-- **Polish 3**: Cloudinary, Railway deploy, Docker
-
-### Funcionalidades Implementadas
+### Funcionalidades Implementadas ✅
 
 #### Panel Admin
 - ✅ Autenticación JWT (login/logout)
 - ✅ Dashboard con métricas
 - ✅ CRUD completo: Services, Products, Tools, SuccessCases, BlogPosts
 - ✅ Editor TipTap con rich text
-- ✅ Soft delete + featured toggle
-- ✅ Drag-to-reorder (Services)
+- ✅ Soft delete + featured toggle + estados de publicación (DRAFT/PUBLISHED/PRIVATE/ARCHIVED)
+- ✅ Reorder de secciones del home (SiteSections) + reorder de BlogPosts
 - ✅ Bandeja de entrada (Clientes + Reclutadores)
 - ✅ Settings (perfil, password)
 
@@ -109,7 +98,7 @@ portafolio-v2/
 - ✅ Home con carruseles destacados
 - ✅ Servicios con detalle y galería
 - ✅ Productos con catálogo
-- ✅ Herramientas con lógica condicional
+- ✅ Herramientas con lógica condicional (`requiresInstall`)
 - ✅ Casos de Éxito con multimedia
 - ✅ Formularios de contacto con source automático
 - ✅ Blog (lectura pública)
@@ -130,39 +119,41 @@ portafolio-v2/
 
 - **Node.js** 20+ LTS
 - **pnpm** 9+ (`npm i -g pnpm`)
-- **Docker** (para PostgreSQL)
 - **Git**
+- Una cuenta de **Supabase** (proyecto con PostgreSQL + Storage) — opcional para desarrollo local puro
 
 ### 1. Clonar e instalar
 
 ```bash
 git clone git@github.com:JulioN02/portafolio-v2.git
 cd portafolio-v2
-pnpm install
+pnpm install   # el postinstall ejecuta `prisma generate`
 ```
 
-### 2. Base de datos
+### 2. Variables de entorno
 
 ```bash
-# Iniciar PostgreSQL con Docker
-docker compose up -d
-
-# Ejecutar migraciones
-pnpm --filter api exec prisma migrate dev
-
-# (Opcional) Cargar datos de prueba
-pnpm --filter api exec tsx prisma/seed-full.ts
+# API: revisa el .env.example, luego crea tu archivo real (no se commitea):
+cp api/.env.example api/.env
 ```
 
-### 3. Variables de entorno
+Los frontends **no requieren** `.env` en local: su valor por defecto `VITE_API_URL="/api"` usa el proxy del dev server hacia la API en `:3000`. Los `.env.example` de los frontends documentan el valor de producción.
+
+### 3. Base de datos
+
+La base de datos primaria es **Supabase PostgreSQL**. `DATABASE_URL` usa el **transaction pooler** (puerto `6543`, `?pgbouncer=true`) y `DIRECT_URL` la conexión **session mode** (puerto `5432`, requerida por el Prisma CLI).
 
 ```bash
-cp api/.env.example api/.env.local
-# Editar .env.local con:
-# DATABASE_URL=postgresql://julion:julion123@localhost:5434/portafolio_v2
-# JWT_SECRET=your-secret-key-min-32-chars
-# JWT_EXPIRES_IN=7d
+# Aplicar migraciones
+pnpm --filter api exec prisma migrate deploy
+
+# Cargar datos de prueba
+pnpm --filter api db:seed                      # seed.ts (datos base)
+# o datos completos:
+pnpm --filter api exec tsx prisma/seed-full.ts # seed-full.ts (6 servicios, 3 productos, …)
 ```
+
+> **Docker (opcional)**: `docker-compose.yml` levanta `postgres:15-alpine` en el puerto `5434` para flujos 100% locales. Ya **no** es la base primaria — Supabase lo es. Solo úsalo si quieres desarrollo local sin Supabase.
 
 ### 4. Iniciar servicios
 
@@ -188,82 +179,95 @@ pnpm dev
 
 ---
 
-## 🗄️ Base de Datos
+## 🔑 Variables de Entorno
 
-- **Imagen Docker**: `postgres:15-alpine`
-- **Puerto**: `5434` (host) → `5432` (container)
-- **Usuario**: `julion`
-- **Contraseña**: `julion123`
-- **Base de datos**: `portafolio_v2`
-- **Nombre contenedor**: `portafolio-postgres`
+### API (`api/.env`)
 
-### Seed Data
+| Variable | Descripción | Ejemplo |
+|----------|-------------|---------|
+| `DATABASE_URL` | Supabase **transaction pooler** (puerto `6543`, `?pgbouncer=true`) — usada por la API en runtime | `postgresql://postgres.<ref>:<pass>@<region>.pooler.supabase.com:6543/postgres?pgbouncer=true` |
+| `DIRECT_URL` | Supabase **session mode** (puerto `5432`) para el **Prisma CLI** (migraciones/generate). **REQUERIDA** por `schema.prisma` | `postgresql://postgres.<ref>:<pass>@<region>.pooler.supabase.com:5432/postgres` |
+| `JWT_SECRET` | Clave secreta JWT (32+ chars) | `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
+| `JWT_EXPIRES_IN` | Expiración del token | `7d` |
+| `SUPABASE_PROJECT_ID` | ID del proyecto Supabase (Storage) | `xxxxxxxx` |
+| `SUPABASE_SERVICE_KEY` | Service key de Supabase (Storage, uploads) | `sb_secret_...` |
+| `SUPABASE_BUCKET` | Bucket público para uploads (debe coincidir con el creado en Supabase) | `general` |
+| `NODE_ENV` | Entorno | `development` / `production` |
+| `PORT` | Puerto del servidor | `3000` |
+| `CORS_ORIGIN` | Orígenes permitidos (separados por coma) | `http://localhost:5173,http://localhost:5174,http://localhost:5175` |
 
-```bash
-pnpm --filter api exec tsx prisma/seed-full.ts
-```
+> **Nota**: `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` **solo** las necesitan consumidores no-API (p. ej. si algún frontend hablara directo con Supabase). La API solo requiere `SUPABASE_PROJECT_ID` + `SUPABASE_SERVICE_KEY` para Storage.
 
-Carga: 6 servicios, 3 productos, 3 herramientas, 3 casos de éxito, 3 posts de blog, 2 formularios de contacto.
+### Frontends (`client-site/.env`, `recruiter-site/.env`, `admin-panel/.env`)
+
+| Variable | Descripción | Ejemplo |
+|----------|-------------|---------|
+| `VITE_API_URL` | Base URL de la API | `"/api"` (default, local) · `https://portafolio-v2-api.vercel.app` (producción) |
+
+---
+
+## 🚀 Deploy (Vercel)
+
+El deploy usa **Vercel Git integration**: cada push a `main` dispara un deploy por proyecto conectado. Hay **4 proyectos** en el equipo Vercel:
+
+| Proyecto Vercel | Root directory | Build |
+|-----------------|----------------|-------|
+| `portafolio-v2-api` | `/` (raíz del repo) | `vercel.json` → esbuild sobre `api/src/index.ts` |
+| `portafolio-v2-client-site` | `client-site` | Vite SPA (`tsc && vite build`) |
+| `portafolio-v2-recruiter-site` | `recruiter-site` | Vite SPA (`tsc && vite build`) |
+| `portafolio-v2-admin-panel` | `admin-panel` | Vite SPA (`tsc && vite build`) |
+
+- **API**: el `vercel.json` de la raíz compila con esbuild desde **`api/src/index.ts`** y marca `@prisma/client` como **external** para que el binario nativo del motor funcione en la Lambda de Vercel. `api/dist` **no** está en git: Vercel compila desde el src.
+- **URL de producción API**: `https://portafolio-v2-api.vercel.app`.
+- **Env**: registra las variables de la API en el dashboard del proyecto `portafolio-v2-api`; los frontends usan `VITE_API_URL` apuntando a la URL de producción de la API.
+- **CI (GitHub Actions)**: `.github/workflows/ci.yml` corre en pushes/PRs a `main`: install → build `@jsoft/shared` → `prisma generate` → typecheck (`pnpm -r run typecheck`) → tests (API, shared y los 3 frontends) → build.
+- **`deploy.yml` es un placeholder intencional**: los deploys reales ocurren vía la integración Git de Vercel, no por GitHub Actions.
 
 ---
 
 ## 🧪 Testing
 
 ```bash
-# Tests de API (Jest)
+# Typecheck en todos los paquetes
+pnpm -r run typecheck
+
+# API — Jest (~99 tests, umbral 70% coverage)
 pnpm --filter api test
-# o con coverage
 pnpm --filter api test -- --coverage
+
+# Shared + Frontends — Vitest
+pnpm --filter @jsoft/shared test
+pnpm --filter client-site test
+pnpm --filter recruiter-site test
+pnpm --filter admin-panel test
 ```
 
-**Nota**: Los frontends no tienen infraestructura de testing actualmente.
+### Archivos de test
+
+| Paquete | Framework | Archivos |
+|---------|-----------|----------|
+| `api` | Jest 30 | `api/src/__tests__/*.service.test.ts` (auth, blog-post, contact, product, projects, successCase, tool, verification-code + setup) — ~99 tests |
+| `@jsoft/shared` | Vitest | `packages/shared/src/schemas/__tests__/index.test.ts` |
+| `client-site` | Vitest | `client-site/src/i18n/LanguageContext.test.tsx` |
+| `recruiter-site` | Vitest | `recruiter-site/src/i18n/LanguageContext.test.tsx`, `recruiter-site/src/pages/NotFoundPage.test.tsx` |
+| `admin-panel` | Vitest | `admin-panel/src/i18n/LanguageContext.test.tsx` |
 
 ---
 
 ## 📖 Documentación
 
+- **Índice de docs**: `docs/README.md`
 - **Plan de desarrollo**: `docs/plans/DEVELOPMENT_PLAN.md`
 - **Especificaciones técnicas**: `docs/specs/TECHNICAL_SPEC_UPDATED.md`
 - **Arquitectura del sistema**: `docs/analysis/SYSTEM_ARCHITECTURE.md`
-- **Artefactos SDD**: `openspec/changes/` (activos y archivados)
+- **Workflows de prueba manual**: `docs/WORKFLOWS.md`
+- **SDD (planificación activa)**: `openspec/specs/` y `openspec/changes/`
 
 ---
 
-## 🌐 GitHub Pages (Deploy)
+## 🔐 Seguridad
 
-Para desplegar en GitHub Pages, cada frontend necesita su propio workflow:
-
-### Requisitos
-1. El API debe estar desplegada en Railway (o similar) para que los frontends tengan datos
-2. Cada frontend Vite necesita configurar `base` en `vite.config.ts`
-3. Los frontends sin API funcional mostrarán solo estados de carga/vacío
-
-### Pasos rápidos (Recruiter Site como portfolio estático)
-
-```bash
-# 1. Configurar base path en vite.config.ts
-# Agregar: base: '/portafolio-v2/' (o el nombre del repo)
-
-# 2. Build
-pnpm --filter recruiter-site build
-
-# 3. El output está en recruiter-site/dist/
-```
-
----
-
-## 🔑 Variables de Entorno (API)
-
-| Variable | Descripción | Ejemplo |
-|----------|-------------|---------|
-| `DATABASE_URL` | Conexión PostgreSQL | `postgresql://user:pass@localhost:5434/portafolio_v2` |
-| `JWT_SECRET` | Clave secreta JWT (32+ chars) | `generate with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
-| `JWT_EXPIRES_IN` | Expiración del token | `7d` |
-| `NODE_ENV` | Entorno | `development` / `production` |
-| `PORT` | Puerto del servidor | `3000` |
-| `CLOUDINARY_CLOUD_NAME` | Cloudinary (producción) | — |
-| `CLOUDINARY_API_KEY` | Cloudinary (producción) | — |
-| `CLOUDINARY_API_SECRET` | Cloudinary (producción) | — |
+Ver [SECURITY.md](./SECURITY.md) para la política de seguridad y cómo reportar vulnerabilidades.
 
 ---
 

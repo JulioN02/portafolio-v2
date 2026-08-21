@@ -36,6 +36,25 @@ jest.mock('@prisma/client', () => {
     },
     service: {
       findMany: jest.fn(),
+      findFirst: jest.fn(),
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      deleteMany: jest.fn(),
+      count: jest.fn(),
+      updateMany: jest.fn(),
+    },
+    siteSection: {
+      findMany: jest.fn(),
+      findFirst: jest.fn(),
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      updateMany: jest.fn(),
+      delete: jest.fn(),
+      deleteMany: jest.fn(),
+      count: jest.fn(),
     },
     blogPost: {
       findMany: jest.fn(),
@@ -54,6 +73,7 @@ jest.mock('@prisma/client', () => {
       delete: jest.fn(),
       count: jest.fn(),
     },
+    $transaction: jest.fn(),
   };
   
   return {

@@ -26,10 +26,11 @@ export const serviceService = {
     const { status, classification, page = 1, limit = 10 } = filter || {};
     const skip = (page - 1) * limit;
 
+    const resolvedStatus = (status as string) === 'ALL' ? undefined : (status || 'PUBLISHED');
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const where: Record<string, any> = {
       deletedAt: null,
-      ...(status && { status: status as PostStatus }),
+      ...(resolvedStatus && { status: resolvedStatus as PostStatus }),
       ...(classification && { classification }),
     };
 

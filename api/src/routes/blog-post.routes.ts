@@ -15,7 +15,6 @@ router.post('/', authMiddleware, blogPostController.create);
 router.put('/:id', authMiddleware, blogPostController.update);
 router.delete('/:id', authMiddleware, blogPostController.delete);
 router.patch('/:id/restore', authMiddleware, blogPostController.restore);
-router.patch('/:id/reorder', authMiddleware, blogPostController.reorder);
 router.patch('/:id/status', authMiddleware, blogPostController.updateStatus);
 
 export default router;
