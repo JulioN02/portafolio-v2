@@ -12,7 +12,7 @@
           "api/prisma/**"
         ],
         "esbuild": {
-          "external": ["@prisma/client", "@prisma/client/*", "@jsoft/shared"]
+          "external": ["@prisma/client", "@prisma/client/*"]
         }
       }
     }
