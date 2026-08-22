@@ -1,8 +1,11 @@
 {
   "version": 2,
-  "buildCommand": "node scripts/build-api.mjs",
-  "outputDirectory": "api/build",
   "installCommand": "pnpm install",
+  "functions": {
+    "api/build/index.cjs": {
+      "includeFiles": "api/prisma/**"
+    }
+  },
   "routes": [
     { "src": "/(.*)", "dest": "api/build/index.cjs" }
   ]
