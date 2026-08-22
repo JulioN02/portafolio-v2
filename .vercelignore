@@ -1,0 +1,5 @@
+node_modules/
+api/coverage/
+api/uploads/
+coverage/
+*.log
