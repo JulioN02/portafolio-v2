@@ -1,22 +1,14 @@
 {
   "version": 2,
   "installCommand": "pnpm install",
-  "buildCommand": "cd packages/shared && pnpm build && cd ../../api && npx prisma generate",
+  "buildCommand": "node scripts/build-api.mjs",
   "builds": [
     {
-      "src": "api/src/index.ts",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": [
-          "api/prisma/**"
-        ],
-        "esbuild": {
-          "external": ["@prisma/client", "@prisma/client/*"]
-        }
-      }
+      "src": "api/build/index.cjs",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
-    { "src": "/(.*)", "dest": "api/src/index.ts" }
+    { "src": "/(.*)", "dest": "api/build/index.cjs" }
   ]
 }

@@ -33,7 +33,7 @@ const result = await build({
   platform: 'node',
   target: 'node20',
   format: 'cjs',
-  outfile: resolve(root, 'api/dist/index.cjs'),
+  outfile: resolve(root, 'api/build/index.cjs'),
   sourcemap: true,
   define: {
     'process.env.NODE_ENV': '"production"',
@@ -56,4 +56,4 @@ const result = await build({
 });
 
 console.log('✅ API bundled successfully!');
-console.log('   Output: api/dist/index.cjs');
+console.log('   Output: api/build/index.cjs');
