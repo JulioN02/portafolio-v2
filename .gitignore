@@ -10,6 +10,7 @@ node_modules/
 # Build outputs (Vercel compiles from src; dist is never deployed from git)
 dist/
 /build/
+api/build/
 *.tsbuildinfo
 
 # Frontends
