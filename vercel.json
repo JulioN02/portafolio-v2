@@ -1,12 +1,13 @@
 {
   "version": 2,
   "installCommand": "pnpm install",
-  "buildCommand": "echo 'Using pre-bundled api/build/index.cjs — no build needed'",
-  "functions": {
-    "api/build/index.cjs": {
-      "includeFiles": "api/prisma/**"
+  "buildCommand": "echo 'Using pre-bundled api/build/index.cjs'",
+  "builds": [
+    {
+      "src": "api/build/index.cjs",
+      "use": "@vercel/node"
     }
-  },
+  ],
   "routes": [
     { "src": "/(.*)", "dest": "api/build/index.cjs" }
   ]
