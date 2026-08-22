@@ -1,22 +1,14 @@
 {
   "version": 2,
-  "installCommand": "pnpm install && chmod +x scripts/link-shared-for-vercel.sh && bash scripts/link-shared-for-vercel.sh",
-  "buildCommand": "cd api && npx prisma generate",
+  "installCommand": "pnpm install",
+  "buildCommand": "node scripts/build-api.mjs",
   "builds": [
     {
-      "src": "api/src/index.ts",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": [
-          "api/prisma/**"
-        ],
-        "esbuild": {
-          "external": ["@prisma/client", "@prisma/client/*"]
-        }
-      }
+      "src": "api/dist/index.cjs",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
-    { "src": "/(.*)", "dest": "api/src/index.ts" }
+    { "src": "/(.*)", "dest": "api/dist/index.cjs" }
   ]
 }
