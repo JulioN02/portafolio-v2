@@ -1,14 +1,8 @@
 {
   "version": 2,
-  "installCommand": "pnpm install",
   "buildCommand": "node scripts/build-api.mjs",
   "outputDirectory": "api/build",
-  "functions": {
-    "api/build/index.cjs": {
-      "runtime": "@vercel/node@3",
-      "includeFiles": "api/prisma/**"
-    }
-  },
+  "installCommand": "pnpm install",
   "routes": [
     { "src": "/(.*)", "dest": "api/build/index.cjs" }
   ]
