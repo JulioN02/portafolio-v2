@@ -6,9 +6,7 @@
   "functions": {
     "api/build/index.cjs": {
       "runtime": "@vercel/node@3",
-      "includeFiles": [
-        "api/prisma/**"
-      ]
+      "includeFiles": "api/prisma/**"
     }
   },
   "routes": [
