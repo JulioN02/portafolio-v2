@@ -1,7 +1,6 @@
 {
   "version": 2,
-  "installCommand": "pnpm install",
-  "buildCommand": "node scripts/build-api.mjs",
+  "installCommand": "pnpm install && node scripts/build-api.mjs",
   "builds": [
     {
       "src": "api/build/index.cjs",
