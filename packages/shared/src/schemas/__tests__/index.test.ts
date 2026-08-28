@@ -35,7 +35,7 @@ import {
 describe('Shared schemas', () => {
   it('exports postStatusEnum as a Zod enum', () => {
     expect(postStatusEnum._def.typeName).toBe('ZodEnum');
-    expect(postStatusEnum.options).toEqual(['DRAFT', 'PUBLISHED', 'PRIVATE', 'ARCHIVED']);
+    expect(postStatusEnum.options).toEqual(['DRAFT', 'PUBLISHED', 'PRIVATE', 'ARCHIVED', 'ALL']);
   });
 
   it('exports formOriginEnum as a Zod enum', () => {
