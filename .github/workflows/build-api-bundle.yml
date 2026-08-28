@@ -61,10 +61,14 @@ jobs:
       - name: Check if bundle changed
         id: bundle-diff
         run: |
-          if [ -z "$(git status --porcelain api/build/)" ]; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-          else
+          if ! git ls-files --error-unmatch api/build/index.cjs >/dev/null 2>&1; then
+            # Bundle is not tracked (gitignored but present) -> changed
             echo "changed=true" >> "$GITHUB_OUTPUT"
+          elif ! git diff --quiet api/build/index.cjs; then
+            # Tracked but modified -> changed
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Commit bundle if changed
