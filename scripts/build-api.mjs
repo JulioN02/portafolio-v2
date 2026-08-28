@@ -35,7 +35,7 @@ const result = await build({
   target: 'node20',
   format: 'cjs',
   outfile: resolve(root, 'api/build/index.cjs'),
-  sourcemap: true,
+  sourcemap: false,
   define: {
     'process.env.NODE_ENV': '"production"',
   },

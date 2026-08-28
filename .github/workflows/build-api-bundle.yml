@@ -1,0 +1,76 @@
+name: Build API bundle
+
+# Regenera automáticamente api/build/index.cjs cuando cambia el código del API
+# o de @jsoft/shared. El bundle commiteado es lo que Vercel deploya (Vercel
+# solo acepta archivos presentes en git, no archivos generados en el build).
+#
+# Flujo: push a main → este workflow corre → si el bundle cambió, lo commitea
+# → Vercel detecta el commit del bot y deploya. El usuario no hace nada extra.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'api/src/**'
+      - 'api/prisma/**'
+      - 'api/package.json'
+      - 'packages/shared/**'
+      - 'scripts/build-api.mjs'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: api-bundle
+  cancel-in-progress: true
+
+jobs:
+  build-bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        working-directory: api
+        run: npx prisma generate
+
+      - name: Build API bundle
+        run: node scripts/build-api.mjs
+
+      - name: Check if bundle changed
+        id: bundle-diff
+        run: |
+          if git diff --quiet api/build/; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit bundle if changed
+        if: steps.bundle-diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add api/build/index.cjs
+          git commit -m "chore: update API bundle [skip ci]"
+          git push
