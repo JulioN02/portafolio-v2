@@ -1,5 +1,10 @@
 // Build script for Vercel deployment
-// Bundles the API with esbuild, resolving @jsoft/shared via symlink
+// Bundles the API with esbuild, resolving @jsoft/shared via alias to source.
+//
+// NOTE: We do NOT build @jsoft/shared with tsup here. tsup is a devDependency
+// and Vercel installs with NODE_ENV=production (devDependencies skipped).
+// The esbuild `alias` below maps @jsoft/shared directly to the TS source,
+// so the shared package dist/ is never needed for the API bundle.
 import { build } from 'esbuild';
 import { execSync } from 'child_process';
 import { resolve, dirname } from 'path';
@@ -9,15 +14,11 @@ import { existsSync } from 'fs';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, '..');
 
-// Step 1: Build shared package
-console.log('🔧 Building @jsoft/shared...');
-execSync('cd packages/shared && pnpm build', { cwd: root, stdio: 'inherit' });
-
-// Step 2: Generate Prisma Client
+// Step 1: Generate Prisma Client (prisma CLI is a production dependency)
 console.log('🔧 Generating Prisma Client...');
 execSync('cd api && npx prisma generate', { cwd: root, stdio: 'inherit' });
 
-// Step 3: Bundle API with esbuild
+// Step 2: Bundle API with esbuild
 console.log('🔧 Bundling API with esbuild...');
 
 const sharedPath = resolve(root, 'packages/shared/src/server.ts');
