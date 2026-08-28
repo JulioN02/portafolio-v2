@@ -18,6 +18,7 @@ on:
       - 'scripts/build-api.mjs'
       - 'package.json'
       - 'pnpm-lock.yaml'
+  workflow_dispatch:
 
 permissions:
   contents: write
