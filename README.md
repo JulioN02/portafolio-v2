@@ -49,9 +49,9 @@ portafolio-v2/
 │   ├── config.yaml               # Configuración del proyecto
 │   ├── specs/                    # Especificaciones por dominio
 │   └── changes/                  # Cambios activos y archivados
-├── vercel.json                   # Configuración del build de la API en Vercel (esbuild desde src)
+├── vercel.json                   # Configuración del build de la API en Vercel (bundle api/build/index.cjs)
 ├── docker-compose.yml            # PostgreSQL 15 (puerto 5434) — OPCIONAL, solo local
-└── .github/workflows/            # ci.yml (CI) + deploy.yml (placeholder intencional)
+└── .github/workflows/            # ci.yml (CI) + deploy.yml (placeholder intencional) + build-api-bundle.yml (bundle API)
 ```
 
 ---
@@ -217,10 +217,10 @@ El deploy usa **Vercel Git integration**: cada push a `main` dispara un deploy p
 | `portafolio-v2-recruiter-site` | `recruiter-site` | Vite SPA (`tsc && vite build`) |
 | `portafolio-v2-admin-panel` | `admin-panel` | Vite SPA (`tsc && vite build`) |
 
-- **API**: el `vercel.json` de la raíz compila con esbuild desde **`api/src/index.ts`** y marca `@prisma/client` como **external** para que el binario nativo del motor funcione en la Lambda de Vercel. `api/dist` **no** está en git: Vercel compila desde el src.
+- **API**: Vercel deploya el **bundle commiteado** `api/build/index.cjs` (`vercel.json` → `@vercel/node`). El workflow `build-api-bundle.yml` lo regenera con `scripts/build-api.mjs` y lo commitea automáticamente (con PAT del bot) cuando cambian `api/src/**`, `api/prisma/**` o `packages/shared/**`. El bundle está en `.gitignore`, por lo que el workflow lo fuerza con `git add -f`.
 - **URL de producción API**: `https://portafolio-v2-api.vercel.app`.
 - **Env**: registra las variables de la API en el dashboard del proyecto `portafolio-v2-api`; los frontends usan `VITE_API_URL` apuntando a la URL de producción de la API.
-- **CI (GitHub Actions)**: `.github/workflows/ci.yml` corre en pushes/PRs a `main`: install → build `@jsoft/shared` → `prisma generate` → typecheck (`pnpm -r run typecheck`) → tests (API, shared y los 3 frontends) → build.
+- **CI (GitHub Actions)**: `.github/workflows/ci.yml` corre en pushes/PRs a `main`: install → build `@jsoft/shared` → `prisma generate` → typecheck (`pnpm -r run typecheck`) → tests (API, shared y los 3 frontends) → build. Además, `build-api-bundle.yml` regenera y commitea el bundle de la API en cada push a `main`.
 - **`deploy.yml` es un placeholder intencional**: los deploys reales ocurren vía la integración Git de Vercel, no por GitHub Actions.
 
 ---
