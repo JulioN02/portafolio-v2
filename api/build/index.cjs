@@ -45803,6 +45803,7 @@ function errorHandler(err, _req, res, _next) {
 // api/src/app.ts
 import_dotenv.default.config();
 var app = (0, import_express11.default)();
+app.set("trust proxy", 1);
 if (!process.env.JWT_SECRET && true) {
   throw new Error("JWT_SECRET must be set in production");
 }
