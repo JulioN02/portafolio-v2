@@ -20,6 +20,11 @@ dotenv.config();
 
 const app: Express = express();
 
+// Trust the first proxy hop (Vercel edge). This makes Express read the real
+// client IP from X-Forwarded-For (which Vercel overwrites), so express-rate-limit
+// can identify users correctly instead of treating everyone as the same proxy IP.
+app.set('trust proxy', 1);
+
 // Verify JWT configuration at startup
 // Fail fast: a missing/empty JWT_SECRET would silently accept forged tokens
 // (jwt.verify with an empty secret), so we refuse to boot without one.
