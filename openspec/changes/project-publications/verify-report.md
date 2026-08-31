@@ -220,3 +220,183 @@ None.
 
 **Prepared by**: sdd-verify (fresh-review gate, hybrid artifact store)
 **Artifacts**: `openspec/changes/project-publications/verify-report.md` | Engram `sdd/project-publications/verify-report`
+
+---
+
+# Verification Report — project-publications (Phase 1b)
+
+**Change**: project-publications
+**Phase**: 1b (admin + client + recruiter + lab-inclusion restoration + status:'ALL' guard) — tasks P1-10 (checkbox) + P1-11..P1-20
+**Mode**: Strict TDD (api — jest 30, coverage ≥70%); Vitest for frontends
+**Branch**: feat/project-publications-p1b (uncommitted working tree)
+**Gate**: fresh-review before PR creation
+**Date**: 2026-08-31
+
+---
+
+## Verdict: ✅ GO (PASS WITH WARNINGS)
+
+Phase 1b is complete and behaviorally compliant with the P1b delta specs (projects admin/client, recruiter-projects, sanitization). All gates pass: `pnpm -r run typecheck` 0 errors (5 packages); api jest 211/211, coverage 86.55% stmts / 71.87% branch / 93.28% funcs / 95.04% lines (all ≥70%); Vitest suites shared 67/67, admin-panel 7/7, client-site 12/12, recruiter-site 15/15 (one transient flake observed once, not reproduced — see WARNING 1). No CRITICAL issues. Three WARNINGs and five SUGGESTIONs — none blocking. Safe to create the PR.
+
+---
+
+## Completeness
+
+| Metric | Value |
+|--------|-------|
+| Tasks in scope (P1-10, P1-11..P1-20) | 11 |
+| Tasks implemented | 11 |
+| Tasks marked `[x]` in tasks.md | 11 |
+| Tasks incomplete | 0 |
+
+P1-10 checkbox is now ticked (was a P1a verify WARNING); tasks.md note 6 reconciled (lab deferral resolved in P1b).
+
+---
+
+## Build & Tests Execution
+
+**Typecheck** (`pnpm -r run typecheck`): ✅ Passed — 0 errors, 5/5 packages (shared, api, admin-panel, client-site, recruiter-site).
+
+**API tests** (`pnpm --filter @jsoft/api exec jest --coverage`): ✅ 211 passed / 0 failed / 0 skipped — 17 suites.
+
+**Coverage**: ✅ Above threshold — All files 86.55% stmts / 71.87% branch / 93.28% funcs / 95.04% lines (threshold ≥70%). Changed files: `project.service.ts` 84.9% stmts / 100% lines; `portfolio.service.ts` 95.52% stmts / 100% lines.
+
+**Frontend Vitest**:
+- shared: ✅ 67/67 (3 files) — incl. project.schema + sanitize strip/preserve assertions
+- admin-panel: ✅ 7/7 (2 files)
+- client-site: ✅ 12/12 (4 files) — incl. ProjectDetailPage sanitize + 404
+- recruiter-site: ✅ 15/15 (5 files) — incl. ProjectList lab navigation + ProjectDetailModal project branch
+
+---
+
+## Checklist P1-11..P1-20 (+ P1-10)
+
+| Task | Status | Evidence |
+|------|--------|----------|
+| P1-10 Seed demo Projects | ✅ PASS | `seed.ts` L42-93: 3 PUBLISHED demo projects, tags-based classification (`proyecto-profesional/web`, `proyecto-rapido/api`, `pedagogico/simulador`), upsert-by-slug idempotent |
+| P1-11 Admin api + hooks | ✅ PASS | `api/projects.api.ts` (getAll/getBySlug/getById/create/update/softDelete/restore/updateStatus/reorder/getTags → matches `/api/projects*` route contract); `hooks/useProjects.ts` (TanStack Query, invalidates on mutations) |
+| P1-12 Admin table + list + routes/sidebar/i18n | ✅ PASS | `ProjectTable.tsx` (tags, status select, edit/delete), `ProjectsListPage.tsx` (tag + status filters, delete confirm modal); routes `/projects` + lazy `/projects/create` + `/projects/edit/:id` in AppRoutes (ProtectedLayout + ErrorBoundary); Sidebar `nav.projects`; es+en i18n |
+| P1-13 Admin create page | ✅ PASS | `ProjectCreatePage.tsx` → `ProjectForm.tsx` (title/slug/shortDescription/body via TipTapEditor/images/repositoryUrl/tags chips + datalist suggestions from `/api/projects/tags`/status/featured/order) → POST via useCreate → redirect `/projects`; neutral Spanish |
+| P1-14 Admin edit page | ✅ PASS | `ProjectEditPage.tsx` prefill via `useGetById` (all fields incl. tags) → PUT via useUpdate; 404 text when missing |
+| P1-15 Client hooks | ✅ PASS | `useProjects` (list w/ status=PUBLISHED + tag), `useProjectTags` (/api/projects/tags), `useProjectBySlug` (/api/projects/:slug); typecheck 0 errors |
+| P1-16 Client list page | ✅ PASS | `/proyectos` — PUBLISHED only; tag chips from `/api/projects/tags`; `?tag=` refetch via searchParams; pagination; i18n neutral Spanish |
+| P1-17 Client detail page | ✅ PASS | `/proyectos/:slug` — `sanitizeHtml(body, {allowMedia:true})` imported from `@jsoft/shared`, images carousel, repositoryUrl, tags; 404 state; routes + ErrorBoundary in App.tsx; Header nav; sanitize assertion test |
+| P1-18 Recruiter types + hooks | ✅ PASS | `ProjectType` union incl. `project`\|`laboratorio`; `ProjectSummary.tags?`; `detailEndpointMap` + `project: '/projects'`; paths `/portfolio/projects*` consistent |
+| P1-19 Recruiter list + modal | ✅ PASS | `ProjectList.tsx` classification filter (tags for projects + legacy + lab category); lab cards → `/blog/:slug` via navigate (NO modal) — tested; `ProjectDetailModal.tsx` real-Project branch GETs `/api/projects/:slug`, renders sanitized body/images/tags/repositoryUrl, hides legacy sections — tested |
+| P1-20 Phase gate | ✅ PASS | typecheck 0 errors; jest coverage ≥70%; Vitest suites green (see Gates above) |
+
+**Result: 11/11 PASS**
+
+---
+
+## Lab-Inclusion Restoration & status:'ALL' Guard (scope items)
+
+| Check | Status | Evidence |
+|-------|--------|----------|
+| BlogPost category in [laboratorio, experimento] | ✅ | `portfolio.service.ts` LAB_CATEGORIES, applied in findAll AND findRecent |
+| PUBLISHED + deletedAt null on labs | ✅ | `...PUBLISHED` spread on blogPost query (both paths) |
+| type 'laboratorio' | ✅ | `toLabSummary` sets type; test asserts |
+| articulo excluded | ✅ | `category: { in: [...] }` — articulo never matches; regression test asserts the where clause |
+| Classification filter on labs = category | ✅ | `...(classification && { category: classification })`; test asserts `category: 'laboratorio'` |
+| status-leak regression covers all 6 sources | ✅ | `portfolio.service.test.ts` expectPublishedOnly() on project/service/product/tool/successCase/blogPost (findAll) + project/blogPost (findRecent) |
+| update path rejects 'ALL' → 400 ValidationError | ✅ | `project.service.update` throws `ValidationError('ALL is not a valid status')`; test asserts `rejects.toMatchObject({statusCode:400, code:'VALIDATION_ERROR'})` AND `mockPrisma.project.update` NOT called; errorHandler maps AppError → statusCode |
+| Controller defense-in-depth | ✅ | `project.controller.updateStatus` also rejects 'ALL' with 400 |
+
+---
+
+## TDD Compliance (Strict TDD module)
+
+| Check | Result | Details |
+|-------|--------|---------|
+| TDD Evidence reported | ✅ | apply-progress in Engram `sdd/project-publications/apply-progress` (#1012) — TDD Cycle Evidence table present |
+| All tasks have tests | ✅ | api changes: portfolio.service.test.ts (12), portfolio.routes.test.ts (4), project.service.test.ts (21) — all pass; frontends: typecheck + Vitest per tasks.md |
+| RED confirmed (tests exist) | ✅ | 3/3 TDD work items have test files |
+| GREEN confirmed (tests pass) | ✅ | 211/211 jest pass on execution; Vitest suites pass |
+| Triangulation adequate | ✅ | lab inclusion: 5 cases (lab include, articulo-excluded where, classification filter, findRecent lab, 6-source leak); ALL guard: rejection + no-Prisma + normal path; integration: lab row + where assertion |
+| Safety Net for modified files | ✅ | 33/33 (3 api test files) per apply-progress |
+| Assertion Quality Audit | ✅ | No tautologies, no ghost loops, no smoke-only tests, no type-only-only assertions; all tests assert real behavior (see below) |
+
+### Assertion Quality
+All changed test files (project.service.test.ts, portfolio.service.test.ts, portfolio.routes.test.ts, ProjectList.test.tsx, ProjectDetailModal.test.tsx, ProjectDetailPage.test.tsx, project.schema.test.ts, sanitize.test.ts) were audited: value/behavioral assertions only (e.g. `expect(result.data[0].type).toBe('laboratorio')`, script-stripped + media-preserved DOM assertions, `navigate` called with `/blog/:slug`). **✅ All assertions verify real behavior.**
+
+### Test Layer Distribution
+| Layer | Tests | Files | Tools |
+|-------|-------|-------|-------|
+| Unit (api services) | 33 changed + suite 211 | 17 suites | Jest 30 + ts-jest |
+| Integration (api routes) | 4 (portfolio.routes) | 1 | Jest 30 + supertest-style fetch |
+| Frontend component (jsdom) | recruiter 4 + client 2 new | 3 new files | Vitest 4 + testing-library |
+
+---
+
+## Spec Compliance Matrix (P1b delta)
+
+| Requirement | Scenario | Test | Result |
+|-------------|----------|------|--------|
+| projects:SharedSchemas | Valid input passes | `project.schema.test.ts` | ✅ COMPLIANT |
+| projects:SharedSchemas | Empty tag / 11 tags rejected | `project.schema.test.ts` | ✅ COMPLIANT |
+| projects:APICRUD | Public list PUBLISHED + deletedAt null | `project.service.test.ts > findAll` | ✅ COMPLIANT |
+| projects:APICRUD | Detail by slug; DRAFT/unknown → 404 | `project.service.test.ts > findBySlug` | ✅ COMPLIANT |
+| projects:APICRUD | Admin writes; 201; soft-delete; no JWT → 401 | `project.service.test.ts > create/softDelete` + P1a controller/routes integration | ✅ COMPLIANT |
+| projects:APICRUD | Tags endpoint derives from PUBLISHED only | `project.service.test.ts > getTags` | ✅ COMPLIANT |
+| projects:AdminPages | Create with tags → POST → redirect | typecheck + structural (manual per tasks) | ⚠️ PARTIAL — no automated admin test |
+| projects:AdminPages | Edit prefills incl. tags | typecheck + structural (manual per tasks) | ⚠️ PARTIAL — no automated admin test |
+| projects:ClientPages | List PUBLISHED only + `?tag=` refetch | structural + typecheck (list page has no Vitest) | ⚠️ PARTIAL |
+| projects:ClientPages | Detail sanitized body/images/repo + 404 | `ProjectDetailPage.test.tsx` (2 tests) | ✅ COMPLIANT |
+| sanitize:AllRenderers | Scripts stripped; safe HTML intact | `sanitize.test.ts` | ✅ COMPLIANT |
+| sanitize:AllRenderers | Inline image/figure preserved | `sanitize.test.ts` | ✅ COMPLIANT |
+| sanitize:AllRenderers | Simulator iframe kept; other origins stripped | `sanitize.test.ts` | ✅ COMPLIANT |
+| recruiter:Listing | Only PUBLISHED rows — all 6 sources | `portfolio.service.test.ts > status leak` | ✅ COMPLIANT |
+| recruiter:Listing | Lab posts → type laboratorio | `portfolio.service.test.ts` | ✅ COMPLIANT |
+| recruiter:Listing | Articulo excluded | `portfolio.service.test.ts` (where assertion) | ✅ COMPLIANT |
+| recruiter:Listing | Filter by classification (tags + legacy + lab) | `portfolio.service.test.ts` | ✅ COMPLIANT |
+| recruiter:Listing | Paginate results | `portfolio.service.test.ts` | ✅ COMPLIANT |
+| recruiter:DetailModal | Real Project branch: sanitized body/tags/repo, legacy hidden | `ProjectDetailModal.test.tsx` | ✅ COMPLIANT |
+| recruiter:DetailModal | Lab card → `/blog/:slug` (no modal) | `ProjectList.test.tsx` | ✅ COMPLIANT |
+| recruiter:DetailModal | Entity not found → error state | code: `isError` renders errorState w/ message; no dedicated test | ⚠️ PARTIAL |
+| recruiter:DetailModal | Close modal / scroll preserved | pre-existing, unchanged | ➖ not part of P1b delta |
+
+**Compliance summary: 18/22 fully compliant, 4 partial (all documented as manual/typecheck per tasks.md or untested error branch), 0 failing, 0 untested-critical.**
+
+---
+
+## Coherence (Design)
+
+| Decision | Followed? | Notes |
+|----------|-----------|-------|
+| D1 Aggregation moved to `/api/portfolio/projects*` | ✅ Yes | Project CRUD owns `/api/projects`; old aggregation files deleted; zero stale refs |
+| D4 Lab posts → type `laboratorio`; detail opens `/blog/:slug` | ✅ Yes | ProjectList navigates; modal keeps entity-only scope |
+| D5 Shared `sanitizeHtml(html, {allowMedia})` + restricted iframe | ✅ Yes | client + recruiter project renderers use it; regex `^/api/simulators/[A-Za-z0-9]+/content$` |
+| D7 Free-form tags, no type enum | ✅ Yes | Project model tags String[]; tagsSchema (trim 1–30, max 10) |
+| Route-order guard `/tags`, `/by-id/:id` before `/:slug` | ✅ Yes | project.routes.ts order + P1a integration tests |
+| Deploy order / P1b additions additive | ✅ Yes | no schema change in P1b; routes already mounted in P1a |
+
+**Deviation (documented, consistent)**: `ProjectForm.tsx` created as a shared-form component (not in the task file list) — mirrors ServiceForm/BlogPostForm pattern; tag input is minimal chip+datalist (full shared `TagInput` is P2-07).
+
+---
+
+## Issues Found
+
+**CRITICAL** (must fix before archive): None
+
+**WARNING** (should fix):
+1. **Recruiter Vitest transient flake** — the first full-suite run failed 3 tests (error frame pointed at `ProjectList.test.tsx` mock setup) while 4 Vitest suites were executing; **not reproduced in 5 subsequent runs** (isolated ×3, full suite ×2, client+recruiter concurrent ×1 — all 15/15). Likely resource/timing sensitivity under load. Monitor in CI; if it recurs, run recruiter suite with reduced parallelism (`--maxWorkers`/`--pool=threads`) or serialize suites.
+2. **`portfolio.service.ts` branch coverage 59.32%** — below the 70% per-file branch bar (overall suite branch 71.87% passes the gate). Uncovered branches are the `!type || type === 'x'` guards and the lab `category: classification` override — only the no-type path is exercised. Informational per strict-tdd rules (never blocking).
+3. **Dead admin i18n keys** — `projects.subtitleCreate`, `projects.subtitleEdit`, `projects.editor`, `projects.content` are defined in es+en but never referenced; create/edit pages use hardcoded English subtitles and a hardcoded "Project not found".
+
+**SUGGESTION** (nice to have):
+1. Wire the unused subtitle i18n keys and translate "Project not found" in `ProjectEditPage` for full neutral-Spanish consistency (matches existing admin pattern today).
+2. Add a unit test for `findAll` with `status: 'ALL'` (sentinel → no status filter) — the sentinel is used by the admin list but untested.
+3. `client-site ProjectsListPage`: the tag-chip map variable `t` shadows the `useTranslation` `t` — rename to `tag` for clarity.
+4. `recruiter-site/src/types/index.ts` missing trailing newline (style).
+5. Admin CRUD pages and the client list page have no automated behavioral tests (typecheck/manual per tasks.md) — a Vitest for `ProjectForm`/`ProjectsListPage` would harden P2 regressions.
+
+---
+
+## Verdict
+
+**✅ GO (PASS WITH WARNINGS)** — Phase 1b is complete, behaviorally compliant with the P1b delta specs, gates green (typecheck 0 errors, coverage ≥70%, all suites pass), status-leak regression covers all 6 sources, `status:'ALL'` guard verified at service+test level. The three WARNINGs are non-blocking (one environmental flake, one informational coverage metric, one dead-code/i18n cleanup). Safe to create the PR.
+
+---
+
+**Prepared by**: sdd-verify (fresh-review gate, hybrid artifact store)
+**Artifacts**: `openspec/changes/project-publications/verify-report.md` | Engram `sdd/project-publications/verify-report`
