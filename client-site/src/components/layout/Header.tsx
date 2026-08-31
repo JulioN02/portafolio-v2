@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { to: '/servicios', key: 'nav.services' },
   { to: '/productos', key: 'nav.products' },
   { to: '/herramientas', key: 'nav.tools' },
+  { to: '/proyectos', key: 'nav.projects' },
   { to: '/blog', key: 'nav.blog' },
   { to: '/casos-de-exito', key: 'nav.successCases' },
   { to: '/contacto', key: 'nav.contact' },

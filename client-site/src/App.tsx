@@ -18,6 +18,8 @@ const ServiceDetailPage = lazy(() => import('./pages/Services/ServiceDetail').th
 const ProductDetailPage = lazy(() => import('./pages/Products/ProductDetail').then(m => ({ default: m.ProductDetailPage })));
 const ToolDetailPage = lazy(() => import('./pages/Tools/ToolDetail').then(m => ({ default: m.ToolDetailPage })));
 const SuccessCaseDetailPage = lazy(() => import('./pages/SuccessCases/SuccessCaseDetail').then(m => ({ default: m.SuccessCaseDetailPage })));
+const ProjectsPage = lazy(() => import('./pages/Projects/ProjectsListPage').then(m => ({ default: m.ProjectsPage })));
+const ProjectDetailPage = lazy(() => import('./pages/Projects/ProjectDetailPage').then(m => ({ default: m.ProjectDetailPage })));
 
 function App() {
   return (
@@ -31,6 +33,8 @@ function App() {
           <Route path="/productos/:slug" element={<ErrorBoundary><Suspense fallback={<Loading />}><ProductDetailPage /></Suspense></ErrorBoundary>} />
           <Route path="/herramientas" element={<ErrorBoundary><ToolsPage /></ErrorBoundary>} />
           <Route path="/herramientas/:slug" element={<ErrorBoundary><Suspense fallback={<Loading />}><ToolDetailPage /></Suspense></ErrorBoundary>} />
+          <Route path="/proyectos" element={<ErrorBoundary><Suspense fallback={<Loading />}><ProjectsPage /></Suspense></ErrorBoundary>} />
+          <Route path="/proyectos/:slug" element={<ErrorBoundary><Suspense fallback={<Loading />}><ProjectDetailPage /></Suspense></ErrorBoundary>} />
           <Route path="/casos-de-exito" element={<ErrorBoundary><SuccessCasesPage /></ErrorBoundary>} />
           <Route path="/casos-de-exito/:slug" element={<ErrorBoundary><Suspense fallback={<Loading />}><SuccessCaseDetailPage /></Suspense></ErrorBoundary>} />
           <Route path="/blog" element={<ErrorBoundary><BlogPage /></ErrorBoundary>} />

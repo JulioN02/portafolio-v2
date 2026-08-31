@@ -1,0 +1,202 @@
+.page {
+  padding-bottom: var(--spacing-lg);
+}
+
+@media (min-width: 768px) {
+  .page {
+    padding-bottom: var(--spacing-xl);
+  }
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+  padding-top: var(--spacing-lg);
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: 0 var(--spacing-lg);
+    padding-top: var(--spacing-xl);
+  }
+}
+
+/* Tag filter chips */
+.tagFilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background-color: var(--color-neutral-50);
+  border-radius: var(--radius-md);
+}
+
+.tagChip {
+  padding: var(--spacing-xs) var(--spacing-md);
+  border: 1px solid var(--color-neutral-300);
+  border-radius: 999px;
+  background-color: var(--color-neutral-0);
+  color: var(--color-neutral-700);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+@media (hover: hover) {
+  .tagChip:hover {
+    border-color: var(--color-primary-500);
+    color: var(--color-primary-600);
+  }
+}
+
+.tagChipActive {
+  background-color: var(--color-primary-600);
+  border-color: var(--color-primary-600);
+  color: var(--color-neutral-0);
+}
+
+/* Grid */
+.grid {
+  display: grid;
+  gap: var(--spacing-md);
+}
+
+@media (min-width: 640px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-lg);
+  }
+}
+
+/* Card */
+.card {
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background-color: var(--color-neutral-0);
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+@media (hover: hover) {
+  .card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+}
+
+.cardLink {
+  display: block;
+  height: 100%;
+  text-decoration: none;
+  color: inherit;
+}
+
+.imageWrapper {
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.content {
+  padding: var(--spacing-md);
+}
+
+.tag {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  margin-bottom: var(--spacing-sm);
+  background-color: var(--color-primary-50);
+  color: var(--color-primary-700);
+  border-radius: 999px;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  margin-bottom: var(--spacing-xs);
+  color: var(--color-neutral-900);
+}
+
+.description {
+  font-size: var(--font-size-sm);
+  color: var(--color-neutral-600);
+  line-height: 1.5;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-xl);
+  flex-wrap: wrap;
+}
+
+.pageButton {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-neutral-300);
+  border-radius: var(--radius-md);
+  background-color: var(--color-neutral-0);
+  color: var(--color-neutral-700);
+  font-size: var(--font-size-sm);
+  transition: all var(--transition-fast);
+}
+
+@media (hover: hover) {
+  .pageButton:hover:not(:disabled) {
+    border-color: var(--color-primary-500);
+    color: var(--color-primary-600);
+  }
+}
+
+.pageButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pageInfo {
+  font-size: var(--font-size-sm);
+  color: var(--color-neutral-600);
+}
+
+/* Error & Empty */
+.error,
+.empty {
+  text-align: center;
+  padding: var(--spacing-xl);
+  color: var(--color-neutral-600);
+}
+
+.error {
+  color: var(--color-danger-600);
+  background-color: var(--color-danger-50);
+  border-radius: var(--radius-md);
+}
+
+.emptyClear {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-primary-500);
+  border-radius: var(--radius-md);
+  background-color: var(--color-neutral-0);
+  color: var(--color-primary-600);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+}
