@@ -18024,17 +18024,17 @@ var require_router = __commonJS({
     var toString = Object.prototype.toString;
     var proto = module2.exports = function(options) {
       var opts = options || {};
-      function router11(req, res, next) {
-        router11.handle(req, res, next);
+      function router12(req, res, next) {
+        router12.handle(req, res, next);
       }
-      setPrototypeOf(router11, proto);
-      router11.params = {};
-      router11._params = [];
-      router11.caseSensitive = opts.caseSensitive;
-      router11.mergeParams = opts.mergeParams;
-      router11.strict = opts.strict;
-      router11.stack = [];
-      return router11;
+      setPrototypeOf(router12, proto);
+      router12.params = {};
+      router12._params = [];
+      router12.caseSensitive = opts.caseSensitive;
+      router12.mergeParams = opts.mergeParams;
+      router12.strict = opts.strict;
+      router12.stack = [];
+      return router12;
     };
     proto.param = function param(name, fn) {
       if (typeof name === "function") {
@@ -20626,7 +20626,7 @@ var require_application = __commonJS({
   "node_modules/.pnpm/express@4.22.1/node_modules/express/lib/application.js"(exports2, module2) {
     "use strict";
     var finalhandler = require_finalhandler();
-    var Router11 = require_router();
+    var Router12 = require_router();
     var methods = require_methods();
     var middleware = require_init();
     var query = require_query();
@@ -20691,7 +20691,7 @@ var require_application = __commonJS({
     };
     app2.lazyrouter = function lazyrouter() {
       if (!this._router) {
-        this._router = new Router11({
+        this._router = new Router12({
           caseSensitive: this.enabled("case sensitive routing"),
           strict: this.enabled("strict routing")
         });
@@ -20700,17 +20700,17 @@ var require_application = __commonJS({
       }
     };
     app2.handle = function handle(req, res, callback) {
-      var router11 = this._router;
+      var router12 = this._router;
       var done = callback || finalhandler(req, res, {
         env: this.get("env"),
         onerror: logerror.bind(this)
       });
-      if (!router11) {
+      if (!router12) {
         debug("no routes defined on app");
         done();
         return;
       }
-      router11.handle(req, res, done);
+      router12.handle(req, res, done);
     };
     app2.use = function use(fn) {
       var offset = 0;
@@ -20730,15 +20730,15 @@ var require_application = __commonJS({
         throw new TypeError("app.use() requires a middleware function");
       }
       this.lazyrouter();
-      var router11 = this._router;
+      var router12 = this._router;
       fns.forEach(function(fn2) {
         if (!fn2 || !fn2.handle || !fn2.set) {
-          return router11.use(path3, fn2);
+          return router12.use(path3, fn2);
         }
         debug(".use app under %s", path3);
         fn2.mountpath = path3;
         fn2.parent = this;
-        router11.use(path3, function mounted_app(req, res, next) {
+        router12.use(path3, function mounted_app(req, res, next) {
           var orig = req.app;
           fn2.handle(req, res, function(err) {
             setPrototypeOf(req, orig.request);
@@ -22555,7 +22555,7 @@ var require_express = __commonJS({
     var mixin = require_merge_descriptors();
     var proto = require_application();
     var Route = require_route();
-    var Router11 = require_router();
+    var Router12 = require_router();
     var req = require_request();
     var res = require_response();
     exports2 = module2.exports = createApplication;
@@ -22578,7 +22578,7 @@ var require_express = __commonJS({
     exports2.request = req;
     exports2.response = res;
     exports2.Route = Route;
-    exports2.Router = Router11;
+    exports2.Router = Router12;
     exports2.json = bodyParser.json;
     exports2.query = require_query();
     exports2.raw = bodyParser.raw;
@@ -37499,7 +37499,7 @@ __export(index_exports, {
 module.exports = __toCommonJS(index_exports);
 
 // api/src/app.ts
-var import_express11 = __toESM(require_express2(), 1);
+var import_express12 = __toESM(require_express2(), 1);
 var import_cors = __toESM(require_lib3(), 1);
 
 // node_modules/.pnpm/helmet@8.1.0/node_modules/helmet/index.mjs
@@ -43448,6 +43448,37 @@ var successCaseStatusSchema = external_exports.object({
   status: postStatusEnum
 });
 
+// packages/shared/src/schemas/project.schema.ts
+var tagsSchema = external_exports.array(
+  external_exports.string().trim().min(1, "Tag must be at least 1 character").max(30, "Tag must be at most 30 characters")
+).max(10, "Maximum 10 tags allowed");
+var projectSchema = external_exports.object({
+  title: external_exports.string().min(3, "Title must be at least 3 characters").max(200),
+  slug: external_exports.string().min(3).max(200).regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "Slug must be lowercase with hyphens"),
+  shortDescription: external_exports.string().min(10).max(500),
+  body: external_exports.string().min(100, "Body must be at least 100 characters").max(5e4),
+  images: external_exports.array(external_exports.string().url()).optional(),
+  repositoryUrl: external_exports.string().url().optional(),
+  tags: tagsSchema.optional(),
+  featured: external_exports.boolean().default(false),
+  order: external_exports.number().int().min(0).default(0),
+  status: postStatusEnum.default("DRAFT")
+});
+var projectUpdateSchema = projectSchema.partial();
+var projectFilterSchema = external_exports.object({
+  status: postStatusEnum.optional(),
+  tag: external_exports.string().optional(),
+  search: external_exports.string().optional(),
+  page: external_exports.coerce.number().int().min(1).default(1),
+  limit: external_exports.coerce.number().int().min(1).max(100).default(10)
+});
+var projectStatusSchema = external_exports.object({
+  status: postStatusEnum
+});
+var projectReorderSchema = external_exports.object({
+  order: external_exports.number().int().min(0)
+});
+
 // packages/shared/src/schemas/contact.schema.ts
 var formOriginEnum = external_exports.enum(["CLIENT", "RECRUITER"]);
 var clientContactSchema = external_exports.object({
@@ -44564,22 +44595,318 @@ router5.patch("/:id/restore", authMiddleware, successCaseController.restore);
 router5.patch("/:id/status", authMiddleware, successCaseController.updateStatus);
 var successCase_routes_default = router5;
 
-// api/src/routes/projects.routes.ts
+// api/src/routes/project.routes.ts
 var import_express6 = __toESM(require_express2(), 1);
 
-// api/src/services/projects.service.ts
+// api/src/services/project.service.ts
 var import_client6 = require("@prisma/client");
 var prisma6 = new import_client6.PrismaClient();
-var projectsService = {
+var PROJECT_SELECT = {
+  id: true,
+  title: true,
+  slug: true,
+  shortDescription: true,
+  body: true,
+  images: true,
+  repositoryUrl: true,
+  tags: true,
+  featured: true,
+  order: true,
+  status: true,
+  deletedAt: true,
+  createdAt: true,
+  updatedAt: true,
+  publishedAt: true
+};
+var projectService = {
+  async findAll(filter) {
+    const { status, tag, search, page = 1, limit = 10 } = filter || {};
+    const skip = (page - 1) * limit;
+    const resolvedStatus = status === "ALL" ? void 0 : status || "PUBLISHED";
+    const where = {
+      deletedAt: null,
+      ...resolvedStatus && { status: resolvedStatus },
+      ...tag && { tags: { hasSome: [tag] } }
+    };
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: "insensitive" } },
+        { shortDescription: { contains: search, mode: "insensitive" } },
+        { body: { contains: search, mode: "insensitive" } }
+      ];
+    }
+    const [projects, total] = await Promise.all([
+      prisma6.project.findMany({
+        where,
+        select: PROJECT_SELECT,
+        orderBy: [{ createdAt: "desc" }],
+        skip,
+        take: limit
+      }),
+      prisma6.project.count({ where })
+    ]);
+    return {
+      data: projects,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page * limit < total,
+        hasPrev: page > 1
+      }
+    };
+  },
+  /** Public detail — PUBLISHED + non-deleted only (anything else → null → 404). */
+  async findBySlug(slug) {
+    return prisma6.project.findFirst({
+      where: { slug, deletedAt: null, status: "PUBLISHED" },
+      select: PROJECT_SELECT
+    });
+  },
+  /** Admin fetch (any status, incl. soft-deleted, so editors can restore). */
+  async findById(id) {
+    return prisma6.project.findUnique({
+      where: { id },
+      select: PROJECT_SELECT
+    });
+  },
+  async create(data) {
+    return prisma6.project.create({
+      data: {
+        title: data.title,
+        slug: data.slug,
+        shortDescription: data.shortDescription,
+        body: data.body,
+        images: data.images || [],
+        repositoryUrl: data.repositoryUrl,
+        tags: data.tags || [],
+        featured: data.featured ?? false,
+        order: data.order ?? 0,
+        status: data.status && data.status !== "ALL" ? data.status : "DRAFT",
+        ...data.status === "PUBLISHED" && { publishedAt: /* @__PURE__ */ new Date() }
+      },
+      select: PROJECT_SELECT
+    });
+  },
+  async update(id, data) {
+    const updateData = {};
+    if (data.title !== void 0) updateData.title = data.title;
+    if (data.slug !== void 0) updateData.slug = data.slug;
+    if (data.shortDescription !== void 0) updateData.shortDescription = data.shortDescription;
+    if (data.body !== void 0) updateData.body = data.body;
+    if (data.images !== void 0) updateData.images = data.images;
+    if (data.repositoryUrl !== void 0) updateData.repositoryUrl = data.repositoryUrl;
+    if (data.tags !== void 0) updateData.tags = data.tags;
+    if (data.featured !== void 0) updateData.featured = data.featured;
+    if (data.order !== void 0) updateData.order = data.order;
+    if (data.status !== void 0) {
+      updateData.status = data.status;
+      if (data.status === "PUBLISHED") {
+        updateData.publishedAt = /* @__PURE__ */ new Date();
+      }
+    }
+    return prisma6.project.update({
+      where: { id },
+      data: updateData,
+      select: PROJECT_SELECT
+    });
+  },
+  async softDelete(id) {
+    return prisma6.project.update({
+      where: { id },
+      data: { deletedAt: /* @__PURE__ */ new Date() },
+      select: PROJECT_SELECT
+    });
+  },
+  async restore(id) {
+    return prisma6.project.update({
+      where: { id },
+      data: { deletedAt: null },
+      select: PROJECT_SELECT
+    });
+  },
+  async updateStatus(id, status) {
+    const updateData = { status };
+    if (status === "PUBLISHED") {
+      updateData.publishedAt = /* @__PURE__ */ new Date();
+    }
+    return prisma6.project.update({
+      where: { id },
+      data: updateData,
+      select: PROJECT_SELECT
+    });
+  },
+  async reorder(id, order) {
+    return prisma6.project.update({
+      where: { id },
+      data: { order },
+      select: PROJECT_SELECT
+    });
+  },
+  /** Distinct tags among PUBLISHED, non-deleted projects, sorted. */
+  async getTags() {
+    const projects = await prisma6.project.findMany({
+      where: { status: "PUBLISHED", deletedAt: null },
+      select: { tags: true }
+    });
+    const tags = [...new Set(projects.flatMap((project) => project.tags))].sort();
+    return tags;
+  }
+};
+
+// api/src/controllers/project.controller.ts
+var getStringParam5 = (param) => {
+  if (Array.isArray(param)) return param[0];
+  return param || "";
+};
+var getExistingProject = async (id) => {
+  const existing = await projectService.findById(id);
+  if (!existing) {
+    throw new NotFoundError("Project not found");
+  }
+  return existing;
+};
+var projectController = {
+  findAll: asyncHandler(async (req, res) => {
+    const filter = projectFilterSchema.parse(req.query);
+    const result = await projectService.findAll(filter);
+    res.json(result);
+  }),
+  findBySlug: asyncHandler(async (req, res) => {
+    const slug = getStringParam5(req.params.slug);
+    const project = await projectService.findBySlug(slug);
+    if (!project) {
+      throw new NotFoundError("Project not found");
+    }
+    res.json(project);
+  }),
+  findById: asyncHandler(async (req, res) => {
+    const id = getStringParam5(req.params.id);
+    const project = await projectService.findById(id);
+    if (!project) {
+      throw new NotFoundError("Project not found");
+    }
+    res.json(project);
+  }),
+  create: asyncHandler(async (req, res) => {
+    const data = projectSchema.parse(req.body);
+    const project = await projectService.create(data);
+    res.status(201).json(project);
+  }),
+  update: asyncHandler(async (req, res) => {
+    const id = getStringParam5(req.params.id);
+    const data = projectUpdateSchema.parse(req.body);
+    await getExistingProject(id);
+    const project = await projectService.update(id, data);
+    res.json(project);
+  }),
+  delete: asyncHandler(async (req, res) => {
+    const id = getStringParam5(req.params.id);
+    await getExistingProject(id);
+    await projectService.softDelete(id);
+    res.json({ message: "Project deleted successfully" });
+  }),
+  restore: asyncHandler(async (req, res) => {
+    const id = getStringParam5(req.params.id);
+    await getExistingProject(id);
+    const project = await projectService.restore(id);
+    res.json(project);
+  }),
+  updateStatus: asyncHandler(async (req, res) => {
+    const id = getStringParam5(req.params.id);
+    const { status } = req.body;
+    const parsedStatus = postStatusEnum.safeParse(status);
+    if (!parsedStatus.success) {
+      throw new ValidationError("Invalid status value");
+    }
+    if (parsedStatus.data === "ALL") {
+      res.status(400).json({ error: "ALL is not a valid status" });
+      return;
+    }
+    await getExistingProject(id);
+    const project = await projectService.updateStatus(id, parsedStatus.data);
+    res.json(project);
+  }),
+  reorder: asyncHandler(async (req, res) => {
+    const id = getStringParam5(req.params.id);
+    const { order } = projectReorderSchema.parse(req.body);
+    await getExistingProject(id);
+    const project = await projectService.reorder(id, order);
+    res.json(project);
+  }),
+  getTags: asyncHandler(async (_req, res) => {
+    const tags = await projectService.getTags();
+    res.json(tags);
+  })
+};
+
+// api/src/routes/project.routes.ts
+var router6 = (0, import_express6.Router)();
+router6.get("/", projectController.findAll);
+router6.get("/tags", projectController.getTags);
+router6.get("/by-id/:id", authMiddleware, projectController.findById);
+router6.post("/", authMiddleware, projectController.create);
+router6.put("/:id", authMiddleware, projectController.update);
+router6.delete("/:id", authMiddleware, projectController.delete);
+router6.patch("/:id/restore", authMiddleware, projectController.restore);
+router6.patch("/:id/status", authMiddleware, projectController.updateStatus);
+router6.patch("/:id/reorder", authMiddleware, projectController.reorder);
+router6.get("/:slug", projectController.findBySlug);
+var project_routes_default = router6;
+
+// api/src/routes/portfolio.routes.ts
+var import_express7 = __toESM(require_express2(), 1);
+
+// api/src/services/portfolio.service.ts
+var import_client7 = require("@prisma/client");
+var prisma7 = new import_client7.PrismaClient();
+var PUBLISHED = { status: "PUBLISHED", deletedAt: null };
+var toProjectSummary = (item) => ({
+  id: item.id,
+  type: "project",
+  title: item.title,
+  slug: item.slug,
+  classification: item.tags[0] || "",
+  tags: item.tags,
+  shortDescription: item.shortDescription,
+  image: item.images[0] || "",
+  images: item.images,
+  featured: item.featured,
+  createdAt: item.createdAt
+});
+var portfolioService = {
   async findAll(filter) {
     const { page = 1, limit = 10, classification, type } = filter || {};
     const skip = (page - 1) * limit;
     const queries = [];
+    if (!type || type === "project") {
+      queries.push(
+        prisma7.project.findMany({
+          where: {
+            ...PUBLISHED,
+            ...classification && { tags: { hasSome: [classification] } }
+          },
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+            tags: true,
+            shortDescription: true,
+            images: true,
+            featured: true,
+            order: true,
+            createdAt: true
+          },
+          orderBy: [{ createdAt: "desc" }]
+        }).then((items) => items.map(toProjectSummary))
+      );
+    }
     if (!type || type === "service") {
       queries.push(
-        prisma6.service.findMany({
+        prisma7.service.findMany({
           where: {
-            deletedAt: null,
+            ...PUBLISHED,
             ...classification && { classification }
           },
           select: {
@@ -44594,21 +44921,22 @@ var projectsService = {
           orderBy: [{ createdAt: "desc" }]
         }).then((items) => items.map((item) => ({
           id: item.id,
+          type: "service",
           title: item.title,
           slug: item.slug,
           classification: item.classification,
           shortDescription: item.shortDescription,
-          createdAt: item.createdAt,
-          type: "service",
-          image: item.images[0] || ""
+          image: item.images[0] || "",
+          images: item.images,
+          createdAt: item.createdAt
         })))
       );
     }
     if (!type || type === "product") {
       queries.push(
-        prisma6.product.findMany({
+        prisma7.product.findMany({
           where: {
-            deletedAt: null,
+            ...PUBLISHED,
             ...classification && { classification }
           },
           select: {
@@ -44624,22 +44952,23 @@ var projectsService = {
           orderBy: [{ createdAt: "desc" }]
         }).then((items) => items.map((item) => ({
           id: item.id,
+          type: "product",
           title: item.title,
           slug: item.slug,
           classification: item.classification,
           shortDescription: item.shortDescription,
-          createdAt: item.createdAt,
+          image: item.images[0] || "",
+          images: item.images,
           featured: item.featured,
-          type: "product",
-          image: item.images[0] || ""
+          createdAt: item.createdAt
         })))
       );
     }
     if (!type || type === "tool") {
       queries.push(
-        prisma6.tool.findMany({
+        prisma7.tool.findMany({
           where: {
-            deletedAt: null,
+            ...PUBLISHED,
             ...classification && { classification }
           },
           select: {
@@ -44655,22 +44984,23 @@ var projectsService = {
           orderBy: [{ createdAt: "desc" }]
         }).then((items) => items.map((item) => ({
           id: item.id,
+          type: "tool",
           title: item.title,
           slug: item.slug,
           classification: item.classification,
           shortDescription: item.shortDescription,
-          createdAt: item.createdAt,
+          image: item.images[0] || "",
+          images: item.images,
           featured: item.featured,
-          type: "tool",
-          image: item.images[0] || ""
+          createdAt: item.createdAt
         })))
       );
     }
     if (!type || type === "successCase") {
       queries.push(
-        prisma6.successCase.findMany({
+        prisma7.successCase.findMany({
           where: {
-            deletedAt: null
+            ...PUBLISHED
           },
           select: {
             id: true,
@@ -44683,22 +45013,22 @@ var projectsService = {
           orderBy: [{ createdAt: "desc" }]
         }).then((items) => items.map((item) => ({
           id: item.id,
+          type: "successCase",
           title: item.title,
           slug: item.slug,
           classification: "success-case",
           shortDescription: item.description,
-          createdAt: item.createdAt,
-          type: "successCase",
-          image: item.images[0] || ""
+          image: item.images[0] || "",
+          images: item.images,
+          createdAt: item.createdAt
         })))
       );
     }
     const results = await Promise.all(queries);
-    const allProjects = results.flat().sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    const allProjects = results.flat().sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
     const total = allProjects.length;
-    const paginatedProjects = allProjects.slice(skip, skip + limit);
     return {
-      data: paginatedProjects,
+      data: allProjects.slice(skip, skip + limit),
       pagination: {
         page,
         limit,
@@ -44710,7 +45040,18 @@ var projectsService = {
     };
   },
   async findRecent(limit = 3) {
-    const recentSelect = {
+    const projectSelect = {
+      id: true,
+      title: true,
+      slug: true,
+      tags: true,
+      shortDescription: true,
+      images: true,
+      featured: true,
+      order: true,
+      createdAt: true
+    };
+    const legacySelect = {
       id: true,
       title: true,
       slug: true,
@@ -44719,25 +45060,9 @@ var projectsService = {
       images: true,
       createdAt: true
     };
-    const productSelect = {
-      id: true,
-      title: true,
-      slug: true,
-      classification: true,
-      shortDescription: true,
-      images: true,
-      featured: true,
-      createdAt: true
-    };
-    const toolSelect = {
-      id: true,
-      title: true,
-      slug: true,
-      classification: true,
-      shortDescription: true,
-      images: true,
-      featured: true,
-      createdAt: true
+    const featuredSelect = {
+      ...legacySelect,
+      featured: true
     };
     const successCaseSelect = {
       id: true,
@@ -44747,117 +45072,106 @@ var projectsService = {
       images: true,
       createdAt: true
     };
-    const [services, products, tools, successCases] = await Promise.all([
-      prisma6.service.findMany({
-        where: { deletedAt: null },
-        select: recentSelect,
-        orderBy: [{ createdAt: "desc" }],
-        take: limit
-      }).then((items) => items.map((item) => ({
+    const [projects, services, products, tools, successCases] = await Promise.all([
+      prisma7.project.findMany({ where: PUBLISHED, select: projectSelect, orderBy: [{ createdAt: "desc" }], take: limit }).then((items) => items.map(toProjectSummary)),
+      prisma7.service.findMany({ where: PUBLISHED, select: legacySelect, orderBy: [{ createdAt: "desc" }], take: limit }).then((items) => items.map((item) => ({
         id: item.id,
-        title: item.title,
-        slug: item.slug,
-        classification: item.classification,
-        shortDescription: item.shortDescription,
-        createdAt: item.createdAt,
         type: "service",
-        image: item.images[0] || ""
-      }))),
-      prisma6.product.findMany({
-        where: { deletedAt: null },
-        select: productSelect,
-        orderBy: [{ createdAt: "desc" }],
-        take: limit
-      }).then((items) => items.map((item) => ({
-        id: item.id,
         title: item.title,
         slug: item.slug,
         classification: item.classification,
         shortDescription: item.shortDescription,
-        createdAt: item.createdAt,
-        featured: item.featured,
+        image: item.images[0] || "",
+        images: item.images,
+        createdAt: item.createdAt
+      }))),
+      prisma7.product.findMany({ where: PUBLISHED, select: featuredSelect, orderBy: [{ createdAt: "desc" }], take: limit }).then((items) => items.map((item) => ({
+        id: item.id,
         type: "product",
-        image: item.images[0] || ""
-      }))),
-      prisma6.tool.findMany({
-        where: { deletedAt: null },
-        select: toolSelect,
-        orderBy: [{ createdAt: "desc" }],
-        take: limit
-      }).then((items) => items.map((item) => ({
-        id: item.id,
         title: item.title,
         slug: item.slug,
         classification: item.classification,
         shortDescription: item.shortDescription,
-        createdAt: item.createdAt,
+        image: item.images[0] || "",
+        images: item.images,
         featured: item.featured,
-        type: "tool",
-        image: item.images[0] || ""
+        createdAt: item.createdAt
       }))),
-      prisma6.successCase.findMany({
-        where: { deletedAt: null },
-        select: successCaseSelect,
-        orderBy: [{ createdAt: "desc" }],
-        take: limit
-      }).then((items) => items.map((item) => ({
+      prisma7.tool.findMany({ where: PUBLISHED, select: featuredSelect, orderBy: [{ createdAt: "desc" }], take: limit }).then((items) => items.map((item) => ({
         id: item.id,
+        type: "tool",
+        title: item.title,
+        slug: item.slug,
+        classification: item.classification,
+        shortDescription: item.shortDescription,
+        image: item.images[0] || "",
+        images: item.images,
+        featured: item.featured,
+        createdAt: item.createdAt
+      }))),
+      prisma7.successCase.findMany({ where: PUBLISHED, select: successCaseSelect, orderBy: [{ createdAt: "desc" }], take: limit }).then((items) => items.map((item) => ({
+        id: item.id,
+        type: "successCase",
         title: item.title,
         slug: item.slug,
         classification: "success-case",
         shortDescription: item.description,
-        createdAt: item.createdAt,
-        type: "successCase",
-        image: item.images[0] || ""
+        image: item.images[0] || "",
+        images: item.images,
+        createdAt: item.createdAt
       })))
     ]);
-    const allRecent = [...services, ...products, ...tools, ...successCases].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, limit);
-    return allRecent;
+    return [...projects, ...services, ...products, ...tools, ...successCases].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()).slice(0, limit);
   },
+  /** Legacy classifications + project tags, deduped and sorted. */
   async getClassifications() {
-    const [serviceClassifications, productClassifications, toolClassifications] = await Promise.all([
-      prisma6.service.findMany({
-        where: { deletedAt: null },
+    const [serviceClassifications, productClassifications, toolClassifications, projectTags] = await Promise.all([
+      prisma7.service.findMany({
+        where: PUBLISHED,
         select: { classification: true },
         distinct: ["classification"]
       }).then((items) => items.map((i) => i.classification)),
-      prisma6.product.findMany({
-        where: { deletedAt: null },
+      prisma7.product.findMany({
+        where: PUBLISHED,
         select: { classification: true },
         distinct: ["classification"]
       }).then((items) => items.map((i) => i.classification)),
-      prisma6.tool.findMany({
-        where: { deletedAt: null },
+      prisma7.tool.findMany({
+        where: PUBLISHED,
         select: { classification: true },
         distinct: ["classification"]
-      }).then((items) => items.map((i) => i.classification))
+      }).then((items) => items.map((i) => i.classification)),
+      prisma7.project.findMany({
+        where: PUBLISHED,
+        select: { tags: true }
+      }).then((items) => items.flatMap((i) => i.tags))
     ]);
-    const allClassifications = [.../* @__PURE__ */ new Set([
+    return [.../* @__PURE__ */ new Set([
       ...serviceClassifications,
       ...productClassifications,
-      ...toolClassifications
+      ...toolClassifications,
+      ...projectTags
     ])].sort();
-    return allClassifications;
   }
 };
 
-// api/src/controllers/projects.controller.ts
-var VALID_TYPES = ["service", "product", "tool", "successCase"];
-var projectsController = {
+// api/src/controllers/portfolio.controller.ts
+var VALID_TYPES = ["service", "product", "tool", "successCase", "project", "laboratorio"];
+var portfolioController = {
   findAll: asyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const classification = req.query.classification;
     const type = req.query.type;
     if (type && !VALID_TYPES.includes(type)) {
-      throw new ValidationError("Invalid type. Must be: service, product, tool, or successCase");
+      throw new ValidationError(`Invalid type. Must be: ${VALID_TYPES.join(", ")}`);
     }
-    const result = await projectsService.findAll({ page, limit, classification, type });
+    const result = await portfolioService.findAll({ page, limit, classification, type });
     res.json(result);
   }),
   findRecent: asyncHandler(async (req, res) => {
     const limit = parseInt(req.query.limit) || 3;
-    const projects = await projectsService.findRecent(limit);
+    const projects = await portfolioService.findRecent(limit);
     res.json({
       data: projects,
       pagination: {
@@ -44871,20 +45185,20 @@ var projectsController = {
     });
   }),
   getClassifications: asyncHandler(async (_req, res) => {
-    const classifications = await projectsService.getClassifications();
+    const classifications = await portfolioService.getClassifications();
     res.json(classifications);
   })
 };
 
-// api/src/routes/projects.routes.ts
-var router6 = (0, import_express6.Router)();
-router6.get("/", projectsController.findAll);
-router6.get("/recent", projectsController.findRecent);
-router6.get("/classifications", projectsController.getClassifications);
-var projects_routes_default = router6;
+// api/src/routes/portfolio.routes.ts
+var router7 = (0, import_express7.Router)();
+router7.get("/", portfolioController.findAll);
+router7.get("/recent", portfolioController.findRecent);
+router7.get("/classifications", portfolioController.getClassifications);
+var portfolio_routes_default = router7;
 
 // api/src/routes/upload.routes.ts
-var import_express7 = __toESM(require_express2(), 1);
+var import_express8 = __toESM(require_express2(), 1);
 
 // api/src/controllers/upload.controller.ts
 var import_multer = __toESM(require_multer(), 1);
@@ -45109,18 +45423,18 @@ var uploadController = {
 };
 
 // api/src/routes/upload.routes.ts
-var router7 = (0, import_express7.Router)();
-router7.use(authMiddleware);
-router7.post("/", uploadMiddleware.single("file"), uploadController.upload);
-router7.delete("/:filename", uploadController.delete);
-var upload_routes_default = router7;
+var router8 = (0, import_express8.Router)();
+router8.use(authMiddleware);
+router8.post("/", uploadMiddleware.single("file"), uploadController.upload);
+router8.delete("/:filename", uploadController.delete);
+var upload_routes_default = router8;
 
 // api/src/routes/contact.routes.ts
-var import_express8 = __toESM(require_express2(), 1);
+var import_express9 = __toESM(require_express2(), 1);
 
 // api/src/services/contact.service.ts
-var import_client7 = require("@prisma/client");
-var prisma7 = new import_client7.PrismaClient();
+var import_client8 = require("@prisma/client");
+var prisma8 = new import_client8.PrismaClient();
 var CONTACT_SELECT = {
   id: true,
   firstName: true,
@@ -45138,7 +45452,7 @@ var CONTACT_SELECT = {
 };
 var contactService = {
   async createClientContact(data, source) {
-    return prisma7.contactForm.create({
+    return prisma8.contactForm.create({
       data: {
         firstName: data.firstName,
         lastName: data.lastName,
@@ -45152,7 +45466,7 @@ var contactService = {
     });
   },
   async createRecruiterContact(data) {
-    return prisma7.contactForm.create({
+    return prisma8.contactForm.create({
       data: {
         firstName: data.firstName,
         email: data.email,
@@ -45183,14 +45497,14 @@ var contactService = {
       ];
     }
     const [contacts, total] = await Promise.all([
-      prisma7.contactForm.findMany({
+      prisma8.contactForm.findMany({
         where,
         select: CONTACT_SELECT,
         orderBy: { createdAt: "desc" },
         skip,
         take: limit
       }),
-      prisma7.contactForm.count({ where })
+      prisma8.contactForm.count({ where })
     ]);
     return {
       data: contacts,
@@ -45208,7 +45522,7 @@ var contactService = {
    * Get a single contact form by ID
    */
   async findById(id) {
-    return prisma7.contactForm.findUnique({
+    return prisma8.contactForm.findUnique({
       where: { id },
       select: CONTACT_SELECT
     });
@@ -45217,7 +45531,7 @@ var contactService = {
    * Delete a contact form
    */
   async delete(id) {
-    return prisma7.contactForm.delete({
+    return prisma8.contactForm.delete({
       where: { id }
     });
   },
@@ -45225,7 +45539,7 @@ var contactService = {
    * Mark a contact form as read
    */
   async markRead(id) {
-    return prisma7.contactForm.update({
+    return prisma8.contactForm.update({
       where: { id },
       data: { readAt: /* @__PURE__ */ new Date() },
       select: { id: true, readAt: true }
@@ -45235,9 +45549,9 @@ var contactService = {
    * Toggle archive status of a contact form
    */
   async toggleArchive(id) {
-    const current = await prisma7.contactForm.findUnique({ where: { id }, select: { archived: true } });
+    const current = await prisma8.contactForm.findUnique({ where: { id }, select: { archived: true } });
     if (!current) throw new NotFoundError("Contact form not found");
-    return prisma7.contactForm.update({
+    return prisma8.contactForm.update({
       where: { id },
       data: { archived: !current.archived },
       select: { id: true, archived: true }
@@ -45247,9 +45561,9 @@ var contactService = {
    * Toggle starred status of a contact form
    */
   async toggleStar(id) {
-    const current = await prisma7.contactForm.findUnique({ where: { id }, select: { starred: true } });
+    const current = await prisma8.contactForm.findUnique({ where: { id }, select: { starred: true } });
     if (!current) throw new NotFoundError("Contact form not found");
-    return prisma7.contactForm.update({
+    return prisma8.contactForm.update({
       where: { id },
       data: { starred: !current.starred },
       select: { id: true, starred: true }
@@ -45259,7 +45573,7 @@ var contactService = {
    * Set labels on a contact form
    */
   async setLabels(id, labels) {
-    return prisma7.contactForm.update({
+    return prisma8.contactForm.update({
       where: { id },
       data: { labels },
       select: { id: true, labels: true }
@@ -45270,10 +45584,10 @@ var contactService = {
    */
   async getStats() {
     const [total, clientCount, recruiterCount, recentCount] = await Promise.all([
-      prisma7.contactForm.count(),
-      prisma7.contactForm.count({ where: { originType: "CLIENT" } }),
-      prisma7.contactForm.count({ where: { originType: "RECRUITER" } }),
-      prisma7.contactForm.count({
+      prisma8.contactForm.count(),
+      prisma8.contactForm.count({ where: { originType: "CLIENT" } }),
+      prisma8.contactForm.count({ where: { originType: "RECRUITER" } }),
+      prisma8.contactForm.count({
         where: {
           createdAt: {
             gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1e3)
@@ -45407,26 +45721,26 @@ var contactController = {
 };
 
 // api/src/routes/contact.routes.ts
-var router8 = (0, import_express8.Router)();
-router8.post("/client", contactController.createClient);
-router8.post("/recruiter", contactController.createRecruiter);
-router8.use(authMiddleware);
-router8.get("/", contactController.findAll);
-router8.get("/stats/summary", contactController.getStats);
-router8.patch("/:id/star", contactController.toggleStar);
-router8.patch("/:id/read", contactController.markRead);
-router8.patch("/:id/archive", contactController.toggleArchive);
-router8.post("/:id/labels", contactController.setLabels);
-router8.get("/:id", contactController.findById);
-router8.delete("/:id", contactController.delete);
-var contact_routes_default = router8;
+var router9 = (0, import_express9.Router)();
+router9.post("/client", contactController.createClient);
+router9.post("/recruiter", contactController.createRecruiter);
+router9.use(authMiddleware);
+router9.get("/", contactController.findAll);
+router9.get("/stats/summary", contactController.getStats);
+router9.patch("/:id/star", contactController.toggleStar);
+router9.patch("/:id/read", contactController.markRead);
+router9.patch("/:id/archive", contactController.toggleArchive);
+router9.post("/:id/labels", contactController.setLabels);
+router9.get("/:id", contactController.findById);
+router9.delete("/:id", contactController.delete);
+var contact_routes_default = router9;
 
 // api/src/routes/blog-post.routes.ts
-var import_express9 = __toESM(require_express2(), 1);
+var import_express10 = __toESM(require_express2(), 1);
 
 // api/src/services/blog-post.service.ts
-var import_client8 = require("@prisma/client");
-var prisma8 = new import_client8.PrismaClient();
+var import_client9 = require("@prisma/client");
+var prisma9 = new import_client9.PrismaClient();
 var BLOG_POST_SELECT = {
   id: true,
   title: true,
@@ -45462,14 +45776,14 @@ var blogPostService = {
       ];
     }
     const [posts, total] = await Promise.all([
-      prisma8.blogPost.findMany({
+      prisma9.blogPost.findMany({
         where,
         select: BLOG_POST_SELECT,
         orderBy: [{ createdAt: "desc" }],
         skip,
         take: limit
       }),
-      prisma8.blogPost.count({ where })
+      prisma9.blogPost.count({ where })
     ]);
     return {
       data: posts,
@@ -45484,19 +45798,19 @@ var blogPostService = {
     };
   },
   async findBySlug(slug) {
-    return prisma8.blogPost.findFirst({
+    return prisma9.blogPost.findFirst({
       where: { slug, deletedAt: null },
       select: BLOG_POST_SELECT
     });
   },
   async findById(id) {
-    return prisma8.blogPost.findUnique({
+    return prisma9.blogPost.findUnique({
       where: { id },
       select: BLOG_POST_SELECT
     });
   },
   async create(data) {
-    return prisma8.blogPost.create({
+    return prisma9.blogPost.create({
       data: {
         title: data.title,
         slug: data.slug,
@@ -45530,21 +45844,21 @@ var blogPostService = {
         updateData.publishedAt = /* @__PURE__ */ new Date();
       }
     }
-    return prisma8.blogPost.update({
+    return prisma9.blogPost.update({
       where: { id },
       data: updateData,
       select: BLOG_POST_SELECT
     });
   },
   async softDelete(id) {
-    return prisma8.blogPost.update({
+    return prisma9.blogPost.update({
       where: { id },
       data: { deletedAt: /* @__PURE__ */ new Date() },
       select: BLOG_POST_SELECT
     });
   },
   async restore(id) {
-    return prisma8.blogPost.update({
+    return prisma9.blogPost.update({
       where: { id },
       data: { deletedAt: null },
       select: BLOG_POST_SELECT
@@ -45555,14 +45869,14 @@ var blogPostService = {
     if (status === "PUBLISHED") {
       updateData.publishedAt = /* @__PURE__ */ new Date();
     }
-    return prisma8.blogPost.update({
+    return prisma9.blogPost.update({
       where: { id },
       data: updateData,
       select: BLOG_POST_SELECT
     });
   },
   async getCategories() {
-    const result = await prisma8.blogPost.findMany({
+    const result = await prisma9.blogPost.findMany({
       where: { deletedAt: null },
       select: { category: true },
       distinct: ["category"],
@@ -45573,7 +45887,7 @@ var blogPostService = {
 };
 
 // api/src/controllers/blog-post.controller.ts
-var getStringParam5 = (param) => {
+var getStringParam6 = (param) => {
   if (Array.isArray(param)) return param[0];
   return param || "";
 };
@@ -45591,7 +45905,7 @@ var blogPostController = {
     res.json(result);
   }),
   findBySlug: asyncHandler(async (req, res) => {
-    const slug = getStringParam5(req.params.slug);
+    const slug = getStringParam6(req.params.slug);
     const post = await blogPostService.findBySlug(slug);
     if (!post) {
       throw new NotFoundError("Blog post not found");
@@ -45599,7 +45913,7 @@ var blogPostController = {
     res.json(post);
   }),
   findById: asyncHandler(async (req, res) => {
-    const id = getStringParam5(req.params.id);
+    const id = getStringParam6(req.params.id);
     const post = await blogPostService.findById(id);
     if (!post) {
       throw new NotFoundError("Blog post not found");
@@ -45612,26 +45926,26 @@ var blogPostController = {
     res.status(201).json(post);
   }),
   update: asyncHandler(async (req, res) => {
-    const id = getStringParam5(req.params.id);
+    const id = getStringParam6(req.params.id);
     const data = blogPostUpdateSchema.parse(req.body);
     await getExistingPost(id);
     const post = await blogPostService.update(id, data);
     res.json(post);
   }),
   delete: asyncHandler(async (req, res) => {
-    const id = getStringParam5(req.params.id);
+    const id = getStringParam6(req.params.id);
     await getExistingPost(id);
     await blogPostService.softDelete(id);
     res.json({ message: "Blog post deleted successfully" });
   }),
   restore: asyncHandler(async (req, res) => {
-    const id = getStringParam5(req.params.id);
+    const id = getStringParam6(req.params.id);
     await getExistingPost(id);
     const post = await blogPostService.restore(id);
     res.json(post);
   }),
   updateStatus: asyncHandler(async (req, res) => {
-    const id = getStringParam5(req.params.id);
+    const id = getStringParam6(req.params.id);
     const { status } = req.body;
     const parsedStatus = postStatusEnum.safeParse(status);
     if (!parsedStatus.success) {
@@ -45652,24 +45966,24 @@ var blogPostController = {
 };
 
 // api/src/routes/blog-post.routes.ts
-var router9 = (0, import_express9.Router)();
-router9.get("/", blogPostController.findAll);
-router9.get("/categories", blogPostController.getCategories);
-router9.get("/:slug", blogPostController.findBySlug);
-router9.get("/by-id/:id", blogPostController.findById);
-router9.post("/", authMiddleware, blogPostController.create);
-router9.put("/:id", authMiddleware, blogPostController.update);
-router9.delete("/:id", authMiddleware, blogPostController.delete);
-router9.patch("/:id/restore", authMiddleware, blogPostController.restore);
-router9.patch("/:id/status", authMiddleware, blogPostController.updateStatus);
-var blog_post_routes_default = router9;
+var router10 = (0, import_express10.Router)();
+router10.get("/", blogPostController.findAll);
+router10.get("/categories", blogPostController.getCategories);
+router10.get("/:slug", blogPostController.findBySlug);
+router10.get("/by-id/:id", blogPostController.findById);
+router10.post("/", authMiddleware, blogPostController.create);
+router10.put("/:id", authMiddleware, blogPostController.update);
+router10.delete("/:id", authMiddleware, blogPostController.delete);
+router10.patch("/:id/restore", authMiddleware, blogPostController.restore);
+router10.patch("/:id/status", authMiddleware, blogPostController.updateStatus);
+var blog_post_routes_default = router10;
 
 // api/src/routes/siteSection.routes.ts
-var import_express10 = __toESM(require_express2(), 1);
+var import_express11 = __toESM(require_express2(), 1);
 
 // api/src/services/siteSection.service.ts
-var import_client9 = require("@prisma/client");
-var prisma9 = new import_client9.PrismaClient();
+var import_client10 = require("@prisma/client");
+var prisma10 = new import_client10.PrismaClient();
 var SITE_SECTION_SELECT = {
   id: true,
   key: true,
@@ -45681,33 +45995,33 @@ var SITE_SECTION_SELECT = {
 };
 var siteSectionService = {
   async findAll() {
-    return prisma9.siteSection.findMany({
+    return prisma10.siteSection.findMany({
       select: SITE_SECTION_SELECT,
       orderBy: [{ order: "asc" }]
     });
   },
   async findById(id) {
-    return prisma9.siteSection.findUnique({
+    return prisma10.siteSection.findUnique({
       where: { id },
       select: SITE_SECTION_SELECT
     });
   },
   async reorder(data) {
-    await prisma9.$transaction(
+    await prisma10.$transaction(
       data.sections.map(
-        (section) => prisma9.siteSection.update({
+        (section) => prisma10.siteSection.update({
           where: { id: section.id },
           data: { order: section.order }
         })
       )
     );
-    return prisma9.siteSection.findMany({
+    return prisma10.siteSection.findMany({
       select: SITE_SECTION_SELECT,
       orderBy: [{ order: "asc" }]
     });
   },
   async update(id, data) {
-    return prisma9.siteSection.update({
+    return prisma10.siteSection.update({
       where: { id },
       data: {
         ...data.visible !== void 0 && { visible: data.visible },
@@ -45719,7 +46033,7 @@ var siteSectionService = {
 };
 
 // api/src/controllers/siteSection.controller.ts
-var getStringParam6 = (param) => {
+var getStringParam7 = (param) => {
   if (Array.isArray(param)) return param[0];
   return param || "";
 };
@@ -45729,7 +46043,7 @@ var siteSectionController = {
     res.json(sections);
   }),
   findById: asyncHandler(async (req, res) => {
-    const id = getStringParam6(req.params.id);
+    const id = getStringParam7(req.params.id);
     const section = await siteSectionService.findById(id);
     if (!section) {
       throw new NotFoundError("Site section not found");
@@ -45742,7 +46056,7 @@ var siteSectionController = {
     res.json(sections);
   }),
   update: asyncHandler(async (req, res) => {
-    const id = getStringParam6(req.params.id);
+    const id = getStringParam7(req.params.id);
     const data = siteSectionUpdateSchema.parse(req.body);
     const existing = await siteSectionService.findById(id);
     if (!existing) {
@@ -45754,12 +46068,12 @@ var siteSectionController = {
 };
 
 // api/src/routes/siteSection.routes.ts
-var router10 = (0, import_express10.Router)();
-router10.get("/", siteSectionController.findAll);
-router10.get("/:id", siteSectionController.findById);
-router10.put("/reorder", authMiddleware, siteSectionController.reorder);
-router10.patch("/:id", authMiddleware, siteSectionController.update);
-var siteSection_routes_default = router10;
+var router11 = (0, import_express11.Router)();
+router11.get("/", siteSectionController.findAll);
+router11.get("/:id", siteSectionController.findById);
+router11.put("/reorder", authMiddleware, siteSectionController.reorder);
+router11.patch("/:id", authMiddleware, siteSectionController.update);
+var siteSection_routes_default = router11;
 
 // api/src/middleware/errorHandler.middleware.ts
 var import_multer2 = __toESM(require_multer(), 1);
@@ -45802,7 +46116,7 @@ function errorHandler(err, _req, res, _next) {
 
 // api/src/app.ts
 import_dotenv.default.config();
-var app = (0, import_express11.default)();
+var app = (0, import_express12.default)();
 app.set("trust proxy", 1);
 if (!process.env.JWT_SECRET && true) {
   throw new Error("JWT_SECRET must be set in production");
@@ -45831,8 +46145,8 @@ var corsOptions = {
   credentials: true
 };
 app.use((0, import_cors.default)(corsOptions));
-app.use(import_express11.default.json({ limit: "10mb" }));
-app.use(import_express11.default.urlencoded({ extended: true }));
+app.use(import_express12.default.json({ limit: "10mb" }));
+app.use(import_express12.default.urlencoded({ extended: true }));
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok", timestamp: (/* @__PURE__ */ new Date()).toISOString() });
 });
@@ -45841,7 +46155,8 @@ app.use("/api/services", service_routes_default);
 app.use("/api/products", product_routes_default);
 app.use("/api/tools", tool_routes_default);
 app.use("/api/success-cases", successCase_routes_default);
-app.use("/api/projects", projects_routes_default);
+app.use("/api/projects", project_routes_default);
+app.use("/api/portfolio/projects", portfolio_routes_default);
 app.use("/api/upload", upload_routes_default);
 app.use("/api/contact", contact_routes_default);
 app.use("/api/blog-posts", blog_post_routes_default);
@@ -45853,12 +46168,12 @@ app.use((_req, res) => {
 var app_default = app;
 
 // api/src/index.ts
-var import_client10 = require("@prisma/client");
-var prisma10 = new import_client10.PrismaClient();
+var import_client11 = require("@prisma/client");
+var prisma11 = new import_client11.PrismaClient();
 var PORT = process.env.PORT || 3e3;
 async function main() {
   try {
-    await prisma10.$connect();
+    await prisma11.$connect();
     console.log("\u2705 Database connected successfully");
     app_default.listen(PORT, () => {
       console.log(`\u{1F680} Server running on http://localhost:${PORT}`);
@@ -45873,12 +46188,12 @@ if (!process.env.VERCEL) {
   main();
 }
 process.on("SIGINT", async () => {
-  await prisma10.$disconnect();
+  await prisma11.$disconnect();
   console.log("Database disconnected");
   process.exit(0);
 });
 process.on("SIGTERM", async () => {
-  await prisma10.$disconnect();
+  await prisma11.$disconnect();
   console.log("Database disconnected");
   process.exit(0);
 });
