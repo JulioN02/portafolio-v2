@@ -44701,6 +44701,9 @@ var projectService = {
     if (data.featured !== void 0) updateData.featured = data.featured;
     if (data.order !== void 0) updateData.order = data.order;
     if (data.status !== void 0) {
+      if (data.status === "ALL") {
+        throw new ValidationError("ALL is not a valid status");
+      }
       updateData.status = data.status;
       if (data.status === "PUBLISHED") {
         updateData.publishedAt = /* @__PURE__ */ new Date();
@@ -44862,6 +44865,7 @@ var import_express7 = __toESM(require_express2(), 1);
 var import_client7 = require("@prisma/client");
 var prisma7 = new import_client7.PrismaClient();
 var PUBLISHED = { status: "PUBLISHED", deletedAt: null };
+var LAB_CATEGORIES = ["laboratorio", "experimento"];
 var toProjectSummary = (item) => ({
   id: item.id,
   type: "project",
@@ -44873,6 +44877,17 @@ var toProjectSummary = (item) => ({
   image: item.images[0] || "",
   images: item.images,
   featured: item.featured,
+  createdAt: item.createdAt
+});
+var toLabSummary = (item) => ({
+  id: item.id,
+  type: "laboratorio",
+  title: item.title,
+  slug: item.slug,
+  classification: item.category,
+  shortDescription: item.shortDescription,
+  image: item.coverImage,
+  images: [item.coverImage, ...item.mediaGallery].filter(Boolean),
   createdAt: item.createdAt
 });
 var portfolioService = {
@@ -45024,6 +45039,28 @@ var portfolioService = {
         })))
       );
     }
+    if (!type || type === "laboratorio") {
+      queries.push(
+        prisma7.blogPost.findMany({
+          where: {
+            ...PUBLISHED,
+            category: { in: LAB_CATEGORIES },
+            ...classification && { category: classification }
+          },
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+            category: true,
+            shortDescription: true,
+            coverImage: true,
+            mediaGallery: true,
+            createdAt: true
+          },
+          orderBy: [{ createdAt: "desc" }]
+        }).then((items) => items.map(toLabSummary))
+      );
+    }
     const results = await Promise.all(queries);
     const allProjects = results.flat().sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
     const total = allProjects.length;
@@ -45072,7 +45109,17 @@ var portfolioService = {
       images: true,
       createdAt: true
     };
-    const [projects, services, products, tools, successCases] = await Promise.all([
+    const labSelect = {
+      id: true,
+      title: true,
+      slug: true,
+      category: true,
+      shortDescription: true,
+      coverImage: true,
+      mediaGallery: true,
+      createdAt: true
+    };
+    const [projects, services, products, tools, successCases, labPosts] = await Promise.all([
       prisma7.project.findMany({ where: PUBLISHED, select: projectSelect, orderBy: [{ createdAt: "desc" }], take: limit }).then((items) => items.map(toProjectSummary)),
       prisma7.service.findMany({ where: PUBLISHED, select: legacySelect, orderBy: [{ createdAt: "desc" }], take: limit }).then((items) => items.map((item) => ({
         id: item.id,
@@ -45119,9 +45166,10 @@ var portfolioService = {
         image: item.images[0] || "",
         images: item.images,
         createdAt: item.createdAt
-      })))
+      }))),
+      prisma7.blogPost.findMany({ where: { ...PUBLISHED, category: { in: LAB_CATEGORIES } }, select: labSelect, orderBy: [{ createdAt: "desc" }], take: limit }).then((items) => items.map(toLabSummary))
     ]);
-    return [...projects, ...services, ...products, ...tools, ...successCases].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()).slice(0, limit);
+    return [...projects, ...services, ...products, ...tools, ...successCases, ...labPosts].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()).slice(0, limit);
   },
   /** Legacy classifications + project tags, deduped and sorted. */
   async getClassifications() {
