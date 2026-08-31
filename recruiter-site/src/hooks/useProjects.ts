@@ -42,12 +42,16 @@ export function useRecentProjects() {
 
 /**
  * Map of project types to their detail API endpoints.
+ * Real Project rows (type 'project') fetch GET /api/projects/:slug.
+ * 'laboratorio' cards navigate to the blog page instead of opening the modal
+ * (handled in ProjectList — no endpoint needed here).
  */
 const detailEndpointMap: Record<string, string> = {
   service: '/services',
   product: '/products',
   tool: '/tools',
   successCase: '/success-cases',
+  project: '/projects',
   SERVICE: '/services',
   PRODUCT: '/products',
   TOOL: '/tools',

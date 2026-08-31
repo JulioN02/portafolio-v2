@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useProjects, useProjectClassifications } from '../../hooks/useProjects';
 import { ProjectCard } from './ProjectCard';
 import type { ProjectSummary } from '../../types';
@@ -13,6 +14,7 @@ const ALL_CLASSIFICATIONS = 'ALL' as const;
 const ITEMS_PER_PAGE = 12;
 
 export function ProjectList({ onSelectProject }: ProjectListProps) {
+  const navigate = useNavigate();
   const [activeClassification, setActiveClassification] = useState<string>(ALL_CLASSIFICATIONS);
   const [page, setPage] = useState(1);
 
@@ -44,6 +46,19 @@ export function ProjectList({ onSelectProject }: ProjectListProps) {
     if (newPage < 1 || newPage > totalPages) return;
     setPage(newPage);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  /**
+   * Lab posts (type 'laboratorio') navigate to the existing blog page —
+   * they are full blog posts, not entity detail rows. All other types open
+   * the detail modal.
+   */
+  const handleCardClick = (project: ProjectSummary) => {
+    if (project.type === 'laboratorio') {
+      navigate(`/blog/${project.slug}`);
+      return;
+    }
+    onSelectProject(project);
   };
 
   // ── Loading state ──
@@ -198,7 +213,7 @@ export function ProjectList({ onSelectProject }: ProjectListProps) {
           <ProjectCard
             key={project.id}
             project={project}
-            onSelect={onSelectProject}
+            onSelect={handleCardClick}
           />
         ))}
       </div>

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import DOMPurify from 'dompurify';
+import { sanitizeHtml } from '@jsoft/shared';
 import { useProjectDetail } from '../../hooks/useProjects';
 import type { ProjectSummary } from '../../types';
 import styles from './ProjectDetailModal.module.css';
@@ -15,6 +16,8 @@ const typeLabels: Record<string, string> = {
   product: 'Producto',
   tool: 'Herramienta',
   successCase: 'Caso de Éxito',
+  project: 'Proyecto',
+  laboratorio: 'Laboratorio',
   SERVICE: 'Servicio',
   PRODUCT: 'Producto',
   TOOL: 'Herramienta',
@@ -61,13 +64,19 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
     ? [project.image, ...(project.images?.slice(1) ?? [])]
     : project.images ?? [];
   const hasMultipleImages = projectImages.length > 1;
+  const isProject = project.type === 'project';
+  const detailRecord = detail as Record<string, unknown> | undefined;
   const hasTechnicalImages =
     detail &&
-    Array.isArray((detail as Record<string, unknown>).technicalImages) &&
-    ((detail as Record<string, unknown>).technicalImages as string[]).length > 0;
+    Array.isArray(detailRecord?.technicalImages) &&
+    (detailRecord?.technicalImages as string[]).length > 0;
   const technicalExplanation = detail
-    ? ((detail as Record<string, unknown>).technicalExplanation as string | undefined)
+    ? (detailRecord?.technicalExplanation as string | undefined)
     : project.technicalExplanation;
+  const projectBody = detail ? (detailRecord?.body as string | undefined) : undefined;
+  const projectRepositoryUrl = detail
+    ? (detailRecord?.repositoryUrl as string | undefined)
+    : undefined;
 
   return (
     <div
@@ -188,8 +197,8 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
           </div>
         )}
 
-        {/* ── Technical explanation (sanitized HTML) ── */}
-        {!isLoading && !isError && technicalExplanation && (
+        {/* ── Technical explanation (sanitized HTML) — legacy entity types only ── */}
+        {!isLoading && !isError && !isProject && technicalExplanation && (
           <div className={styles.technicalSection}>
             <h3 className={styles.sectionTitle}>Detalles Técnicos</h3>
             <div
@@ -202,8 +211,8 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
           </div>
         )}
 
-        {/* ── Technical images gallery ── */}
-        {!isLoading && !isError && hasTechnicalImages && (
+        {/* ── Technical images gallery — legacy entity types only ── */}
+        {!isLoading && !isError && !isProject && hasTechnicalImages && (
           <div className={styles.techImagesSection}>
             <h3 className={styles.sectionTitle}>Imágenes Técnicas</h3>
             <div className={styles.techImagesGrid}>
@@ -221,6 +230,44 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
               ))}
             </div>
           </div>
+        )}
+
+        {/* ── Real Project branch: tags + sanitized body + repository ── */}
+        {!isLoading && !isError && isProject && (
+          <>
+            {project.tags && project.tags.length > 0 && (
+              <div className={styles.tagsSection}>
+                {project.tags.map((tag) => (
+                  <span key={tag} className={styles.tagChip}>
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {projectBody && (
+              <div className={styles.technicalSection}>
+                <h3 className={styles.sectionTitle}>Descripción</h3>
+                <div
+                  className={styles.technicalContent}
+                  dangerouslySetInnerHTML={{
+                    __html: sanitizeHtml(projectBody, { allowMedia: true }),
+                  }}
+                />
+              </div>
+            )}
+
+            {projectRepositoryUrl && (
+              <a
+                href={projectRepositoryUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.repoLink}
+              >
+                Ver repositorio →
+              </a>
+            )}
+          </>
         )}
       </div>
     </div>

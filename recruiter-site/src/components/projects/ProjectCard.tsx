@@ -12,6 +12,8 @@ const typeLabels: Record<string, string> = {
   product: 'Producto',
   tool: 'Herramienta',
   successCase: 'Caso de Éxito',
+  project: 'Proyecto',
+  laboratorio: 'Laboratorio',
   SERVICE: 'Servicio',
   PRODUCT: 'Producto',
   TOOL: 'Herramienta',
