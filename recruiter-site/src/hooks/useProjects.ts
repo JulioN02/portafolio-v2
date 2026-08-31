@@ -23,7 +23,7 @@ export function useProjects(filters?: {
   return useQuery({
     queryKey: ['projects', filters],
     queryFn: () =>
-      apiClient.get<PaginatedResponse<ProjectSummary>>('/projects', {
+      apiClient.get<PaginatedResponse<ProjectSummary>>('/portfolio/projects', {
         params: Object.keys(params).length > 0 ? params : undefined,
       }),
   });
@@ -36,7 +36,7 @@ export function useRecentProjects() {
   return useQuery({
     queryKey: ['projects', 'recent'],
     queryFn: () =>
-      apiClient.get<PaginatedResponse<ProjectSummary>>('/projects/recent'),
+      apiClient.get<PaginatedResponse<ProjectSummary>>('/portfolio/projects/recent'),
   });
 }
 
@@ -78,7 +78,7 @@ export function useProjectDetail(type: string, slug: string) {
 export function useProjectClassifications() {
   return useQuery({
     queryKey: ['projects', 'classifications'],
-    queryFn: () => apiClient.get<string[]>('/projects/classifications'),
+    queryFn: () => apiClient.get<string[]>('/portfolio/projects/classifications'),
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes — classifications rarely change
   });
 }

@@ -131,6 +131,32 @@ model SuccessCase {
 }
 
 // ============================================
+// PROYECTOS (Práctica)
+// ============================================
+model Project {
+  id               String      @id @default(cuid())
+  title            String
+  slug             String      @unique
+  shortDescription String
+  body             String // rich HTML (TipTap)
+  images           String[]
+  repositoryUrl    String?
+  tags             String[] // free-form classification (no type enum)
+  featured         Boolean     @default(false)
+  order            Int         @default(0)
+  status           PostStatus  @default(DRAFT)
+  deletedAt        DateTime?
+  publishedAt      DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, deletedAt])
+  @@index([publishedAt])
+  @@index([featured, deletedAt])
+}
+
+// ============================================
 // SECCIONES DE PÁGINA (Homepage)
 // ============================================
 model SiteSection {
