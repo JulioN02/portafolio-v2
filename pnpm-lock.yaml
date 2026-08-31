@@ -258,6 +258,9 @@ importers:
 
   packages/shared:
     dependencies:
+      dompurify:
+        specifier: ^3.4.14
+        version: 3.4.14
       react-router-dom:
         specifier: ^7.18.3
         version: 7.18.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
@@ -268,12 +271,18 @@ importers:
         specifier: ^3.24.1
         version: 3.25.76
     devDependencies:
+      '@types/dompurify':
+        specifier: ^3.2.0
+        version: 3.2.0
       '@types/react':
         specifier: ^19.0.6
         version: 19.2.14
       '@types/react-dom':
         specifier: ^19.0.2
         version: 19.2.3(@types/react@19.2.14)
+      jsdom:
+        specifier: ^29.1.1
+        version: 29.1.1
       react:
         specifier: ^19.0.0
         version: 19.2.5

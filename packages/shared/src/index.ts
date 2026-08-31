@@ -67,6 +67,10 @@ export type {
   HttpMethod,
 } from './api-client/index.js';
 
+// Utils
+export { sanitizeHtml, SIMULATOR_CONTENT_SRC_REGEX } from './utils/sanitize.js';
+export type { SanitizeOptions } from './utils/sanitize.js';
+
 // UI Components
 export { Button } from './components/index.js';
 export type { ButtonProps, ButtonVariant, ButtonSize } from './components/index.js';
