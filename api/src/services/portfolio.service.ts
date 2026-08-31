@@ -28,6 +28,9 @@ interface PortfolioFilter {
 
 const PUBLISHED = { status: 'PUBLISHED', deletedAt: null } as const;
 
+/** Blog posts rendered as lab projects until P2-06 switches to tags hasSome. */
+const LAB_CATEGORIES: string[] = ['laboratorio', 'experimento'];
+
 const toProjectSummary = (item: {
   id: string;
   title: string;
@@ -49,6 +52,27 @@ const toProjectSummary = (item: {
   image: item.images[0] || '',
   images: item.images,
   featured: item.featured,
+  createdAt: item.createdAt,
+});
+
+const toLabSummary = (item: {
+  id: string;
+  title: string;
+  slug: string;
+  category: string;
+  shortDescription: string;
+  coverImage: string;
+  mediaGallery: string[];
+  createdAt: Date;
+}): PortfolioProjectSummary => ({
+  id: item.id,
+  type: 'laboratorio',
+  title: item.title,
+  slug: item.slug,
+  classification: item.category,
+  shortDescription: item.shortDescription,
+  image: item.coverImage,
+  images: [item.coverImage, ...item.mediaGallery].filter(Boolean),
   createdAt: item.createdAt,
 });
 
@@ -208,7 +232,29 @@ export const portfolioService = {
       );
     }
 
-    // LAB POSTS DEFERRED TO P1b (portfolio.service gains lab inclusion + tags switch in P2-06/P1b)
+    if (!type || type === 'laboratorio') {
+      queries.push(
+        prisma.blogPost.findMany({
+          where: {
+            ...PUBLISHED,
+            category: { in: LAB_CATEGORIES },
+            ...(classification && { category: classification }),
+          },
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+            category: true,
+            shortDescription: true,
+            coverImage: true,
+            mediaGallery: true,
+            createdAt: true,
+          },
+          orderBy: [{ createdAt: 'desc' }],
+        }).then((items) => items.map(toLabSummary)),
+      );
+    }
+
     const results = await Promise.all(queries);
 
     const allProjects: PortfolioProjectSummary[] = results
@@ -247,8 +293,12 @@ export const portfolioService = {
       id: true, title: true, slug: true, description: true,
       images: true, createdAt: true,
     } as const;
+    const labSelect = {
+      id: true, title: true, slug: true, category: true,
+      shortDescription: true, coverImage: true, mediaGallery: true, createdAt: true,
+    } as const;
 
-    const [projects, services, products, tools, successCases] = await Promise.all([
+    const [projects, services, products, tools, successCases, labPosts] = await Promise.all([
       prisma.project.findMany({ where: PUBLISHED, select: projectSelect, orderBy: [{ createdAt: 'desc' }], take: limit })
         .then((items) => items.map(toProjectSummary)),
       prisma.service.findMany({ where: PUBLISHED, select: legacySelect, orderBy: [{ createdAt: 'desc' }], take: limit })
@@ -275,9 +325,11 @@ export const portfolioService = {
           classification: 'success-case', shortDescription: item.description,
           image: item.images[0] || '', images: item.images, createdAt: item.createdAt,
         }))),
+      prisma.blogPost.findMany({ where: { ...PUBLISHED, category: { in: LAB_CATEGORIES } }, select: labSelect, orderBy: [{ createdAt: 'desc' }], take: limit })
+        .then((items) => items.map(toLabSummary)),
     ]);
 
-    return [...projects, ...services, ...products, ...tools, ...successCases]
+    return [...projects, ...services, ...products, ...tools, ...successCases, ...labPosts]
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
       .slice(0, limit);
   },

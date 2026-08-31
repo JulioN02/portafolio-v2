@@ -10,6 +10,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'nav.blog': 'Blog',
     'nav.successCases': 'Casos de Éxito',
     'nav.contact': 'Contacto',
+    'nav.projects': 'Proyectos',
     'nav.toggleMenu': 'Toggle menu',
     'nav.toggleLang': 'Cambiar idioma',
 
@@ -177,6 +178,35 @@ export const translations: Record<Language, Record<string, string>> = {
     'successCaseDetail.videos': 'Videos',
     'successCaseDetail.videoNotSupported': 'Tu navegador no soporta la reproducción de video.',
 
+    // =========== PROJECTS ===========
+    'projects.meta.title': 'Proyectos | J Soft Solutions',
+    'projects.meta.description': 'Proyectos de práctica y experimentación: aplicaciones web, APIs y herramientas de desarrollo.',
+    'projects.pageHeader.title': 'Proyectos',
+    'projects.pageHeader.subtitle': 'Proyectos de práctica, experimentos y soluciones que he construido',
+    'projects.filter.ariaLabel': 'Filtrar proyectos por etiqueta',
+    'projects.filter.allTags': 'Todas las etiquetas',
+    'projects.filter.clear': 'Ver todos los proyectos',
+    'projects.loading': 'Cargando proyectos...',
+    'projects.error': 'Error al cargar los proyectos. Por favor, intenta de nuevo.',
+    'projects.empty': 'No se encontraron proyectos.',
+    'projects.pagination.aria': 'Paginación',
+    'projects.pagination.previous': '← Anterior',
+    'projects.pagination.next': 'Siguiente →',
+    'projects.pagination.info': 'Página {page} de {total}',
+
+    // =========== PROJECT DETAIL ===========
+    'projectDetail.loading': 'Cargando proyecto...',
+    'projectDetail.notFound.title': 'Proyecto no encontrado',
+    'projectDetail.notFound.message': 'El proyecto que buscas no existe o ha sido eliminado.',
+    'projectDetail.backToProjects': '← Volver a proyectos',
+    'projectDetail.breadcrumb.projects': 'Proyectos',
+    'projectDetail.imageAlt': '{title} - Imagen {number}',
+    'projectDetail.prevImage': 'Imagen anterior',
+    'projectDetail.nextImage': 'Siguiente imagen',
+    'projectDetail.goToImage': 'Ir a imagen {number}',
+    'projectDetail.repository': 'Ver repositorio',
+    'projectDetail.body': 'Descripción del proyecto',
+
     // =========== BLOG ===========
     'blog.meta.title': 'Blog | J Soft Solutions',
     'blog.meta.description': 'Artículos sobre desarrollo web, tecnología y tendencias del sector.',
@@ -239,6 +269,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'nav.blog': 'Blog',
     'nav.successCases': 'Success Cases',
     'nav.contact': 'Contact',
+    'nav.projects': 'Projects',
     'nav.toggleMenu': 'Toggle menu',
     'nav.toggleLang': 'Switch language',
 
@@ -405,6 +436,35 @@ export const translations: Record<Language, Record<string, string>> = {
     'successCaseDetail.relatedLinks': 'Related links',
     'successCaseDetail.videos': 'Videos',
     'successCaseDetail.videoNotSupported': 'Your browser does not support video playback.',
+
+    // =========== PROJECTS ===========
+    'projects.meta.title': 'Projects | J Soft Solutions',
+    'projects.meta.description': 'Practice and experimentation projects: web apps, APIs, and development tools.',
+    'projects.pageHeader.title': 'Projects',
+    'projects.pageHeader.subtitle': 'Practice projects, experiments, and solutions I have built',
+    'projects.filter.ariaLabel': 'Filter projects by tag',
+    'projects.filter.allTags': 'All tags',
+    'projects.filter.clear': 'View all projects',
+    'projects.loading': 'Loading projects...',
+    'projects.error': 'Error loading projects. Please try again.',
+    'projects.empty': 'No projects found.',
+    'projects.pagination.aria': 'Pagination',
+    'projects.pagination.previous': '← Previous',
+    'projects.pagination.next': 'Next →',
+    'projects.pagination.info': 'Page {page} of {total}',
+
+    // =========== PROJECT DETAIL ===========
+    'projectDetail.loading': 'Loading project...',
+    'projectDetail.notFound.title': 'Project not found',
+    'projectDetail.notFound.message': 'The project you are looking for does not exist or has been removed.',
+    'projectDetail.backToProjects': '← Back to projects',
+    'projectDetail.breadcrumb.projects': 'Projects',
+    'projectDetail.imageAlt': '{title} - Image {number}',
+    'projectDetail.prevImage': 'Previous image',
+    'projectDetail.nextImage': 'Next image',
+    'projectDetail.goToImage': 'Go to image {number}',
+    'projectDetail.repository': 'View repository',
+    'projectDetail.body': 'Project description',
 
     // =========== BLOG ===========
     'blog.meta.title': 'Blog | J Soft Solutions',

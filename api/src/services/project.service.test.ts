@@ -212,6 +212,14 @@ describe('Project Service', () => {
         })
       );
     });
+
+    it('rejects the reserved "ALL" status with a ValidationError (400) instead of hitting Prisma', async () => {
+      await expect(projectService.update('1', { status: 'ALL' as PostStatus })).rejects.toMatchObject({
+        statusCode: 400,
+        code: 'VALIDATION_ERROR',
+      });
+      expect(mockPrisma.project.update).not.toHaveBeenCalled();
+    });
   });
 
   describe('softDelete / restore', () => {

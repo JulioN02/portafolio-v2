@@ -30,7 +30,7 @@ describe('Portfolio routes (integration)', () => {
     jest.clearAllMocks();
   });
 
-  it('GET / returns the merged paginated portfolio (lab posts deferred to P1b)', async () => {
+  it('GET / returns the merged paginated portfolio including lab blog posts as type "laboratorio"', async () => {
     (mockPrisma.project.findMany as jest.Mock).mockResolvedValue([
       { id: 'p1', title: 'Proyecto', slug: 'proyecto', tags: ['x'], shortDescription: 'D', images: [], featured: false, order: 0, createdAt: new Date('2024-01-02') },
     ]);
@@ -38,15 +38,27 @@ describe('Portfolio routes (integration)', () => {
     (mockPrisma.product.findMany as jest.Mock).mockResolvedValue([]);
     (mockPrisma.tool.findMany as jest.Mock).mockResolvedValue([]);
     (mockPrisma.successCase.findMany as jest.Mock).mockResolvedValue([]);
+    (mockPrisma.blogPost.findMany as jest.Mock).mockResolvedValue([
+      { id: 'b1', title: 'Laboratorio', slug: 'lab-1', category: 'laboratorio', shortDescription: 'D', coverImage: 'c.jpg', mediaGallery: [], createdAt: new Date('2024-01-03') },
+    ]);
 
     const res = await fetch(`${baseUrl}`);
     expect(res.status).toBe(200);
 
     const body = await res.json();
-    expect(body.data).toHaveLength(1);
-    expect(body.data[0].type).toBe('project');
-    expect(body.pagination.total).toBe(1);
-    expect(mockPrisma.blogPost.findMany).not.toHaveBeenCalled(); // lab posts deferred to P1b
+    expect(body.data).toHaveLength(2);
+    expect(body.data[0].type).toBe('laboratorio'); // newest first
+    expect(body.data[1].type).toBe('project');
+    expect(body.pagination.total).toBe(2);
+    expect(mockPrisma.blogPost.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          status: 'PUBLISHED',
+          deletedAt: null,
+          category: { in: ['laboratorio', 'experimento'] },
+        }),
+      })
+    );
   });
 
   it('GET /recent returns the top N merged rows', async () => {
@@ -59,6 +71,7 @@ describe('Portfolio routes (integration)', () => {
     (mockPrisma.product.findMany as jest.Mock).mockResolvedValue([]);
     (mockPrisma.tool.findMany as jest.Mock).mockResolvedValue([]);
     (mockPrisma.successCase.findMany as jest.Mock).mockResolvedValue([]);
+    (mockPrisma.blogPost.findMany as jest.Mock).mockResolvedValue([]);
 
     const res = await fetch(`${baseUrl}/recent?limit=2`);
     expect(res.status).toBe(200);
@@ -73,6 +86,7 @@ describe('Portfolio routes (integration)', () => {
     (mockPrisma.product.findMany as jest.Mock).mockResolvedValue([]);
     (mockPrisma.tool.findMany as jest.Mock).mockResolvedValue([]);
     (mockPrisma.project.findMany as jest.Mock).mockResolvedValue([{ tags: ['proyecto-rapido'] }]);
+    (mockPrisma.blogPost.findMany as jest.Mock).mockResolvedValue([]);
 
     const res = await fetch(`${baseUrl}/classifications`);
     expect(res.status).toBe(200);

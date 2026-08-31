@@ -1,5 +1,6 @@
 import { PrismaClient, PostStatus } from '@prisma/client';
 import { ProjectInput, ProjectUpdateInput, ProjectFilterInput } from '@jsoft/shared';
+import { ValidationError } from '../utils/errors.js';
 
 const prisma = new PrismaClient();
 
@@ -114,6 +115,11 @@ export const projectService = {
     if (data.featured !== undefined) updateData.featured = data.featured;
     if (data.order !== undefined) updateData.order = data.order;
     if (data.status !== undefined) {
+      if (data.status === 'ALL') {
+        // Reserved filter sentinel — never a real status. Mirror the create()
+        // guard so a malformed admin request returns 400, not a Prisma 500.
+        throw new ValidationError('ALL is not a valid status');
+      }
       updateData.status = data.status;
       if (data.status === 'PUBLISHED') {
         updateData.publishedAt = new Date();
