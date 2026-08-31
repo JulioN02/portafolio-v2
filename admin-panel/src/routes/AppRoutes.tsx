@@ -21,6 +21,9 @@ import { ProductsListPage } from '../pages/products/ProductsList';
 // Tools
 import { ToolsListPage } from '../pages/tools/ToolsList';
 
+// Projects
+import { ProjectsListPage } from '../pages/projects/ProjectsListPage';
+
 // SuccessCases
 import { SuccessCasesList as SuccessCasesListPage } from '../pages/success-cases/SuccessCasesList';
 
@@ -46,6 +49,8 @@ const ProductCreatePage = lazy(() => import('../pages/products/ProductCreate').t
 const ProductEditPage = lazy(() => import('../pages/products/ProductEdit').then(m => ({ default: m.ProductEditPage })));
 const ToolCreatePage = lazy(() => import('../pages/tools/ToolCreate').then(m => ({ default: m.ToolCreatePage })));
 const ToolEditPage = lazy(() => import('../pages/tools/ToolEdit').then(m => ({ default: m.ToolEditPage })));
+const ProjectCreatePage = lazy(() => import('../pages/projects/ProjectCreatePage').then(m => ({ default: m.ProjectCreatePage })));
+const ProjectEditPage = lazy(() => import('../pages/projects/ProjectEditPage').then(m => ({ default: m.ProjectEditPage })));
 const SuccessCaseCreatePage = lazy(() => import('../pages/success-cases/SuccessCaseCreate').then(m => ({ default: m.SuccessCaseCreate })));
 const SuccessCaseEditPage = lazy(() => import('../pages/success-cases/SuccessCaseEdit').then(m => ({ default: m.SuccessCaseEdit })));
 
@@ -201,6 +206,41 @@ function AppRoutes() {
             <ProtectedLayout>
               <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>Cargando...</div>}>
                 <ToolEditPage />
+              </Suspense>
+            </ProtectedLayout>
+          </ErrorBoundary>
+        }
+      />
+
+      <Route
+        path="/projects"
+        element={
+          <ErrorBoundary>
+            <ProtectedLayout>
+              <ProjectsListPage />
+            </ProtectedLayout>
+          </ErrorBoundary>
+        }
+      />
+      <Route
+        path="/projects/create"
+        element={
+          <ErrorBoundary>
+            <ProtectedLayout>
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>Cargando...</div>}>
+                <ProjectCreatePage />
+              </Suspense>
+            </ProtectedLayout>
+          </ErrorBoundary>
+        }
+      />
+      <Route
+        path="/projects/edit/:id"
+        element={
+          <ErrorBoundary>
+            <ProtectedLayout>
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>Cargando...</div>}>
+                <ProjectEditPage />
               </Suspense>
             </ProtectedLayout>
           </ErrorBoundary>
