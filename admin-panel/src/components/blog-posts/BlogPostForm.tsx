@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
-import { Select, Button } from '@jsoft/shared';
+import { Select, Button, RichTextEditor } from '@jsoft/shared';
 import type { BlogPostInput, PostStatus } from '@jsoft/shared';
-import { TipTapEditor } from './TipTapEditor';
 import { getTextFromHTML } from '../../utils/getTextFromHTML';
 import { ImageUploader } from '../uploads/ImageUploader';
 import { TagInput } from '../shared/TagInput';
@@ -15,7 +14,7 @@ interface BlogPostFormProps {
 }
 
 export function BlogPostForm({ initialData, onSubmit, isLoading }: BlogPostFormProps) {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const [title, setTitle] = useState(initialData?.title || '');
   const [slug, setSlug] = useState(initialData?.slug || '');
   const [shortDescription, setShortDescription] = useState(initialData?.shortDescription || '');
@@ -158,7 +157,7 @@ export function BlogPostForm({ initialData, onSubmit, isLoading }: BlogPostFormP
         {/* Rich Text Editor */}
         <div className={formStyles.formGroup}>
           <label className={formStyles.formLabel}>{t('blog.bodyContent')}</label>
-          <TipTapEditor content={body} onChange={setBody} />
+          <RichTextEditor value={body} onChange={setBody} minHeight={400} lang={lang} />
           {errors.body && <span className={formStyles.formError}>{errors.body}</span>}
         </div>
       </fieldset>
