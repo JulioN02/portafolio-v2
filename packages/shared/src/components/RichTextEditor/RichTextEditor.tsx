@@ -1,6 +1,7 @@
 import { useEditor, EditorContent } from '@tiptap/react';
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { buildEditorExtensions } from './extensions';
+import { SimulatorPicker, type SimulatorPickerApi, type SimulatorPickerLabels } from './SimulatorPicker';
 
 /** User-facing labels for the toolbar and insert dialogs (es/en). */
 export interface RichTextEditorLabels {
@@ -29,6 +30,7 @@ export interface RichTextEditorLabels {
   imageUrlPrompt: string;
   videoUrlPrompt: string;
   simulatorIdPrompt: string;
+  simulatorPicker: SimulatorPickerLabels;
 }
 
 const ES_LABELS: RichTextEditorLabels = {
@@ -57,6 +59,21 @@ const ES_LABELS: RichTextEditorLabels = {
   imageUrlPrompt: 'URL de la imagen:',
   videoUrlPrompt: 'URL del video:',
   simulatorIdPrompt: 'ID del simulador:',
+  simulatorPicker: {
+    title: 'Insertar simulador',
+    listTitle: 'Simuladores existentes',
+    empty: 'Aún no hay simuladores. Sube uno abajo.',
+    loading: 'Cargando simuladores...',
+    error: 'No se pudieron cargar los simuladores. Intenta de nuevo.',
+    uploadTitle: 'Subir nuevo simulador',
+    titleLabel: 'Título',
+    titlePlaceholder: 'Nombre del simulador',
+    fileLabel: 'Archivo HTML (.html, máx. 1MB)',
+    invalidFile: 'El archivo debe ser .html y pesar menos de 1MB.',
+    insert: 'Insertar',
+    upload: 'Subir e insertar',
+    uploading: 'Subiendo...',
+  },
 };
 
 const EN_LABELS: RichTextEditorLabels = {
@@ -85,6 +102,21 @@ const EN_LABELS: RichTextEditorLabels = {
   imageUrlPrompt: 'Image URL:',
   videoUrlPrompt: 'Video URL:',
   simulatorIdPrompt: 'Simulator ID:',
+  simulatorPicker: {
+    title: 'Insert Simulator',
+    listTitle: 'Existing simulators',
+    empty: 'No simulators yet. Upload one below.',
+    loading: 'Loading simulators...',
+    error: 'Could not load simulators. Try again.',
+    uploadTitle: 'Upload new simulator',
+    titleLabel: 'Title',
+    titlePlaceholder: 'Simulator name',
+    fileLabel: 'HTML file (.html, max 1MB)',
+    invalidFile: 'The file must be .html and under 1MB.',
+    insert: 'Insert',
+    upload: 'Upload and insert',
+    uploading: 'Uploading...',
+  },
 };
 
 export interface RichTextEditorProps {
@@ -98,6 +130,11 @@ export interface RichTextEditorProps {
   lang?: 'es' | 'en';
   /** Partial label overrides (highest priority). */
   labels?: Partial<RichTextEditorLabels>;
+  /**
+   * Optional simulator data source. When provided, "Insertar simulador" opens
+   * the picker (list + upload); otherwise it falls back to a manual ID prompt.
+   */
+  simulatorApi?: SimulatorPickerApi;
 }
 
 export function RichTextEditor({
@@ -106,11 +143,13 @@ export function RichTextEditor({
   minHeight = 400,
   lang = 'es',
   labels: labelOverrides,
+  simulatorApi,
 }: RichTextEditorProps) {
   const labels: RichTextEditorLabels = {
     ...(lang === 'en' ? EN_LABELS : ES_LABELS),
     ...labelOverrides,
   };
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   const editor = useEditor({
     extensions: buildEditorExtensions(),
@@ -192,7 +231,12 @@ export function RichTextEditor({
   };
 
   const handleInsertSimulator = () => {
-    // Phase 4 binds the placeholder to the simulator embed service.
+    // Phase 4: with a simulator data source, open the picker (list + upload);
+    // without one, fall back to a manual ID prompt (previous behavior).
+    if (simulatorApi) {
+      setPickerOpen(true);
+      return;
+    }
     const id = window.prompt(labels.simulatorIdPrompt);
     editor
       .chain()
@@ -362,6 +406,23 @@ export function RichTextEditor({
       <div className="rte-editor-shell">
         <EditorContent editor={editor} />
       </div>
+
+      {/* ── Simulator picker (Phase 4) ── */}
+      {simulatorApi && (
+        <SimulatorPicker
+          isOpen={pickerOpen}
+          onClose={() => setPickerOpen(false)}
+          api={simulatorApi}
+          labels={labels.simulatorPicker}
+          onSelect={(simulatorId) => {
+            editor
+              .chain()
+              .focus()
+              .insertContent({ type: 'simulatorPlaceholder', attrs: { simulatorId } })
+              .run();
+          }}
+        />
+      )}
     </div>
   );
 }

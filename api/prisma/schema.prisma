@@ -157,6 +157,26 @@ model Project {
 }
 
 // ============================================
+// SIMULADORES (HTML/CSS/JS sandboxed embeds)
+// ============================================
+model Simulator {
+  id         String   @id @default(cuid())
+  title      String
+  slug       String   @unique
+  fileName   String // object key inside the private 'simulators' bucket
+  size       Int // bytes (enforced ≤ 1MB at upload AND serve time)
+  mimeType   String   @default("text/html")
+  width      Int? // display width px (dimension limit override)
+  height     Int? // display height px (dimension limit override)
+  uploadedAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  deletedAt  DateTime?
+
+  @@index([deletedAt])
+}
+
+// ============================================
 // SECCIONES DE PÁGINA (Homepage)
 // ============================================
 model SiteSection {

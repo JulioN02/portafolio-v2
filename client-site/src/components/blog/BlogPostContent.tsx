@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react';
-import { sanitizeHtml } from '@jsoft/shared';
+import { renderSimulatorEmbeds } from '@jsoft/shared';
 import type { BlogPostResponse } from '@jsoft/shared';
 import styles from './BlogPostContent.module.css';
 
@@ -12,7 +12,7 @@ export function BlogPostContent({ post }: BlogPostContentProps) {
 
   useEffect(() => {
     if (bodyRef.current && post.body) {
-      bodyRef.current.innerHTML = sanitizeHtml(post.body, { allowMedia: true });
+      bodyRef.current.innerHTML = renderSimulatorEmbeds(post.body);
     }
   }, [post.body]);
 
@@ -71,7 +71,7 @@ export function BlogPostContent({ post }: BlogPostContentProps) {
           <h2 className={styles.lessonsTitle}>Lecciones aprendidas</h2>
           <div
             className={styles.lessonsContent}
-            dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.lessonsLearned, { allowMedia: true }) }}
+            dangerouslySetInnerHTML={{ __html: renderSimulatorEmbeds(post.lessonsLearned) }}
           />
         </section>
       )}

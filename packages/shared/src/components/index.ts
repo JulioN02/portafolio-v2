@@ -43,3 +43,22 @@ export { withBoundary } from './ui/ErrorBoundary/index.js';
 // Rich Text Editor
 export { RichTextEditor } from './RichTextEditor/index.js';
 export type { RichTextEditorProps, RichTextEditorLabels } from './RichTextEditor/index.js';
+export { SimulatorPicker, SIMULATOR_PICKER_MAX_SIZE } from './RichTextEditor/index.js';
+export type {
+  SimulatorPickerApi,
+  SimulatorOption,
+  SimulatorPickerLabels,
+} from './RichTextEditor/index.js';
+export {
+  SimulatorNode,
+  SimulatorSection,
+  renderSimulatorEmbeds,
+  buildSimulatorSrc,
+  SIMULATOR_DEFAULT_WIDTH,
+  SIMULATOR_DEFAULT_HEIGHT,
+} from './RichTextEditor/index.js';
+export type {
+  SimulatorNodeProps,
+  SimulatorSectionProps,
+  RenderSimulatorEmbedsOptions,
+} from './RichTextEditor/index.js';

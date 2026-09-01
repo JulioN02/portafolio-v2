@@ -5,6 +5,7 @@ import type { BlogPostInput, PostStatus } from '@jsoft/shared';
 import { getTextFromHTML } from '../../utils/getTextFromHTML';
 import { ImageUploader } from '../uploads/ImageUploader';
 import { TagInput } from '../shared/TagInput';
+import { simulatorPickerApi } from '../../api/simulators.api';
 import formStyles from '../../styles/form.module.css';
 
 interface BlogPostFormProps {
@@ -157,7 +158,7 @@ export function BlogPostForm({ initialData, onSubmit, isLoading }: BlogPostFormP
         {/* Rich Text Editor */}
         <div className={formStyles.formGroup}>
           <label className={formStyles.formLabel}>{t('blog.bodyContent')}</label>
-          <RichTextEditor value={body} onChange={setBody} minHeight={400} lang={lang} />
+          <RichTextEditor value={body} onChange={setBody} minHeight={400} lang={lang} simulatorApi={simulatorPickerApi} />
           {errors.body && <span className={formStyles.formError}>{errors.body}</span>}
         </div>
       </fieldset>

@@ -14,6 +14,7 @@ import uploadRoutes from './routes/upload.routes.js';
 import contactRoutes from './routes/contact.routes.js';
 import blogPostRoutes from './routes/blog-post.routes.js';
 import siteSectionRoutes from './routes/siteSection.routes.js';
+import simulatorRoutes from './routes/simulator.routes.js';
 import { errorHandler } from './middleware/errorHandler.middleware.js';
 import { apiLimiter } from './middleware/rateLimit.middleware.js';
 
@@ -85,6 +86,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/blog-posts', blogPostRoutes);
 app.use('/api/site-sections', siteSectionRoutes);
+app.use('/api/simulators', simulatorRoutes);
 
 // Centralized error handler (must be registered after all routes)
 app.use(errorHandler);

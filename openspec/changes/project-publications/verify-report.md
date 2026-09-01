@@ -1,17 +1,38 @@
-# Verification Report — project-publications (Phase 3)
+# Verification Report — project-publications (Phase 4: Simulators)
 
 **Change**: project-publications
-**Phase**: 3 (shared rich text editor + sanitization adoption) — tasks P3-01..P3-08
+**Phase**: 4 (Simulators) — tasks P4-01..P4-10
 **Mode**: Strict TDD (api) — runner `pnpm --filter api test`, coverage ≥70%, typecheck gate `pnpm -r run typecheck`
-**Branch**: feat/project-publications-p3 (implementation done, NOT committed)
-**Gate**: fresh-review before P3 PR creation
-**Date**: 2026-08-31
+**Branch**: feat/project-publications-p4 (implementation done, NOT committed)
+**Gate**: fresh-review before P4 PR creation (SECURITY-SENSITIVE phase — sandbox/CSP invariants)
+**Date**: 2026-09-01
 
 ---
 
-## Verdict: ✅ GO (PASS WITH WARNINGS)
+## Verdict: ✅ GO (PASS)
 
-Phase 3 is complete and behaviorally compliant with the P3 delta specs (rich-text-editor, sanitization) and the Phase 3 design file-changes table. Every phase gate passes on real execution: typecheck 0 errors (5 packages), api 240/240 tests, coverage ≥70% on all four metrics, all four Vitest suites green (shared 91, admin 13, client 17, recruiter 15), and `@jsoft/shared` tsup build succeeds with RTE styles bundled in dist/index.css and @tiptap externalized in ESM. No CRITICAL issues. One WARNING (apply-progress lacks the formal TDD Cycle Evidence table format — mitigated: Phase 3 contains zero strict-TDD-scoped api tasks, and every new test file exists and passes) and four SUGGESTIONs. Safe to create the P3 PR.
+Phase 4 is complete and behaviorally compliant with the P4 delta specs (`simulator-embeds`, `sanitization`, `rich-text-editor`) and the design file-changes table. Every security invariant verified rigorously on real execution: private bucket confirmed via Supabase Storage API (`public: false`), iframe `sandbox="allow-scripts"` without `allow-same-origin` asserted in rendered DOM, CSP `sandbox allow-scripts; default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors <CORS_ORIGIN>` + `nosniff` + `no-store` + `X-Frame-Options` removal verified at HTTP level with helmet mounted, serve-time 1MB guard, post-sanitize hardening that FORCES `sandbox="allow-scripts"` on every surviving iframe. All phase gates pass on real execution: typecheck 0 errors (5 packages), api 264/264 (21 suites), coverage ≥70% on all four metrics (Stmts 85.21 / Branch 72.09 / Funcs 91.5 / Lines 91.55), all four Vitest suites green (shared 106, admin 13, client 18, recruiter 15), `@jsoft/shared` tsup build succeeds. No CRITICAL, no WARNING. 3 SUGGESTIONs. Safe to create the P4 PR.
+
+---
+
+## Security-Invariant Checklist (verified by real execution)
+
+| # | Invariant | Status | Evidence |
+|---|-----------|--------|----------|
+| S1 | `simulators` bucket is PRIVATE (`public: false`) | ✅ PASS | `GET …/storage/v1/bucket` → `simulators \| public=False`; `GET …/storage/v1/bucket/simulators` → `{"public": false}` (service key auth from api/.env) |
+| S2 | iframe `sandbox="allow-scripts"` WITHOUT `allow-same-origin` | ✅ PASS | `SimulatorNode` renders `sandbox="allow-scripts"`; Vitest asserts `getAttribute('sandbox') === 'allow-scripts'` and `not.toContain('allow-same-origin')` (SimulatorNode.test.tsx L22-23, SimulatorSection test L69-70, client BlogPostContent.test.tsx L65-66) |
+| S3 | iframe src ALWAYS `/api/simulators/:id/content` (never inline raw HTML, never DOMPurify) | ✅ PASS | `buildSimulatorSrc` validates id against `^/api/simulators/[A-Za-z0-9]+/content$` and returns null for unsafe ids (tests: `../../etc/passwd`, `a/b`, `https://evil.com` rejected). Raw HTML is served only by the API endpoint |
+| S4 | Serving endpoint CSP: `sandbox allow-scripts; default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors <CORS_ORIGIN>` | ✅ PASS | HTTP-level integration test (express + helmet, real fetch): csp contains `sandbox allow-scripts`, `default-src 'none'`, `base-uri 'none'`, `form-action 'none'`, `frame-ancestors http://localhost:5173 http://localhost:4173`; and derives from `CORS_ORIGIN` (2nd test with custom origins) |
+| S5 | `X-Content-Type-Options: nosniff` + `Cache-Control: no-store` on `/content` | ✅ PASS | Integration test asserts `x-content-type-options === 'nosniff'` and `cache-control === 'no-store'` (simulator.routes.test.ts L110-111) |
+| S6 | `X-Frame-Options` REMOVED on `/content` (cross-origin embeds allowed, governed by frame-ancestors) | ✅ PASS | Integration test asserts `res.headers.get('x-frame-options') === null` with helmet mounted (L114); controller `res.removeHeader('X-Frame-Options')` |
+| S7 | Upload: ≤1MB, `.html`/`text/html` only, JWT, bucket forced server-side | ✅ PASS | multer `limits.fileSize = 1MB` + `.html` fileFilter; service validates ext+mimetype+size; bucket constant `'simulators'` never client-chosen; integration tests: >1MB → 400 `UPLOAD_ERROR`, no JWT → 401 |
+| S8 | Serve-time size re-check (≤1MB at download) | ✅ PASS | `simulatorService.download` re-checks `record.size > SIMULATOR_MAX_SIZE` → 400 VALIDATION_ERROR; test asserts `downloadFile` NOT called (simulator.service.test.ts L187-198) |
+| S9 | 404 / soft-delete handling (deletedAt never served) | ✅ PASS | `download`/`getMetadata`/`list` all filter `deletedAt: null`; unknown id → 404 (route test); soft-delete sets deletedAt (service test) |
+| S10 | Post-sanitize transform drops unsafe ids + FORCES sandbox on every surviving iframe (defense-in-depth hardening) | ✅ PASS | `renderSimulatorEmbeds`: unsafe id → div removed; every surviving iframe gets `sandbox="allow-scripts"` overwriting any author `allow-same-origin` — Vitest `strips allow-same-origin from hand-written simulator iframes (strict invariant)` |
+| S11 | Sanitize allowlist keeps `data-simulator-id`; iframe restricted to simulator endpoint | ✅ PASS | sanitize.test.ts L75-80 (`data-simulator-id` kept), L53-67 (simulator iframe preserved, other origins stripped); `SIMULATOR_CONTENT_SRC_REGEX` export tests |
+| S12 | No `dangerouslySetInnerHTML` in admin-panel; scripts stripped everywhere | ✅ PASS | grep → 0 matches in admin-panel; shared sanitize tests assert `<script>` stripped with and without allowMedia |
+
+**Security-invariant summary**: 12/12 PASS
 
 ---
 
@@ -19,180 +40,151 @@ Phase 3 is complete and behaviorally compliant with the P3 delta specs (rich-tex
 
 | Metric | Value |
 |--------|-------|
-| Tasks in scope (P3-01..P3-08) | 8 |
-| Tasks implemented | 8 |
-| Tasks marked `[x]` in tasks.md | 8 |
+| Tasks in scope (P4-01..P4-10) | 10 |
+| Tasks implemented | 10 |
+| Tasks marked `[x]` in tasks.md | 10 |
 | Tasks incomplete | 0 |
 
-All P3 tasks are marked `[x]` and verified implemented (see checklist below). Phase 4 tasks (P4-01..P4-10) remain unchecked — out of scope for this PR.
+All P4 tasks are marked `[x]` and verified implemented (see checklist below).
 
 ---
 
-## Gate Results (Real Execution)
+## Checklist P4-01..P4-10
 
-**Typecheck**: ✅ 0 errors — `pnpm -r run typecheck` (5 packages: shared, api, admin-panel, client-site, recruiter-site) all "Done" (6th workspace project is the root `portafolio-jsoft`, which has no typecheck script).
-
-**API tests**: ✅ 240 passed / 240 total (19 suites), exit 0 — `pnpm --filter api test`.
-
-**Coverage**: ✅ `pnpm --filter @jsoft/api exec jest --coverage` — Stmts 84.00 / Branch 71.45 / Funcs 90.97 / Lines 90.94 — all ≥ 70% threshold. (API files unchanged in P3; coverage reported for continuity.)
-
-**Vitest suites** (all green):
-
-| Package | Files | Tests | Result |
-|---------|-------|-------|--------|
-| `@jsoft/shared` | 6 | 91 | ✅ 91/91 passed |
-| `@jsoft/admin-panel` | 4 | 13 | ✅ 13/13 passed |
-| `@jsoft/client-site` | 6 | 17 | ✅ 17/17 passed |
-| `@jsoft/recruiter-site` | 5 | 15 | ✅ 15/15 passed |
-
-**Shared build**: ✅ `pnpm --filter @jsoft/shared run build` — CJS + ESM + DTS all "Build success". `dist/index.css` (22.39 KB) contains the RTE styles (`.rte-toolbar` present). `dist/index.mjs` imports `@tiptap/react`, `@tiptap/starter-kit`, etc. as external ESM imports (tsup auto-externalization confirmed — matches the pnpm strict-resolution design).
-
----
-
-## Checklist P3-01..P3-08
-
-| Task | Result | Evidence |
+| Task | Status | Evidence |
 |------|--------|----------|
-| **P3-01** shared package.json: add @tiptap/* + react deps | ✅ PASS | `packages/shared/package.json` adds 6 `@tiptap/*` deps `^2.27.2` in `dependencies` AND `peerDependencies`; `@testing-library/{react,jest-dom,user-event}` added to devDeps. |
-| **P3-02** Shared `RichTextEditor.tsx` `{value,onChange,minHeight}` | ✅ PASS | `RichTextEditor.tsx` props `{value, onChange, minHeight=400, lang='es', labels?}`; `useEditor({ content: value, onUpdate: onChange(ed.getHTML()) })` — init from HTML + emits HTML; extensions via `buildEditorExtensions()` (StarterKit headings 1–4, Underline, Link, TextAlign, Highlight + 3 custom nodes); toolbar with formatting/headings/alignment/lists/block/links/media groups extracted from admin TipTapEditor (all old commands present — verified via `git show HEAD:...TipTapEditor.tsx` command inventory — plus new Insert buttons). Tests: `RichTextEditor.test.tsx` (4) prove init-from-HTML, HTML emission, toolbar a11y labels, minHeight. |
-| **P3-03** `InlineImage` node → `<figure><img>` | ✅ PASS | `extensions/InlineImage.tsx`: `renderHTML` emits `['figure', ['img', {src, alt}]]`; `parseHTML` `figure img[src]` / `img[src]`; node view with editable src/alt. Tests: `extensions.test.ts` — roundtrip + insert-between-paragraphs both assert exact `<figure><img src alt></figure>` output. |
-| **P3-04** `InlineVideo` node → `<video src controls>` | ✅ PASS | `extensions/InlineVideo.tsx`: `renderHTML` emits `['video', {src, controls: 'controls'}]`; parse `video[src]`; node view with editable URL. Tests: `extensions.test.ts` — roundtrip + insert both assert `<video src=... controls`. |
-| **P3-05** `SimulatorPlaceholder` node → `<div data-simulator-id>` | ✅ PASS | `extensions/SimulatorPlaceholder.tsx`: `renderHTML` emits `['div', {'data-simulator-id': id}]`; parse `div[data-simulator-id]`; toolbar button "Insertar simulador" present (test-asserted); node view placeholder block. Tests: `extensions.test.ts` — roundtrip + insert assert `data-simulator-id`. |
-| **P3-06** Delete admin TipTapEditor; adopt shared RichTextEditor in Project/Product/Tool/Blog forms | ✅ PASS | `admin-panel/src/components/blog-posts/TipTapEditor.tsx` DELETED (git status `D`); zero `TipTapEditor` references across all packages (grep = NONE). `BlogPostForm`, `ProjectForm`, `ProductForm`, `ToolForm` import `RichTextEditor` from `@jsoft/shared` with `lang` from `useTranslation`. Length validation on HTML content uses `getTextFromHTML` in all four forms (BlogPostForm L45, ProjectForm L58, ProductForm L52, ToolForm L60). |
-| **P3-07** Sanitization adoption + admin zero dangerouslySetInnerHTML | ✅ PASS | All renderers use `sanitizeHtml(…,{allowMedia:true})` from `@jsoft/shared`: recruiter `BlogPostContent` (body + lessons), recruiter `ProjectDetailModal` (technicalExplanation L206 + projectBody L252); client `ServiceDetail`, `ProductDetail`, `ToolDetail`, `BlogPostContent` (body innerHTML L15 + lessons L74), `ProjectDetailPage` L138 (from P1). `dangerouslySetInnerHTML` grep in `admin-panel/src` = 0. Sanitize util (`packages/shared/src/utils/sanitize.ts`) allowlist: img/video/source/figure/figcaption + iframe ONLY for `^/api/simulators/[A-Za-z0-9]+/content$`; tests in `sanitize.test.ts` assert strip/preserve + iframe restriction. |
-| **P3-08** Phase gate: typecheck 0 errors; Vitest where sensible | ✅ PASS | See Gate Results — all green. |
+| **P4-01** Prisma `Simulator` model + migration | ✅ PASS | `schema.prisma` L162-177: id, title, slug @unique, fileName, size Int, mimeType default text/html, width?, height?, uploadedAt, createdAt, updatedAt, deletedAt?, `@@index([deletedAt])` — matches design exactly. Migration `20260831_add_simulator_model/migration.sql` (CreateTable + `Simulator_slug_key` UNIQUE + `Simulator_deletedAt_idx`). `prisma migrate status`: 8 migrations, **"Database schema is up to date!"**. Jest setup mock `simulator` delegate added to `api/src/__tests__/setup.ts` |
+| **P4-02** Supabase private `simulators` bucket | ✅ PASS | Live API check (S1): bucket exists, `public: false`. Empty bucket (no objects) — infra created, no test uploads left behind |
+| **P4-03** RED `simulator.service.test.ts` | ✅ PASS | 13 tests: upload validation (≤1MB / `.html` / `text/html` / title required), record creation, slug from title, unique-slug counter, width/height persistence, list ordering, getMetadata null, download stream + serve-time guard + deletedAt-null, softDelete. All pass in the api suite (264/264) |
+| **P4-04** GREEN `simulator.service.ts` | ✅ PASS | `validateSimulatorFile` (pure), `slugifyTitle` (pure), `upload` (bucket forced `simulators` via uploadService.saveFile + allowlist), `list`, `getMetadata`, `download` (1MB serve-time guard, null → 404), `softDelete`, `resolveUniqueSlug` (-2, -3, …). Coverage: 97.91% stmts / 82.14% branch / 97.82% lines |
+| **P4-05** `storage.service.ts` `downloadFile` | ✅ PASS | Server-side stream from PRIVATE bucket with service key (`apikey` + `Authorization: Bearer`), `Readable.fromWeb`; local-dev fallback reads `/uploads`. 11 unit tests incl. private-object auth header assertion and failure throw. Coverage 97.72% stmts / 92.59% branch |
+| **P4-06** Route/controller + mount | ✅ PASS | `POST /upload` (JWT + multer memory 1MB + `.html` fileFilter), `GET /` (JWT), `GET /:id` (JWT), `GET /:id/content` (PUBLIC, registered after — single-segment `/:id` cannot shadow the two-segment path). `/content` sets text/html; charset=utf-8 + CSP + nosniff + no-store + removes X-Frame-Options. Mounted `app.ts` L89. Integration tests (real express + helmet): 401 upload/list/:id, 404 unknown content, full header assertions incl. frame-ancestors from CORS_ORIGIN and x-frame-options null, 1MB+ → 400 |
+| **P4-07** Admin simulators page + picker wiring | ✅ PASS | `SimulatorsListPage` (upload form: client-side `.html` + ≤1MB validation, list w/ size+date), `simulators.api.ts` (list/getById/upload + `simulatorPickerApi` adapter over authed apiClient), `useSimulators.ts` (useGetAll/useUpload + invalidation). RichTextEditor gains `simulatorApi` prop → `SimulatorPicker` modal (list → insert / upload → insert); `onSelect` inserts `simulatorPlaceholder` node → serializes `<div data-simulator-id>` (extensions.test.ts L61-80). Wired in BlogPostForm, ProductForm, ProjectForm, ToolForm. Route `/simulators` + sidebar + i18n es/en |
+| **P4-08** Shared `SimulatorNode` | ✅ PASS | iframe `sandbox="allow-scripts"` (NO allow-same-origin), src via `buildSimulatorSrc` (regex-validated), defaults 800×600, lazy, title. Vitest: sandbox attr, no allow-same-origin, src, defaults, explicit dims, unsafe-id → renders nothing, `SimulatorSection` standalone |
+| **P4-09** `renderSimulatorEmbeds` + renderer adoption | ✅ PASS | Post-sanitize DOMParser transform: sanitize(allowMedia) → swap `div[data-simulator-id]` → sandboxed iframe → **force** `sandbox="allow-scripts"` on every surviving iframe (strips author allow-same-origin — hardening fix). `SimulatorSection` standalone. Adopted client: BlogPostContent (body+lessons), ProjectDetailPage, ProductDetail, ServiceDetail, ToolDetail; recruiter: BlogPostContent (body+lessons), ProjectDetailModal (explanation + projectBody). 7 Vitest cases incl. strict allow-same-origin stripping; client DOM-level sandbox test |
+| **P4-10** Phase gate | ✅ PASS | See Gate Results below — all green on real execution |
 
 ---
 
-## Spec Compliance Matrix (Behavioral)
+## Gate Results (real execution, 2026-09-01)
 
-### rich-text-editor delta
+| Gate | Command | Result |
+|------|---------|--------|
+| Typecheck | `pnpm -r run typecheck` | ✅ 0 errors (5/5 packages: shared, api, admin-panel, client-site, recruiter-site) |
+| API tests | `pnpm --filter api test` | ✅ 21 suites, **264/264 passed**, 0 failed, 0 skipped |
+| Coverage | `pnpm --filter @jsoft/api exec jest --coverage` | ✅ **Stmts 85.21 / Branch 72.09 / Funcs 91.5 / Lines 91.55** — all ≥70% threshold |
+| Shared Vitest | `pnpm --filter @jsoft/shared test` | ✅ 8 files, **106/106 passed** |
+| Admin Vitest | `pnpm --filter @jsoft/admin-panel test` | ✅ 4 files, **13/13 passed** |
+| Client Vitest | `pnpm --filter @jsoft/client-site test` | ✅ 6 files, **18/18 passed** |
+| Recruiter Vitest | `pnpm --filter @jsoft/recruiter-site test` | ✅ 5 files, **15/15 passed** |
+| Shared build | `pnpm --filter @jsoft/shared run build` | ✅ tsup CJS+ESM+DTS build success |
+| Migration | `pnpm exec prisma migrate status` | ✅ 8 migrations, up to date |
 
-| Requirement | Scenario | Test | Result |
-|-------------|----------|------|--------|
-| Shared Editor Component | Editor initializes from HTML | `RichTextEditor.test.tsx > initializes from HTML` | ✅ COMPLIANT |
-| Shared Editor Component | Editor emits HTML | `RichTextEditor.test.tsx > emits serialized HTML on change` | ✅ COMPLIANT |
-| Inline Image Node | Insert image between paragraphs | `extensions.test.ts > inserting an image between paragraphs serializes to figure>img` | ✅ COMPLIANT |
-| Inline Video Node | Insert video | `extensions.test.ts > inserting a video serializes to <video src controls>` | ✅ COMPLIANT |
-| Simulator Node Placeholder | Insert simulator placeholder | `extensions.test.ts > inserting the placeholder serializes to data-simulator-id markup` | ✅ COMPLIANT |
-| Adoption Across Forms | Project form uses shared editor | Static: `ProjectForm.tsx` imports `RichTextEditor`; typecheck + admin Vitest green | ✅ COMPLIANT (structural) |
-| Adoption Across Forms | Blog form uses shared editor | Static: `BlogPostForm.tsx` imports `RichTextEditor`; typecheck + admin Vitest green | ✅ COMPLIANT (structural) |
-| Storage Compatibility | Output sanitizable | `extensions.test.ts > output stays sanitizable` (figure/img + video preserved, script stripped) | ✅ COMPLIANT |
-
-### sanitization delta
-
-| Requirement | Scenario | Test | Result |
-|-------------|----------|------|--------|
-| DOMPurify on Every dangerouslySetInnerHTML | Client-site ServiceDetail sanitizes | Static: `ServiceDetail.tsx` uses `sanitizeHtml(fullDescription,{allowMedia:true})`; shared `sanitize.test.ts` asserts allowlist behavior | ✅ COMPLIANT (structural) |
-| DOMPurify on Every dangerouslySetInnerHTML | Recruiter 3 calls use media allowlist | Static: recruiter `BlogPostContent` (body, lessons) + `ProjectDetailModal` (explanation, projectBody) — all `sanitizeHtml(…,{allowMedia:true})` | ✅ COMPLIANT |
-| DOMPurify on Every dangerouslySetInnerHTML | Inline image preserved | `sanitize.test.ts` + `BlogPostContent.test.tsx` (figure img src/alt preserved) | ✅ COMPLIANT |
-| DOMPurify on Every dangerouslySetInnerHTML | Simulator iframe restricted to endpoint | `sanitize.test.ts > preserves iframe pointing to simulator endpoint` / `strips iframe to any other origin` / `strips non-matching local path` | ✅ COMPLIANT |
-| Script Tags Are Stripped | HTML with script tags stripped | `sanitize.test.ts`, `extensions.test.ts > output stays sanitizable`, `BlogPostContent.test.tsx` (querySelector('script') null) | ✅ COMPLIANT |
-| Script Tags Are Stripped | Safe tags render correctly | `sanitize.test.ts` safe-tags scenario | ✅ COMPLIANT |
-| Script Tags Are Stripped | Simulator bypasses DOMPurify by design | Phase 4 scope (sandboxed iframe). Placeholder markup (`data-simulator-id`) is preserved through sanitize (DOMPurify keeps `data-*`) — verified in `extensions.test.ts` sanitize-compat test | ✅ COMPLIANT (placeholder markup) / Phase 4 binding |
-| Admin Panel Does Not Render User HTML | Zero dangerouslySetInnerHTML in admin | grep `admin-panel/src` = NONE; no DOMPurify install in admin (none present in admin package.json) | ✅ COMPLIANT |
-
-**Compliance summary**: 16/16 scenarios compliant (10 behavioral test-backed, 6 structural/static with supporting unit tests).
+**Security scenarios run**: sanitize allowlist strip/preserve (data-simulator-id kept, iframe restricted), sandbox attrs in rendered DOM, CSP headers at HTTP level, serve-time oversize 400, public endpoint 401/404 — all asserted by passing tests.
 
 ---
 
-## TDD Compliance (Strict TDD mode)
+### TDD Compliance (Strict TDD)
 
 | Check | Result | Details |
 |-------|--------|---------|
-| TDD Evidence reported | ⚠️ | apply-progress found (engram #1012) with full gate evidence + test documentation, but **no formal "TDD Cycle Evidence" table** (RED/GREEN/TRIANGULATE/SAFETY NET columns). See WARNING-1. |
-| All tasks have tests | ✅ | New test files: `extensions.test.ts` (8), `RichTextEditor.test.tsx` (4), `BlogPostContent.test.tsx` (2); plus existing suites re-run green. |
-| RED confirmed (tests exist) | ➖ | N/A — Phase 3 has zero strict-TDD-scoped (api) tasks; all P3 tasks are frontend/shared (specs: "typecheck; manual" / "Vitest where sensible"). |
-| GREEN confirmed (tests pass) | ✅ | All test files pass on execution (shared 91, client 17, api 240). |
-| Triangulation adequate | ✅ | Each extension node has roundtrip + insert cases; sanitize has strip/preserve/iframe-restriction variance; editor has init/emit/toolbar/minHeight cases. |
-| Safety Net for modified files | ➖ | N/A — P3 added only NEW test files; no existing test files were modified; existing suites re-run green (admin 13, recruiter 15). |
+| TDD Evidence reported | ✅ | apply-progress (#1012) contains TDD Cycle Evidence table |
+| All tasks have tests | ✅ | 10/10 — every P4 task maps to a test file that exists and passes |
+| RED confirmed (tests exist) | ✅ | simulator.service.test.ts, simulator.routes.test.ts, storage.service.test.ts, SimulatorNode.test.tsx, SimulatorEmbeds.test.ts, client BlogPostContent.test.tsx — all present |
+| GREEN confirmed (tests pass) | ✅ | Re-ran: 264 api + 106 shared + 18 client, 0 failures |
+| Triangulation adequate | ✅ | Service 13 cases, routes 8, storage 11, embeds 7, node 5 — multiple edge cases per behavior (oversize, bad ext, bad mimetype, unsafe ids, allow-same-origin stripping) |
+| Safety Net for modified files | ✅ | Documented (shared 105/105 before hardening change); hardening added NEW test to NEW file — no pre-existing file modified without safety net |
+| REFACTOR | ✅ | Apply reports clean; code structure (pure validators + service + controller) matches project patterns |
 
-**TDD Compliance**: 3/4 applicable checks passed (table-format gap only).
+**Note**: the apply-progress TDD table lists the new-work row (P4 hardening RED→GREEN); the remaining P4 test files were attributed to the cancelled run and were independently re-verified by this review (files exist and pass on execution).
 
----
+**TDD Compliance**: 7/7 checks passed
 
-## Test Layer Distribution
+### Test Layer Distribution
 
 | Layer | Tests | Files | Tools |
 |-------|-------|-------|-------|
-| Unit | 91 | 5 (shared: extensions, sanitize, schemas, etc.) | Vitest 4 + jsdom |
-| Integration | 6 | 2 (`RichTextEditor.test.tsx`, `BlogPostContent.test.tsx` — render + userEvent + testing-library) | Vitest + @testing-library/react + user-event + jest-dom |
+| Unit (api service) | 24 (13 sim + 11 storage) | 2 new + setup mock | Jest 30 + ts-jest |
+| Integration (api HTTP) | 8 (simulator.routes) | 1 new | Jest + real express/helmet + node fetch |
+| Integration (frontend component) | 15 (5 node + 7 embeds + 3 client BlogPostContent) | 3 new | Vitest 4.1.8 + Testing Library + jsdom |
 | E2E | 0 | 0 | not installed (not in capabilities) |
-| **Total** | **97** | **7** (P3-relevant new/changed) | |
+| **Total (P4-attributed)** | **47** | **6** | |
 
-No layer uses tools not present in capabilities.
+### Changed File Coverage (Phase 4 api files)
 
----
+| File | Line % | Branch % | Uncovered Lines | Rating |
+|------|--------|----------|-----------------|--------|
+| `api/src/services/simulator.service.ts` | 97.82 | 82.14 | L71 (empty-title throw) | ✅ Excellent |
+| `api/src/services/storage.service.ts` | 97.56 | 92.59 | L143 (empty-body throw) | ✅ Excellent |
 
-## Changed File Coverage
+**Average changed api-file coverage**: 97.7%
+(Frontend/shared coverage: not configured — Vitest coverage tool not enabled; reported as not available, not a failure)
 
-**Coverage analysis skipped for changed files** — the only coverage tool detected (Jest, api) covers `api/` files only, and no api files changed in Phase 3. Vitest coverage is not configured in any frontend package. Api-wide coverage confirmed separately: Stmts 84.00 / Branch 71.45 / Funcs 90.97 / Lines 90.94 (≥70%). Not a failure — informational.
+### Assertion Quality
 
----
-
-## Assertion Quality
-
-Scan of all P3 test files (`RichTextEditor.test.tsx`, `extensions.test.ts`, `BlogPostContent.test.tsx`):
-
-- No tautologies, no ghost loops, no type-only-only assertions, no orphan empty checks, no smoke-only tests (toolbar test asserts specific accessible button names, not just render).
-- 1 mock (`vi.fn` onChange) vs 7+ behavioral assertions in `RichTextEditor.test.tsx` — ratio fine.
-- Serialization tests assert exact HTML strings; sanitization tests assert both strip (`querySelector('script')` null) and preserve (figure/img attrs).
-
-**Assertion quality**: ✅ All assertions verify real behavior.
+✅ All assertions verify real behavior — no tautologies, no ghost loops, no orphan empty checks, no smoke-only tests, no type-only-alone assertions, no CSS-class/implementation-detail coupling found in any P4 test file. Mock-to-assertion ratio healthy (mocked storage/prisma delegates with behavioral assertions on outcomes).
 
 ---
 
-## Quality Metrics
+## Spec Compliance Matrix (behavioral — test-backed)
 
-**Linter**: ➖ Not available (eslint script exists but no config — per openspec/config.yaml).
-**Type Checker**: ✅ No errors — `pnpm -r run typecheck` 0 errors across 5 packages.
+| Spec | Scenario | Test | Result |
+|------|----------|------|--------|
+| simulators:Upload | Upload simulator (auth → stored + record created) | `simulator.service.test.ts > upload validates, stores, creates record` | ✅ COMPLIANT |
+| simulators:Upload | Oversized file rejected 400 | `simulator.service.test.ts > rejects files over 1MB` + `simulator.routes.test.ts > 1MB+ → 400 UPLOAD_ERROR` | ✅ COMPLIANT |
+| simulators:Upload | Unauthenticated upload rejected 401 | `simulator.routes.test.ts > POST /upload → 401` | ✅ COMPLIANT |
+| simulators:ServingEndpoint | Endpoint serves sandboxed HTML (text/html + CSP sandbox) | `simulator.routes.test.ts > streams raw HTML with CSP sandbox + nosniff + no-store + no XFO` | ✅ COMPLIANT |
+| simulators:ServingEndpoint | Unknown simulator → 404 | `simulator.routes.test.ts > 404 for unknown` + `simulator.service.test.ts > download returns null` | ✅ COMPLIANT |
+| simulators:SandboxIframe | Sandbox attributes present (allow-scripts, no allow-same-origin) | `SimulatorNode.test.tsx > renders iframe sandbox attr` + `client BlogPostContent.test.tsx > sandboxed iframes` | ✅ COMPLIANT |
+| simulators:SandboxIframe | Script runs but parent isolated | verified via sandbox-attr + CSP assertions (spec Testing Note designates this method) | ✅ COMPLIANT* |
+| simulators:SandboxIframe | Malicious content contained | verified via sandbox-attr + CSP assertions + `renderSimulatorEmbeds` hardening test (spec Testing Note) | ✅ COMPLIANT* |
+| simulators:Placement | Inline simulator renders between paragraphs | `SimulatorEmbeds.test.ts > replaces placeholders with sandboxed iframes` + `extensions.test.ts > roundtrip` | ✅ COMPLIANT |
+| simulators:Placement | Standalone simulator renders (constrained dims) | `SimulatorNode.test.tsx > SimulatorSection renders sandboxed iframe` | ✅ COMPLIANT |
+| simulators:SizeLimits | Oversized content blocked at serve time | `simulator.service.test.ts > rejects stored content exceeding 1MB guard` | ✅ COMPLIANT |
+| sanitization:AllRenderers | ServiceDetail sanitizes via media allowlist | `ServiceDetail.tsx` uses `renderSimulatorEmbeds` (= sanitizeHtml allowMedia + transform); shared sanitize tests strip/preserve | ✅ COMPLIANT |
+| sanitization:AllRenderers | Recruiter 3 calls through DOMPurify + allowlist | `BlogPostContent` (body+lessons) + `ProjectDetailModal` (explanation) → `renderSimulatorEmbeds` | ✅ COMPLIANT |
+| sanitization:AllRenderers | Inline image preserved | `sanitize.test.ts > preserves figure + img` | ✅ COMPLIANT |
+| sanitization:AllRenderers | Simulator iframe restricted to dedicated endpoint | `sanitize.test.ts > preserves simulator iframe, strips other origins/local paths` | ✅ COMPLIANT |
+| sanitization:ScriptsStripped | HTML with script tags stripped, safe HTML intact | `sanitize.test.ts > strips script tags` + `keeps safe HTML identical` | ✅ COMPLIANT |
+| sanitization:ScriptsStripped | Simulator bypasses DOMPurify by design | iframe src is the API endpoint (never inline HTML via dangerouslySetInnerHTML); endpoint streams raw HTML with sandbox headers | ✅ COMPLIANT |
+| sanitization:AdminNoHTML | Zero dangerouslySetInnerHTML in admin | grep → 0 matches | ✅ COMPLIANT |
+| rich-text:SimulatorPlaceholder | Placeholder serializes to dedicated markup | `extensions.test.ts > roundtrips <div data-simulator-id>` + insert serialization | ✅ COMPLIANT |
+| rich-text:Adoption | Project/Product/Tool/Blog forms use shared editor | P4 diff: all 4 forms pass `simulatorApi={simulatorPickerApi}` to shared RichTextEditor | ✅ COMPLIANT |
+| rich-text:StorageCompat | Output sanitizable (media preserved, scripts stripped) | `sanitize.test.ts` allowMedia suite + `renderSimulatorEmbeds` tests | ✅ COMPLIANT |
+
+\* spec Testing Note: "Iframe/XSS containment is verified via sandbox attribute and CSP assertions during verify" — the agreed verification method; attribute + CSP assertions are in place and passing. No Playwright E2E exists (E2E not available in this project's capabilities).
+
+**Compliance summary**: 21/21 scenarios compliant
 
 ---
 
-## Correctness (Static — Structural Evidence)
-
-| Requirement | Status | Notes |
-|------------|--------|-------|
-| RichTextEditor props + node set | ✅ Implemented | {value,onChange,minHeight,lang,labels}; StarterKit h1–4 + Underline/Link/TextAlign/Highlight + InlineImage/InlineVideo/SimulatorPlaceholder |
-| InlineImage `<figure><img src alt>` | ✅ Implemented | renderHTML exact; parseHTML roundtrip; test-backed |
-| InlineVideo `<video src controls>` | ✅ Implemented | renderHTML exact; parseHTML roundtrip; test-backed |
-| SimulatorPlaceholder `<div data-simulator-id>` | ✅ Implemented | renderHTML exact; parseHTML roundtrip; test-backed |
-| Adoption across 4 admin forms | ✅ Implemented | Blog/Project/Product/Tool forms; getTextFromHTML validation everywhere HTML content is length-checked |
-| Sanitize adoption (client + recruiter) | ✅ Implemented | every dangerouslySetInnerHTML / innerHTML render path uses `sanitizeHtml(…,{allowMedia:true})`; admin = 0 occurrences |
-| Deps hygiene | ✅ Implemented | client/recruiter +6 @tiptap each, −dompurify/−@types/dompurify; admin already held @tiptap (now consumed by shared ESM); dompurify only in shared |
-
----
-
-## Coherence (Design)
+## Coherence (Design match)
 
 | Decision | Followed? | Notes |
 |----------|-----------|-------|
-| Phase 3 File Changes table | ✅ Yes | RichTextEditor/* new; shared package.json +tiptap; TipTapEditor deleted; 4 admin forms modified; client/recruiter renderers modified; sanitize.ts (P1) reused |
-| Decision 5 — shared media allowlist + restricted iframe src | ✅ Yes | single `sanitizeHtml` in `@jsoft/shared`; regex `^/api/simulators/[A-Za-z0-9]+/content$`; strip/preserve tests |
-| Props `{value,onChange,minHeight}` | ✅ Yes (+extension) | optional `lang`/`labels` added for i18n — backward-compatible, explicitly in verify scope |
-| Toolbar extracted from admin TipTapEditor | ✅ Yes | command inventory of deleted file matches new toolbar; new Insert buttons added |
-| Storage format stays DOMPurify-compatible HTML | ✅ Yes | `output stays sanitizable` test proves media preserved + scripts stripped |
+| D2: Simulator metadata model + private bucket + server-streamed content | ✅ Yes | Model matches exactly; private bucket confirmed; downloadFile streams server-side |
+| D2: Upload constraints (multer 1MB, .html/text-html, bucket forced server-side) | ✅ Yes | multer limits + fileFilter + `SIMULATOR_BUCKET` constant; allowlist includes `simulators` |
+| D5: Shared media allowlist + restricted iframe src regex | ✅ Yes | `sanitizeHtml` + `SIMULATOR_CONTENT_SRC_REGEX` intact |
+| D6: /content overrides helmet (CSP sandbox + frame-ancestors, removes X-Frame-Options) | ✅ Yes | Verified at HTTP level; `frame-ancestors` derives from CORS_ORIGIN (5173/4173/5175 all covered) |
+| Defaults 800×600 (open question resolution) | ✅ Yes | `SIMULATOR_DEFAULT_WIDTH/HEIGHT` = 800/600; per-record width/height overrides supported |
+| Route-order guard | ✅ Yes | `/upload`, `/`, `/:id` before `/:id/content` (no shadowing — different segment counts) |
+| File Changes table (Phase 4) | ✅ Yes | All listed files created/modified; no rejected alternatives implemented |
 
 ---
 
 ## Issues Found
 
-**CRITICAL** (must fix before PR/archive):
-- None.
+**CRITICAL** (must fix before archive): None
 
-**WARNING** (should fix):
-1. **apply-progress lacks the formal TDD Cycle Evidence table** (engram #1012 documents What/Why/Where/Learned/Gate evidence but not the RED/GREEN/TRIANGULATE/SAFETY-NET table required by strict-tdd-verify Step 5a). Mitigation: Strict TDD scope in this project is the api (per tasks.md header "Strict TDD (api)"); Phase 3 contains zero api tasks — all 8 tasks are frontend/shared with "typecheck; manual" / "Vitest where sensible" test specs. Every test file P3 claims was written exists and passes on execution (independently reproduced), and the gate evidence in the apply-progress is accurate. Flagged for protocol-format compliance; not a functional gap.
+**WARNING** (should fix): None
 
 **SUGGESTION** (nice to have):
-1. `RichTextEditor` parses `value` once on mount (TipTap standard). A parent-driven reset of `value` after mount (e.g., future "clear form" action) will not refresh the editor. Matches the deleted TipTapEditor behavior — no regression — but worth documenting for future form-reset features.
-2. Node-view strings in `InlineImage`/`InlineVideo`/`SimulatorPlaceholder` ("Imagen sin URL", "Quitar", "Simulador", …) are Spanish-only regardless of `lang='en'`. Accepted per scope (neutral Spanish node-view strings documented as acceptable); a future i18n pass could route them through `labels`.
-3. Cancelling the simulator-ID prompt inserts an empty placeholder (`simulatorId: ''`). Minor UX — could no-op on cancel.
-4. Root `.npmrc` uses `shamefully-hoist=true` (pre-existing); it explains why admin resolves `@tiptap` transitively. Works, but a stricter `public-hoist-pattern` would be cleaner long-term.
+1. **Dead i18n keys** — `simulators.colTitle`, `simulators.colSlug`, `simulators.colSize`, `simulators.colUploaded` exist in both es and en but are referenced by 0 files (leftover from a table layout replaced by the list). Remove or wire into the list. (`admin-panel/src/i18n/translations.ts`)
+2. **SSR fallback inert placeholders** — `renderSimulatorEmbeds` returns the sanitized HTML unchanged when `DOMParser` is undefined (SSR), leaving `div[data-simulator-id]` placeholders un-transformed. Harmless today (both frontends are client-rendered SPAs), but if SSR is ever introduced, add an SSR-safe regex replacement for the placeholders.
+3. **Untested branch** — `simulator.service.ts` L71 (`Title is required`) is the only uncovered line in the service (97.82% lines). A one-line test for `upload({ title: '' })` would close it.
 
 ---
 
 ## Verdict
 
-### ✅ GO (PASS WITH WARNINGS)
-
-Phase 3 is complete and behaviorally compliant with the rich-text-editor and sanitization delta specs. All gates pass on real execution: typecheck 0 errors, api 240/240 tests, coverage ≥70% (all four metrics), Vitest shared 91 / admin 13 / client 17 / recruiter 15 all green, shared tsup build succeeds with RTE CSS bundled and @tiptap externalized. No CRITICAL issues. Safe to create the P3 PR.
+**GO (PASS)** — Phase 4 (Simulators) of change `project-publications` is complete, coherent (salvaged + hardened state verified, not just "exists"), and behaviorally compliant with the P4 delta specs and design. All 12 security invariants PASS, 10/10 tasks complete, all phase gates green on real execution. Safe to create the P4 PR.

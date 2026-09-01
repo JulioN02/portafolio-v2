@@ -24,6 +24,9 @@ import { ToolsListPage } from '../pages/tools/ToolsList';
 // Projects
 import { ProjectsListPage } from '../pages/projects/ProjectsListPage';
 
+// Simulators
+import { SimulatorsListPage } from '../pages/simulators/SimulatorsListPage';
+
 // SuccessCases
 import { SuccessCasesList as SuccessCasesListPage } from '../pages/success-cases/SuccessCasesList';
 
@@ -242,6 +245,17 @@ function AppRoutes() {
               <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>Cargando...</div>}>
                 <ProjectEditPage />
               </Suspense>
+            </ProtectedLayout>
+          </ErrorBoundary>
+        }
+      />
+
+      <Route
+        path="/simulators"
+        element={
+          <ErrorBoundary>
+            <ProtectedLayout>
+              <SimulatorsListPage />
             </ProtectedLayout>
           </ErrorBoundary>
         }
