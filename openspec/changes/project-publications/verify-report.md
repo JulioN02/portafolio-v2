@@ -1,17 +1,17 @@
-# Verification Report — project-publications (Phase 2)
+# Verification Report — project-publications (Phase 3)
 
 **Change**: project-publications
-**Phase**: 2 (blog tags + admin gaps + uploads) — tasks P2-01..P2-14
+**Phase**: 3 (shared rich text editor + sanitization adoption) — tasks P3-01..P3-08
 **Mode**: Strict TDD (api) — runner `pnpm --filter api test`, coverage ≥70%, typecheck gate `pnpm -r run typecheck`
-**Branch**: feat/project-publications-p2 (implementation done, NOT committed)
-**Gate**: fresh-review before P2 PR creation
+**Branch**: feat/project-publications-p3 (implementation done, NOT committed)
+**Gate**: fresh-review before P3 PR creation
 **Date**: 2026-08-31
 
 ---
 
 ## Verdict: ✅ GO (PASS WITH WARNINGS)
 
-Phase 2 is complete and behaviorally compliant with the P2 delta specs (blog-tags, blog-post-api, blog-filters, upload-hardening, admin-success-cases-crud, admin-services-crud) and the design decisions. All phase gates pass: typecheck 0 errors (5 packages), api 240/240 tests, coverage ≥70% on all four metrics, and all Vitest suites green. No CRITICAL issues. Two WARNINGs (one protocol-format, one pre-existing spec gap not owned by P2) and five SUGGESTIONs. Safe to create the P2 PR.
+Phase 3 is complete and behaviorally compliant with the P3 delta specs (rich-text-editor, sanitization) and the Phase 3 design file-changes table. Every phase gate passes on real execution: typecheck 0 errors (5 packages), api 240/240 tests, coverage ≥70% on all four metrics, all four Vitest suites green (shared 91, admin 13, client 17, recruiter 15), and `@jsoft/shared` tsup build succeeds with RTE styles bundled in dist/index.css and @tiptap externalized in ESM. No CRITICAL issues. One WARNING (apply-progress lacks the formal TDD Cycle Evidence table format — mitigated: Phase 3 contains zero strict-TDD-scoped api tasks, and every new test file exists and passes) and four SUGGESTIONs. Safe to create the P3 PR.
 
 ---
 
@@ -19,45 +19,95 @@ Phase 2 is complete and behaviorally compliant with the P2 delta specs (blog-tag
 
 | Metric | Value |
 |--------|-------|
-| Tasks in scope (P2-01..P2-14) | 14 |
-| Tasks implemented | 14 |
-| Tasks marked `[x]` in tasks.md | 14 |
+| Tasks in scope (P3-01..P3-08) | 8 |
+| Tasks implemented | 8 |
+| Tasks marked `[x]` in tasks.md | 8 |
 | Tasks incomplete | 0 |
 
-All P2 tasks are marked `[x]` and verified implemented (see checklist below).
+All P3 tasks are marked `[x]` and verified implemented (see checklist below). Phase 4 tasks (P4-01..P4-10) remain unchecked — out of scope for this PR.
 
 ---
 
 ## Gate Results (Real Execution)
 
-**Typecheck**: ✅ 0 errors — `pnpm -r run typecheck` (5 packages: shared, api, admin-panel, client-site, recruiter-site) all "Done".
+**Typecheck**: ✅ 0 errors — `pnpm -r run typecheck` (5 packages: shared, api, admin-panel, client-site, recruiter-site) all "Done" (6th workspace project is the root `portafolio-jsoft`, which has no typecheck script).
 
 **API tests**: ✅ 240 passed / 240 total (19 suites), exit 0 — `pnpm --filter api test`.
 
-**Coverage**: ✅ `pnpm --filter @jsoft/api exec jest --coverage` — Stmts 84.00 / Branch 71.45 / Funcs 90.97 / Lines 90.94 — all ≥ 70% threshold.
+**Coverage**: ✅ `pnpm --filter @jsoft/api exec jest --coverage` — Stmts 84.00 / Branch 71.45 / Funcs 90.97 / Lines 90.94 — all ≥ 70% threshold. (API files unchanged in P3; coverage reported for continuity.)
 
-**Vitest suites**:
+**Vitest suites** (all green):
+
 | Package | Files | Tests | Result |
 |---------|-------|-------|--------|
-| @jsoft/shared | 4 | 79 | ✅ |
-| @jsoft/admin-panel | 4 | 13 | ✅ |
-| @jsoft/client-site | 5 | 15 | ✅ |
-| @jsoft/recruiter-site | 5 | 15 | ✅ |
+| `@jsoft/shared` | 6 | 91 | ✅ 91/91 passed |
+| `@jsoft/admin-panel` | 4 | 13 | ✅ 13/13 passed |
+| `@jsoft/client-site` | 6 | 17 | ✅ 17/17 passed |
+| `@jsoft/recruiter-site` | 5 | 15 | ✅ 15/15 passed |
+
+**Shared build**: ✅ `pnpm --filter @jsoft/shared run build` — CJS + ESM + DTS all "Build success". `dist/index.css` (22.39 KB) contains the RTE styles (`.rte-toolbar` present). `dist/index.mjs` imports `@tiptap/react`, `@tiptap/starter-kit`, etc. as external ESM imports (tsup auto-externalization confirmed — matches the pnpm strict-resolution design).
 
 ---
 
-## TDD Compliance (Strict TDD)
+## Checklist P3-01..P3-08
+
+| Task | Result | Evidence |
+|------|--------|----------|
+| **P3-01** shared package.json: add @tiptap/* + react deps | ✅ PASS | `packages/shared/package.json` adds 6 `@tiptap/*` deps `^2.27.2` in `dependencies` AND `peerDependencies`; `@testing-library/{react,jest-dom,user-event}` added to devDeps. |
+| **P3-02** Shared `RichTextEditor.tsx` `{value,onChange,minHeight}` | ✅ PASS | `RichTextEditor.tsx` props `{value, onChange, minHeight=400, lang='es', labels?}`; `useEditor({ content: value, onUpdate: onChange(ed.getHTML()) })` — init from HTML + emits HTML; extensions via `buildEditorExtensions()` (StarterKit headings 1–4, Underline, Link, TextAlign, Highlight + 3 custom nodes); toolbar with formatting/headings/alignment/lists/block/links/media groups extracted from admin TipTapEditor (all old commands present — verified via `git show HEAD:...TipTapEditor.tsx` command inventory — plus new Insert buttons). Tests: `RichTextEditor.test.tsx` (4) prove init-from-HTML, HTML emission, toolbar a11y labels, minHeight. |
+| **P3-03** `InlineImage` node → `<figure><img>` | ✅ PASS | `extensions/InlineImage.tsx`: `renderHTML` emits `['figure', ['img', {src, alt}]]`; `parseHTML` `figure img[src]` / `img[src]`; node view with editable src/alt. Tests: `extensions.test.ts` — roundtrip + insert-between-paragraphs both assert exact `<figure><img src alt></figure>` output. |
+| **P3-04** `InlineVideo` node → `<video src controls>` | ✅ PASS | `extensions/InlineVideo.tsx`: `renderHTML` emits `['video', {src, controls: 'controls'}]`; parse `video[src]`; node view with editable URL. Tests: `extensions.test.ts` — roundtrip + insert both assert `<video src=... controls`. |
+| **P3-05** `SimulatorPlaceholder` node → `<div data-simulator-id>` | ✅ PASS | `extensions/SimulatorPlaceholder.tsx`: `renderHTML` emits `['div', {'data-simulator-id': id}]`; parse `div[data-simulator-id]`; toolbar button "Insertar simulador" present (test-asserted); node view placeholder block. Tests: `extensions.test.ts` — roundtrip + insert assert `data-simulator-id`. |
+| **P3-06** Delete admin TipTapEditor; adopt shared RichTextEditor in Project/Product/Tool/Blog forms | ✅ PASS | `admin-panel/src/components/blog-posts/TipTapEditor.tsx` DELETED (git status `D`); zero `TipTapEditor` references across all packages (grep = NONE). `BlogPostForm`, `ProjectForm`, `ProductForm`, `ToolForm` import `RichTextEditor` from `@jsoft/shared` with `lang` from `useTranslation`. Length validation on HTML content uses `getTextFromHTML` in all four forms (BlogPostForm L45, ProjectForm L58, ProductForm L52, ToolForm L60). |
+| **P3-07** Sanitization adoption + admin zero dangerouslySetInnerHTML | ✅ PASS | All renderers use `sanitizeHtml(…,{allowMedia:true})` from `@jsoft/shared`: recruiter `BlogPostContent` (body + lessons), recruiter `ProjectDetailModal` (technicalExplanation L206 + projectBody L252); client `ServiceDetail`, `ProductDetail`, `ToolDetail`, `BlogPostContent` (body innerHTML L15 + lessons L74), `ProjectDetailPage` L138 (from P1). `dangerouslySetInnerHTML` grep in `admin-panel/src` = 0. Sanitize util (`packages/shared/src/utils/sanitize.ts`) allowlist: img/video/source/figure/figcaption + iframe ONLY for `^/api/simulators/[A-Za-z0-9]+/content$`; tests in `sanitize.test.ts` assert strip/preserve + iframe restriction. |
+| **P3-08** Phase gate: typecheck 0 errors; Vitest where sensible | ✅ PASS | See Gate Results — all green. |
+
+---
+
+## Spec Compliance Matrix (Behavioral)
+
+### rich-text-editor delta
+
+| Requirement | Scenario | Test | Result |
+|-------------|----------|------|--------|
+| Shared Editor Component | Editor initializes from HTML | `RichTextEditor.test.tsx > initializes from HTML` | ✅ COMPLIANT |
+| Shared Editor Component | Editor emits HTML | `RichTextEditor.test.tsx > emits serialized HTML on change` | ✅ COMPLIANT |
+| Inline Image Node | Insert image between paragraphs | `extensions.test.ts > inserting an image between paragraphs serializes to figure>img` | ✅ COMPLIANT |
+| Inline Video Node | Insert video | `extensions.test.ts > inserting a video serializes to <video src controls>` | ✅ COMPLIANT |
+| Simulator Node Placeholder | Insert simulator placeholder | `extensions.test.ts > inserting the placeholder serializes to data-simulator-id markup` | ✅ COMPLIANT |
+| Adoption Across Forms | Project form uses shared editor | Static: `ProjectForm.tsx` imports `RichTextEditor`; typecheck + admin Vitest green | ✅ COMPLIANT (structural) |
+| Adoption Across Forms | Blog form uses shared editor | Static: `BlogPostForm.tsx` imports `RichTextEditor`; typecheck + admin Vitest green | ✅ COMPLIANT (structural) |
+| Storage Compatibility | Output sanitizable | `extensions.test.ts > output stays sanitizable` (figure/img + video preserved, script stripped) | ✅ COMPLIANT |
+
+### sanitization delta
+
+| Requirement | Scenario | Test | Result |
+|-------------|----------|------|--------|
+| DOMPurify on Every dangerouslySetInnerHTML | Client-site ServiceDetail sanitizes | Static: `ServiceDetail.tsx` uses `sanitizeHtml(fullDescription,{allowMedia:true})`; shared `sanitize.test.ts` asserts allowlist behavior | ✅ COMPLIANT (structural) |
+| DOMPurify on Every dangerouslySetInnerHTML | Recruiter 3 calls use media allowlist | Static: recruiter `BlogPostContent` (body, lessons) + `ProjectDetailModal` (explanation, projectBody) — all `sanitizeHtml(…,{allowMedia:true})` | ✅ COMPLIANT |
+| DOMPurify on Every dangerouslySetInnerHTML | Inline image preserved | `sanitize.test.ts` + `BlogPostContent.test.tsx` (figure img src/alt preserved) | ✅ COMPLIANT |
+| DOMPurify on Every dangerouslySetInnerHTML | Simulator iframe restricted to endpoint | `sanitize.test.ts > preserves iframe pointing to simulator endpoint` / `strips iframe to any other origin` / `strips non-matching local path` | ✅ COMPLIANT |
+| Script Tags Are Stripped | HTML with script tags stripped | `sanitize.test.ts`, `extensions.test.ts > output stays sanitizable`, `BlogPostContent.test.tsx` (querySelector('script') null) | ✅ COMPLIANT |
+| Script Tags Are Stripped | Safe tags render correctly | `sanitize.test.ts` safe-tags scenario | ✅ COMPLIANT |
+| Script Tags Are Stripped | Simulator bypasses DOMPurify by design | Phase 4 scope (sandboxed iframe). Placeholder markup (`data-simulator-id`) is preserved through sanitize (DOMPurify keeps `data-*`) — verified in `extensions.test.ts` sanitize-compat test | ✅ COMPLIANT (placeholder markup) / Phase 4 binding |
+| Admin Panel Does Not Render User HTML | Zero dangerouslySetInnerHTML in admin | grep `admin-panel/src` = NONE; no DOMPurify install in admin (none present in admin package.json) | ✅ COMPLIANT |
+
+**Compliance summary**: 16/16 scenarios compliant (10 behavioral test-backed, 6 structural/static with supporting unit tests).
+
+---
+
+## TDD Compliance (Strict TDD mode)
 
 | Check | Result | Details |
 |-------|--------|---------|
-| TDD Evidence reported | ⚠️ | Present narratively in `sdd/project-publications/apply-progress` (engram #1012) + RED/GREEN markers in tasks.md (P2-04 "Test: RED", P2-05 "GREEN + integration", P2-10 "RED→GREEN"); NOT in the canonical RED/GREEN/TRIANGULATE/SAFETY-NET/REFACTOR table format |
-| All tasks have tests | ✅ | 10/10 TDD-bearing tasks have test files (service, routes, migration, schema, upload, storage, TagInput, ImageUploader, BlogPage) |
-| RED confirmed (tests exist) | ✅ | All RED test files exist and were verified by reading source |
-| GREEN confirmed (tests pass) | ✅ | 240/240 api tests + all Vitest suites pass on execution |
-| Triangulation adequate | ✅ | Tags behavior ×7 cases, upload bucket ×4, schema tags ×8, route 401s ×5 — multiple distinct expected values per behavior |
-| Safety Net for modified files | ✅ | apply-progress documents updating existing upload/storage tests for the new default-bucket 4th arg (`toHaveBeenCalledWith` exact-arg-count); full suite green |
+| TDD Evidence reported | ⚠️ | apply-progress found (engram #1012) with full gate evidence + test documentation, but **no formal "TDD Cycle Evidence" table** (RED/GREEN/TRIANGULATE/SAFETY NET columns). See WARNING-1. |
+| All tasks have tests | ✅ | New test files: `extensions.test.ts` (8), `RichTextEditor.test.tsx` (4), `BlogPostContent.test.tsx` (2); plus existing suites re-run green. |
+| RED confirmed (tests exist) | ➖ | N/A — Phase 3 has zero strict-TDD-scoped (api) tasks; all P3 tasks are frontend/shared (specs: "typecheck; manual" / "Vitest where sensible"). |
+| GREEN confirmed (tests pass) | ✅ | All test files pass on execution (shared 91, client 17, api 240). |
+| Triangulation adequate | ✅ | Each extension node has roundtrip + insert cases; sanitize has strip/preserve/iframe-restriction variance; editor has init/emit/toolbar/minHeight cases. |
+| Safety Net for modified files | ➖ | N/A — P3 added only NEW test files; no existing test files were modified; existing suites re-run green (admin 13, recruiter 15). |
 
-**TDD Compliance**: 5/6 checks passed; 1 format deviation (WARNING — evidence substance fully verifiable).
+**TDD Compliance**: 3/4 applicable checks passed (table-format gap only).
 
 ---
 
@@ -65,76 +115,37 @@ All P2 tasks are marked `[x]` and verified implemented (see checklist below).
 
 | Layer | Tests | Files | Tools |
 |-------|-------|-------|-------|
-| Unit (api, Jest+ts-jest) | ~200 | 19 suites | Jest 30 (mocked Prisma) |
-| Integration (api HTTP, Node fetch) | 11 | blog-post.routes.test.ts + project/portfolio routes | Express + real router |
-| Frontend (Vitest + Testing Library) | 122 | shared 4 / admin 4 / client 5 / recruiter 5 | Vitest 4.1.8 |
-| **Total** | **~362** | **~37** | |
+| Unit | 91 | 5 (shared: extensions, sanitize, schemas, etc.) | Vitest 4 + jsdom |
+| Integration | 6 | 2 (`RichTextEditor.test.tsx`, `BlogPostContent.test.tsx` — render + userEvent + testing-library) | Vitest + @testing-library/react + user-event + jest-dom |
+| E2E | 0 | 0 | not installed (not in capabilities) |
+| **Total** | **97** | **7** (P3-relevant new/changed) | |
 
-Integration tests use real HTTP (fetch against ephemeral Express server) — no E2E tool needed; capabilities are consistent.
-
----
-
-## Changed File Coverage (api, from jest --coverage)
-
-| File | Stmts | Branch | Funcs | Lines | Rating |
-|------|-------|--------|-------|-------|--------|
-| `config/upload.config.ts` | 100% | 100% | 100% | 100% | ✅ Excellent |
-| `scripts/category-to-tags.ts` | 100% | 100% | 100% | 100% | ✅ Excellent |
-| `scripts/migrate-category-to-tags.ts` | 0% | 0% | 0% | 0% | ⚠️ DB-touching script executed via tsx (pure mapping covered at 100%) |
-| `services/blog-post.service.ts` | 85.45% | 76.78% | 100% | 97.77% | ⚠️ Acceptable (L117 = else-if category-only update branch) |
-| `services/portfolio.service.ts` | 95.58% | 59.01% | 91.42% | 100% | ⚠️ Branch low — type-filter paths + getClassifications uncovered |
-| `services/upload.service.ts` | 94.44% | 88.88% | 100% | 94.44% | ✅ |
-| `services/storage.service.ts` | 100% | 100% | 100% | 100% | ✅ Excellent |
-
-**Average changed-file coverage**: ~82% stmts (weighted). Project-wide all four metrics ≥ 70% gate. The two low-branch files are informational per strict-TDD module (non-blocking).
+No layer uses tools not present in capabilities.
 
 ---
 
-## Assertion Quality (Step 5f)
+## Changed File Coverage
 
-**✅ All assertions verify real behavior.** No tautologies, no ghost loops, no type-only lone assertions, no smoke-only tests found in the 9 new/modified test files reviewed (blog-post.service.test.ts, blog-post.routes.test.ts, migrate-category-to-tags.test.ts, upload.service.test.ts, storage.service.test.ts, TagInput.test.tsx, ImageUploader.test.tsx, BlogPage.test.tsx, blogPost.schema.test.ts). Mock/assertion ratios are healthy. Two cosmetic notes (SUGGESTION level): TagInput test asserts the hardcoded "Máximo 10 etiquetas" string while passing `max={3}` (message does not reflect the prop); BlogPage chips-count assertion is loose but paired with value assertions.
+**Coverage analysis skipped for changed files** — the only coverage tool detected (Jest, api) covers `api/` files only, and no api files changed in Phase 3. Vitest coverage is not configured in any frontend package. Api-wide coverage confirmed separately: Stmts 84.00 / Branch 71.45 / Funcs 90.97 / Lines 90.94 (≥70%). Not a failure — informational.
 
 ---
 
-## Spec Compliance Matrix (behavioral, by executed tests)
+## Assertion Quality
 
-| Requirement | Scenario | Test | Result |
-|-------------|----------|------|--------|
-| blog-tags:TagsField | Tags stored on create | `blog-post.service.test.ts > persists tags on create` | ✅ COMPLIANT |
-| blog-tags:TagsField | Category derived from first tag | `blog-post.service.test.ts > derives category from first tag on create` + `persists tags and derives category on update` | ✅ COMPLIANT |
-| blog-tags:TagsField | Empty tags allowed | `blogPost.schema.test.ts > accepts a post without tags` | ✅ COMPLIANT |
-| blog-tags:TagSuggestions | Suggestions from published posts | `blog-post.service.test.ts > getTags distinct PUBLISHED sorted` + `excludes tags from DRAFT` | ✅ COMPLIANT |
-| blog-tags:TagFilter | Filter by tag | `blog-post.service.test.ts > combines tag + category filters with AND (hasSome)` | ✅ COMPLIANT |
-| blog-tags:TagFilter | Combined filters (AND) | `blog-post.service.test.ts > combines tag filter with search via AND` | ✅ COMPLIANT |
-| blog-tags:AdminTagEditor | Free entry with suggestions | `TagInput.test.tsx > fetches suggestions / commits typed tag / chips / max` | ✅ COMPLIANT |
-| blog-tags:TagMigration | Existing categories become tags | `migrate-category-to-tags.test.ts > non-empty → tag, empty → [], clamp 30` | ✅ COMPLIANT |
-| blog-post-api:Routes | Get all (public, filters) | `blog-post.routes.test.ts > GET /` + service findAll | ✅ COMPLIANT |
-| blog-post-api:Routes | Get by slug (public) | `blog-post.routes.test.ts > GET /:slug 404` + service findBySlug | ✅ COMPLIANT |
-| blog-post-api:Routes | Get by ID (protected) | `blog-post.routes.test.ts > GET /by-id/:id → 401` + route has authMiddleware | ✅ COMPLIANT |
-| blog-post-api:Routes | Create (protected) | `blog-post.routes.test.ts > POST / → 401` + service create | ✅ COMPLIANT |
-| blog-post-api:Routes | Update (protected) | `blog-post.routes.test.ts > PUT /:id → 401` + service update | ✅ COMPLIANT |
-| blog-post-api:Routes | Delete (protected) | `blog-post.routes.test.ts > DELETE /:id → 401` | ✅ COMPLIANT |
-| blog-post-api:Routes | Restore (protected) | `blog-post.routes.test.ts > PATCH /:id/restore → 401` | ✅ COMPLIANT |
-| blog-post-api:Routes | Reorder (protected) | (none found — no route/handler/service/admin API exists) | ❌ UNTESTED — pre-existing gap, see WARNING-2 |
-| blog-post-api:Routes | Change status (protected) | `blog-post.routes.test.ts > PATCH /:id/status → 401` + service updateStatus | ✅ COMPLIANT |
-| blog-post-api:Routes | Get available tags (public) | `blog-post.routes.test.ts > GET /tags 200` + service getTags | ✅ COMPLIANT |
-| blog-post-api:Routes | Unauthorized access | 5× 401 integration tests | ✅ COMPLIANT |
-| upload-hardening:ServerBucket | Upload to allowed bucket | `upload.service.test.ts > stores allowed bucket in requested bucket` | ✅ COMPLIANT |
-| upload-hardening:ServerBucket | Unknown bucket → 400 | `upload.service.test.ts > rejects unknown bucket, uploadFile NOT called` + env-override test | ✅ COMPLIANT |
-| upload-hardening:ServerBucket | Missing bucket → default | `upload.service.test.ts > uses default bucket (general)` | ✅ COMPLIANT |
-| upload-hardening:ClientAccept | Accept list aligned (no SVG) | `ImageUploader.test.tsx > accept = jpeg/png/gif/webp, not svg/html` | ✅ COMPLIANT |
-| upload-hardening:ClientAccept | Server still rejects SVG | `upload.service.test.ts > rejects svg with XSS-safety message` + controller fileFilter | ✅ COMPLIANT |
-| upload-hardening:ContentType | Image served with image content-type | `storage.service.test.ts > Content-Type: image/png stored with object` | ✅ COMPLIANT |
-| upload-hardening:ContentType | Non-image upload rejected | `upload.service.test.ts > rejects pdf` + multer fileFilter rejects .html | ✅ COMPLIANT |
-| admin-sc:Create | Create with videos+links | `SuccessCaseForm.tsx` (UrlListInput videos/links in payload) — typecheck gate | ✅ COMPLIANT (structural; no Vitest required by task) |
-| admin-sc:Edit | Prefill + edit videos/links | `SuccessCaseForm.tsx` (initialData.videos/links prefill + submit) | ✅ COMPLIANT (structural) |
-| admin-sv:Create | includedItems + technicalExplanation | `ServiceForm.tsx` (ItemListInput + textarea in payload, validation) | ✅ COMPLIANT (structural) |
-| admin-sv:Edit | Prefill + edit both fields | `ServiceForm.tsx` (initialData prefill + submit) | ✅ COMPLIANT (structural) |
-| blog-filters:RecruiterGrid | Tag filter auto-populated, AND, ?tag= URL | `BlogPage.tsx` + `useBlogTags()` + `BlogGrid.tsx` (category/tag/search → API) — typecheck gate | ✅ COMPLIANT (structural) |
-| blog-filters:ClientBlog | Tag filter, AND, URL persistence | `BlogPage.test.tsx > pre-applies ?category&tag&search` + `no-tag when URL has none` + code | ✅ COMPLIANT (URL pre-apply covered; debounce/click not automated — SUGGESTION-1) |
-| blog-filters:archive | Delta heading + requirement names match main spec | Delta `# Delta for Blog Frontend Filters`; req names `Blog Grid (Recruiter Site)` + `Client Site Blog Page` — exact match with `openspec/specs/blog-filters/spec.md` | ✅ COMPLIANT (H1 wording "for" vs ":" differs — SUGGESTION-4) |
+Scan of all P3 test files (`RichTextEditor.test.tsx`, `extensions.test.ts`, `BlogPostContent.test.tsx`):
 
-**Compliance summary**: 33/34 scenarios compliant; 1 pre-existing unimplemented scenario (blog-post reorder).
+- No tautologies, no ghost loops, no type-only-only assertions, no orphan empty checks, no smoke-only tests (toolbar test asserts specific accessible button names, not just render).
+- 1 mock (`vi.fn` onChange) vs 7+ behavioral assertions in `RichTextEditor.test.tsx` — ratio fine.
+- Serialization tests assert exact HTML strings; sanitization tests assert both strip (`querySelector('script')` null) and preserve (figure/img attrs).
+
+**Assertion quality**: ✅ All assertions verify real behavior.
+
+---
+
+## Quality Metrics
+
+**Linter**: ➖ Not available (eslint script exists but no config — per openspec/config.yaml).
+**Type Checker**: ✅ No errors — `pnpm -r run typecheck` 0 errors across 5 packages.
 
 ---
 
@@ -142,19 +153,13 @@ Integration tests use real HTTP (fetch against ephemeral Express server) — no 
 
 | Requirement | Status | Notes |
 |------------|--------|-------|
-| P2-01 Prisma BlogPost.tags + migration | ✅ | `tags String[]` in schema; `20260831_add_blog_tags/migration.sql` = `ALTER TABLE "BlogPost" ADD COLUMN "tags" TEXT[]` (coherent, additive) |
-| P2-02 Shared schema tags + tag filter | ✅ | `tags: tagsSchema.optional()`, filter gains `tag`; tagsSchema (trim 1–30, max 10) in own module to break circular import; re-exported via project.schema |
-| P2-03 Migration script idempotent | ✅ | `category-to-tags.ts` pure helper (trim, clamp 30, empty → []); script skips unchanged rows; ran on live DB (0 posts) |
-| P2-04/05 Blog API tags + `/tags` + guards | ✅ | create/update persist tags + derived category; tag `hasSome` AND category/search; `GET /tags` PUBLISHED-only, distinct, sorted; `/tags` + `/by-id/:id` before `/:slug`; 401 guards on all protected routes |
-| P2-06 Portfolio lab filter | ✅ | `tags hasSome [laboratorio,experimento]` + `NOT tags hasSome [articulo]`; classification = first tag; PUBLISHED+deletedAt-null on all 6 sources |
-| P2-07 TagInput | ✅ | Shared component (suggestionsUrl, chips, Enter/comma commit, max 10 default, 1–30 trim); adopted in BlogPostForm + ProjectForm; project pages use ProjectForm (no stale inline editor) |
-| P2-08 SuccessCase videos/links | ✅ | Create + edit via UrlListInput; payload includes videos/links (optional) |
-| P2-09 Service includedItems/technicalExplanation | ✅ | Create + edit via ItemListInput + textarea; validation (min 1 item); prefill from initialData |
-| P2-10 Upload hardening | ✅ | `upload.config.ts` (default `general`, env `UPLOAD_BUCKET_ALLOWLIST` override, unknown → ValidationError 400); controller passes bucket from body; SVG rejected with XSS message at multer + service; content-type stored on object |
-| P2-11 ImageUploader accept | ✅ | `DEFAULT_ACCEPT = image/jpeg,image/png,image/gif,image/webp` (SVG removed); Vitest asserts attr |
-| P2-12 Client blog filters | ✅ | Tag chips from `/api/blog-posts/tags`, AND with category/search, `?tag=` URL persistence, 300ms debounce (code); BlogPage.test covers URL pre-apply |
-| P2-13 Recruiter blog filters | ✅ | Same pattern; BlogGrid receives category/tag/search → API params |
-| P2-14 Phase gate | ✅ | typecheck 0 errors; api coverage ≥70% (all metrics); Vitest suites green |
+| RichTextEditor props + node set | ✅ Implemented | {value,onChange,minHeight,lang,labels}; StarterKit h1–4 + Underline/Link/TextAlign/Highlight + InlineImage/InlineVideo/SimulatorPlaceholder |
+| InlineImage `<figure><img src alt>` | ✅ Implemented | renderHTML exact; parseHTML roundtrip; test-backed |
+| InlineVideo `<video src controls>` | ✅ Implemented | renderHTML exact; parseHTML roundtrip; test-backed |
+| SimulatorPlaceholder `<div data-simulator-id>` | ✅ Implemented | renderHTML exact; parseHTML roundtrip; test-backed |
+| Adoption across 4 admin forms | ✅ Implemented | Blog/Project/Product/Tool forms; getTextFromHTML validation everywhere HTML content is length-checked |
+| Sanitize adoption (client + recruiter) | ✅ Implemented | every dangerouslySetInnerHTML / innerHTML render path uses `sanitizeHtml(…,{allowMedia:true})`; admin = 0 occurrences |
+| Deps hygiene | ✅ Implemented | client/recruiter +6 @tiptap each, −dompurify/−@types/dompurify; admin already held @tiptap (now consumed by shared ESM); dompurify only in shared |
 
 ---
 
@@ -162,36 +167,32 @@ Integration tests use real HTTP (fetch against ephemeral Express server) — no 
 
 | Decision | Followed? | Notes |
 |----------|-----------|-------|
-| D1 Aggregation at `/api/portfolio/projects` | ✅ Yes | Unchanged from P1; blog-post reorder gap unrelated |
-| D3 SVG accept aligned to server | ✅ Yes | ImageUploader accept + server fileFilter agree; sanitized-SVG deferred as designed |
-| D4 Lab posts type `laboratorio` via tags | ✅ Yes | P2-06 switched category-proxy → `tags hasSome`; articulo excluded; first-tag classification |
-| D7 Tags free-form, category derived | ✅ Yes | tagsSchema shared; category derived from first tag on create/update; BlogPostForm derives category client-side for validation |
-| Bucket allowlist source (open question) | ✅ Resolved | config constant + `UPLOAD_BUCKET_ALLOWLIST` env override (config-driven, per risk note) |
-| Route-order guard | ✅ Yes | `/tags` + `/by-id/:id` before `/:slug`; enforced by integration tests |
-| Design File Changes table | ✅ Matched | All listed Phase 2 files present; `api/src/config/` (upload.config.ts) new as designed |
+| Phase 3 File Changes table | ✅ Yes | RichTextEditor/* new; shared package.json +tiptap; TipTapEditor deleted; 4 admin forms modified; client/recruiter renderers modified; sanitize.ts (P1) reused |
+| Decision 5 — shared media allowlist + restricted iframe src | ✅ Yes | single `sanitizeHtml` in `@jsoft/shared`; regex `^/api/simulators/[A-Za-z0-9]+/content$`; strip/preserve tests |
+| Props `{value,onChange,minHeight}` | ✅ Yes (+extension) | optional `lang`/`labels` added for i18n — backward-compatible, explicitly in verify scope |
+| Toolbar extracted from admin TipTapEditor | ✅ Yes | command inventory of deleted file matches new toolbar; new Insert buttons added |
+| Storage format stays DOMPurify-compatible HTML | ✅ Yes | `output stays sanitizable` test proves media preserved + scripts stripped |
 
 ---
 
 ## Issues Found
 
 **CRITICAL** (must fix before PR/archive):
-None.
+- None.
 
-**WARNING** (should fix / be aware of):
-1. **TDD evidence format** — the apply-progress artifact reports TDD narratively (tests written first, existing tests updated as safety net) but lacks the canonical "TDD Cycle Evidence" table (RED/GREEN/TRIANGULATE/SAFETY NET/REFACTOR). Substance is fully verifiable: all RED test files exist and pass. Protocol-format deviation only.
-2. **Spec scenario "Reorder blog posts (protected)" unimplemented** — `PATCH /api/blog-posts/:id/reorder` has no route/handler/service/admin API anywhere. This is a **pre-existing gap** carried from the main spec (archived change, present on main before P2) into the P2 delta as an unchanged scenario; no P2 task owns it. Not a P2 regression, but the delta spec lists it as active — orchestrator should decide: implement in a follow-up or clean the spec.
-3. **Changed-file branch coverage below 80%** — `portfolio.service.ts` branch 59.01% (uncovered: type-filter branches, getClassifications) and `blog-post.service.ts` branch 76.78%. Informational per strict-TDD module; project-wide branch 71.45% passes the 70% gate.
-4. **`migrate-category-to-tags.ts` script 0% coverage** — expected (DB-touching, executed via tsx); the pure mapping is 100% covered.
+**WARNING** (should fix):
+1. **apply-progress lacks the formal TDD Cycle Evidence table** (engram #1012 documents What/Why/Where/Learned/Gate evidence but not the RED/GREEN/TRIANGULATE/SAFETY-NET table required by strict-tdd-verify Step 5a). Mitigation: Strict TDD scope in this project is the api (per tasks.md header "Strict TDD (api)"); Phase 3 contains zero api tasks — all 8 tasks are frontend/shared with "typecheck; manual" / "Vitest where sensible" test specs. Every test file P3 claims was written exists and passes on execution (independently reproduced), and the gate evidence in the apply-progress is accurate. Flagged for protocol-format compliance; not a functional gap.
 
 **SUGGESTION** (nice to have):
-1. Client BlogPage Vitest does not exercise the 300ms debounce (no fake timers) or chip-click → `?tag=` URL update; it covers URL pre-apply only. Add a fake-timer + click test.
-2. Recruiter BlogPage tag filter has no Vitest (task required only typecheck) — structurally identical to client, low risk.
-3. TagInput max-tag message is the hardcoded "Máximo 10 etiquetas" string regardless of the `max` prop (test passes max=3 but asserts the "10" message). Cosmetic.
-4. Delta H1 `# Delta for Blog Frontend Filters` vs main spec `# Delta: Blog Frontend Filters` — requirement names match exactly (merge-safe), but archive phase should confirm heading-based matching.
-5. `update` with `tags: []` leaves `category` untouched (undefined → skipped in Prisma data). Consider explicitly setting category (e.g. keep-or-empty policy) so empty-tags updates are unambiguous.
+1. `RichTextEditor` parses `value` once on mount (TipTap standard). A parent-driven reset of `value` after mount (e.g., future "clear form" action) will not refresh the editor. Matches the deleted TipTapEditor behavior — no regression — but worth documenting for future form-reset features.
+2. Node-view strings in `InlineImage`/`InlineVideo`/`SimulatorPlaceholder` ("Imagen sin URL", "Quitar", "Simulador", …) are Spanish-only regardless of `lang='en'`. Accepted per scope (neutral Spanish node-view strings documented as acceptable); a future i18n pass could route them through `labels`.
+3. Cancelling the simulator-ID prompt inserts an empty placeholder (`simulatorId: ''`). Minor UX — could no-op on cancel.
+4. Root `.npmrc` uses `shamefully-hoist=true` (pre-existing); it explains why admin resolves `@tiptap` transitively. Works, but a stricter `public-hoist-pattern` would be cleaner long-term.
 
 ---
 
 ## Verdict
 
-**PASS (GO)** — Phase 2 (P2-01..P2-14) is complete, all gates pass, implementation matches the P2 delta specs and design. No CRITICAL issues; 2 WARNINGs (protocol format + pre-existing out-of-scope gap) and 5 SUGGESTIONs. Safe to create the P2 PR (`feat/project-publications-p2`). Remember to `git add` the untracked files (migration folder, TagInput, new tests, config/scripts) before committing.
+### ✅ GO (PASS WITH WARNINGS)
+
+Phase 3 is complete and behaviorally compliant with the rich-text-editor and sanitization delta specs. All gates pass on real execution: typecheck 0 errors, api 240/240 tests, coverage ≥70% (all four metrics), Vitest shared 91 / admin 13 / client 17 / recruiter 15 all green, shared tsup build succeeds with RTE CSS bundled and @tiptap externalized. No CRITICAL issues. Safe to create the P3 PR.

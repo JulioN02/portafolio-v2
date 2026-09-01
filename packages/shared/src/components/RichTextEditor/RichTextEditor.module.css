@@ -1,0 +1,252 @@
+/* RichTextEditor — toolbar, editor shell, and node-view styles.
+   NOTE: class names are literal strings (tsup strips CSS module mappings);
+   this file is imported from packages/shared/src/index.ts so tsup bundles it
+   into dist/index.css. */
+
+.rte-shell {
+  display: flex;
+  flex-direction: column;
+}
+
+.rte-toolbar {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+  padding: 0.5rem;
+  background: #fafafa;
+  border: 1px solid #e1e4e8;
+  border-radius: 6px 6px 0 0;
+  align-items: center;
+}
+
+.rte-toolbar-button {
+  padding: 0.35rem 0.6rem;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  background: #f5f5f5;
+  color: #4a4a4a;
+  border: 1px solid #e1e4e8;
+  border-radius: 4px;
+  cursor: pointer;
+  line-height: 1.4;
+  transition: background 0.15s ease, color 0.15s ease;
+  font-family: inherit;
+}
+
+.rte-toolbar-button:hover {
+  background: #e6f7ff;
+}
+
+.rte-toolbar-button--active {
+  background: #1677ff;
+  color: #fff;
+  font-weight: 600;
+}
+
+.rte-toolbar-separator {
+  width: 1px;
+  align-self: stretch;
+  background: #e1e4e8;
+  margin: 2px 4px;
+}
+
+.rte-editor-shell {
+  border: 1px solid #e1e4e8;
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  overflow: hidden;
+}
+
+/* ── Editor content typography (ProseMirror editable element) ── */
+
+.rte-content.ProseMirror {
+  outline: none;
+}
+
+.rte-content.ProseMirror p {
+  margin: 0.5em 0;
+}
+
+.rte-content.ProseMirror h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0.75em 0 0.25em;
+}
+
+.rte-content.ProseMirror h2 {
+  font-size: 1.375rem;
+  font-weight: 600;
+  margin: 0.75em 0 0.25em;
+}
+
+.rte-content.ProseMirror h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0.5em 0 0.25em;
+}
+
+.rte-content.ProseMirror h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0.5em 0 0.25em;
+}
+
+.rte-content.ProseMirror ul,
+.rte-content.ProseMirror ol {
+  padding-left: 1.5rem;
+  margin: 0.5em 0;
+}
+
+.rte-content.ProseMirror li {
+  margin: 0.25em 0;
+}
+
+.rte-content.ProseMirror blockquote {
+  border-left: 3px solid var(--color-blue-ui, #1677ff);
+  padding-left: 1rem;
+  margin: 0.5em 0;
+  color: var(--color-neutral-500, #6b7280);
+  font-style: italic;
+}
+
+.rte-content.ProseMirror pre {
+  background: var(--color-neutral-800, #1f2937);
+  color: var(--color-neutral-200, #e5e7eb);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.875rem;
+  overflow-x: auto;
+  margin: 0.5em 0;
+}
+
+.rte-content.ProseMirror code {
+  background: var(--color-neutral-100, #f3f4f6);
+  border-radius: 4px;
+  padding: 0.125rem 0.25rem;
+  font-size: 0.875em;
+}
+
+.rte-content.ProseMirror pre code {
+  background: none;
+  padding: 0;
+}
+
+.rte-content.ProseMirror hr {
+  border: none;
+  border-top: 1px solid var(--color-neutral-300, #d1d5db);
+  margin: 1em 0;
+}
+
+.rte-content.ProseMirror a {
+  color: var(--color-blue-ui, #1677ff);
+  text-decoration: underline;
+}
+
+/* ── Inline media node views ── */
+
+.rte-media-node {
+  margin: 0.75rem 0;
+}
+
+.rte-media-figure {
+  margin: 0;
+}
+
+.rte-media-figure img,
+.rte-video {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+
+.rte-media-caption {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.rte-media-empty {
+  display: block;
+  padding: 1rem;
+  background: #fafafa;
+  border: 1px dashed #d1d5db;
+  border-radius: 6px;
+  color: #9ca3af;
+  text-align: center;
+}
+
+.rte-media-controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.rte-media-input {
+  flex: 1;
+  min-width: 160px;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.8125rem;
+  border: 1px solid #e1e4e8;
+  border-radius: 4px;
+  font-family: inherit;
+  color: #333;
+  background: #fff;
+}
+
+.rte-media-remove {
+  padding: 0.35rem 0.6rem;
+  font-size: 0.8125rem;
+  background: #fff1f0;
+  color: #cf1322;
+  border: 1px solid #ffa39e;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* ── Simulator placeholder node view ── */
+
+.rte-simulator-placeholder {
+  margin: 0.75rem 0;
+}
+
+.rte-simulator-box {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: #f0f7ff;
+  border: 1px dashed #91caff;
+  border-radius: 6px;
+}
+
+.rte-simulator-icon {
+  font-size: 1.1rem;
+}
+
+.rte-simulator-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.rte-simulator-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #0958d9;
+}
+
+.rte-simulator-input {
+  padding: 0.35rem 0.5rem;
+  font-size: 0.8125rem;
+  border: 1px solid #e1e4e8;
+  border-radius: 4px;
+  font-family: inherit;
+  max-width: 240px;
+  color: #333;
+  background: #fff;
+}

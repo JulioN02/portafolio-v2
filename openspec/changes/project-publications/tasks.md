@@ -44,14 +44,14 @@
 
 ## Phase 3: Shared editor + sanitization adoption (WEIGHT: MEDIUM)
 
-- [ ] **P3-01** `packages/shared/package.json`: add @tiptap/* + react deps. REQ: rich-text:SharedEditor. Test: typecheck.
-- [ ] **P3-02** Shared `RichTextEditor.tsx` (`{value,onChange,minHeight}`; StarterKit h1–4, Underline, Link, TextAlign, Highlight; toolbar extracted from admin TipTapEditor). REQ: rich-text:SharedEditor. Files: `packages/shared/src/components/RichTextEditor/RichTextEditor.tsx`. Test: typecheck; manual init-from-HTML + emits HTML.
-- [ ] **P3-03** `InlineImage` node — insert between paragraphs, serializes `<figure><img>`. REQ: rich-text:InlineImage. Files: `packages/shared/src/components/RichTextEditor/extensions/InlineImage.tsx`. Test: typecheck; manual.
-- [ ] **P3-04** `InlineVideo` node — local/URL, serializes `<video src>`. REQ: rich-text:InlineVideo. Files: `packages/shared/src/components/RichTextEditor/extensions/InlineVideo.tsx`. Test: typecheck; manual.
-- [ ] **P3-05** `SimulatorPlaceholder` node — "Insertar simulador", serializes `<div data-simulator-id>`. REQ: rich-text:SimulatorPlaceholder. Files: `packages/shared/src/components/RichTextEditor/extensions/SimulatorPlaceholder.tsx`. Test: typecheck; manual.
-- [ ] **P3-06** Delete `admin-panel/src/components/blog-posts/TipTapEditor.tsx`; adopt shared `RichTextEditor` in Project/Product/Tool/Blog forms (output stays DOMPurify-compatible). REQ: rich-text:Adoption/StorageCompat. Files: admin Project/Product/Tool/Blog forms. Test: typecheck; manual sanitizable output.
-- [ ] **P3-07** Sanitization adoption: client + recruiter renderers use `sanitizeHtml(…,{allowMedia:true})` (recruiter: BlogPostContent body/lessons, ProjectDetailModal explanation; client: ServiceDetail + remaining); assert admin-panel has zero `dangerouslySetInnerHTML`. REQ: sanitize:AllRenderers/AdminNoHTML. Files: client-site + recruiter-site renderers. Test: strip/preserve assertions.
-- [ ] **P3-08** Phase gate: `pnpm -r run typecheck` 0 errors (5 packages); Vitest where sensible.
+- [x] **P3-01** `packages/shared/package.json`: add @tiptap/* + react deps. REQ: rich-text:SharedEditor. Test: typecheck.
+- [x] **P3-02** Shared `RichTextEditor.tsx` (`{value,onChange,minHeight}`; StarterKit h1–4, Underline, Link, TextAlign, Highlight; toolbar extracted from admin TipTapEditor). REQ: rich-text:SharedEditor. Files: `packages/shared/src/components/RichTextEditor/RichTextEditor.tsx`. Test: typecheck; manual init-from-HTML + emits HTML.
+- [x] **P3-03** `InlineImage` node — insert between paragraphs, serializes `<figure><img>`. REQ: rich-text:InlineImage. Files: `packages/shared/src/components/RichTextEditor/extensions/InlineImage.tsx`. Test: typecheck; manual.
+- [x] **P3-04** `InlineVideo` node — local/URL, serializes `<video src>`. REQ: rich-text:InlineVideo. Files: `packages/shared/src/components/RichTextEditor/extensions/InlineVideo.tsx`. Test: typecheck; manual.
+- [x] **P3-05** `SimulatorPlaceholder` node — "Insertar simulador", serializes `<div data-simulator-id>`. REQ: rich-text:SimulatorPlaceholder. Files: `packages/shared/src/components/RichTextEditor/extensions/SimulatorPlaceholder.tsx`. Test: typecheck; manual.
+- [x] **P3-06** Delete `admin-panel/src/components/blog-posts/TipTapEditor.tsx`; adopt shared `RichTextEditor` in Project/Product/Tool/Blog forms (output stays DOMPurify-compatible). REQ: rich-text:Adoption/StorageCompat. Files: admin Project/Product/Tool/Blog forms. Test: typecheck; manual sanitizable output.
+- [x] **P3-07** Sanitization adoption: client + recruiter renderers use `sanitizeHtml(…,{allowMedia:true})` (recruiter: BlogPostContent body/lessons, ProjectDetailModal explanation; client: ServiceDetail + remaining); assert admin-panel has zero `dangerouslySetInnerHTML`. REQ: sanitize:AllRenderers/AdminNoHTML. Files: client-site + recruiter-site renderers. Test: strip/preserve assertions.
+- [x] **P3-08** Phase gate: `pnpm -r run typecheck` 0 errors (5 packages); Vitest where sensible.
 
 ## Phase 4: Simulators (WEIGHT: MEDIUM)
 

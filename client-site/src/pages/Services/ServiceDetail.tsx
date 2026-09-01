@@ -1,6 +1,6 @@
 import { useState, type SyntheticEvent } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import DOMPurify from 'dompurify';
+import { sanitizeHtml } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useServiceBySlug } from '../../hooks/useServices';
 import { Loading } from '../../components/common/Loading';
@@ -138,7 +138,7 @@ export function ServiceDetailPage() {
         {service.fullDescription && (
           <div className={styles.fullDescription}>
             <h2>{t('serviceDetail.fullDescription')}</h2>
-            <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(service.fullDescription) }} />
+            <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(service.fullDescription, { allowMedia: true }) }} />
           </div>
         )}
       </div>

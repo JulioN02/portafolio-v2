@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
+import { RichTextEditor } from '@jsoft/shared';
 import type { ToolInput } from '@jsoft/shared';
 import { ImageUploader } from '../uploads/ImageUploader';
+import { getTextFromHTML } from '../../utils/getTextFromHTML';
 import formStyles from '../../styles/form.module.css';
 
 interface ToolFormProps {
@@ -11,7 +13,7 @@ interface ToolFormProps {
 }
 
 export function ToolForm({ initialData, onSubmit, isLoading }: ToolFormProps) {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const [title, setTitle] = useState(initialData?.title || '');
   const [slug, setSlug] = useState(initialData?.slug || '');
   const [classification, setClassification] = useState(initialData?.classification || '');
@@ -55,7 +57,7 @@ export function ToolForm({ initialData, onSubmit, isLoading }: ToolFormProps) {
     if (!slug || slug.length < 3) newErrors.slug = t('validation.slugMin');
     if (!classification || classification.length < 2) newErrors.classification = t('validation.classificationMin');
     if (!shortDescription || shortDescription.length < 10) newErrors.shortDescription = t('validation.shortDescriptionMin');
-    if (!fullDescription || fullDescription.length < 50) newErrors.fullDescription = t('validation.fullDescriptionMin');
+    if (getTextFromHTML(fullDescription).length < 50) newErrors.fullDescription = t('validation.fullDescriptionMin');
     if (images.length === 0) newErrors.images = t('validation.imageRequired');
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -140,15 +142,7 @@ export function ToolForm({ initialData, onSubmit, isLoading }: ToolFormProps) {
         </div>
         <div className={formStyles.formGroup}>
           <label className={formStyles.formLabel} htmlFor="fullDescription">{t('form.fullDescription')}</label>
-          <textarea
-            id="fullDescription"
-            className={`${formStyles.formInput} ${formStyles.formTextarea} ${errors.fullDescription ? formStyles.inputError : ''}`}
-            value={fullDescription}
-            onChange={(e) => setFullDescription(e.target.value)}
-            placeholder={t('form.fullDescriptionPlaceholder')}
-            required
-            style={{ minHeight: '200px' }}
-          />
+          <RichTextEditor value={fullDescription} onChange={setFullDescription} minHeight={250} lang={lang} />
           {errors.fullDescription && <span className={formStyles.formError}>{errors.fullDescription}</span>}
         </div>
       </fieldset>

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
+import { RichTextEditor } from '@jsoft/shared';
 import type { ProjectInput } from '@jsoft/shared';
-import { TipTapEditor } from '../blog-posts/TipTapEditor';
 import { ImageUploader } from '../uploads/ImageUploader';
 import { TagInput } from '../shared/TagInput';
 import { getTextFromHTML } from '../../utils/getTextFromHTML';
@@ -24,7 +24,7 @@ const generateSlug = (title: string): string => {
 const MAX_TAGS = 10;
 
 export function ProjectForm({ initialData, onSubmit, isLoading }: ProjectFormProps) {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
 
   const [title, setTitle] = useState(initialData?.title || '');
   const [slug, setSlug] = useState(initialData?.slug || '');
@@ -144,7 +144,7 @@ export function ProjectForm({ initialData, onSubmit, isLoading }: ProjectFormPro
         </div>
         <div className={formStyles.formGroup}>
           <label className={formStyles.formLabel}>{t('projects.bodyContent')}</label>
-          <TipTapEditor content={body} onChange={setBody} />
+          <RichTextEditor value={body} onChange={setBody} minHeight={400} lang={lang} />
           {errors.body && <span className={formStyles.formError}>{errors.body}</span>}
         </div>
       </fieldset>
