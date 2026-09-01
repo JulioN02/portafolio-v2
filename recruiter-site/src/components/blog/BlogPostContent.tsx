@@ -1,4 +1,4 @@
-import { sanitizeHtml } from '@jsoft/shared';
+import { renderSimulatorEmbeds } from '@jsoft/shared';
 import type { BlogPostResponse } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import styles from './BlogPostContent.module.css';
@@ -25,9 +25,9 @@ function formatDate(dateStr: string): string {
 
 export function BlogPostContent({ post }: BlogPostContentProps) {
   const { t } = useTranslation();
-  const sanitizedBody = sanitizeHtml(post.body, { allowMedia: true });
+  const sanitizedBody = renderSimulatorEmbeds(post.body);
   const sanitizedLessons = post.lessonsLearned
-    ? sanitizeHtml(post.lessonsLearned, { allowMedia: true })
+    ? renderSimulatorEmbeds(post.lessonsLearned)
     : null;
 
   const hasMediaGallery =

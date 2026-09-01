@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
-import { sanitizeHtml } from '@jsoft/shared';
+import { renderSimulatorEmbeds } from '@jsoft/shared';
 import { useProjectDetail } from '../../hooks/useProjects';
 import type { ProjectSummary } from '../../types';
 import styles from './ProjectDetailModal.module.css';
@@ -204,7 +204,7 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
               ref={contentRef}
               className={styles.technicalContent}
               dangerouslySetInnerHTML={{
-                __html: sanitizeHtml(technicalExplanation, { allowMedia: true }),
+                __html: renderSimulatorEmbeds(technicalExplanation),
               }}
             />
           </div>
@@ -250,7 +250,7 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
                 <div
                   className={styles.technicalContent}
                   dangerouslySetInnerHTML={{
-                    __html: sanitizeHtml(projectBody, { allowMedia: true }),
+                    __html: renderSimulatorEmbeds(projectBody),
                   }}
                 />
               </div>
