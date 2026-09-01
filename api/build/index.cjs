@@ -46381,7 +46381,7 @@ var parseOptionalInt = (value) => {
 };
 function buildSimulatorCsp() {
   const origins = (process.env.CORS_ORIGIN?.split(",") || ["http://localhost:5173", "http://localhost:4173"]).map((origin) => origin.trim()).filter(Boolean).join(" ");
-  return `sandbox allow-scripts; default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors ${origins}`;
+  return `sandbox allow-scripts; default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors ${origins}`;
 }
 var simulatorController = {
   /**
