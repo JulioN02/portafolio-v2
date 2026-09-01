@@ -55,16 +55,16 @@
 
 ## Phase 4: Simulators (WEIGHT: MEDIUM)
 
-- [ ] **P4-01** Prisma `Simulator` model (id, title, slug unique, fileName, size, mimeType, width?, height?, uploadedAt, timestamps, deletedAt) + `migrate dev --name add_simulator_model`. REQ: simulators:Upload. Files: `api/prisma/schema.prisma`. Test: schema inspect.
-- [ ] **P4-02** Supabase: create private `simulators` bucket (infra). REQ: simulators:Upload. Test: manual bucket check.
-- [ ] **P4-03** RED `simulator.service.test.ts`: upload validation (≤1MB, `.html`/text/html only, auth), record creation, download, size guard, 404. REQ: simulators:Upload/ServingEndpoint/SizeLimits. Files: `api/src/services/simulator.service.test.ts`. Test: RED.
-- [ ] **P4-04** GREEN `simulator.service.ts` (upload/list/getMetadata/download with 1MB guard). REQ: simulators:Upload. Files: `api/src/services/simulator.service.ts`. Test: GREEN.
-- [ ] **P4-05** `storage.service.ts` + `downloadFile(bucket, fileName)` server-side stream. REQ: simulators:ServingEndpoint. Files: `api/src/services/storage.service.ts`. Test: unit.
-- [ ] **P4-06** `simulator.controller.ts` + `simulator.routes.ts` (`/upload` JWT+multer, `GET /`, `GET /:id`, `GET /:id/content` public) + mount `app.ts`; `/content` sets text/html + CSP `sandbox allow-scripts; frame-ancestors <CORS_ORIGIN>; default-src 'none'; base-uri 'none'; form-action 'none'` + nosniff + no-store, removes helmet X-Frame-Options. REQ: simulators:ServingEndpoint. Files: `api/src/{controllers,routes}/simulator.*`, `api/src/app.ts`. Test: integration header/404/401 assertions.
-- [ ] **P4-07** Admin simulators page (list + upload form ≤1MB) + `api/simulators.api.ts`; wire into editor picker. REQ: simulators:Upload. Files: `admin-panel/src/pages/simulators/*`, `admin-panel/src/api/simulators.api.ts`. Test: typecheck; manual upload.
-- [ ] **P4-08** Shared `SimulatorNode.tsx`: bind placeholder → `<iframe src="/api/simulators/:id/content" sandbox="allow-scripts">` (NO allow-same-origin). REQ: simulators:SandboxIframe. Files: `packages/shared/src/components/RichTextEditor/SimulatorNode.tsx`. Test: DOM sandbox-attr assertion (verify phase).
-- [ ] **P4-09** Client/recruiter renderers: simulator node → sandboxed iframe inline; standalone section component with width/height limits. REQ: simulators:Placement/SizeLimits. Files: client-site + recruiter-site components. Test: typecheck; sandbox attr assertions.
-- [ ] **P4-10** Phase gate: typecheck 0 errors; api coverage ≥70%; run verify scenarios (sanitize allowlist, sandbox attrs, CSP headers).
+- [x] **P4-01** Prisma `Simulator` model (id, title, slug unique, fileName, size, mimeType, width?, height?, uploadedAt, timestamps, deletedAt) + `migrate dev --name add_simulator_model`. REQ: simulators:Upload. Files: `api/prisma/schema.prisma`. Test: schema inspect.
+- [x] **P4-02** Supabase: create private `simulators` bucket (infra). REQ: simulators:Upload. Test: manual bucket check.
+- [x] **P4-03** RED `simulator.service.test.ts`: upload validation (≤1MB, `.html`/text/html only, auth), record creation, download, size guard, 404. REQ: simulators:Upload/ServingEndpoint/SizeLimits. Files: `api/src/services/simulator.service.test.ts`. Test: RED.
+- [x] **P4-04** GREEN `simulator.service.ts` (upload/list/getMetadata/download with 1MB guard). REQ: simulators:Upload. Files: `api/src/services/simulator.service.ts`. Test: GREEN.
+- [x] **P4-05** `storage.service.ts` + `downloadFile(bucket, fileName)` server-side stream. REQ: simulators:ServingEndpoint. Files: `api/src/services/storage.service.ts`. Test: unit.
+- [x] **P4-06** `simulator.controller.ts` + `simulator.routes.ts` (`/upload` JWT+multer, `GET /`, `GET /:id`, `GET /:id/content` public) + mount `app.ts`; `/content` sets text/html + CSP `sandbox allow-scripts; frame-ancestors <CORS_ORIGIN>; default-src 'none'; base-uri 'none'; form-action 'none'` + nosniff + no-store, removes helmet X-Frame-Options. REQ: simulators:ServingEndpoint. Files: `api/src/{controllers,routes}/simulator.*`, `api/src/app.ts`. Test: integration header/404/401 assertions.
+- [x] **P4-07** Admin simulators page (list + upload form ≤1MB) + `api/simulators.api.ts`; wire into editor picker. REQ: simulators:Upload. Files: `admin-panel/src/pages/simulators/*`, `admin-panel/src/api/simulators.api.ts`. Test: typecheck; manual upload.
+- [x] **P4-08** Shared `SimulatorNode.tsx`: bind placeholder → `<iframe src="/api/simulators/:id/content" sandbox="allow-scripts">` (NO allow-same-origin). REQ: simulators:SandboxIframe. Files: `packages/shared/src/components/RichTextEditor/SimulatorNode.tsx`. Test: DOM sandbox-attr assertion (verify phase).
+- [x] **P4-09** Client/recruiter renderers: simulator node → sandboxed iframe inline; standalone section component with width/height limits. REQ: simulators:Placement/SizeLimits. Files: client-site + recruiter-site components. Test: typecheck; sandbox attr assertions.
+- [x] **P4-10** Phase gate: typecheck 0 errors; api coverage ≥70%; run verify scenarios (sanitize allowlist, sandbox attrs, CSP headers).
 
 ## Notes / flagged decisions
 1. Phase 1 Project form reuses existing admin `TipTapEditor`; P3-06 swaps it for the shared editor.
