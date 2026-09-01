@@ -54,6 +54,9 @@ export type {
   PaginatedResponse,
   ApiError,
   ApiSuccess,
+
+  // Simulators
+  SimulatorResponse,
 } from './types/index.js';
 
 // API Client
@@ -116,6 +119,26 @@ export { withBoundary } from './components/index.js';
 // Rich Text Editor
 export { RichTextEditor } from './components/index.js';
 export type { RichTextEditorProps, RichTextEditorLabels } from './components/index.js';
+
+// Simulator embeds (Phase 4 — sandboxed iframe rendering)
+export {
+  SimulatorNode,
+  SimulatorSection,
+  SimulatorPicker,
+  renderSimulatorEmbeds,
+  buildSimulatorSrc,
+  SIMULATOR_DEFAULT_WIDTH,
+  SIMULATOR_DEFAULT_HEIGHT,
+  SIMULATOR_PICKER_MAX_SIZE,
+} from './components/index.js';
+export type {
+  SimulatorNodeProps,
+  SimulatorSectionProps,
+  RenderSimulatorEmbedsOptions,
+  SimulatorPickerApi,
+  SimulatorOption,
+  SimulatorPickerLabels,
+} from './components/index.js';
 
 // CSS Variables (import to apply design tokens)
 import './styles/variables.css';

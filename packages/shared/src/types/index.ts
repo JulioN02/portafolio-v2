@@ -80,6 +80,22 @@ export interface PaginationParams {
   limit: number;
 }
 
+/** Simulator metadata (Phase 4 — sandboxed HTML/CSS/JS embeds). */
+export interface SimulatorResponse {
+  id: string;
+  title: string;
+  slug: string;
+  fileName: string;
+  size: number;
+  mimeType: string;
+  width: number | null;
+  height: number | null;
+  uploadedAt: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+}
+
 export interface PaginatedResponse<T> {
   data: T[];
   pagination: {

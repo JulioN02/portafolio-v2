@@ -71,6 +71,13 @@ describe('sanitizeHtml', () => {
       expect(result).not.toContain('<script');
       expect(result).toContain('<img src="/uploads/x.png"');
     });
+
+    it('keeps div[data-simulator-id] placeholders (editor node markup)', () => {
+      const result = sanitizeHtml('<p>Intro</p><div data-simulator-id="abc123"></div><p>Fin</p>', {
+        allowMedia: true,
+      });
+      expect(result).toContain('data-simulator-id="abc123"');
+    });
   });
 
   it('keeps safe HTML identical (no safe content lost)', () => {
