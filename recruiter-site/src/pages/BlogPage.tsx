@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { MetaTags } from '../components/seo/MetaTags';
 import { BlogGrid } from '../components/blog/BlogGrid';
-import { useBlogCategories } from '../hooks/useBlogPosts';
+import { useBlogCategories, useBlogTags } from '../hooks/useBlogPosts';
 import { useTranslation } from '../i18n/LanguageContext';
 import styles from './BlogPage.module.css';
 
@@ -10,10 +10,12 @@ export function BlogPage() {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const category = searchParams.get('category') || undefined;
+  const tag = searchParams.get('tag') || undefined;
   const search = searchParams.get('search') || undefined;
 
   const [searchInput, setSearchInput] = useState(search || '');
   const { data: categories } = useBlogCategories();
+  const { data: tags = [] } = useBlogTags();
 
   // Debounce search input — update URL search param after 300ms of inactivity
   useEffect(() => {
@@ -39,6 +41,19 @@ export function BlogPage() {
         next.set('category', value);
       } else {
         next.delete('category');
+      }
+      next.delete('page');
+      return next;
+    }, { replace: true });
+  };
+
+  const handleTagChange = (value: string) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (value) {
+        next.set('tag', value);
+      } else {
+        next.delete('tag');
       }
       next.delete('page');
       return next;
@@ -78,7 +93,28 @@ export function BlogPage() {
         </select>
       </div>
 
-      <BlogGrid category={category} search={search} />
+      {/* Tag filter chips — auto-populated from /api/blog-posts/tags */}
+      {tags.length > 0 && (
+        <div className={styles.tagFilters} role="group" aria-label={t('blog.tagFilterAriaLabel')}>
+          <button
+            className={`${styles.tagChip} ${!tag ? styles.tagChipActive : ''}`}
+            onClick={() => handleTagChange('')}
+          >
+            {t('blog.tagAll')}
+          </button>
+          {tags.map((t) => (
+            <button
+              key={t}
+              className={`${styles.tagChip} ${tag === t ? styles.tagChipActive : ''}`}
+              onClick={() => handleTagChange(t)}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <BlogGrid category={category} tag={tag} search={search} />
     </main>
   );
 }
