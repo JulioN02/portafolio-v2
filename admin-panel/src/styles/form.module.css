@@ -510,6 +510,26 @@ select.formInput {
   border-color: var(--color-error);
 }
 
+/* Small danger button (remove item from a list) */
+.btnDangerSmall {
+  padding: 0.25rem 0.5rem;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-error);
+  background: var(--color-error-bg);
+  border: 1px solid #ffccc7;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.btnDangerSmall:hover:not(:disabled) {
+  background: #ffccc7;
+  border-color: var(--color-error);
+}
+
 /* ── Form Actions (legacy, kept for compatibility) ── */
 .formActions {
   display: flex;

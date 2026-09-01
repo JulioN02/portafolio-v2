@@ -4,7 +4,9 @@ import { useTranslation } from '../../i18n/LanguageContext';
 import { uploadApi } from '../../api/upload.api';
 import styles from './ImageUploader.module.css';
 
-const DEFAULT_ACCEPT = 'image/jpeg,image/png,image/gif,image/webp,image/svg+xml';
+// Aligned with the server's allowed extensions (upload-hardening spec):
+// SVG is NOT advertised because the server rejects it for XSS safety.
+const DEFAULT_ACCEPT = 'image/jpeg,image/png,image/gif,image/webp';
 
 interface UploadTask {
   key: string;

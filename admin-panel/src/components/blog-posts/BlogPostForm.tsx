@@ -5,6 +5,7 @@ import type { BlogPostInput, PostStatus } from '@jsoft/shared';
 import { TipTapEditor } from './TipTapEditor';
 import { getTextFromHTML } from '../../utils/getTextFromHTML';
 import { ImageUploader } from '../uploads/ImageUploader';
+import { TagInput } from '../shared/TagInput';
 import formStyles from '../../styles/form.module.css';
 
 interface BlogPostFormProps {
@@ -22,19 +23,23 @@ export function BlogPostForm({ initialData, onSubmit, isLoading }: BlogPostFormP
   const [status, setStatus] = useState<PostStatus>(initialData?.status || 'DRAFT');
   const [coverImage, setCoverImage] = useState(initialData?.coverImage || '');
   const [mediaGallery, setMediaGallery] = useState<string[]>(initialData?.mediaGallery || []);
-  const [category, setCategory] = useState(initialData?.category || '');
+  const [tags, setTags] = useState<string[]>(initialData?.tags || []);
   const [externalLink, setExternalLink] = useState(initialData?.externalLink || '');
   const [lessonsLearned, setLessonsLearned] = useState(initialData?.lessonsLearned || '');
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Category is derived from the first tag (kept for API/recruiter compat).
+  // Fall back to the previous category while editing an existing post.
+  const category = tags[0] || initialData?.category || '';
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!title || title.length < 3) newErrors.title = t('validation.titleMin');
     if (!slug || slug.length < 3) newErrors.slug = t('validation.slugMin');
     if (!category) {
-      newErrors.category = t('validation.categoryRequired');
+      newErrors.tags = t('validation.categoryRequired');
     } else if (category.length < 2) {
-      newErrors.category = t('validation.categoryMin');
+      newErrors.tags = t('validation.categoryMin');
     }
     if (!shortDescription || shortDescription.length < 10) newErrors.shortDescription = t('validation.shortDescriptionMin');
     if (!coverImage) newErrors.coverImage = t('validation.coverImageRequired');
@@ -64,6 +69,7 @@ export function BlogPostForm({ initialData, onSubmit, isLoading }: BlogPostFormP
         coverImage,
         mediaGallery,
         category,
+        tags,
         externalLink: externalLink || undefined,
         lessonsLearned: lessonsLearned || undefined,
       });
@@ -100,30 +106,31 @@ export function BlogPostForm({ initialData, onSubmit, isLoading }: BlogPostFormP
           {errors.title && <span className={formStyles.formError}>{errors.title}</span>}
         </div>
 
-        {/* Slug + Category */}
-        <div className={formStyles.gridTwoCols}>
-          <div className={formStyles.formGroup}>
-            <label className={formStyles.formLabel} htmlFor="slug">{t('form.slug')}</label>
-            <input
-              id="slug"
-              className={`${formStyles.formInput} ${errors.slug ? formStyles.inputError : ''}`}
-              value={slug}
-              onChange={(e) => setSlug(e.target.value)}
-              required
-            />
-            {errors.slug && <span className={formStyles.formError}>{errors.slug}</span>}
-          </div>
-          <div className={formStyles.formGroup}>
-            <label className={formStyles.formLabel} htmlFor="category">{t('blog.category')}</label>
-            <input
-              id="category"
-              className={`${formStyles.formInput} ${errors.category ? formStyles.inputError : ''}`}
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              required
-            />
-            {errors.category && <span className={formStyles.formError}>{errors.category}</span>}
-          </div>
+        {/* Slug */}
+        <div className={formStyles.formGroup}>
+          <label className={formStyles.formLabel} htmlFor="slug">{t('form.slug')}</label>
+          <input
+            id="slug"
+            className={`${formStyles.formInput} ${errors.slug ? formStyles.inputError : ''}`}
+            value={slug}
+            onChange={(e) => setSlug(e.target.value)}
+            required
+          />
+          {errors.slug && <span className={formStyles.formError}>{errors.slug}</span>}
+        </div>
+
+        {/* Tags (category derives from the first tag) */}
+        <div className={formStyles.formGroup}>
+          <TagInput
+            id="tags"
+            value={tags}
+            onChange={setTags}
+            suggestionsUrl="/blog-posts/tags"
+            label={t('projects.tags')}
+            placeholder={t('projects.tagsHint')}
+            hint={t('blog.categoryHint')}
+            error={errors.tags}
+          />
         </div>
       </fieldset>
 

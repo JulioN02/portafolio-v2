@@ -41,6 +41,7 @@ export function BlogPostEditPage() {
           coverImage: post.coverImage,
           mediaGallery: post.mediaGallery,
           category: post.category,
+          tags: post.tags,
           externalLink: post.externalLink,
           lessonsLearned: post.lessonsLearned,
         }}

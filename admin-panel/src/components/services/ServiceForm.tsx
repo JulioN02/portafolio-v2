@@ -10,6 +10,74 @@ interface ServiceFormProps {
   isLoading?: boolean;
 }
 
+interface ItemListInputProps {
+  label: string;
+  placeholder: string;
+  hint?: string;
+  values: string[];
+  onChange: (values: string[]) => void;
+  error?: string;
+}
+
+/** Dynamic list of plain-text items with add/remove controls. */
+function ItemListInput({ label, placeholder, hint, values, onChange, error }: ItemListInputProps) {
+  const { t } = useTranslation();
+  const [draft, setDraft] = useState('');
+
+  const add = () => {
+    const value = draft.trim();
+    if (!value) return;
+    if (!values.includes(value)) onChange([...values, value]);
+    setDraft('');
+  };
+
+  const remove = (target: string) => {
+    onChange(values.filter((value) => value !== target));
+  };
+
+  return (
+    <div className={formStyles.formGroup}>
+      <label className={formStyles.formLabel}>{label}</label>
+      <div className={formStyles.inputActionGroup}>
+        <input
+          className={formStyles.formInput}
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              add();
+            }
+          }}
+          placeholder={placeholder}
+        />
+        <button type="button" className={formStyles.btnAction} onClick={add}>
+          {t('common.add')}
+        </button>
+      </div>
+      {hint && <p className={formStyles.hint}>{hint}</p>}
+      {error && <span className={formStyles.formError}>{error}</span>}
+      {values.length > 0 && (
+        <ul style={{ listStyle: 'none', padding: 0, margin: '0.5rem 0 0', display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+          {values.map((value) => (
+            <li key={value} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
+              <span style={{ flex: 1 }}>{value}</span>
+              <button
+                type="button"
+                className={formStyles.btnDangerSmall}
+                onClick={() => remove(value)}
+                aria-label={`${t('form.remove')} ${value}`}
+              >
+                {t('form.remove')}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 // Helper to generate slug from title
 const generateSlug = (title: string): string => {
   return title
@@ -27,6 +95,8 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
   const [fullDescription, setFullDescription] = useState(initialData?.fullDescription || '');
   const [status, setStatus] = useState<string>(initialData?.status || 'DRAFT');
   const [images, setImages] = useState<string[]>(initialData?.images || []);
+  const [includedItems, setIncludedItems] = useState<string[]>(initialData?.includedItems || []);
+  const [technicalExplanation, setTechnicalExplanation] = useState(initialData?.technicalExplanation || '');
   const [technicalImages, setTechnicalImages] = useState<string[]>(initialData?.technicalImages || []);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -54,6 +124,7 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
     if (!shortDescription || shortDescription.length < 10) newErrors.shortDescription = t('validation.shortDescriptionMin');
     if (!fullDescription || fullDescription.length < 50) newErrors.fullDescription = t('validation.fullDescriptionMin');
     if (images.length === 0) newErrors.images = t('validation.imageRequired');
+    if (includedItems.length === 0) newErrors.includedItems = t('services.includedItemsRequired');
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -67,10 +138,10 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
         classification,
         shortDescription,
         fullDescription,
-        includedItems: initialData?.includedItems || [],
+        includedItems,
         images,
         status: status as ServiceInput['status'],
-        technicalExplanation: initialData?.technicalExplanation,
+        technicalExplanation: technicalExplanation || undefined,
         technicalImages,
       });
     }
@@ -170,6 +241,33 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
             multiple
             label={t('form.technicalImages')}
           />
+        </div>
+      </fieldset>
+
+      {/* Included Items + Technical Explanation Section */}
+      <fieldset className={formStyles.formSection}>
+        <legend className={formStyles.sectionTitle}>{t('services.includedItemsTitle')}</legend>
+        <ItemListInput
+          label={t('services.includedItems')}
+          placeholder={t('services.includedItemsPlaceholder')}
+          hint={t('services.includedItemsHint')}
+          values={includedItems}
+          onChange={setIncludedItems}
+          error={errors.includedItems}
+        />
+        <div className={formStyles.formGroup}>
+          <label className={formStyles.formLabel} htmlFor="technicalExplanation">
+            {t('services.technicalExplanation')}
+          </label>
+          <textarea
+            id="technicalExplanation"
+            className={`${formStyles.formInput} ${formStyles.formTextarea}`}
+            value={technicalExplanation}
+            onChange={(e) => setTechnicalExplanation(e.target.value)}
+            placeholder={t('services.technicalExplanationPlaceholder')}
+            style={{ minHeight: '140px' }}
+          />
+          <p className={formStyles.hint}>{t('services.technicalExplanationHint')}</p>
         </div>
       </fieldset>
 
