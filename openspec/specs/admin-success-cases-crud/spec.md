@@ -24,7 +24,7 @@ The system SHALL provide a page at `/admin/success-cases` displaying all success
 
 ### Requirement: Create Success Case
 
-The system SHALL provide a form page at `/admin/success-cases/new` with fields: title, slug, client, description, shortDescription, coverImage, category, featured, mediaGallery, testimonial. Form MUST validate using Zod schema.
+The system SHALL provide a form page at `/admin/success-cases/new` with fields: title, slug, client, description, shortDescription, coverImage, category, featured, mediaGallery, testimonial, videos, and links. Form MUST validate using Zod schema.
 
 #### Scenario: Create success case successfully
 
@@ -38,20 +38,26 @@ The system SHALL provide a form page at `/admin/success-cases/new` with fields: 
 - WHEN user submits without testimonial
 - THEN system accepts form (testimonial is optional)
 
+#### Scenario: Add videos and links
+
+- GIVEN user is on the create form
+- WHEN user adds video URLs and link URLs
+- THEN the POST payload includes videos and links arrays
+
 ### Requirement: Edit Success Case
 
-The system SHALL provide an edit page at `/admin/success-cases/:id` pre-filled with success case data.
+The system SHALL provide an edit page at `/admin/success-cases/:id` pre-filled with success case data, including videos and links, which MUST be editable and saved on update.
 
 #### Scenario: Edit success case loads data
 
 - GIVEN user navigates to `/admin/success-cases/:id`
 - WHEN page loads
-- THEN system fetches success case by ID and pre-fills form
+- THEN system fetches success case by ID and pre-fills form including videos and links
 
 #### Scenario: Update success case successfully
 
 - GIVEN user is editing a success case
-- WHEN user modifies fields and clicks "Update"
+- WHEN user modifies fields (including videos/links) and clicks "Update"
 - THEN system calls PUT `/api/success-cases/:id`, shows success message
 
 ### Requirement: Delete Success Case
