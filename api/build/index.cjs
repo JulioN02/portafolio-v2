@@ -43322,12 +43322,18 @@ var coerce = {
 };
 var NEVER = INVALID;
 
+// packages/shared/src/schemas/tags.schema.ts
+var tagsSchema = external_exports.array(
+  external_exports.string().trim().min(1, "Tag must be at least 1 character").max(30, "Tag must be at most 30 characters")
+).max(10, "Maximum 10 tags allowed");
+
 // packages/shared/src/schemas/blogPost.schema.ts
 var postStatusEnum = external_exports.enum(["DRAFT", "PUBLISHED", "PRIVATE", "ARCHIVED", "ALL"]);
 var blogPostSchema = external_exports.object({
   title: external_exports.string().min(3, "Title must be at least 3 characters").max(200),
   slug: external_exports.string().min(3).max(200).regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "Slug must be lowercase with hyphens"),
   category: external_exports.string().min(2).max(50),
+  tags: tagsSchema.optional(),
   shortDescription: external_exports.string().min(10).max(500),
   coverImage: external_exports.string().url(),
   mediaGallery: external_exports.array(external_exports.string().url()).optional(),
@@ -43340,6 +43346,7 @@ var blogPostUpdateSchema = blogPostSchema.partial();
 var blogPostFilterSchema = external_exports.object({
   status: postStatusEnum.optional(),
   category: external_exports.string().optional(),
+  tag: external_exports.string().optional(),
   search: external_exports.string().optional(),
   page: external_exports.coerce.number().int().min(1).default(1),
   limit: external_exports.coerce.number().int().min(1).max(100).default(10)
@@ -43449,9 +43456,6 @@ var successCaseStatusSchema = external_exports.object({
 });
 
 // packages/shared/src/schemas/project.schema.ts
-var tagsSchema = external_exports.array(
-  external_exports.string().trim().min(1, "Tag must be at least 1 character").max(30, "Tag must be at most 30 characters")
-).max(10, "Maximum 10 tags allowed");
 var projectSchema = external_exports.object({
   title: external_exports.string().min(3, "Title must be at least 3 characters").max(200),
   slug: external_exports.string().min(3).max(200).regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "Slug must be lowercase with hyphens"),
@@ -44865,7 +44869,8 @@ var import_express7 = __toESM(require_express2(), 1);
 var import_client7 = require("@prisma/client");
 var prisma7 = new import_client7.PrismaClient();
 var PUBLISHED = { status: "PUBLISHED", deletedAt: null };
-var LAB_CATEGORIES = ["laboratorio", "experimento"];
+var LAB_TAGS = ["laboratorio", "experimento"];
+var ARTICULO_TAG = "articulo";
 var toProjectSummary = (item) => ({
   id: item.id,
   type: "project",
@@ -44884,7 +44889,7 @@ var toLabSummary = (item) => ({
   type: "laboratorio",
   title: item.title,
   slug: item.slug,
-  classification: item.category,
+  classification: item.tags[0] || "",
   shortDescription: item.shortDescription,
   image: item.coverImage,
   images: [item.coverImage, ...item.mediaGallery].filter(Boolean),
@@ -45044,14 +45049,17 @@ var portfolioService = {
         prisma7.blogPost.findMany({
           where: {
             ...PUBLISHED,
-            category: { in: LAB_CATEGORIES },
-            ...classification && { category: classification }
+            AND: [
+              { tags: { hasSome: LAB_TAGS } },
+              { NOT: { tags: { hasSome: [ARTICULO_TAG] } } },
+              ...classification ? [{ tags: { hasSome: [classification] } }] : []
+            ]
           },
           select: {
             id: true,
             title: true,
             slug: true,
-            category: true,
+            tags: true,
             shortDescription: true,
             coverImage: true,
             mediaGallery: true,
@@ -45113,7 +45121,7 @@ var portfolioService = {
       id: true,
       title: true,
       slug: true,
-      category: true,
+      tags: true,
       shortDescription: true,
       coverImage: true,
       mediaGallery: true,
@@ -45167,7 +45175,18 @@ var portfolioService = {
         images: item.images,
         createdAt: item.createdAt
       }))),
-      prisma7.blogPost.findMany({ where: { ...PUBLISHED, category: { in: LAB_CATEGORIES } }, select: labSelect, orderBy: [{ createdAt: "desc" }], take: limit }).then((items) => items.map(toLabSummary))
+      prisma7.blogPost.findMany({
+        where: {
+          ...PUBLISHED,
+          AND: [
+            { tags: { hasSome: LAB_TAGS } },
+            { NOT: { tags: { hasSome: [ARTICULO_TAG] } } }
+          ]
+        },
+        select: labSelect,
+        orderBy: [{ createdAt: "desc" }],
+        take: limit
+      }).then((items) => items.map(toLabSummary))
     ]);
     return [...projects, ...services, ...products, ...tools, ...successCases, ...labPosts].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()).slice(0, limit);
   },
@@ -45334,6 +45353,35 @@ var storageService = {
   }
 };
 
+// api/src/config/upload.config.ts
+var DEFAULT_UPLOAD_BUCKET = "general";
+var DEFAULT_BUCKET_ALLOWLIST = [
+  "servicios",
+  "productos",
+  "herramientas",
+  "blog",
+  "proyectos",
+  "casos-exito",
+  "general",
+  "simulators"
+];
+function getBucketAllowlist() {
+  const env = process.env.UPLOAD_BUCKET_ALLOWLIST;
+  if (env) {
+    return env.split(",").map((bucket) => bucket.trim()).filter(Boolean);
+  }
+  return DEFAULT_BUCKET_ALLOWLIST;
+}
+function resolveBucket(bucket) {
+  const value = (bucket || "").trim();
+  if (!value) return DEFAULT_UPLOAD_BUCKET;
+  const allowlist = getBucketAllowlist();
+  if (!allowlist.includes(value)) {
+    throw new ValidationError(`Unknown bucket: "${value}". Allowed: ${allowlist.join(", ")}`);
+  }
+  return value;
+}
+
 // api/src/services/upload.service.ts
 var UPLOAD_DIR = import_path.default.join(process.cwd(), "uploads");
 if (!process.env.VERCEL && !import_fs.default.existsSync(UPLOAD_DIR)) {
@@ -45341,14 +45389,17 @@ if (!process.env.VERCEL && !import_fs.default.existsSync(UPLOAD_DIR)) {
 }
 var uploadService = {
   /**
-   * Save uploaded file — uploads to remote storage in production, local disk in dev
+   * Save uploaded file — uploads to remote storage in production, local disk in dev.
+   * The `bucket` parameter is validated against the configured allowlist:
+   * allowed → stored in that bucket; missing → default bucket; unknown → 400.
    */
-  async saveFile(file) {
+  async saveFile(file, bucket) {
+    const resolvedBucket = resolveBucket(bucket);
     const timestamp = Date.now();
     const safeName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, "_");
     const filename = `${timestamp}-${safeName}`;
     if (storageService.isConfigured()) {
-      const result = await storageService.uploadFile(file.buffer, filename, file.mimetype);
+      const result = await storageService.uploadFile(file.buffer, filename, file.mimetype, resolvedBucket);
       return {
         filename: result.filename,
         url: result.url,
@@ -45366,11 +45417,13 @@ var uploadService = {
     };
   },
   /**
-   * Delete a file — from remote storage or local disk
+   * Delete a file — from remote storage or local disk.
+   * The `bucket` parameter is validated against the allowlist (unknown → 400).
    */
-  async deleteFile(filename) {
+  async deleteFile(filename, bucket) {
+    const resolvedBucket = resolveBucket(bucket);
     if (storageService.isConfigured()) {
-      await storageService.deleteFile(filename);
+      await storageService.deleteFile(filename, resolvedBucket);
       return;
     }
     const filepath = import_path.default.join(UPLOAD_DIR, filename);
@@ -45450,7 +45503,8 @@ var uploadController = {
     if (!validation.valid) {
       throw new ValidationError(validation.error || "Invalid file");
     }
-    const result = await uploadService.saveFile(req.file);
+    const bucket = typeof req.body?.bucket === "string" ? req.body.bucket : void 0;
+    const result = await uploadService.saveFile(req.file, bucket);
     res.status(201).json({
       message: "File uploaded successfully",
       data: result
@@ -45465,7 +45519,8 @@ var uploadController = {
     if (!filename) {
       throw new ValidationError("Filename is required");
     }
-    await uploadService.deleteFile(filename);
+    const bucket = typeof req.query?.bucket === "string" ? req.query.bucket : void 0;
+    await uploadService.deleteFile(filename, bucket);
     res.json({ message: "File deleted successfully" });
   })
 };
@@ -45794,6 +45849,7 @@ var BLOG_POST_SELECT = {
   title: true,
   slug: true,
   category: true,
+  tags: true,
   shortDescription: true,
   coverImage: true,
   mediaGallery: true,
@@ -45808,13 +45864,14 @@ var BLOG_POST_SELECT = {
 };
 var blogPostService = {
   async findAll(filter) {
-    const { status, category, page = 1, limit = 10 } = filter || {};
+    const { status, category, tag, page = 1, limit = 10 } = filter || {};
     const skip = (page - 1) * limit;
     const resolvedStatus = status === "ALL" ? void 0 : status || "PUBLISHED";
     const where = {
       deletedAt: null,
       ...resolvedStatus && { status: resolvedStatus },
-      ...category && { category }
+      ...category && { category },
+      ...tag && { tags: { hasSome: [tag] } }
     };
     if (filter?.search) {
       where.OR = [
@@ -45858,11 +45915,13 @@ var blogPostService = {
     });
   },
   async create(data) {
+    const category = data.tags?.[0] || data.category;
     return prisma9.blogPost.create({
       data: {
         title: data.title,
         slug: data.slug,
-        category: data.category,
+        category,
+        tags: data.tags || [],
         shortDescription: data.shortDescription,
         coverImage: data.coverImage,
         mediaGallery: data.mediaGallery || [],
@@ -45879,7 +45938,12 @@ var blogPostService = {
     const updateData = {};
     if (data.title !== void 0) updateData.title = data.title;
     if (data.slug !== void 0) updateData.slug = data.slug;
-    if (data.category !== void 0) updateData.category = data.category;
+    if (data.tags !== void 0) {
+      updateData.tags = data.tags;
+      updateData.category = data.tags[0] || void 0;
+    } else if (data.category !== void 0) {
+      updateData.category = data.category;
+    }
     if (data.shortDescription !== void 0) updateData.shortDescription = data.shortDescription;
     if (data.coverImage !== void 0) updateData.coverImage = data.coverImage;
     if (data.mediaGallery !== void 0) updateData.mediaGallery = data.mediaGallery;
@@ -45931,6 +45995,14 @@ var blogPostService = {
       orderBy: { category: "asc" }
     });
     return result.map((item) => item.category);
+  },
+  /** Distinct tags among PUBLISHED, non-deleted posts, sorted. */
+  async getTags() {
+    const posts = await prisma9.blogPost.findMany({
+      where: { status: "PUBLISHED", deletedAt: null },
+      select: { tags: true }
+    });
+    return [...new Set(posts.flatMap((post) => post.tags))].sort();
   }
 };
 
@@ -46010,20 +46082,25 @@ var blogPostController = {
   getCategories: asyncHandler(async (_req, res) => {
     const categories = await blogPostService.getCategories();
     res.json(categories);
+  }),
+  getTags: asyncHandler(async (_req, res) => {
+    const tags = await blogPostService.getTags();
+    res.json(tags);
   })
 };
 
 // api/src/routes/blog-post.routes.ts
 var router10 = (0, import_express10.Router)();
 router10.get("/", blogPostController.findAll);
+router10.get("/tags", blogPostController.getTags);
 router10.get("/categories", blogPostController.getCategories);
-router10.get("/:slug", blogPostController.findBySlug);
-router10.get("/by-id/:id", blogPostController.findById);
+router10.get("/by-id/:id", authMiddleware, blogPostController.findById);
 router10.post("/", authMiddleware, blogPostController.create);
 router10.put("/:id", authMiddleware, blogPostController.update);
 router10.delete("/:id", authMiddleware, blogPostController.delete);
 router10.patch("/:id/restore", authMiddleware, blogPostController.restore);
 router10.patch("/:id/status", authMiddleware, blogPostController.updateStatus);
+router10.get("/:slug", blogPostController.findBySlug);
 var blog_post_routes_default = router10;
 
 // api/src/routes/siteSection.routes.ts
