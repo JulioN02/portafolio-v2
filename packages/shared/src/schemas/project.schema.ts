@@ -1,13 +1,8 @@
 import { z } from 'zod';
 import { postStatusEnum } from './blogPost.schema.js';
-
-/**
- * Free-form tags used for Project and BlogPost classification.
- * Each tag is a trimmed string of 1-30 chars; at most 10 tags.
- */
-export const tagsSchema = z.array(
-  z.string().trim().min(1, 'Tag must be at least 1 character').max(30, 'Tag must be at most 30 characters'),
-).max(10, 'Maximum 10 tags allowed');
+// Re-export so existing consumers can still import tagsSchema from project.schema.
+export { tagsSchema } from './tags.schema.js';
+import { tagsSchema } from './tags.schema.js';
 
 /**
  * Schema for Project entity

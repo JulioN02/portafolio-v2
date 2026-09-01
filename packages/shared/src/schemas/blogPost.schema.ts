@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { tagsSchema } from './tags.schema.js';
 
 /**
  * Enum for blog post status
@@ -14,6 +15,7 @@ export const blogPostSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters').max(200),
   slug: z.string().min(3).max(200).regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'Slug must be lowercase with hyphens'),
   category: z.string().min(2).max(50),
+  tags: tagsSchema.optional(),
   shortDescription: z.string().min(10).max(500),
   coverImage: z.string().url(),
   mediaGallery: z.array(z.string().url()).optional(),
@@ -34,6 +36,7 @@ export const blogPostUpdateSchema = blogPostSchema.partial();
 export const blogPostFilterSchema = z.object({
   status: postStatusEnum.optional(),
   category: z.string().optional(),
+  tag: z.string().optional(),
   search: z.string().optional(),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(10),
