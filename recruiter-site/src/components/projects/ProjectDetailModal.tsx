@@ -1,5 +1,4 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
-import DOMPurify from 'dompurify';
 import { sanitizeHtml } from '@jsoft/shared';
 import { useProjectDetail } from '../../hooks/useProjects';
 import type { ProjectSummary } from '../../types';
@@ -205,7 +204,7 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
               ref={contentRef}
               className={styles.technicalContent}
               dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(technicalExplanation),
+                __html: sanitizeHtml(technicalExplanation, { allowMedia: true }),
               }}
             />
           </div>
