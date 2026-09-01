@@ -1,6 +1,6 @@
 import { useState, type SyntheticEvent } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { sanitizeHtml } from '@jsoft/shared';
+import { renderSimulatorEmbeds } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useToolBySlug } from '../../hooks/useTools';
 import { Loading } from '../../components/common/Loading';
@@ -131,7 +131,7 @@ export function ToolDetailPage() {
         {tool.fullDescription && (
           <div className={styles.fullDescription}>
             <h2>{t('toolDetail.fullDescription')}</h2>
-            <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(tool.fullDescription, { allowMedia: true }) }} />
+            <div dangerouslySetInnerHTML={{ __html: renderSimulatorEmbeds(tool.fullDescription) }} />
           </div>
         )}
       </div>

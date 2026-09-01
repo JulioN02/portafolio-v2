@@ -49,4 +49,22 @@ describe('BlogPostContent (sanitization adoption)', () => {
     expect(await screen.findByText('Lección segura')).toBeInTheDocument();
     expect(container.querySelector('script')).toBeNull();
   });
+
+  it('renders simulator placeholders as sandboxed iframes (no allow-same-origin)', async () => {
+    const post = makePost({
+      body: '<p>Intro</p><div data-simulator-id="abc123"></div><p>Fin</p>',
+    });
+
+    const { container } = render(<BlogPostContent post={post} />);
+
+    expect(await screen.findByText('Intro')).toBeInTheDocument();
+    const iframe = container.querySelector('iframe') as HTMLIFrameElement | null;
+    // REAL behavioral assertion: the placeholder div became a sandboxed iframe.
+    expect(iframe).not.toBeNull();
+    expect(iframe!.getAttribute('src')).toBe('/api/simulators/abc123/content');
+    expect(iframe!.getAttribute('sandbox')).toBe('allow-scripts');
+    expect(iframe!.getAttribute('sandbox')).not.toContain('allow-same-origin');
+    // Placeholder div is gone from the DOM.
+    expect(container.querySelector('[data-simulator-id]')).toBeNull();
+  });
 });

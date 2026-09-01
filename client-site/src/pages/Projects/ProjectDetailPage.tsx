@@ -1,6 +1,6 @@
 import { useState, type SyntheticEvent } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { sanitizeHtml } from '@jsoft/shared';
+import { renderSimulatorEmbeds } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useProjectBySlug } from '../../hooks/useProjects';
 import { Loading } from '../../components/common/Loading';
@@ -136,7 +136,7 @@ export function ProjectDetailPage() {
             <div
               className={styles.bodyContent}
               dangerouslySetInnerHTML={{
-                __html: sanitizeHtml(project.body, { allowMedia: true }),
+                __html: renderSimulatorEmbeds(project.body),
               }}
             />
           </div>
