@@ -39,3 +39,7 @@ export type { ErrorBoundaryProps } from './ui/ErrorBoundary/index.js';
 export { ErrorFallback } from './ui/ErrorBoundary/index.js';
 export type { ErrorFallbackProps } from './ui/ErrorBoundary/index.js';
 export { withBoundary } from './ui/ErrorBoundary/index.js';
+
+// Rich Text Editor
+export { RichTextEditor } from './RichTextEditor/index.js';
+export type { RichTextEditorProps, RichTextEditorLabels } from './RichTextEditor/index.js';

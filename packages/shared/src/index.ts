@@ -113,6 +113,10 @@ export { ErrorFallback } from './components/index.js';
 export type { ErrorFallbackProps } from './components/index.js';
 export { withBoundary } from './components/index.js';
 
+// Rich Text Editor
+export { RichTextEditor } from './components/index.js';
+export type { RichTextEditorProps, RichTextEditorLabels } from './components/index.js';
+
 // CSS Variables (import to apply design tokens)
 import './styles/variables.css';
 
@@ -129,3 +133,4 @@ import './components/ui/Input/Input.module.css';
 import './components/ui/Textarea/Textarea.module.css';
 import './components/ui/Select/Select.module.css';
 import './components/ui/Checkbox/Checkbox.module.css';
+import './components/RichTextEditor/RichTextEditor.module.css';
