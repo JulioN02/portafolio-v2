@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import { storageService } from '../services/storage.service';
 
 const ORIGINAL_PROJECT_ID = process.env.SUPABASE_PROJECT_ID;
@@ -121,6 +123,64 @@ describe('storageService', () => {
     it('getPublicUrl returns deterministic URL', () => {
       expect(storageService.getPublicUrl('photo.png')).toBe(
         'https://proj-123.supabase.co/storage/v1/object/public/general/photo.png',
+      );
+    });
+  });
+
+  describe('downloadFile', () => {
+    it('reads from the local uploads dir when storage is not configured', async () => {
+      const html = '<html><body>local demo</body></html>';
+      const filepath = path.join(process.cwd(), 'uploads', 'local-sim.html');
+      fs.mkdirSync(path.dirname(filepath), { recursive: true });
+      fs.writeFileSync(filepath, html);
+
+      try {
+        const { stream, mimetype } = await storageService.downloadFile('simulators', 'local-sim.html');
+        const chunks: Buffer[] = [];
+        for await (const chunk of stream) chunks.push(Buffer.from(chunk));
+        expect(Buffer.concat(chunks).toString('utf8')).toBe(html);
+        expect(mimetype).toBe('application/octet-stream');
+      } finally {
+        fs.unlinkSync(filepath);
+      }
+    });
+
+    it('fetches the private object with the service key and streams its content', async () => {
+      process.env.SUPABASE_PROJECT_ID = 'proj-123';
+      process.env.SUPABASE_SERVICE_KEY = 'secret';
+      const html = '<html><body>demo</body></html>';
+      const fetchMock = jest.fn().mockResolvedValue(
+        new Response(html, { headers: { 'content-type': 'text/html' } }),
+      );
+      global.fetch = fetchMock as unknown as typeof fetch;
+
+      const { stream, mimetype } = await storageService.downloadFile('simulators', 'sim.html');
+
+      expect(fetchMock).toHaveBeenCalledWith(
+        'https://proj-123.supabase.co/storage/v1/object/simulators/sim.html',
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            apikey: 'secret',
+            // Private bucket → server-side authorization with the service key.
+            Authorization: 'Bearer secret',
+          }),
+        }),
+      );
+      const chunks: Buffer[] = [];
+      for await (const chunk of stream) chunks.push(Buffer.from(chunk));
+      expect(Buffer.concat(chunks).toString('utf8')).toBe(html);
+      expect(mimetype).toBe('text/html');
+    });
+
+    it('throws when the object download fails', async () => {
+      process.env.SUPABASE_PROJECT_ID = 'proj-123';
+      process.env.SUPABASE_SERVICE_KEY = 'secret';
+      global.fetch = jest.fn().mockResolvedValue(
+        new Response(null, { status: 404, statusText: 'Not Found' }),
+      ) as unknown as typeof fetch;
+
+      await expect(storageService.downloadFile('simulators', 'missing.html')).rejects.toThrow(
+        'Failed to download missing.html from Supabase Storage: Not Found',
       );
     });
   });

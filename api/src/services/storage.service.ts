@@ -1,3 +1,7 @@
+import path from 'path';
+import fs from 'fs';
+import { Readable } from 'stream';
+
 /**
  * Storage Service
  *
@@ -6,6 +10,9 @@
  * back to a local `/uploads` directory for local development.
  */
 const DEFAULT_BUCKET = 'general';
+
+// Local dev fallback directory (flat, mirrors upload.service.ts).
+const UPLOAD_DIR = path.join(process.cwd(), 'uploads');
 
 function getConfig(bucket?: string): { apiUrl: string; bucket: string; secretKey: string } | null {
   const projectId = process.env.SUPABASE_PROJECT_ID;
@@ -97,5 +104,46 @@ export const storageService = {
    */
   isConfigured(): boolean {
     return getConfig() !== null;
+  },
+
+  /**
+   * Download a file from Supabase Storage as a server-side stream.
+   *
+   * The simulators bucket is PRIVATE, so the object cannot be fetched from a
+   * public URL — the service key authorizes this request server-side. The API
+   * owns the security headers (CSP sandbox, nosniff, no-store) on the
+   * response, which is why simulator content is never served directly from the
+   * bucket origin.
+   *
+   * Local dev fallback: read from the flat /uploads directory.
+   *
+   * @returns a Node Readable stream + the stored content-type.
+   */
+  async downloadFile(
+    bucket: string,
+    fileName: string,
+  ): Promise<{ stream: Readable; mimetype: string }> {
+    const config = getConfig(bucket);
+    if (!config) {
+      const filepath = path.join(UPLOAD_DIR, fileName);
+      return { stream: Readable.from([fs.readFileSync(filepath)]), mimetype: 'application/octet-stream' };
+    }
+
+    const response = await fetch(`${config.apiUrl}/object/${config.bucket}/${fileName}`, {
+      headers: {
+        'apikey': config.secretKey,
+        'Authorization': `Bearer ${config.secretKey}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to download ${fileName} from Supabase Storage: ${response.statusText}`);
+    }
+    if (!response.body) {
+      throw new Error(`Empty response body downloading ${fileName} from Supabase Storage`);
+    }
+
+    const mimetype = response.headers.get('content-type') || 'application/octet-stream';
+    return { stream: Readable.fromWeb(response.body as import('stream/web').ReadableStream), mimetype };
   },
 };
