@@ -44,6 +44,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'blog.searchAriaLabel': 'Buscar artículos',
     'blog.categoryAriaLabel': 'Filtrar por categoría',
     'blog.categoryAll': 'Todas las categorías',
+    'blog.tagFilterAriaLabel': 'Filtrar artículos por etiqueta',
+    'blog.tagAll': 'Todas las etiquetas',
 
     // =========== BLOG POST ===========
     'blogPost.backLink': '← Volver al blog',
@@ -186,6 +188,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'blog.searchAriaLabel': 'Search articles',
     'blog.categoryAriaLabel': 'Filter by category',
     'blog.categoryAll': 'All categories',
+    'blog.tagFilterAriaLabel': 'Filter articles by tag',
+    'blog.tagAll': 'All tags',
 
     // =========== BLOG POST ===========
     'blogPost.backLink': '← Back to blog',

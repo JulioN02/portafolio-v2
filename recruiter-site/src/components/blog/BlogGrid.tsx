@@ -8,14 +8,15 @@ const ITEMS_PER_PAGE = 9;
 
 interface BlogGridProps {
   category?: string;
+  tag?: string;
   search?: string;
 }
 
-export function BlogGrid({ category, search }: BlogGridProps) {
+export function BlogGrid({ category, tag, search }: BlogGridProps) {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const page = Number(searchParams.get('page')) || 1;
-  const { data, isLoading, isError, error, refetch } = useBlogPosts(page, { category, search });
+  const { data, isLoading, isError, error, refetch } = useBlogPosts(page, { category, tag, search });
 
   const posts = data?.data ?? [];
   const totalItems = data?.pagination?.total ?? 0;

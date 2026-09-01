@@ -92,4 +92,9 @@ export const blogPostController = {
     const categories = await blogPostService.getCategories();
     res.json(categories);
   }),
+
+  getTags: asyncHandler(async (_req: Request, res: Response) => {
+    const tags = await blogPostService.getTags();
+    res.json(tags);
+  }),
 };

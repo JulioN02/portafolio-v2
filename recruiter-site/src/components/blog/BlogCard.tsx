@@ -63,6 +63,15 @@ export function BlogCard({ post }: BlogCardProps) {
         </time>
         <h3 className={styles.title}>{post.title}</h3>
         <p className={styles.shortDescription}>{post.shortDescription}</p>
+        {post.tags && post.tags.length > 0 && (
+          <div className={styles.tags}>
+            {post.tags.map((tag) => (
+              <span key={tag} className={styles.tag}>
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
     </article>
   );

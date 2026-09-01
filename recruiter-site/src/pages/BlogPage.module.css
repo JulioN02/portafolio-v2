@@ -63,3 +63,38 @@
   border-color: var(--color-primary-500);
   box-shadow: 0 0 0 2px var(--color-primary-100);
 }
+
+/* Tag filter chips */
+.tagFilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background-color: var(--color-neutral-50);
+  border-radius: var(--radius-md);
+}
+
+.tagChip {
+  padding: var(--spacing-xs) var(--spacing-md);
+  border: 1px solid var(--color-neutral-300);
+  border-radius: 999px;
+  background-color: var(--color-neutral-0);
+  color: var(--color-neutral-700);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+@media (hover: hover) {
+  .tagChip:hover {
+    border-color: var(--color-primary-500);
+    color: var(--color-primary-600);
+  }
+}
+
+.tagChipActive {
+  background-color: var(--color-primary-600);
+  border-color: var(--color-primary-600);
+  color: var(--color-neutral-0);
+}

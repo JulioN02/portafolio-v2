@@ -4,9 +4,9 @@ import { PrismaClient } from '@prisma/client';
 /**
  * Portfolio aggregation regression tests.
  * Merges Project + Service + Product + Tool + SuccessCase + lab BlogPosts
- * (category proxy laboratorio/experimento, articulo excluded). EVERY source MUST
- * be status=PUBLISHED + deletedAt null (regression guard against the old
- * aggregation that leaked DRAFT/PRIVATE rows).
+ * (tags-based: `tags hasSome [laboratorio, experimento]`, articulo excluded).
+ * EVERY source MUST be status=PUBLISHED + deletedAt null (regression guard
+ * against the old aggregation that leaked DRAFT/PRIVATE rows).
  */
 
 const mockPrisma = new PrismaClient();
@@ -44,7 +44,7 @@ describe('Portfolio Service', () => {
       expectPublishedOnly(mockPrisma.blogPost.findMany as jest.Mock);
     });
 
-    it('queries BlogPost for lab posts via category proxy (laboratorio/experimento) with PUBLISHED + deletedAt null, articulo excluded', async () => {
+    it('queries BlogPost for lab posts via tags hasSome (laboratorio/experimento) with PUBLISHED + deletedAt null, articulo excluded', async () => {
       (mockPrisma.project.findMany as jest.Mock).mockResolvedValue([]);
       (mockPrisma.service.findMany as jest.Mock).mockResolvedValue([]);
       (mockPrisma.product.findMany as jest.Mock).mockResolvedValue([]);
@@ -59,13 +59,32 @@ describe('Portfolio Service', () => {
           where: expect.objectContaining({
             status: 'PUBLISHED',
             deletedAt: null,
-            category: { in: ['laboratorio', 'experimento'] },
+            AND: expect.arrayContaining([
+              { tags: { hasSome: ['laboratorio', 'experimento'] } },
+              { NOT: { tags: { hasSome: ['articulo'] } } },
+            ]),
           }),
         })
       );
     });
 
-    it('includes lab blog posts as type "laboratorio" with cover image and category as classification', async () => {
+    it('excludes posts tagged articulo even when they also carry a lab tag', async () => {
+      (mockPrisma.project.findMany as jest.Mock).mockResolvedValue([]);
+      (mockPrisma.service.findMany as jest.Mock).mockResolvedValue([]);
+      (mockPrisma.product.findMany as jest.Mock).mockResolvedValue([]);
+      (mockPrisma.tool.findMany as jest.Mock).mockResolvedValue([]);
+      (mockPrisma.successCase.findMany as jest.Mock).mockResolvedValue([]);
+      (mockPrisma.blogPost.findMany as jest.Mock).mockResolvedValue([]);
+
+      await portfolioService.findAll({ page: 1, limit: 10 });
+
+      const blogPostCall = (mockPrisma.blogPost.findMany as jest.Mock).mock.calls[0][0];
+      expect(blogPostCall.where.AND).toEqual(
+        expect.arrayContaining([{ NOT: { tags: { hasSome: ['articulo'] } } }])
+      );
+    });
+
+    it('includes lab blog posts as type "laboratorio" with cover image and first tag as classification', async () => {
       (mockPrisma.project.findMany as jest.Mock).mockResolvedValue([]);
       (mockPrisma.service.findMany as jest.Mock).mockResolvedValue([]);
       (mockPrisma.product.findMany as jest.Mock).mockResolvedValue([]);
@@ -76,7 +95,7 @@ describe('Portfolio Service', () => {
           id: 'b1',
           title: 'Simulador de circuitos',
           slug: 'simulador-circuitos',
-          category: 'laboratorio',
+          tags: ['laboratorio', 'electronica'],
           shortDescription: 'Post de laboratorio',
           coverImage: 'https://example.com/cover.jpg',
           mediaGallery: ['https://example.com/g1.jpg'],
@@ -99,7 +118,7 @@ describe('Portfolio Service', () => {
       );
     });
 
-    it('filters lab posts by category when a classification is selected', async () => {
+    it('filters lab posts by tag when a classification is selected', async () => {
       (mockPrisma.project.findMany as jest.Mock).mockResolvedValue([]);
       (mockPrisma.service.findMany as jest.Mock).mockResolvedValue([]);
       (mockPrisma.product.findMany as jest.Mock).mockResolvedValue([]);
@@ -109,10 +128,9 @@ describe('Portfolio Service', () => {
 
       await portfolioService.findAll({ classification: 'laboratorio' });
 
-      expect(mockPrisma.blogPost.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: expect.objectContaining({ category: 'laboratorio' }),
-        })
+      const blogPostCall = (mockPrisma.blogPost.findMany as jest.Mock).mock.calls[0][0];
+      expect(blogPostCall.where.AND).toEqual(
+        expect.arrayContaining([{ tags: { hasSome: ['laboratorio'] } }])
       );
     });
 
@@ -258,7 +276,7 @@ describe('Portfolio Service', () => {
           id: 'b1',
           title: 'Laboratorio',
           slug: 'laboratorio-1',
-          category: 'laboratorio',
+          tags: ['laboratorio'],
           shortDescription: 'D',
           coverImage: 'c.jpg',
           mediaGallery: [],

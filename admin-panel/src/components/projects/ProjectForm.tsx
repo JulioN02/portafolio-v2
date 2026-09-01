@@ -3,8 +3,8 @@ import { useTranslation } from '../../i18n/LanguageContext';
 import type { ProjectInput } from '@jsoft/shared';
 import { TipTapEditor } from '../blog-posts/TipTapEditor';
 import { ImageUploader } from '../uploads/ImageUploader';
+import { TagInput } from '../shared/TagInput';
 import { getTextFromHTML } from '../../utils/getTextFromHTML';
-import { useProjects } from '../../hooks/useProjects';
 import formStyles from '../../styles/form.module.css';
 
 interface ProjectFormProps {
@@ -22,12 +22,9 @@ const generateSlug = (title: string): string => {
 };
 
 const MAX_TAGS = 10;
-const MAX_TAG_LENGTH = 30;
 
 export function ProjectForm({ initialData, onSubmit, isLoading }: ProjectFormProps) {
   const { t } = useTranslation();
-  const { useGetTags } = useProjects();
-  const { data: tagSuggestions = [] } = useGetTags();
 
   const [title, setTitle] = useState(initialData?.title || '');
   const [slug, setSlug] = useState(initialData?.slug || '');
@@ -36,7 +33,6 @@ export function ProjectForm({ initialData, onSubmit, isLoading }: ProjectFormPro
   const [images, setImages] = useState<string[]>(initialData?.images || []);
   const [repositoryUrl, setRepositoryUrl] = useState(initialData?.repositoryUrl || '');
   const [tags, setTags] = useState<string[]>(initialData?.tags || []);
-  const [tagInput, setTagInput] = useState('');
   const [status, setStatus] = useState<string>(initialData?.status || 'DRAFT');
   const [featured, setFeatured] = useState(initialData?.featured || false);
   const [order, setOrder] = useState(initialData?.order ?? 0);
@@ -54,46 +50,6 @@ export function ProjectForm({ initialData, onSubmit, isLoading }: ProjectFormPro
     setImages(Array.isArray(value) ? value : value ? [value] : []);
   };
 
-  const addTag = (raw: string): boolean => {
-    const tag = raw.trim();
-    if (!tag) return false;
-    if (tag.length > MAX_TAG_LENGTH) {
-      setErrors((prev) => ({ ...prev, tags: t('projects.tagTooLong') }));
-      return false;
-    }
-    if (tags.length >= MAX_TAGS) {
-      setErrors((prev) => ({ ...prev, tags: t('projects.tagsMax') }));
-      return false;
-    }
-    if (tags.includes(tag)) return false;
-    setTags((prev) => [...prev, tag]);
-    setErrors((prev) => {
-      const next = { ...prev };
-      delete next.tags;
-      return next;
-    });
-    return true;
-  };
-
-  const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' || e.key === ',') {
-      e.preventDefault();
-      addTag(tagInput);
-      setTagInput('');
-    }
-  };
-
-  const handleTagBlur = () => {
-    if (tagInput) {
-      addTag(tagInput);
-      setTagInput('');
-    }
-  };
-
-  const removeTag = (target: string) => {
-    setTags((prev) => prev.filter((tag) => tag !== target));
-  };
-
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!title || title.length < 3) newErrors.title = t('validation.titleMin');
@@ -103,15 +59,12 @@ export function ProjectForm({ initialData, onSubmit, isLoading }: ProjectFormPro
     if (!body || textContent.length < 100) newErrors.body = t('validation.bodyMin');
     if (tags.some((tag) => tag.length === 0)) newErrors.tags = t('projects.tagsMin');
     if (tags.length > MAX_TAGS) newErrors.tags = t('projects.tagsMax');
-    if (errors.tags) newErrors.tags = errors.tags;
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Commit any pending tag text before validating
-    if (tagInput) addTag(tagInput);
     if (validate()) {
       onSubmit({
         title,
@@ -161,61 +114,16 @@ export function ProjectForm({ initialData, onSubmit, isLoading }: ProjectFormPro
 
         {/* Tags */}
         <div className={formStyles.formGroup}>
-          <label className={formStyles.formLabel} htmlFor="tags">{t('projects.tags')}</label>
-          <input
+          <TagInput
             id="tags"
-            className={`${formStyles.formInput} ${errors.tags ? formStyles.inputError : ''}`}
-            value={tagInput}
-            onChange={(e) => setTagInput(e.target.value)}
-            onKeyDown={handleTagKeyDown}
-            onBlur={handleTagBlur}
+            value={tags}
+            onChange={setTags}
+            suggestionsUrl="/projects/tags"
+            label={t('projects.tags')}
             placeholder={t('projects.tagsHint')}
-            list="project-tag-suggestions"
+            hint={t('projects.tagsHint')}
+            error={errors.tags}
           />
-          <datalist id="project-tag-suggestions">
-            {tagSuggestions.map((tag) => (
-              <option key={tag} value={tag} />
-            ))}
-          </datalist>
-          <p className={formStyles.hint}>{t('projects.tagsHint')}</p>
-          {errors.tags && <span className={formStyles.formError}>{errors.tags}</span>}
-          {tags.length > 0 && (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
-              {tags.map((tag) => (
-                <span
-                  key={tag}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.35rem',
-                    padding: '0.25rem 0.6rem',
-                    background: 'var(--color-primary-light, #e6f0ff)',
-                    border: '1px solid var(--color-primary, #2563eb)',
-                    borderRadius: '999px',
-                    fontSize: '0.8125rem',
-                  }}
-                >
-                  {tag}
-                  <button
-                    type="button"
-                    onClick={() => removeTag(tag)}
-                    aria-label={`${t('form.remove')} ${tag}`}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      color: 'inherit',
-                      fontSize: '0.9rem',
-                      lineHeight: 1,
-                      padding: 0,
-                    }}
-                  >
-                    ×
-                  </button>
-                </span>
-              ))}
-            </div>
-          )}
         </div>
       </fieldset>
 

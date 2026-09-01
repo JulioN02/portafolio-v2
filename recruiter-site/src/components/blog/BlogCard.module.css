@@ -99,6 +99,22 @@
   flex: 1;
 }
 
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-sm);
+}
+
+.tag {
+  padding: 0.125rem 0.5rem;
+  border: 1px solid var(--color-neutral-300);
+  border-radius: 999px;
+  font-size: var(--font-size-xs);
+  color: var(--color-neutral-600);
+  background-color: var(--color-neutral-50);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .card,
   .image {

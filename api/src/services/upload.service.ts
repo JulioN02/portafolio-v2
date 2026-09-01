@@ -1,6 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import { storageService } from './storage.service.js';
+import { resolveBucket } from '../config/upload.config.js';
 
 const UPLOAD_DIR = path.join(process.cwd(), 'uploads');
 
@@ -18,16 +19,19 @@ export interface UploadResult {
 
 export const uploadService = {
   /**
-   * Save uploaded file — uploads to remote storage in production, local disk in dev
+   * Save uploaded file — uploads to remote storage in production, local disk in dev.
+   * The `bucket` parameter is validated against the configured allowlist:
+   * allowed → stored in that bucket; missing → default bucket; unknown → 400.
    */
-  async saveFile(file: Express.Multer.File): Promise<UploadResult> {
+  async saveFile(file: Express.Multer.File, bucket?: string): Promise<UploadResult> {
+    const resolvedBucket = resolveBucket(bucket);
     const timestamp = Date.now();
     const safeName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
     const filename = `${timestamp}-${safeName}`;
 
     if (storageService.isConfigured()) {
-      // Production: upload to Supabase Storage
-      const result = await storageService.uploadFile(file.buffer, filename, file.mimetype);
+      // Production: upload to Supabase Storage in the requested bucket.
+      const result = await storageService.uploadFile(file.buffer, filename, file.mimetype, resolvedBucket);
       return {
         filename: result.filename,
         url: result.url,
@@ -36,7 +40,8 @@ export const uploadService = {
       };
     }
 
-    // Local dev: save to disk
+    // Local dev: save to disk (flat /uploads dir — bucket not partitioned on
+    // disk; validated server-side so the contract holds for dev too).
     const filepath = path.join(UPLOAD_DIR, filename);
     fs.writeFileSync(filepath, file.buffer);
 
@@ -49,11 +54,13 @@ export const uploadService = {
   },
 
   /**
-   * Delete a file — from remote storage or local disk
+   * Delete a file — from remote storage or local disk.
+   * The `bucket` parameter is validated against the allowlist (unknown → 400).
    */
-  async deleteFile(filename: string): Promise<void> {
+  async deleteFile(filename: string, bucket?: string): Promise<void> {
+    const resolvedBucket = resolveBucket(bucket);
     if (storageService.isConfigured()) {
-      await storageService.deleteFile(filename);
+      await storageService.deleteFile(filename, resolvedBucket);
       return;
     }
 

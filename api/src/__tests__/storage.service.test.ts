@@ -63,7 +63,15 @@ describe('storageService', () => {
 
       expect(fetchMock).toHaveBeenCalledWith(
         'https://proj-123.supabase.co/storage/v1/object/general/photo.png',
-        expect.objectContaining({ method: 'POST', headers: expect.objectContaining({ apikey: 'secret' }) }),
+        expect.objectContaining({
+          method: 'POST',
+          headers: expect.objectContaining({
+            apikey: 'secret',
+            // Correct Content-Type is stored with the object so it is served
+            // with the right type (never HTML/SVG-as-HTML).
+            'Content-Type': 'image/png',
+          }),
+        }),
       );
       expect(result.url).toBe('https://proj-123.supabase.co/storage/v1/object/public/general/photo.png');
     });

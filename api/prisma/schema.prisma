@@ -180,6 +180,7 @@ model BlogPost {
   title            String
   slug             String      @unique
   category         String
+  tags             String[] // free-form classification; category derived from first tag on write
   shortDescription String
   coverImage       String
   mediaGallery     String[]
