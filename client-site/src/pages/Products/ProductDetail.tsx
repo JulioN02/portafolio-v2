@@ -1,6 +1,6 @@
 import { useState, type SyntheticEvent } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import DOMPurify from 'dompurify';
+import { sanitizeHtml } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useProductBySlug } from '../../hooks/useProducts';
 import { Loading } from '../../components/common/Loading';
@@ -139,7 +139,7 @@ export function ProductDetailPage() {
         {product.fullDescription && (
           <div className={styles.fullDescription}>
             <h2>{t('productDetail.fullDescription')}</h2>
-            <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.fullDescription) }} />
+            <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(product.fullDescription, { allowMedia: true }) }} />
           </div>
         )}
       </div>
