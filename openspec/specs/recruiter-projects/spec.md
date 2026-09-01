@@ -8,13 +8,31 @@ Aggregated project listing with classification/type filters, pagination, and a d
 
 ### Requirement: Project Listing
 
-The system SHALL fetch `GET /api/projects` and display a filterable, paginated list of project cards.
+The system SHALL fetch the portfolio aggregation endpoint and display a filterable, paginated list of project cards. The aggregation MUST merge real Project rows (Project model), Service, Product, Tool, SuccessCase, and blog posts tagged `laboratorio` or `experimento` (rendered as type `laboratorio`); blog posts tagged `articulo` MUST be excluded. Every source MUST be filtered to `status=PUBLISHED` and `deletedAt=null` — no other status may appear. Classification filters MUST cover tags for real projects and classification for legacy types.
 
 #### Scenario: Render project list
 
 - GIVEN user visits `/proyectos`
 - WHEN projects load
-- THEN list shows cards with title, description, classification, type, and thumbnail
+- THEN list shows cards with title, description, classification/tags, type, and thumbnail
+
+#### Scenario: Only published rows appear
+
+- GIVEN rows exist in DRAFT, PRIVATE, and PUBLISHED status across all sources
+- WHEN the aggregation is fetched
+- THEN only PUBLISHED, non-deleted rows are returned
+
+#### Scenario: Lab blog posts count as projects
+
+- GIVEN a published blog post tagged "laboratorio"
+- WHEN the aggregation is fetched
+- THEN the post appears as a project with type "laboratorio"
+
+#### Scenario: Articles excluded
+
+- GIVEN a published blog post tagged "articulo"
+- WHEN the aggregation is fetched
+- THEN the post does NOT appear in the listing
 
 #### Scenario: Filter by classification
 
@@ -30,7 +48,7 @@ The system SHALL fetch `GET /api/projects` and display a filterable, paginated l
 
 ### Requirement: Detail Modal
 
-The system SHALL open a modal on project click, fetching the individual entity endpoint for `technicalExplanation` (sanitized via DOMPurify) and `technicalImages`.
+The system SHALL open a modal on project click, fetching the individual entity endpoint for `technicalExplanation` (sanitized via DOMPurify) and `technicalImages`, or — for real Project rows — `GET /api/projects/:slug` rendering the sanitized rich body, images, tags, and repositoryUrl.
 
 #### Scenario: Open modal for Service
 
@@ -49,6 +67,12 @@ The system SHALL open a modal on project click, fetching the individual entity e
 - GIVEN user clicks a project with `classification=TOOL`
 - WHEN modal opens
 - THEN system fetches `GET /api/tools/:slug` and renders technical content
+
+#### Scenario: Open modal for real Project
+
+- GIVEN user clicks a project of type "project" (real Project row)
+- WHEN modal opens
+- THEN system fetches `GET /api/projects/:slug` and renders sanitized body, images, tags, and repository link
 
 #### Scenario: Entity not found
 
