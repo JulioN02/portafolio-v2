@@ -30,7 +30,7 @@ The admin SHALL upload simulator files (HTML with embedded CSS/JS) to the `simul
 
 ### Requirement: Dedicated Serving Endpoint
 
-Simulator files MUST be served by a dedicated API endpoint (e.g. GET `/api/simulators/:id/content`) responding with `Content-Type: text/html`, CSP `sandbox` headers (no same-origin privileges), and no-cache.
+Simulator files MUST be served by a dedicated API endpoint (e.g. GET `/api/simulators/:id/content`) responding with `Content-Type: text/html`, a CSP `sandbox allow-scripts` header (no same-origin privileges) that additionally allows inline script/style so self-contained dashboards run — `sandbox allow-scripts; default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors <CORS_ORIGIN>` — and no-cache.
 
 #### Scenario: Endpoint serves sandboxed HTML
 
