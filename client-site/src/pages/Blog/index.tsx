@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { MetaTags } from '../../components/seo/MetaTags';
 import { BlogCard } from '../../components/blog/BlogCard';
-import { useBlogPosts, useBlogCategories } from '../../hooks/useBlogPosts';
+import { useBlogPosts, useBlogCategories, useBlogTags } from '../../hooks/useBlogPosts';
 import styles from './Blog.module.css';
 
 const ITEMS_PER_PAGE = 9;
@@ -12,13 +12,15 @@ export function BlogPage() {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const category = searchParams.get('category') || undefined;
+  const tag = searchParams.get('tag') || undefined;
   const search = searchParams.get('search') || undefined;
   const page = Number(searchParams.get('page')) || 1;
 
   const [searchInput, setSearchInput] = useState(search || '');
 
-  const { data, isLoading, isError, error, refetch } = useBlogPosts(page, { category, search });
+  const { data, isLoading, isError, error, refetch } = useBlogPosts(page, { category, tag, search });
   const { data: categories } = useBlogCategories();
+  const { data: tags = [] } = useBlogTags();
 
   const posts = data?.data ?? [];
   const totalItems = data?.pagination?.total ?? 0;
@@ -59,6 +61,19 @@ export function BlogPage() {
         next.set('category', value);
       } else {
         next.delete('category');
+      }
+      next.delete('page');
+      return next;
+    }, { replace: true });
+  };
+
+  const handleTagChange = (value: string) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (value) {
+        next.set('tag', value);
+      } else {
+        next.delete('tag');
       }
       next.delete('page');
       return next;
@@ -114,7 +129,7 @@ export function BlogPage() {
 
   // Empty state
   if (posts.length === 0) {
-    const hasFilters = !!(search || category);
+    const hasFilters = !!(search || category || tag);
     return (
       <div className={styles.page}>
         <MetaTags
@@ -180,6 +195,27 @@ export function BlogPage() {
           ))}
         </select>
       </div>
+
+      {/* Tag filter chips — auto-populated from /api/blog-posts/tags */}
+      {tags.length > 0 && (
+        <div className={styles.tagFilters} role="group" aria-label={t('blog.filter.tagAriaLabel')}>
+          <button
+            className={`${styles.tagChip} ${!tag ? styles.tagChipActive : ''}`}
+            onClick={() => handleTagChange('')}
+          >
+            {t('blog.filter.allTags')}
+          </button>
+          {tags.map((t) => (
+            <button
+              key={t}
+              className={`${styles.tagChip} ${tag === t ? styles.tagChipActive : ''}`}
+              onClick={() => handleTagChange(t)}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className={styles.grid}>
         {posts.map((post) => (
