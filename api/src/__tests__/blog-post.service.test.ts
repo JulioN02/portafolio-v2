@@ -286,4 +286,150 @@ describe('BlogPost Service', () => {
       // But mock returns array as-is, so we check for contains instead
     });
   });
+
+  describe('tags', () => {
+    it('persists tags on create', async () => {
+      const postData = {
+        title: 'Post con tags',
+        slug: 'post-con-tags',
+        category: 'laboratorio',
+        tags: ['laboratorio', 'react'],
+        shortDescription: 'Descripción corta del post',
+        coverImage: 'https://example.com/cover.jpg',
+        body: 'This is the main body content with enough characters to pass validation.',
+        status: 'DRAFT' as const,
+      };
+      const mockCreatedPost = { id: '1', ...postData, deletedAt: null, mediaGallery: [] };
+      (mockPrisma.blogPost.create as jest.Mock).mockResolvedValue(mockCreatedPost);
+
+      const result = await blogPostService.create(postData);
+
+      expect(result).toEqual(mockCreatedPost);
+      expect(mockPrisma.blogPost.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ tags: ['laboratorio', 'react'] }),
+          select: expect.any(Object),
+        })
+      );
+    });
+
+    it('derives category from the first tag on create (category kept for API compat)', async () => {
+      const postData = {
+        title: 'Post laboratorio',
+        slug: 'post-laboratorio',
+        category: 'stale-category',
+        tags: ['experimento', 'react'],
+        shortDescription: 'Descripción corta del post',
+        coverImage: 'https://example.com/cover.jpg',
+        body: 'This is the main body content with enough characters to pass validation.',
+        status: 'DRAFT' as const,
+      };
+      (mockPrisma.blogPost.create as jest.Mock).mockResolvedValue({ id: '1', ...postData, deletedAt: null });
+
+      await blogPostService.create(postData);
+
+      expect(mockPrisma.blogPost.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ category: 'experimento', tags: ['experimento', 'react'] }),
+          select: expect.any(Object),
+        })
+      );
+    });
+
+    it('persists tags and derives category on update', async () => {
+      const updateData = { tags: ['laboratorio', 'node'] };
+      (mockPrisma.blogPost.update as jest.Mock).mockResolvedValue({ id: '1', ...updateData, deletedAt: null });
+
+      await blogPostService.update('1', updateData);
+
+      expect(mockPrisma.blogPost.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: '1' },
+          data: expect.objectContaining({ tags: ['laboratorio', 'node'], category: 'laboratorio' }),
+          select: expect.any(Object),
+        })
+      );
+    });
+
+    it('keeps the provided category when updating without tags', async () => {
+      const updateData = { title: 'Solo título' };
+      (mockPrisma.blogPost.update as jest.Mock).mockResolvedValue({ id: '1', ...updateData, deletedAt: null });
+
+      await blogPostService.update('1', updateData);
+
+      expect(mockPrisma.blogPost.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: '1' },
+          data: { title: 'Solo título' },
+          select: expect.any(Object),
+        })
+      );
+    });
+
+    it('combines tag + category filters with AND logic', async () => {
+      (mockPrisma.blogPost.findMany as jest.Mock).mockResolvedValue([]);
+      (mockPrisma.blogPost.count as jest.Mock).mockResolvedValue(0);
+
+      await blogPostService.findAll({ tag: 'react', category: 'laboratorio' });
+
+      expect(mockPrisma.blogPost.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            category: 'laboratorio',
+            tags: { hasSome: ['react'] },
+          }),
+        })
+      );
+    });
+
+    it('combines tag filter with search via AND (OR branches preserved)', async () => {
+      (mockPrisma.blogPost.findMany as jest.Mock).mockResolvedValue([]);
+      (mockPrisma.blogPost.count as jest.Mock).mockResolvedValue(0);
+
+      await blogPostService.findAll({ tag: 'react', search: 'simulador' });
+
+      expect(mockPrisma.blogPost.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            tags: { hasSome: ['react'] },
+            OR: expect.arrayContaining([
+              { title: { contains: 'simulador', mode: 'insensitive' } },
+            ]),
+          }),
+        })
+      );
+    });
+
+    it('getTags returns distinct tags among PUBLISHED, non-deleted posts, sorted', async () => {
+      (mockPrisma.blogPost.findMany as jest.Mock).mockResolvedValue([
+        { tags: ['react'] },
+        { tags: ['laboratorio', 'react'] },
+      ]);
+
+      const result = await blogPostService.getTags();
+
+      expect(mockPrisma.blogPost.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { status: 'PUBLISHED', deletedAt: null },
+          select: { tags: true },
+        })
+      );
+      expect(result).toEqual(['laboratorio', 'react']);
+    });
+
+    it('getTags excludes tags from DRAFT posts (PUBLISHED-only)', async () => {
+      (mockPrisma.blogPost.findMany as jest.Mock).mockResolvedValue([
+        { tags: ['publico'] },
+      ]);
+
+      const result = await blogPostService.getTags();
+
+      expect(result).toEqual(['publico']);
+      expect(mockPrisma.blogPost.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({ status: 'PUBLISHED', deletedAt: null }),
+        })
+      );
+    });
+  });
 });

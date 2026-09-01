@@ -50,8 +50,12 @@ export const uploadController = {
       throw new ValidationError(validation.error || 'Invalid file');
     }
 
+    // Bucket comes from the multipart body; validated against the allowlist
+    // inside the service (allowed → stored there, missing → default, unknown → 400).
+    const bucket = typeof req.body?.bucket === 'string' ? req.body.bucket : undefined;
+
     // Save file
-    const result = await uploadService.saveFile(req.file);
+    const result = await uploadService.saveFile(req.file, bucket);
 
     res.status(201).json({
       message: 'File uploaded successfully',
@@ -70,7 +74,8 @@ export const uploadController = {
       throw new ValidationError('Filename is required');
     }
 
-    await uploadService.deleteFile(filename);
+    const bucket = typeof req.query?.bucket === 'string' ? req.query.bucket : undefined;
+    await uploadService.deleteFile(filename, bucket);
 
     res.json({ message: 'File deleted successfully' });
   }),

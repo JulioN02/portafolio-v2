@@ -28,8 +28,10 @@ interface PortfolioFilter {
 
 const PUBLISHED = { status: 'PUBLISHED', deletedAt: null } as const;
 
-/** Blog posts rendered as lab projects until P2-06 switches to tags hasSome. */
-const LAB_CATEGORIES: string[] = ['laboratorio', 'experimento'];
+/** Blog posts rendered as lab projects via tags (post P2-06). */
+const LAB_TAGS: string[] = ['laboratorio', 'experimento'];
+/** Posts tagged articulo are excluded from the aggregation. */
+const ARTICULO_TAG = 'articulo';
 
 const toProjectSummary = (item: {
   id: string;
@@ -59,7 +61,7 @@ const toLabSummary = (item: {
   id: string;
   title: string;
   slug: string;
-  category: string;
+  tags: string[];
   shortDescription: string;
   coverImage: string;
   mediaGallery: string[];
@@ -69,7 +71,7 @@ const toLabSummary = (item: {
   type: 'laboratorio',
   title: item.title,
   slug: item.slug,
-  classification: item.category,
+  classification: item.tags[0] || '',
   shortDescription: item.shortDescription,
   image: item.coverImage,
   images: [item.coverImage, ...item.mediaGallery].filter(Boolean),
@@ -237,14 +239,17 @@ export const portfolioService = {
         prisma.blogPost.findMany({
           where: {
             ...PUBLISHED,
-            category: { in: LAB_CATEGORIES },
-            ...(classification && { category: classification }),
+            AND: [
+              { tags: { hasSome: LAB_TAGS } },
+              { NOT: { tags: { hasSome: [ARTICULO_TAG] } } },
+              ...(classification ? [{ tags: { hasSome: [classification] } }] : []),
+            ],
           },
           select: {
             id: true,
             title: true,
             slug: true,
-            category: true,
+            tags: true,
             shortDescription: true,
             coverImage: true,
             mediaGallery: true,
@@ -294,7 +299,7 @@ export const portfolioService = {
       images: true, createdAt: true,
     } as const;
     const labSelect = {
-      id: true, title: true, slug: true, category: true,
+      id: true, title: true, slug: true, tags: true,
       shortDescription: true, coverImage: true, mediaGallery: true, createdAt: true,
     } as const;
 
@@ -325,7 +330,18 @@ export const portfolioService = {
           classification: 'success-case', shortDescription: item.description,
           image: item.images[0] || '', images: item.images, createdAt: item.createdAt,
         }))),
-      prisma.blogPost.findMany({ where: { ...PUBLISHED, category: { in: LAB_CATEGORIES } }, select: labSelect, orderBy: [{ createdAt: 'desc' }], take: limit })
+      prisma.blogPost.findMany({
+        where: {
+          ...PUBLISHED,
+          AND: [
+            { tags: { hasSome: LAB_TAGS } },
+            { NOT: { tags: { hasSome: [ARTICULO_TAG] } } },
+          ],
+        },
+        select: labSelect,
+        orderBy: [{ createdAt: 'desc' }],
+        take: limit,
+      })
         .then((items) => items.map(toLabSummary)),
     ]);
 

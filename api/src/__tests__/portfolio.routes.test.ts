@@ -39,7 +39,7 @@ describe('Portfolio routes (integration)', () => {
     (mockPrisma.tool.findMany as jest.Mock).mockResolvedValue([]);
     (mockPrisma.successCase.findMany as jest.Mock).mockResolvedValue([]);
     (mockPrisma.blogPost.findMany as jest.Mock).mockResolvedValue([
-      { id: 'b1', title: 'Laboratorio', slug: 'lab-1', category: 'laboratorio', shortDescription: 'D', coverImage: 'c.jpg', mediaGallery: [], createdAt: new Date('2024-01-03') },
+      { id: 'b1', title: 'Laboratorio', slug: 'lab-1', tags: ['laboratorio'], shortDescription: 'D', coverImage: 'c.jpg', mediaGallery: [], createdAt: new Date('2024-01-03') },
     ]);
 
     const res = await fetch(`${baseUrl}`);
@@ -48,6 +48,7 @@ describe('Portfolio routes (integration)', () => {
     const body = await res.json();
     expect(body.data).toHaveLength(2);
     expect(body.data[0].type).toBe('laboratorio'); // newest first
+    expect(body.data[0].classification).toBe('laboratorio'); // first tag
     expect(body.data[1].type).toBe('project');
     expect(body.pagination.total).toBe(2);
     expect(mockPrisma.blogPost.findMany).toHaveBeenCalledWith(
@@ -55,7 +56,10 @@ describe('Portfolio routes (integration)', () => {
         where: expect.objectContaining({
           status: 'PUBLISHED',
           deletedAt: null,
-          category: { in: ['laboratorio', 'experimento'] },
+          AND: expect.arrayContaining([
+            { tags: { hasSome: ['laboratorio', 'experimento'] } },
+            { NOT: { tags: { hasSome: ['articulo'] } } },
+          ]),
         }),
       })
     );

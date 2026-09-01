@@ -8,6 +8,7 @@ const BLOG_POST_SELECT = {
   title: true,
   slug: true,
   category: true,
+  tags: true,
   shortDescription: true,
   coverImage: true,
   mediaGallery: true,
@@ -23,7 +24,7 @@ const BLOG_POST_SELECT = {
 
 export const blogPostService = {
   async findAll(filter?: BlogPostFilterInput) {
-    const { status, category, page = 1, limit = 10 } = filter || {};
+    const { status, category, tag, page = 1, limit = 10 } = filter || {};
     const skip = (page - 1) * limit;
 
     const resolvedStatus = (status as string) === 'ALL' ? undefined : (status || 'PUBLISHED');
@@ -32,6 +33,7 @@ export const blogPostService = {
       deletedAt: null,
       ...(resolvedStatus && { status: resolvedStatus as PostStatus }),
       ...(category && { category }),
+      ...(tag && { tags: { hasSome: [tag] } }),
     };
 
     if (filter?.search) {
@@ -81,11 +83,14 @@ export const blogPostService = {
   },
 
   async create(data: BlogPostInput) {
+    // Category is derived from the first tag (kept for API/recruiter compat).
+    const category = data.tags?.[0] || data.category;
     return prisma.blogPost.create({
       data: {
         title: data.title,
         slug: data.slug,
-        category: data.category,
+        category,
+        tags: data.tags || [],
         shortDescription: data.shortDescription,
         coverImage: data.coverImage,
         mediaGallery: data.mediaGallery || [],
@@ -104,7 +109,13 @@ export const blogPostService = {
 
     if (data.title !== undefined) updateData.title = data.title;
     if (data.slug !== undefined) updateData.slug = data.slug;
-    if (data.category !== undefined) updateData.category = data.category;
+    if (data.tags !== undefined) {
+      updateData.tags = data.tags;
+      // Category derives from the first tag whenever tags change.
+      updateData.category = data.tags[0] || undefined;
+    } else if (data.category !== undefined) {
+      updateData.category = data.category;
+    }
     if (data.shortDescription !== undefined) updateData.shortDescription = data.shortDescription;
     if (data.coverImage !== undefined) updateData.coverImage = data.coverImage;
     if (data.mediaGallery !== undefined) updateData.mediaGallery = data.mediaGallery;
@@ -162,5 +173,14 @@ export const blogPostService = {
       orderBy: { category: 'asc' },
     });
     return result.map((item: { category: string }) => item.category);
+  },
+
+  /** Distinct tags among PUBLISHED, non-deleted posts, sorted. */
+  async getTags() {
+    const posts = await prisma.blogPost.findMany({
+      where: { status: 'PUBLISHED', deletedAt: null },
+      select: { tags: true },
+    });
+    return [...new Set(posts.flatMap((post) => post.tags))].sort();
   },
 };
