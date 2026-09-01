@@ -104,6 +104,11 @@ describe('Simulator routes (integration)', () => {
       const csp = res.headers.get('content-security-policy') || '';
       expect(csp).toContain('sandbox allow-scripts');
       expect(csp).toContain("default-src 'none'");
+      // Inline script/style must be allowed so self-contained dashboards run,
+      // but default-src 'none' still blocks all network (connect/font/etc.).
+      expect(csp).toContain("script-src 'unsafe-inline'");
+      expect(csp).toContain("style-src 'unsafe-inline'");
+      expect(csp).toContain("img-src 'self' data:");
       expect(csp).toContain("base-uri 'none'");
       expect(csp).toContain("form-action 'none'");
       expect(csp).toContain('frame-ancestors http://localhost:5173 http://localhost:4173');
@@ -123,6 +128,10 @@ describe('Simulator routes (integration)', () => {
 
       const csp = res.headers.get('content-security-policy') || '';
       expect(csp).toContain('frame-ancestors https://client.example.com https://recruiter.example.com');
+      // New inline-allow directives hold regardless of the configured origins.
+      expect(csp).toContain("script-src 'unsafe-inline'");
+      expect(csp).toContain("style-src 'unsafe-inline'");
+      expect(csp).toContain("img-src 'self' data:");
     });
 
     it('returns 404 for an unknown simulator', async () => {

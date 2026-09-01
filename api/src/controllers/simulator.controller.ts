@@ -48,6 +48,13 @@ const parseOptionalInt = (value: unknown): number | undefined => {
  *   the raw HTML is never DOMPurify-rendered).
  * - `default-src 'none'; base-uri 'none'; form-action 'none'` — the document
  *   can't reach any origin, can't navigate the parent, can't submit forms.
+ * - `script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:`
+ *   — minimal relaxation so the self-contained dashboard HTML (inline
+ *   `<script>`/`<style>`, local/embedded images) actually runs inside the
+ *   sandboxed iframe. `default-src 'none'` still blocks ALL network requests
+ *   (connect-src/font-src/object-src/etc.), and the content is admin-trusted
+ *   and served with `sandbox="allow-scripts"` WITHOUT `allow-same-origin`, so
+ *   inline JS cannot access the parent DOM or exfiltrate data.
  * - `frame-ancestors <CORS_ORIGIN>` — cross-origin frontends may embed it
  *   (helmet's `frame-ancestors 'self'` is replaced for this response).
  */
@@ -56,7 +63,7 @@ export function buildSimulatorCsp(): string {
     .map((origin) => origin.trim())
     .filter(Boolean)
     .join(' ');
-  return `sandbox allow-scripts; default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors ${origins}`;
+  return `sandbox allow-scripts; default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors ${origins}`;
 }
 
 export const simulatorController = {
