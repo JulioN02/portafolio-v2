@@ -4,6 +4,7 @@ import { RichTextEditor } from '@jsoft/shared';
 import type { ToolInput } from '@jsoft/shared';
 import { ImageUploader } from '../uploads/ImageUploader';
 import { getTextFromHTML } from '../../utils/getTextFromHTML';
+import { simulatorPickerApi } from '../../api/simulators.api';
 import formStyles from '../../styles/form.module.css';
 
 interface ToolFormProps {
@@ -142,7 +143,7 @@ export function ToolForm({ initialData, onSubmit, isLoading }: ToolFormProps) {
         </div>
         <div className={formStyles.formGroup}>
           <label className={formStyles.formLabel} htmlFor="fullDescription">{t('form.fullDescription')}</label>
-          <RichTextEditor value={fullDescription} onChange={setFullDescription} minHeight={250} lang={lang} />
+          <RichTextEditor value={fullDescription} onChange={setFullDescription} minHeight={250} lang={lang} simulatorApi={simulatorPickerApi} />
           {errors.fullDescription && <span className={formStyles.formError}>{errors.fullDescription}</span>}
         </div>
       </fieldset>
