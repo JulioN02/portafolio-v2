@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/api/(.*)", "destination": "https://portafolio-v2-api-v2.vercel.app/api/$1" },
     { "source": "/((?!assets/).*)", "destination": "/index.html" }
   ]
 }
