@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
+import { successCaseSchema } from '@jsoft/shared';
 import type { SuccessCaseInput } from '@jsoft/shared';
 import { ImageUploader } from '../uploads/ImageUploader';
 import formStyles from '../../styles/form.module.css';
@@ -121,7 +122,7 @@ export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCas
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validate()) {
-      onSubmit({
+      const payload: SuccessCaseInput = {
         title,
         slug: initialData?.slug || generateSlug(title),
         description,
@@ -129,7 +130,21 @@ export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCas
         videos: videos.length > 0 ? videos : undefined,
         links: links.length > 0 ? links : undefined,
         status: status as 'DRAFT' | 'PUBLISHED' | 'PRIVATE' | 'ARCHIVED',
-      });
+      };
+
+      // Final gate: same Zod schema as the API (see BlogPostForm).
+      const parsed = successCaseSchema.safeParse(payload);
+      if (!parsed.success) {
+        const newErrors: Record<string, string> = {};
+        for (const issue of parsed.error.issues) {
+          const field = String(issue.path[0] ?? '');
+          if (!newErrors[field]) newErrors[field] = issue.message;
+        }
+        setErrors(newErrors);
+        return;
+      }
+
+      onSubmit(parsed.data);
     }
   };
 

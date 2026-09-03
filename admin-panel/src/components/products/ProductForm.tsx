@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
-import { RichTextEditor } from '@jsoft/shared';
+import { RichTextEditor, productSchema } from '@jsoft/shared';
 import type { ProductInput } from '@jsoft/shared';
 import { ImageUploader } from '../uploads/ImageUploader';
 import { getTextFromHTML } from '../../utils/getTextFromHTML';
@@ -59,7 +59,7 @@ export function ProductForm({ initialData, onSubmit, isLoading }: ProductFormPro
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validate()) {
-      onSubmit({
+      const payload: ProductInput = {
         title,
         slug,
         classification,
@@ -71,7 +71,21 @@ export function ProductForm({ initialData, onSubmit, isLoading }: ProductFormPro
         featured,
         technicalExplanation: technicalExplanation || undefined,
         technicalImages: technicalImages.length > 0 ? technicalImages : undefined,
-      });
+      };
+
+      // Final gate: same Zod schema as the API (see BlogPostForm).
+      const parsed = productSchema.safeParse(payload);
+      if (!parsed.success) {
+        const newErrors: Record<string, string> = {};
+        for (const issue of parsed.error.issues) {
+          const field = String(issue.path[0] ?? '');
+          if (!newErrors[field]) newErrors[field] = issue.message;
+        }
+        setErrors(newErrors);
+        return;
+      }
+
+      onSubmit(parsed.data);
     }
   };
 

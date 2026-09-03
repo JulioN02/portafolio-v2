@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
-import { RichTextEditor } from '@jsoft/shared';
+import { RichTextEditor, projectSchema } from '@jsoft/shared';
 import type { ProjectInput } from '@jsoft/shared';
 import { ImageUploader } from '../uploads/ImageUploader';
 import { TagInput } from '../shared/TagInput';
@@ -67,7 +67,7 @@ export function ProjectForm({ initialData, onSubmit, isLoading }: ProjectFormPro
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validate()) {
-      onSubmit({
+      const payload: ProjectInput = {
         title,
         slug,
         shortDescription,
@@ -78,7 +78,21 @@ export function ProjectForm({ initialData, onSubmit, isLoading }: ProjectFormPro
         status: status as ProjectInput['status'],
         featured,
         order,
-      });
+      };
+
+      // Final gate: same Zod schema as the API (see BlogPostForm).
+      const parsed = projectSchema.safeParse(payload);
+      if (!parsed.success) {
+        const newErrors: Record<string, string> = {};
+        for (const issue of parsed.error.issues) {
+          const field = String(issue.path[0] ?? '');
+          if (!newErrors[field]) newErrors[field] = issue.message;
+        }
+        setErrors(newErrors);
+        return;
+      }
+
+      onSubmit(parsed.data);
     }
   };
 

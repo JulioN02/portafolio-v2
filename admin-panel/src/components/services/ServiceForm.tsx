@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
+import { serviceSchema } from '@jsoft/shared';
 import type { ServiceInput } from '@jsoft/shared';
 import { ImageUploader } from '../uploads/ImageUploader';
 import formStyles from '../../styles/form.module.css';
@@ -132,7 +133,7 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validate()) {
-      onSubmit({
+      const payload: ServiceInput = {
         title,
         slug,
         classification,
@@ -143,7 +144,21 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
         status: status as ServiceInput['status'],
         technicalExplanation: technicalExplanation || undefined,
         technicalImages,
-      });
+      };
+
+      // Final gate: same Zod schema as the API (see BlogPostForm).
+      const parsed = serviceSchema.safeParse(payload);
+      if (!parsed.success) {
+        const newErrors: Record<string, string> = {};
+        for (const issue of parsed.error.issues) {
+          const field = String(issue.path[0] ?? '');
+          if (!newErrors[field]) newErrors[field] = issue.message;
+        }
+        setErrors(newErrors);
+        return;
+      }
+
+      onSubmit(parsed.data);
     }
   };
 

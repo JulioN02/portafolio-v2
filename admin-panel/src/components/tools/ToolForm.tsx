@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
-import { RichTextEditor } from '@jsoft/shared';
+import { RichTextEditor, toolSchema } from '@jsoft/shared';
 import type { ToolInput } from '@jsoft/shared';
 import { ImageUploader } from '../uploads/ImageUploader';
 import { getTextFromHTML } from '../../utils/getTextFromHTML';
@@ -67,7 +67,7 @@ export function ToolForm({ initialData, onSubmit, isLoading }: ToolFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validate()) {
-      onSubmit({
+      const payload: ToolInput = {
         title,
         slug,
         classification,
@@ -79,7 +79,21 @@ export function ToolForm({ initialData, onSubmit, isLoading }: ToolFormProps) {
         status: status as 'DRAFT' | 'PUBLISHED' | 'PRIVATE' | 'ARCHIVED',
         technicalExplanation: technicalExplanation || undefined,
         technicalImages,
-      });
+      };
+
+      // Final gate: same Zod schema as the API (see BlogPostForm).
+      const parsed = toolSchema.safeParse(payload);
+      if (!parsed.success) {
+        const newErrors: Record<string, string> = {};
+        for (const issue of parsed.error.issues) {
+          const field = String(issue.path[0] ?? '');
+          if (!newErrors[field]) newErrors[field] = issue.message;
+        }
+        setErrors(newErrors);
+        return;
+      }
+
+      onSubmit(parsed.data);
     }
   };
 
