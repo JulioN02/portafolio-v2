@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
-import { Select, Button, RichTextEditor } from '@jsoft/shared';
+import { Select, Button, RichTextEditor, blogPostSchema } from '@jsoft/shared';
 import type { BlogPostInput, PostStatus } from '@jsoft/shared';
 import { getTextFromHTML } from '../../utils/getTextFromHTML';
 import { ImageUploader } from '../uploads/ImageUploader';
@@ -60,7 +60,7 @@ export function BlogPostForm({ initialData, onSubmit, isLoading }: BlogPostFormP
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validate()) {
-      onSubmit({
+      const payload: BlogPostInput = {
         title,
         slug,
         shortDescription,
@@ -72,7 +72,24 @@ export function BlogPostForm({ initialData, onSubmit, isLoading }: BlogPostFormP
         tags,
         externalLink: externalLink || undefined,
         lessonsLearned: lessonsLearned || undefined,
-      });
+      };
+
+      // Final gate: validate against the exact same Zod schema the API uses.
+      // Keeps local validation and server validation perfectly in sync so the
+      // server can never reject a payload the form accepted (e.g. slug regex,
+      // mediaGallery/externalLink URL format, min lengths).
+      const parsed = blogPostSchema.safeParse(payload);
+      if (!parsed.success) {
+        const newErrors: Record<string, string> = {};
+        for (const issue of parsed.error.issues) {
+          const field = String(issue.path[0] ?? '');
+          if (!newErrors[field]) newErrors[field] = issue.message;
+        }
+        setErrors(newErrors);
+        return;
+      }
+
+      onSubmit(parsed.data);
     }
   };
 
