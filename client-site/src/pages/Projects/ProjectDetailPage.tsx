@@ -1,6 +1,6 @@
 import { useState, type SyntheticEvent } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { renderSimulatorEmbeds } from '@jsoft/shared';
+import { renderSimulatorEmbeds, sanitizeHtml } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useProjectBySlug } from '../../hooks/useProjects';
 import { Loading } from '../../components/common/Loading';
@@ -114,7 +114,10 @@ export function ProjectDetailPage() {
               </div>
             )}
             <h1 className={styles.title}>{project.title}</h1>
-            <p className={styles.description}>{project.shortDescription}</p>
+            <p
+              className={styles.description}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(project.shortDescription) }}
+            />
 
             {project.repositoryUrl && (
               <a

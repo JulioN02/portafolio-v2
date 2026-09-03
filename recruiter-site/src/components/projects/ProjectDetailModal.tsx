@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
-import { renderSimulatorEmbeds } from '@jsoft/shared';
+import { renderSimulatorEmbeds, sanitizeHtml } from '@jsoft/shared';
 import { useProjectDetail } from '../../hooks/useProjects';
 import type { ProjectSummary } from '../../types';
 import styles from './ProjectDetailModal.module.css';
@@ -110,7 +110,10 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
         <h2 className={styles.title}>{project.title}</h2>
 
         {/* ── Description ── */}
-        <p className={styles.description}>{project.shortDescription}</p>
+        <p
+          className={styles.description}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(project.shortDescription) }}
+        />
 
         {/* ── Main image ── */}
         {projectImages.length > 0 && (

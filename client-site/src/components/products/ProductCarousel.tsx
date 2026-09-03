@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from '../../i18n/LanguageContext';
+import { sanitizeHtml } from '@jsoft/shared';
 import { useFeaturedProducts } from '../../hooks/useProducts';
 import { Loading } from '../common/Loading';
 import styles from './ProductCarousel.module.css';
@@ -41,11 +42,10 @@ export function ProductCarousel() {
               <div className={styles.content}>
                 <span className={styles.classification}>{product.classification}</span>
                 <h3 className={styles.cardTitle}>{product.title}</h3>
-                <p className={styles.description}>
-                  {product.shortDescription.length > 100 
-                    ? `${product.shortDescription.substring(0, 100)}...` 
-                    : product.shortDescription}
-                </p>
+                <p
+                  className={styles.description}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(product.shortDescription) }}
+                />
                 <Link to={`/productos/${product.slug}`} className={styles.link}>
                   {t('productCarousel.viewMore')}
                 </Link>

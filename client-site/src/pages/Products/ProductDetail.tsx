@@ -1,6 +1,6 @@
 import { useState, type SyntheticEvent } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { renderSimulatorEmbeds } from '@jsoft/shared';
+import { renderSimulatorEmbeds, sanitizeHtml } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useProductBySlug } from '../../hooks/useProducts';
 import { Loading } from '../../components/common/Loading';
@@ -109,7 +109,10 @@ export function ProductDetailPage() {
           <div className={styles.content}>
             <span className={styles.classification}>{product.classification}</span>
             <h1 className={styles.title}>{product.title}</h1>
-            <p className={styles.description}>{product.shortDescription}</p>
+            <p
+              className={styles.description}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(product.shortDescription) }}
+            />
 
             {/* External Link */}
             {product.externalLink && (

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from '../../i18n/LanguageContext';
+import { sanitizeHtml } from '@jsoft/shared';
 import { useFeaturedTools } from '../../hooks/useTools';
 import { Loading } from '../common/Loading';
 import styles from './ToolCarousel.module.css';
@@ -41,11 +42,10 @@ export function ToolCarousel() {
               <div className={styles.content}>
                 <span className={styles.classification}>{tool.classification}</span>
                 <h3 className={styles.cardTitle}>{tool.title}</h3>
-                <p className={styles.description}>
-                  {tool.shortDescription.length > 100 
-                    ? `${tool.shortDescription.substring(0, 100)}...` 
-                    : tool.shortDescription}
-                </p>
+                <p
+                  className={styles.description}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(tool.shortDescription) }}
+                />
                 <Link to={`/herramientas/${tool.slug}`} className={styles.link}>
                   {t('toolCarousel.viewDetails')}
                 </Link>

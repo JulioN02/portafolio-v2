@@ -41,7 +41,7 @@ export function BlogPostForm({ initialData, onSubmit, isLoading }: BlogPostFormP
     } else if (category.length < 2) {
       newErrors.tags = t('validation.categoryMin');
     }
-    if (!shortDescription || shortDescription.length < 10) newErrors.shortDescription = t('validation.shortDescriptionMin');
+    if (!shortDescription || getTextFromHTML(shortDescription).length < 10) newErrors.shortDescription = t('validation.shortDescriptionMin');
     if (!coverImage) newErrors.coverImage = t('validation.coverImageRequired');
     const textContent = getTextFromHTML(body);
     if (!body || textContent.length < 100) newErrors.body = t('validation.bodyMin');
@@ -160,14 +160,7 @@ export function BlogPostForm({ initialData, onSubmit, isLoading }: BlogPostFormP
         {/* Short Description */}
         <div className={formStyles.formGroup}>
           <label className={formStyles.formLabel} htmlFor="shortDescription">{t('form.shortDescription')}</label>
-          <textarea
-            id="shortDescription"
-            className={`${formStyles.formInput} ${formStyles.formTextarea} ${errors.shortDescription ? formStyles.inputError : ''}`}
-            value={shortDescription}
-            onChange={(e) => setShortDescription(e.target.value)}
-            placeholder={t('form.shortDescriptionPlaceholder')}
-            required
-          />
+          <RichTextEditor value={shortDescription} onChange={setShortDescription} minHeight={120} lang={lang} />
           <p className={formStyles.hint}>{t('form.shortDescriptionPlaceholder')}</p>
           {errors.shortDescription && <span className={formStyles.formError}>{errors.shortDescription}</span>}
         </div>
@@ -232,13 +225,7 @@ export function BlogPostForm({ initialData, onSubmit, isLoading }: BlogPostFormP
         {/* Lessons Learned */}
         <div className={formStyles.formGroup}>
           <label className={formStyles.formLabel} htmlFor="lessonsLearned">{t('blog.lessonsLearned')}</label>
-          <textarea
-            id="lessonsLearned"
-            className={`${formStyles.formInput} ${formStyles.formTextarea}`}
-            value={lessonsLearned}
-            onChange={(e) => setLessonsLearned(e.target.value)}
-            placeholder={t('blog.lessonsLearnedHint')}
-          />
+          <RichTextEditor value={lessonsLearned} onChange={setLessonsLearned} minHeight={150} lang={lang} />
           <p className={formStyles.hint}>{t('blog.lessonsLearnedHint')}</p>
         </div>
       </fieldset>

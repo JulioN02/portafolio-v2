@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import useEmblaCarousel from 'embla-carousel-react';
+import { sanitizeHtml } from '@jsoft/shared';
 import { useRecentProjects } from '../../hooks/useProjects';
 import { SectionTitle } from '../common/SectionTitle';
 import { useTranslation } from '../../i18n/LanguageContext';
@@ -92,7 +93,10 @@ export function RecentProjects() {
                       {project.classification}
                     </span>
                     <h3 className={styles.cardTitle}>{project.title}</h3>
-                    <p className={styles.cardDescription}>{project.shortDescription}</p>
+                    <p
+                      className={styles.cardDescription}
+                      dangerouslySetInnerHTML={{ __html: sanitizeHtml(project.shortDescription) }}
+                    />
                   </div>
                 </Link>
               </div>

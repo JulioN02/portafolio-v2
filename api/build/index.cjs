@@ -43327,6 +43327,16 @@ var tagsSchema = external_exports.array(
   external_exports.string().trim().min(1, "Tag must be at least 1 character").max(30, "Tag must be at most 30 characters")
 ).max(10, "Maximum 10 tags allowed");
 
+// packages/shared/src/utils/getTextFromHTML.ts
+function getTextFromHTML(html) {
+  if (typeof document !== "undefined") {
+    const tmp = document.createElement("div");
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || "";
+  }
+  return html.replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/\s+/g, " ").trim();
+}
+
 // packages/shared/src/schemas/blogPost.schema.ts
 var postStatusEnum = external_exports.enum(["DRAFT", "PUBLISHED", "PRIVATE", "ARCHIVED", "ALL"]);
 var blogPostSchema = external_exports.object({
@@ -43334,7 +43344,10 @@ var blogPostSchema = external_exports.object({
   slug: external_exports.string().min(3).max(200).regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "Slug must be lowercase with hyphens"),
   category: external_exports.string().min(2).max(50),
   tags: tagsSchema.optional(),
-  shortDescription: external_exports.string().min(10).max(500),
+  shortDescription: external_exports.string().refine((s) => {
+    const len = getTextFromHTML(s).length;
+    return len >= 10 && len <= 700;
+  }, "Short description must be between 10 and 700 characters"),
   coverImage: external_exports.string().url(),
   mediaGallery: external_exports.array(external_exports.string().url()).optional(),
   body: external_exports.string().min(100, "Body must be at least 100 characters").max(5e4),
@@ -43360,7 +43373,10 @@ var serviceSchema = external_exports.object({
   title: external_exports.string().min(3, "Title must be at least 3 characters").max(100),
   slug: external_exports.string().min(3).max(100).regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "Slug must be lowercase with hyphens"),
   classification: external_exports.string().min(2, "Classification must be at least 2 characters").max(50),
-  shortDescription: external_exports.string().min(10, "Short description must be at least 10 characters").max(300),
+  shortDescription: external_exports.string().refine((s) => {
+    const len = getTextFromHTML(s).length;
+    return len >= 10 && len <= 700;
+  }, "Short description must be between 10 and 700 characters"),
   fullDescription: external_exports.string().min(50, "Full description must be at least 50 characters"),
   includedItems: external_exports.array(external_exports.string().min(3)).min(1, "At least one included item is required"),
   images: external_exports.array(external_exports.string().url()).min(1, "At least one image is required"),
@@ -43385,7 +43401,10 @@ var productSchema = external_exports.object({
   title: external_exports.string().min(3, "Title must be at least 3 characters").max(100),
   slug: external_exports.string().min(3).max(100).regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "Slug must be lowercase with hyphens"),
   classification: external_exports.string().min(2).max(50),
-  shortDescription: external_exports.string().min(10).max(300),
+  shortDescription: external_exports.string().refine((s) => {
+    const len = getTextFromHTML(s).length;
+    return len >= 10 && len <= 700;
+  }, "Short description must be between 10 and 700 characters"),
   fullDescription: external_exports.string().min(50),
   images: external_exports.array(external_exports.string().url()).min(1),
   externalLink: external_exports.string().url().optional(),
@@ -43412,7 +43431,10 @@ var toolSchema = external_exports.object({
   title: external_exports.string().min(3, "Title must be at least 3 characters").max(100),
   slug: external_exports.string().min(3).max(100).regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "Slug must be lowercase with hyphens"),
   classification: external_exports.string().min(2).max(50),
-  shortDescription: external_exports.string().min(10).max(300),
+  shortDescription: external_exports.string().refine((s) => {
+    const len = getTextFromHTML(s).length;
+    return len >= 10 && len <= 700;
+  }, "Short description must be between 10 and 700 characters"),
   fullDescription: external_exports.string().min(50),
   images: external_exports.array(external_exports.string().url()).min(1),
   requiresInstall: external_exports.boolean().default(false),
@@ -43459,7 +43481,10 @@ var successCaseStatusSchema = external_exports.object({
 var projectSchema = external_exports.object({
   title: external_exports.string().min(3, "Title must be at least 3 characters").max(200),
   slug: external_exports.string().min(3).max(200).regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "Slug must be lowercase with hyphens"),
-  shortDescription: external_exports.string().min(10).max(500),
+  shortDescription: external_exports.string().refine((s) => {
+    const len = getTextFromHTML(s).length;
+    return len >= 10 && len <= 700;
+  }, "Short description must be between 10 and 700 characters"),
   body: external_exports.string().min(100, "Body must be at least 100 characters").max(5e4),
   images: external_exports.array(external_exports.string().url()).optional(),
   repositoryUrl: external_exports.string().url().optional(),

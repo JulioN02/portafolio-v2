@@ -1,6 +1,6 @@
 import { useState, type SyntheticEvent } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { renderSimulatorEmbeds } from '@jsoft/shared';
+import { renderSimulatorEmbeds, sanitizeHtml } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useToolBySlug } from '../../hooks/useTools';
 import { Loading } from '../../components/common/Loading';
@@ -109,7 +109,10 @@ export function ToolDetailPage() {
           <div className={styles.content}>
             <span className={styles.classification}>{tool.classification}</span>
             <h1 className={styles.title}>{tool.title}</h1>
-            <p className={styles.description}>{tool.shortDescription}</p>
+            <p
+              className={styles.description}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(tool.shortDescription) }}
+            />
 
             {/* Requires Install badge */}
             {tool.requiresInstall && (

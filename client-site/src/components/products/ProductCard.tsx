@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { sanitizeHtml } from '@jsoft/shared';
 import type { ProductResponse } from '@jsoft/shared';
 import styles from './ProductCard.module.css';
 
@@ -27,7 +28,10 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className={styles.content}>
           <span className={styles.classification}>{product.classification}</span>
           <h3 className={styles.title}>{product.title}</h3>
-          <p className={styles.description}>{product.shortDescription}</p>
+          <p
+          className={styles.description}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(product.shortDescription) }}
+        />
         </div>
       </Link>
     </article>

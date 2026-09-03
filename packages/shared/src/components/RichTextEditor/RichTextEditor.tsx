@@ -20,6 +20,7 @@ export interface RichTextEditorLabels {
   bulletList: string;
   orderedList: string;
   blockquote: string;
+  code: string;
   codeBlock: string;
   horizontalRule: string;
   addLink: string;
@@ -49,6 +50,7 @@ const ES_LABELS: RichTextEditorLabels = {
   bulletList: 'Lista con viñetas',
   orderedList: 'Lista numerada',
   blockquote: 'Cita',
+  code: 'Código en línea (Ctrl+E)',
   codeBlock: 'Bloque de código',
   horizontalRule: 'Línea horizontal',
   addLink: 'Agregar enlace',
@@ -92,6 +94,7 @@ const EN_LABELS: RichTextEditorLabels = {
   bulletList: 'Bullet List',
   orderedList: 'Ordered List',
   blockquote: 'Blockquote',
+  code: 'Inline Code (Ctrl+E)',
   codeBlock: 'Code Block',
   horizontalRule: 'Horizontal Rule',
   addLink: 'Add Link',
@@ -355,6 +358,12 @@ export function RichTextEditor({
           isActive={editor.isActive('blockquote')}
           label={'\u201C'}
           title={labels.blockquote}
+        />
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleCode().run()}
+          isActive={editor.isActive('code')}
+          label={'</>'}
+          title={labels.code}
         />
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}

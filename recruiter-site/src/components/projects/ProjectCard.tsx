@@ -1,3 +1,4 @@
+import { sanitizeHtml } from '@jsoft/shared';
 import type { ProjectSummary } from '../../types';
 import styles from './ProjectCard.module.css';
 
@@ -60,7 +61,10 @@ export function ProjectCard({ project, onSelect }: ProjectCardProps) {
           {project.classification}
         </span>
         <h3 className={styles.title}>{project.title}</h3>
-        <p className={styles.description}>{project.shortDescription}</p>
+        <p
+          className={styles.description}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(project.shortDescription) }}
+        />
       </div>
     </article>
   );

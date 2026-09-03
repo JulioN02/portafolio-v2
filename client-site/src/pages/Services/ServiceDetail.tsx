@@ -1,6 +1,6 @@
 import { useState, type SyntheticEvent } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { renderSimulatorEmbeds } from '@jsoft/shared';
+import { renderSimulatorEmbeds, sanitizeHtml } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useServiceBySlug } from '../../hooks/useServices';
 import { Loading } from '../../components/common/Loading';
@@ -109,7 +109,10 @@ export function ServiceDetailPage() {
           <div className={styles.content}>
             <span className={styles.classification}>{service.classification}</span>
             <h1 className={styles.title}>{service.title}</h1>
-            <p className={styles.description}>{service.shortDescription}</p>
+            <p
+              className={styles.description}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(service.shortDescription) }}
+            />
 
             {/* Included Items */}
             {service.includedItems.length > 0 && (

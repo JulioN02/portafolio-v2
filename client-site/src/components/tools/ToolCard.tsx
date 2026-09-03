@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { sanitizeHtml } from '@jsoft/shared';
 import type { ToolResponse } from '@jsoft/shared';
 import styles from './ToolCard.module.css';
 
@@ -27,7 +28,10 @@ export function ToolCard({ tool }: ToolCardProps) {
         <div className={styles.content}>
           <span className={styles.classification}>{tool.classification}</span>
           <h3 className={styles.title}>{tool.title}</h3>
-          <p className={styles.description}>{tool.shortDescription}</p>
+          <p
+          className={styles.description}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(tool.shortDescription) }}
+        />
         </div>
       </Link>
     </article>

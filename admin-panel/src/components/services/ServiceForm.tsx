@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
-import { serviceSchema } from '@jsoft/shared';
+import { RichTextEditor, serviceSchema } from '@jsoft/shared';
 import type { ServiceInput } from '@jsoft/shared';
+import { getTextFromHTML } from '../../utils/getTextFromHTML';
 import { ImageUploader } from '../uploads/ImageUploader';
 import formStyles from '../../styles/form.module.css';
 
@@ -88,7 +89,7 @@ const generateSlug = (title: string): string => {
 };
 
 export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormProps) {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const [title, setTitle] = useState(initialData?.title || '');
   const [slug, setSlug] = useState(initialData?.slug || '');
   const [classification, setClassification] = useState(initialData?.classification || '');
@@ -122,8 +123,8 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
     if (!title || title.length < 3) newErrors.title = t('validation.titleMin');
     if (!slug || slug.length < 3) newErrors.slug = t('validation.slugMin');
     if (!classification || classification.length < 2) newErrors.classification = t('validation.classificationRequired');
-    if (!shortDescription || shortDescription.length < 10) newErrors.shortDescription = t('validation.shortDescriptionMin');
-    if (!fullDescription || fullDescription.length < 50) newErrors.fullDescription = t('validation.fullDescriptionMin');
+    if (getTextFromHTML(shortDescription).length < 10) newErrors.shortDescription = t('validation.shortDescriptionMin');
+    if (getTextFromHTML(fullDescription).length < 50) newErrors.fullDescription = t('validation.fullDescriptionMin');
     if (images.length === 0) newErrors.images = t('validation.imageRequired');
     if (includedItems.length === 0) newErrors.includedItems = t('services.includedItemsRequired');
     setErrors(newErrors);
@@ -210,27 +211,12 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
         <legend className={formStyles.sectionTitle}>{t('services.description')}</legend>
         <div className={formStyles.formGroup}>
           <label className={formStyles.formLabel} htmlFor="shortDescription">{t('form.shortDescription')}</label>
-          <textarea
-            id="shortDescription"
-            className={`${formStyles.formInput} ${formStyles.formTextarea} ${errors.shortDescription ? formStyles.inputError : ''}`}
-            value={shortDescription}
-            onChange={(e) => setShortDescription(e.target.value)}
-            placeholder={t('form.shortDescriptionPlaceholder')}
-            required
-          />
+          <RichTextEditor value={shortDescription} onChange={setShortDescription} minHeight={120} lang={lang} />
           {errors.shortDescription && <span className={formStyles.formError}>{errors.shortDescription}</span>}
         </div>
         <div className={formStyles.formGroup}>
           <label className={formStyles.formLabel} htmlFor="fullDescription">{t('form.fullDescription')}</label>
-          <textarea
-            id="fullDescription"
-            className={`${formStyles.formInput} ${formStyles.formTextarea} ${errors.fullDescription ? formStyles.inputError : ''}`}
-            value={fullDescription}
-            onChange={(e) => setFullDescription(e.target.value)}
-            placeholder={t('form.fullDescriptionPlaceholder')}
-            required
-            style={{ minHeight: '200px' }}
-          />
+          <RichTextEditor value={fullDescription} onChange={setFullDescription} minHeight={250} lang={lang} />
           {errors.fullDescription && <span className={formStyles.formError}>{errors.fullDescription}</span>}
         </div>
       </fieldset>

@@ -49,7 +49,7 @@ export function ProductForm({ initialData, onSubmit, isLoading }: ProductFormPro
     if (!title || title.length < 3) newErrors.title = t('validation.titleMin');
     if (!slug || slug.length < 3) newErrors.slug = t('validation.slugMin');
     if (!classification || classification.length < 2) newErrors.classification = t('validation.classificationMin');
-    if (!shortDescription || shortDescription.length < 10) newErrors.shortDescription = t('validation.shortDescriptionMin');
+    if (getTextFromHTML(shortDescription).length < 10) newErrors.shortDescription = t('validation.shortDescriptionMin');
     if (getTextFromHTML(fullDescription).length < 50) newErrors.fullDescription = t('validation.fullDescriptionMin');
     if (images.length === 0) newErrors.images = t('validation.imageRequired');
     setErrors(newErrors);
@@ -135,14 +135,7 @@ export function ProductForm({ initialData, onSubmit, isLoading }: ProductFormPro
 
         <div className={formStyles.formGroup}>
           <label className={formStyles.formLabel} htmlFor="shortDescription">{t('form.shortDescription')}</label>
-          <textarea
-            id="shortDescription"
-            className={`${formStyles.formInput} ${formStyles.formTextarea} ${errors.shortDescription ? formStyles.inputError : ''}`}
-            value={shortDescription}
-            onChange={(e) => setShortDescription(e.target.value)}
-            required
-            placeholder={t('form.shortDescriptionPlaceholder')}
-          />
+          <RichTextEditor value={shortDescription} onChange={setShortDescription} minHeight={120} lang={lang} />
           {errors.shortDescription && <span className={formStyles.formError}>{errors.shortDescription}</span>}
         </div>
       </fieldset>

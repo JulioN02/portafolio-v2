@@ -1,4 +1,4 @@
-import { renderSimulatorEmbeds } from '@jsoft/shared';
+import { renderSimulatorEmbeds, sanitizeHtml } from '@jsoft/shared';
 import type { BlogPostResponse } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import styles from './BlogPostContent.module.css';
@@ -48,6 +48,12 @@ export function BlogPostContent({ post }: BlogPostContentProps) {
       <header className={styles.header}>
         <span className={styles.category}>{post.category}</span>
         <h1 className={styles.title}>{post.title}</h1>
+        {post.shortDescription && (
+          <div
+            className={styles.lead}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.shortDescription) }}
+          />
+        )}
         <time
           className={styles.date}
           dateTime={String(post.publishedAt ?? post.createdAt)}

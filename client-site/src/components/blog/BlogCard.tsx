@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { sanitizeHtml } from '@jsoft/shared';
 import type { BlogPostResponse } from '@jsoft/shared';
 import styles from './BlogCard.module.css';
 
@@ -31,7 +32,10 @@ export function BlogCard({ post }: BlogCardProps) {
           <span className={styles.date}>{date}</span>
         </div>
         <h3 className={styles.title}>{post.title}</h3>
-        <p className={styles.description}>{post.shortDescription}</p>
+        <p
+          className={styles.description}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.shortDescription) }}
+        />
         {post.tags && post.tags.length > 0 && (
           <div className={styles.tags}>
             {post.tags.map((tag) => (

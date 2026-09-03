@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { postStatusEnum } from './blogPost.schema.js';
+import { getTextFromHTML } from '../utils/getTextFromHTML.js';
 
 /**
  * Schema for Service entity
@@ -9,7 +10,12 @@ export const serviceSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters').max(100),
   slug: z.string().min(3).max(100).regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'Slug must be lowercase with hyphens'),
   classification: z.string().min(2, 'Classification must be at least 2 characters').max(50),
-  shortDescription: z.string().min(10, 'Short description must be at least 10 characters').max(300),
+  shortDescription: z
+    .string()
+    .refine((s) => {
+      const len = getTextFromHTML(s).length;
+      return len >= 10 && len <= 700;
+    }, 'Short description must be between 10 and 700 characters'),
   fullDescription: z.string().min(50, 'Full description must be at least 50 characters'),
   includedItems: z.array(z.string().min(3)).min(1, 'At least one included item is required'),
   images: z.array(z.string().url()).min(1, 'At least one image is required'),

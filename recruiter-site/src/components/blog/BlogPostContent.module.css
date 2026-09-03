@@ -50,6 +50,20 @@
   margin: 0;
 }
 
+.lead {
+  margin-top: var(--spacing-md);
+  font-size: var(--font-size-lg);
+  color: var(--color-neutral-600);
+  line-height: 1.6;
+}
+
+.lead :global(code) {
+  background: var(--color-neutral-100);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
 .date {
   font-size: var(--font-size-sm);
   color: var(--color-neutral-400);

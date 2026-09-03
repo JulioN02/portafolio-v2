@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { sanitizeHtml } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useProjects, useProjectTags } from '../../hooks/useProjects';
 import { Loading } from '../../components/common/Loading';
@@ -101,7 +102,10 @@ export function ProjectsPage() {
                           <span className={styles.tag}>{project.tags[0]}</span>
                         )}
                         <h3 className={styles.title}>{project.title}</h3>
-                        <p className={styles.description}>{project.shortDescription}</p>
+                        <p
+                          className={styles.description}
+                          dangerouslySetInnerHTML={{ __html: sanitizeHtml(project.shortDescription) }}
+                        />
                       </div>
                     </Link>
                   </article>

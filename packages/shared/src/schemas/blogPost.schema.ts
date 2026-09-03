@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { tagsSchema } from './tags.schema.js';
+import { getTextFromHTML } from '../utils/getTextFromHTML.js';
 
 /**
  * Enum for blog post status
@@ -16,7 +17,12 @@ export const blogPostSchema = z.object({
   slug: z.string().min(3).max(200).regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'Slug must be lowercase with hyphens'),
   category: z.string().min(2).max(50),
   tags: tagsSchema.optional(),
-  shortDescription: z.string().min(10).max(500),
+  shortDescription: z
+    .string()
+    .refine((s) => {
+      const len = getTextFromHTML(s).length;
+      return len >= 10 && len <= 700;
+    }, 'Short description must be between 10 and 700 characters'),
   coverImage: z.string().url(),
   mediaGallery: z.array(z.string().url()).optional(),
   body: z.string().min(100, 'Body must be at least 100 characters').max(50000),

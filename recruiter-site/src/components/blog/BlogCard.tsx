@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { sanitizeHtml } from '@jsoft/shared';
 import type { BlogPostResponse } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import styles from './BlogCard.module.css';
@@ -62,7 +63,10 @@ export function BlogCard({ post }: BlogCardProps) {
           {formatDate(String(post.publishedAt ?? post.createdAt))}
         </time>
         <h3 className={styles.title}>{post.title}</h3>
-        <p className={styles.shortDescription}>{post.shortDescription}</p>
+        <p
+          className={styles.shortDescription}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.shortDescription) }}
+        />
         {post.tags && post.tags.length > 0 && (
           <div className={styles.tags}>
             {post.tags.map((tag) => (

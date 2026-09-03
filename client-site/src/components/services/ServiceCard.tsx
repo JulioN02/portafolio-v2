@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { sanitizeHtml } from '@jsoft/shared';
 import type { ServiceResponse } from '@jsoft/shared';
 import styles from './ServiceCard.module.css';
 
@@ -25,7 +26,10 @@ export function ServiceCard({ service }: ServiceCardProps) {
         <div className={styles.content}>
           <span className={styles.classification}>{service.classification}</span>
           <h3 className={styles.title}>{service.title}</h3>
-          <p className={styles.description}>{service.shortDescription}</p>
+          <p
+            className={styles.description}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(service.shortDescription) }}
+          />
         </div>
       </Link>
     </article>

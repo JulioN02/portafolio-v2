@@ -3,6 +3,7 @@ import { postStatusEnum } from './blogPost.schema.js';
 // Re-export so existing consumers can still import tagsSchema from project.schema.
 export { tagsSchema } from './tags.schema.js';
 import { tagsSchema } from './tags.schema.js';
+import { getTextFromHTML } from '../utils/getTextFromHTML.js';
 
 /**
  * Schema for Project entity
@@ -12,7 +13,12 @@ import { tagsSchema } from './tags.schema.js';
 export const projectSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters').max(200),
   slug: z.string().min(3).max(200).regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'Slug must be lowercase with hyphens'),
-  shortDescription: z.string().min(10).max(500),
+  shortDescription: z
+    .string()
+    .refine((s) => {
+      const len = getTextFromHTML(s).length;
+      return len >= 10 && len <= 700;
+    }, 'Short description must be between 10 and 700 characters'),
   body: z.string().min(100, 'Body must be at least 100 characters').max(50000),
   images: z.array(z.string().url()).optional(),
   repositoryUrl: z.string().url().optional(),

@@ -73,6 +73,7 @@ export type {
 // Utils
 export { sanitizeHtml, SIMULATOR_CONTENT_SRC_REGEX } from './utils/sanitize.js';
 export type { SanitizeOptions } from './utils/sanitize.js';
+export { getTextFromHTML } from './utils/getTextFromHTML.js';
 
 // UI Components
 export { Button } from './components/index.js';

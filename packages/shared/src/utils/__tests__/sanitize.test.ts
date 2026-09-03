@@ -85,6 +85,11 @@ describe('sanitizeHtml', () => {
     expect(sanitizeHtml(input)).toBe(input);
   });
 
+  it('keeps inline code and code blocks (editor code/codeBlock nodes)', () => {
+    const input = '<p>Run <code>pnpm install</code> now</p><pre><code>const x = 1;</code></pre>';
+    expect(sanitizeHtml(input)).toBe(input);
+  });
+
   it('exports the simulator iframe src regex', () => {
     expect(SIMULATOR_CONTENT_SRC_REGEX.test('/api/simulators/abc123/content')).toBe(true);
     expect(SIMULATOR_CONTENT_SRC_REGEX.test('/api/simulators/abc/content')).toBe(true);

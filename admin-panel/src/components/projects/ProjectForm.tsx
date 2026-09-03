@@ -55,7 +55,7 @@ export function ProjectForm({ initialData, onSubmit, isLoading }: ProjectFormPro
     const newErrors: Record<string, string> = {};
     if (!title || title.length < 3) newErrors.title = t('validation.titleMin');
     if (!slug || slug.length < 3) newErrors.slug = t('validation.slugMin');
-    if (!shortDescription || shortDescription.length < 10) newErrors.shortDescription = t('validation.shortDescriptionMin');
+    if (!shortDescription || getTextFromHTML(shortDescription).length < 10) newErrors.shortDescription = t('validation.shortDescriptionMin');
     const textContent = getTextFromHTML(body);
     if (!body || textContent.length < 100) newErrors.body = t('validation.bodyMin');
     if (tags.some((tag) => tag.length === 0)) newErrors.tags = t('projects.tagsMin');
@@ -147,14 +147,7 @@ export function ProjectForm({ initialData, onSubmit, isLoading }: ProjectFormPro
         <legend className={formStyles.sectionTitle}>{t('projects.description')}</legend>
         <div className={formStyles.formGroup}>
           <label className={formStyles.formLabel} htmlFor="shortDescription">{t('form.shortDescription')}</label>
-          <textarea
-            id="shortDescription"
-            className={`${formStyles.formInput} ${formStyles.formTextarea} ${errors.shortDescription ? formStyles.inputError : ''}`}
-            value={shortDescription}
-            onChange={(e) => setShortDescription(e.target.value)}
-            placeholder={t('form.shortDescriptionPlaceholder')}
-            required
-          />
+          <RichTextEditor value={shortDescription} onChange={setShortDescription} minHeight={120} lang={lang} />
           {errors.shortDescription && <span className={formStyles.formError}>{errors.shortDescription}</span>}
         </div>
         <div className={formStyles.formGroup}>

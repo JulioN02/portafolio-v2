@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
-import { successCaseSchema } from '@jsoft/shared';
+import { RichTextEditor, successCaseSchema } from '@jsoft/shared';
 import type { SuccessCaseInput } from '@jsoft/shared';
+import { getTextFromHTML } from '../../utils/getTextFromHTML';
 import { ImageUploader } from '../uploads/ImageUploader';
 import formStyles from '../../styles/form.module.css';
 
@@ -79,7 +80,7 @@ function UrlListInput({ label, placeholder, values, onChange }: UrlListInputProp
 }
 
 export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCaseFormProps) {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const [title, setTitle] = useState(initialData?.title || '');
   const [description, setDescription] = useState(initialData?.description || '');
   const [images, setImages] = useState<string[]>(initialData?.images || []);
@@ -107,7 +108,7 @@ export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCas
     if (!title || title.length < 3) {
       newErrors.title = t('validation.titleMin');
     }
-    if (!description || description.length < 10) {
+    if (!description || getTextFromHTML(description).length < 10) {
       newErrors.description = t('validation.shortDescriptionMin');
     }
     if (images.length === 0) newErrors.images = t('validation.imageRequired');
@@ -180,14 +181,7 @@ export function SuccessCaseForm({ initialData, onSubmit, isLoading }: SuccessCas
           <label className={formStyles.formLabel} htmlFor="description">
             {t('successCases.description')}
           </label>
-          <textarea
-            id="description"
-            className={`${formStyles.formInput} ${formStyles.formTextarea} ${errors.description ? formStyles.inputError : ''}`}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder={t('successCases.descriptionPlaceholder')}
-            required
-          />
+          <RichTextEditor value={description} onChange={setDescription} minHeight={200} lang={lang} />
           {errors.description && <span className={formStyles.formError}>{errors.description}</span>}
         </div>
       </fieldset>
