@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { Transform } from 'stream';
 import multer from 'multer';
 import path from 'path';
 import { simulatorService, SIMULATOR_MAX_SIZE } from '../services/simulator.service.js';
@@ -66,6 +67,56 @@ export function buildSimulatorCsp(): string {
   return `sandbox allow-scripts; default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors ${origins}`;
 }
 
+/**
+ * Minimal fluid CSS injected into every served simulator so large elements
+ * (images, video, pre/code blocks, tables, canvas) never overflow the sandbox
+ * iframe viewport. The embed itself is responsive (width:100% + aspect-ratio
+ * on the iframe), so a simulator designed with relative units fits the whole
+ * container without internal scrolling; this keeps fixed-size media from
+ * blowing out horizontally in narrow viewports.
+ */
+const SIMULATOR_FLUID_CSS =
+  'html,body{max-width:100%;overflow-x:hidden;margin:0;padding:0}img,video,pre,table,canvas{max-width:100%;height:auto}';
+
+function injectFluidCss(): Transform {
+  let injected = false;
+  let buffer = '';
+  return new Transform({
+    transform(chunk, _encoding, cb) {
+      if (injected) {
+        this.push(chunk);
+        cb();
+        return;
+      }
+      buffer += chunk.toString('utf8');
+      if (buffer.includes('</head>')) {
+        const idx = buffer.indexOf('</head>');
+        this.push(buffer.slice(0, idx) + `<style>${SIMULATOR_FLUID_CSS}</style>` + buffer.slice(idx));
+        buffer = '';
+        injected = true;
+        cb();
+        return;
+      }
+      if (buffer.length >= 16384) {
+        // No <head> found in the first 16KB — prepend the style instead.
+        this.push(`<style>${SIMULATOR_FLUID_CSS}</style>` + buffer);
+        buffer = '';
+        injected = true;
+        cb();
+        return;
+      }
+      cb();
+    },
+    flush(cb) {
+      if (!injected && buffer) {
+        this.push(`<style>${SIMULATOR_FLUID_CSS}</style>` + buffer);
+        buffer = '';
+      }
+      cb();
+    },
+  });
+}
+
 export const simulatorController = {
   /**
    * POST /api/simulators/upload (JWT + multer, 1MB, .html/text-html only).
@@ -122,6 +173,6 @@ export const simulatorController = {
     // frame-ancestors directive above (Design Decision 6).
     res.removeHeader('X-Frame-Options');
 
-    result.stream.pipe(res);
+    result.stream.pipe(injectFluidCss()).pipe(res);
   }),
 };

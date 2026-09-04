@@ -301,6 +301,14 @@
   margin-bottom: var(--spacing-sm);
 }
 
+.technicalContent ul {
+  list-style: disc;
+}
+
+.technicalContent ol {
+  list-style: decimal;
+}
+
 .technicalContent li {
   margin-bottom: var(--spacing-xs);
 }

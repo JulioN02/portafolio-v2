@@ -104,6 +104,14 @@
   padding-left: var(--spacing-lg);
 }
 
+.body ul {
+  list-style: disc;
+}
+
+.body ol {
+  list-style: decimal;
+}
+
 .body li {
   margin-bottom: var(--spacing-xs);
 }
@@ -232,6 +240,14 @@
 .lessonsContent ol {
   margin-bottom: var(--spacing-sm);
   padding-left: var(--spacing-lg);
+}
+
+.lessonsContent ul {
+  list-style: disc;
+}
+
+.lessonsContent ol {
+  list-style: decimal;
 }
 
 .lessonsContent li {

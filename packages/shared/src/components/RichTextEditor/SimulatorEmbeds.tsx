@@ -57,6 +57,9 @@ export function renderSimulatorEmbeds(
     iframe.setAttribute('height', String(height));
     iframe.setAttribute('title', 'Simulador');
     iframe.setAttribute('loading', 'lazy');
+    // Responsive: keep the design's aspect ratio, fill the container width.
+    iframe.style.width = '100%';
+    iframe.style.aspectRatio = `${width} / ${height}`;
     div.replaceWith(iframe);
   });
 

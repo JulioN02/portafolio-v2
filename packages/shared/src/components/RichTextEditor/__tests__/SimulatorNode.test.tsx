@@ -31,6 +31,14 @@ describe('SimulatorNode', () => {
     expect(iframe.getAttribute('height')).toBe(String(SIMULATOR_DEFAULT_HEIGHT));
   });
 
+  it('is responsive: fills container width and keeps the design aspect ratio', () => {
+    render(<SimulatorNode simulatorId="abc123" width={800} height={600} />);
+
+    const iframe = screen.getByTitle('Simulador') as HTMLIFrameElement;
+    expect(iframe.style.width).toBe('100%');
+    expect(iframe.style.aspectRatio).toBe('800 / 600');
+  });
+
   it('honors explicit width/height and a custom title', () => {
     render(<SimulatorNode simulatorId="abc123" width={900} height={700} title="Demo" />);
 

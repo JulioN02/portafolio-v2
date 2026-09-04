@@ -363,6 +363,14 @@
   padding-left: var(--spacing-lg);
 }
 
+.fullDescription ul {
+  list-style: disc;
+}
+
+.fullDescription ol {
+  list-style: decimal;
+}
+
 .fullDescription li {
   margin-bottom: var(--spacing-xs);
 }

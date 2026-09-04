@@ -98,7 +98,11 @@ describe('Simulator routes (integration)', () => {
       const res = await fetch(`${baseUrl}/cm-sim-1/content`);
 
       expect(res.status).toBe(200);
-      expect(await res.text()).toBe(HTML);
+      const body = await res.text();
+      expect(body).toContain(HTML);
+      // Fluid CSS is injected so simulators adapt to the responsive iframe.
+      expect(body).toContain('max-width:100%');
+      expect(body).toContain('<style>');
       expect(res.headers.get('content-type')).toBe('text/html; charset=utf-8');
       // Helmet's default CSP is REPLACED by the sandbox CSP for this route.
       const csp = res.headers.get('content-security-policy') || '';

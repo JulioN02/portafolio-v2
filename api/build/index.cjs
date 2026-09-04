@@ -4496,7 +4496,7 @@ var require_streams = __commonJS({
   "node_modules/.pnpm/iconv-lite@0.4.24/node_modules/iconv-lite/lib/streams.js"(exports2, module2) {
     "use strict";
     var Buffer3 = require("buffer").Buffer;
-    var Transform = require("stream").Transform;
+    var Transform2 = require("stream").Transform;
     module2.exports = function(iconv) {
       iconv.encodeStream = function encodeStream(encoding, options) {
         return new IconvLiteEncoderStream(iconv.getEncoder(encoding, options), options);
@@ -4513,9 +4513,9 @@ var require_streams = __commonJS({
       this.conv = conv;
       options = options || {};
       options.decodeStrings = false;
-      Transform.call(this, options);
+      Transform2.call(this, options);
     }
-    IconvLiteEncoderStream.prototype = Object.create(Transform.prototype, {
+    IconvLiteEncoderStream.prototype = Object.create(Transform2.prototype, {
       constructor: { value: IconvLiteEncoderStream }
     });
     IconvLiteEncoderStream.prototype._transform = function(chunk, encoding, done) {
@@ -4553,9 +4553,9 @@ var require_streams = __commonJS({
       this.conv = conv;
       options = options || {};
       options.encoding = this.encoding = "utf8";
-      Transform.call(this, options);
+      Transform2.call(this, options);
     }
-    IconvLiteDecoderStream.prototype = Object.create(Transform.prototype, {
+    IconvLiteDecoderStream.prototype = Object.create(Transform2.prototype, {
       constructor: { value: IconvLiteDecoderStream }
     });
     IconvLiteDecoderStream.prototype._transform = function(chunk, encoding, done) {
@@ -36442,14 +36442,14 @@ var require_stream_readable = __commonJS({
 var require_stream_transform = __commonJS({
   "node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/_stream_transform.js"(exports2, module2) {
     "use strict";
-    module2.exports = Transform;
+    module2.exports = Transform2;
     var _require$codes = require_errors().codes;
     var ERR_METHOD_NOT_IMPLEMENTED = _require$codes.ERR_METHOD_NOT_IMPLEMENTED;
     var ERR_MULTIPLE_CALLBACK = _require$codes.ERR_MULTIPLE_CALLBACK;
     var ERR_TRANSFORM_ALREADY_TRANSFORMING = _require$codes.ERR_TRANSFORM_ALREADY_TRANSFORMING;
     var ERR_TRANSFORM_WITH_LENGTH_0 = _require$codes.ERR_TRANSFORM_WITH_LENGTH_0;
     var Duplex = require_stream_duplex();
-    require_inherits()(Transform, Duplex);
+    require_inherits()(Transform2, Duplex);
     function afterTransform(er, data) {
       var ts = this._transformState;
       ts.transforming = false;
@@ -36468,8 +36468,8 @@ var require_stream_transform = __commonJS({
         this._read(rs.highWaterMark);
       }
     }
-    function Transform(options) {
-      if (!(this instanceof Transform)) return new Transform(options);
+    function Transform2(options) {
+      if (!(this instanceof Transform2)) return new Transform2(options);
       Duplex.call(this, options);
       this._transformState = {
         afterTransform: afterTransform.bind(this),
@@ -36497,14 +36497,14 @@ var require_stream_transform = __commonJS({
         done(this, null, null);
       }
     }
-    Transform.prototype.push = function(chunk, encoding) {
+    Transform2.prototype.push = function(chunk, encoding) {
       this._transformState.needTransform = false;
       return Duplex.prototype.push.call(this, chunk, encoding);
     };
-    Transform.prototype._transform = function(chunk, encoding, cb) {
+    Transform2.prototype._transform = function(chunk, encoding, cb) {
       cb(new ERR_METHOD_NOT_IMPLEMENTED("_transform()"));
     };
-    Transform.prototype._write = function(chunk, encoding, cb) {
+    Transform2.prototype._write = function(chunk, encoding, cb) {
       var ts = this._transformState;
       ts.writecb = cb;
       ts.writechunk = chunk;
@@ -36514,7 +36514,7 @@ var require_stream_transform = __commonJS({
         if (ts.needTransform || rs.needReadable || rs.length < rs.highWaterMark) this._read(rs.highWaterMark);
       }
     };
-    Transform.prototype._read = function(n) {
+    Transform2.prototype._read = function(n) {
       var ts = this._transformState;
       if (ts.writechunk !== null && !ts.transforming) {
         ts.transforming = true;
@@ -36523,7 +36523,7 @@ var require_stream_transform = __commonJS({
         ts.needTransform = true;
       }
     };
-    Transform.prototype._destroy = function(err, cb) {
+    Transform2.prototype._destroy = function(err, cb) {
       Duplex.prototype._destroy.call(this, err, function(err2) {
         cb(err2);
       });
@@ -36544,11 +36544,11 @@ var require_stream_passthrough = __commonJS({
   "node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/_stream_passthrough.js"(exports2, module2) {
     "use strict";
     module2.exports = PassThrough;
-    var Transform = require_stream_transform();
-    require_inherits()(PassThrough, Transform);
+    var Transform2 = require_stream_transform();
+    require_inherits()(PassThrough, Transform2);
     function PassThrough(options) {
       if (!(this instanceof PassThrough)) return new PassThrough(options);
-      Transform.call(this, options);
+      Transform2.call(this, options);
     }
     PassThrough.prototype._transform = function(chunk, encoding, cb) {
       cb(null, chunk);
@@ -46267,6 +46267,7 @@ var siteSection_routes_default = router11;
 var import_express12 = __toESM(require_express2(), 1);
 
 // api/src/controllers/simulator.controller.ts
+var import_stream2 = require("stream");
 var import_multer2 = __toESM(require_multer(), 1);
 var import_path5 = __toESM(require("path"), 1);
 
@@ -46408,6 +46409,44 @@ function buildSimulatorCsp() {
   const origins = (process.env.CORS_ORIGIN?.split(",") || ["http://localhost:5173", "http://localhost:4173"]).map((origin) => origin.trim()).filter(Boolean).join(" ");
   return `sandbox allow-scripts; default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors ${origins}`;
 }
+var SIMULATOR_FLUID_CSS = "html,body{max-width:100%;overflow-x:hidden;margin:0;padding:0}img,video,pre,table,canvas{max-width:100%;height:auto}";
+function injectFluidCss() {
+  let injected = false;
+  let buffer = "";
+  return new import_stream2.Transform({
+    transform(chunk, _encoding, cb) {
+      if (injected) {
+        this.push(chunk);
+        cb();
+        return;
+      }
+      buffer += chunk.toString("utf8");
+      if (buffer.includes("</head>")) {
+        const idx = buffer.indexOf("</head>");
+        this.push(buffer.slice(0, idx) + `<style>${SIMULATOR_FLUID_CSS}</style>` + buffer.slice(idx));
+        buffer = "";
+        injected = true;
+        cb();
+        return;
+      }
+      if (buffer.length >= 16384) {
+        this.push(`<style>${SIMULATOR_FLUID_CSS}</style>` + buffer);
+        buffer = "";
+        injected = true;
+        cb();
+        return;
+      }
+      cb();
+    },
+    flush(cb) {
+      if (!injected && buffer) {
+        this.push(`<style>${SIMULATOR_FLUID_CSS}</style>` + buffer);
+        buffer = "";
+      }
+      cb();
+    }
+  });
+}
 var simulatorController = {
   /**
    * POST /api/simulators/upload (JWT + multer, 1MB, .html/text-html only).
@@ -46453,7 +46492,7 @@ var simulatorController = {
     res.setHeader("X-Content-Type-Options", "nosniff");
     res.setHeader("Cache-Control", "no-store");
     res.removeHeader("X-Frame-Options");
-    result.stream.pipe(res);
+    result.stream.pipe(injectFluidCss()).pipe(res);
   })
 };
 
