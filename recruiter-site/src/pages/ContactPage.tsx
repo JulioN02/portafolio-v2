@@ -1,25 +1,27 @@
 import { Link } from 'react-router-dom';
+import { PROFILE } from '@jsoft/shared';
 import { RecruiterContactForm } from '../components/contact/RecruiterContactForm';
 import { useTranslation } from '../i18n/LanguageContext';
 
+// Contact values come from the shared canonical PROFILE constants (CIN-3).
 const socialLinks = [
   {
-    href: 'https://wa.me/573001234567',
+    href: PROFILE.whatsappUrl,
     label: 'WhatsApp',
     icon: '📱',
   },
   {
-    href: 'https://linkedin.com/in/jsoftsolutions',
+    href: PROFILE.linkedinUrl,
     label: 'LinkedIn',
     icon: '💼',
   },
   {
-    href: 'https://github.com/jsoftsolutions',
+    href: PROFILE.githubUrl,
     label: 'GitHub',
     icon: '🐙',
   },
   {
-    href: 'mailto:info@jsoftsolutions.com',
+    href: `mailto:${PROFILE.email}`,
     label: 'Email',
     icon: '✉️',
   },

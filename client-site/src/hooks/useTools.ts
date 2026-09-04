@@ -21,11 +21,9 @@ export function useFeaturedTools(limit = 3) {
   return useQuery({
     queryKey: ['tools', 'featured', limit],
     queryFn: () =>
-      apiClient
-        .get<PaginatedResponse<ToolResponse>>('/tools', {
-          params: { limit, status: 'PUBLISHED' } as Record<string, string | number | boolean>,
-        })
-        .then((res) => res.data),
+      apiClient.get<ToolResponse[]>('/tools/featured', {
+        params: { limit } as Record<string, string | number | boolean>,
+      }),
   });
 }
 

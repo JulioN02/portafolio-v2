@@ -2,18 +2,22 @@ import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../api/client';
 import type { BlogPostResponse, PaginatedResponse } from '@jsoft/shared';
 
-export function useBlogPosts(page: number = 1, filters?: { category?: string; tag?: string; search?: string }) {
+export function useBlogPosts(
+  page: number = 1,
+  filters?: { category?: string; tag?: string; search?: string },
+  limit: number = 9,
+) {
   const params: Record<string, string | number | boolean> = {
     status: 'PUBLISHED',
     page,
-    limit: 9,
+    limit,
   };
   if (filters?.category) params.category = filters.category;
   if (filters?.tag) params.tag = filters.tag;
   if (filters?.search) params.search = filters.search;
 
   return useQuery({
-    queryKey: ['blog-posts', 'published', page, filters],
+    queryKey: ['blog-posts', 'published', page, filters, limit],
     queryFn: () =>
       apiClient.get<PaginatedResponse<BlogPostResponse>>('/blog-posts', { params }),
     placeholderData: (prev) => prev,

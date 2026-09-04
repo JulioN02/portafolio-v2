@@ -2,8 +2,11 @@ import { Link } from 'react-router-dom';
 import { MetaTags } from '../components/seo/MetaTags';
 import { Hero } from '../components/home/Hero';
 import { ProfileToggle } from '../components/home/ProfileToggle';
+import { StatsStrip } from '../components/home/StatsStrip';
 import { TechStack } from '../components/home/TechStack';
+import { Timeline } from '../components/home/Timeline';
 import { RecentProjects } from '../components/home/RecentProjects';
+import { ContactStrip } from '../components/home/ContactStrip';
 import { useTranslation } from '../i18n/LanguageContext';
 import styles from './HomePage.module.css';
 
@@ -22,11 +25,20 @@ export function HomePage() {
       {/* Profile Toggle Section */}
       <ProfileToggle />
 
+      {/* Stats Strip Section */}
+      <StatsStrip />
+
       {/* Tech Stack Section */}
       <TechStack />
 
+      {/* Timeline Section */}
+      <Timeline />
+
       {/* Recent Projects Section */}
       <RecentProjects />
+
+      {/* Contact Strip Section */}
+      <ContactStrip />
 
       {/* CTA Section */}
       <section className={styles.ctaSection}>

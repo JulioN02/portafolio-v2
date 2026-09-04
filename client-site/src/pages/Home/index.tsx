@@ -1,6 +1,8 @@
 import { useTranslation } from '../../i18n/LanguageContext';
 import { MetaTags } from '../../components/seo/MetaTags';
 import { Hero } from './Hero';
+import { ProcessSection } from './ProcessSection';
+import { BlogTeaser } from './BlogTeaser';
 import { FeaturedServices } from './FeaturedServices';
 import { SuccessCaseCarousel } from '../../components/successCases/SuccessCaseCarousel';
 import { ProductCarousel } from '../../components/products/ProductCarousel';
@@ -34,10 +36,12 @@ export function HomePage() {
         description={t('home.meta.description')}
       />
       <Hero />
+      <ProcessSection />
       {orderedKeys.map((key) => {
         const Component = SECTION_COMPONENTS[key];
         return Component ? <Component key={key} /> : null;
       })}
+      <BlogTeaser />
       <CTA />
     </>
   );

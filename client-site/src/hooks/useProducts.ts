@@ -21,11 +21,9 @@ export function useFeaturedProducts(limit = 5) {
   return useQuery({
     queryKey: ['products', 'featured', limit],
     queryFn: () =>
-      apiClient
-        .get<PaginatedResponse<ProductResponse>>('/products', {
-          params: { limit, status: 'PUBLISHED' } as Record<string, string | number | boolean>,
-        })
-        .then((res) => res.data),
+      apiClient.get<ProductResponse[]>('/products/featured', {
+        params: { limit } as Record<string, string | number | boolean>,
+      }),
   });
 }
 

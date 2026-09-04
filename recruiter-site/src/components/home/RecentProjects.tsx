@@ -1,10 +1,27 @@
 import { Link } from 'react-router-dom';
 import useEmblaCarousel from 'embla-carousel-react';
-import { sanitizeHtml } from '@jsoft/shared';
+import { getTextFromHTML, sanitizeHtml } from '@jsoft/shared';
 import { useRecentProjects } from '../../hooks/useProjects';
 import { SectionTitle } from '../common/SectionTitle';
 import { useTranslation } from '../../i18n/LanguageContext';
 import styles from './RecentProjects.module.css';
+
+const EXCERPT_MAX_LENGTH = 140;
+
+/**
+ * Build a sanitized, truncated plain-text excerpt from a project's
+ * technicalExplanation rich-text field (RHP-9). Returns '' when absent so
+ * cards render nothing extra instead of an empty block.
+ */
+export function buildTechnicalExcerpt(
+  html: string | undefined,
+  maxLength = EXCERPT_MAX_LENGTH,
+): string {
+  if (!html) return '';
+  const text = getTextFromHTML(html).replace(/\s+/g, ' ').trim();
+  if (text.length <= maxLength) return text;
+  return `${text.slice(0, maxLength).trimEnd()}…`;
+}
 
 export function RecentProjects() {
   const { t } = useTranslation();
@@ -71,36 +88,40 @@ export function RecentProjects() {
 
         <div className={styles.embla} ref={emblaRef}>
           <div className={styles.emblaContainer}>
-            {projects.map((project) => (
-              <div key={project.id} className={styles.emblaSlide}>
-                <Link to="/proyectos" className={styles.card}>
-                  <div className={styles.cardImageWrapper}>
-                    {project.images && project.images.length > 0 ? (
-                      <img
-                        src={project.images[0]}
-                        alt={project.title}
-                        className={styles.cardImage}
-                        loading="lazy"
+            {projects.map((project) => {
+              const excerpt = buildTechnicalExcerpt(project.technicalExplanation);
+              return (
+                <div key={project.id} className={styles.emblaSlide}>
+                  <Link to="/proyectos" className={styles.card}>
+                    <div className={styles.cardImageWrapper}>
+                      {project.images && project.images.length > 0 ? (
+                        <img
+                          src={project.images[0]}
+                          alt={project.title}
+                          className={styles.cardImage}
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className={styles.cardImagePlaceholder}>
+                          <span>{project.title.charAt(0)}</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className={styles.cardBody}>
+                      <span className={styles.cardClassification}>
+                        {project.classification}
+                      </span>
+                      <h3 className={styles.cardTitle}>{project.title}</h3>
+                      <p
+                        className={styles.cardDescription}
+                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(project.shortDescription) }}
                       />
-                    ) : (
-                      <div className={styles.cardImagePlaceholder}>
-                        <span>{project.title.charAt(0)}</span>
-                      </div>
-                    )}
-                  </div>
-                  <div className={styles.cardBody}>
-                    <span className={styles.cardClassification}>
-                      {project.classification}
-                    </span>
-                    <h3 className={styles.cardTitle}>{project.title}</h3>
-                    <p
-                      className={styles.cardDescription}
-                      dangerouslySetInnerHTML={{ __html: sanitizeHtml(project.shortDescription) }}
-                    />
-                  </div>
-                </Link>
-              </div>
-            ))}
+                      {excerpt && <p className={styles.cardExcerpt}>{excerpt}</p>}
+                    </div>
+                  </Link>
+                </div>
+              );
+            })}
           </div>
         </div>
 

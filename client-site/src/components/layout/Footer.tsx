@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom';
+import { PROFILE } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import styles from './Footer.module.css';
 
 const socialLinks = [
   {
-    href: 'https://wa.me/573001234567',
+    href: PROFILE.whatsappUrl,
     label: 'WhatsApp',
     icon: (
       <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
@@ -14,7 +15,7 @@ const socialLinks = [
     ),
   },
   {
-    href: 'https://linkedin.com/in/julion',
+    href: PROFILE.linkedinUrl,
     label: 'LinkedIn',
     icon: (
       <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
@@ -23,7 +24,7 @@ const socialLinks = [
     ),
   },
   {
-    href: 'https://github.com/julion',
+    href: PROFILE.githubUrl,
     label: 'GitHub',
     icon: (
       <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
@@ -32,7 +33,7 @@ const socialLinks = [
     ),
   },
   {
-    href: 'mailto:info@jsoftsolutions.com',
+    href: `mailto:${PROFILE.email}`,
     label: 'Email',
     icon: (
       <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
@@ -101,8 +102,10 @@ export function Footer() {
           <div className={styles.contact}>
             <h4 className={styles.contactTitle}>{t('footer.contact')}</h4>
             <address className={styles.contactInfo}>
-              <a href="mailto:info@jsoftsolutions.com">info@jsoftsolutions.com</a>
-              <a href="https://wa.me/573001234567">WhatsApp</a>
+              <a href={`mailto:${PROFILE.email}`}>{PROFILE.email}</a>
+              <a href={PROFILE.whatsappUrl} target="_blank" rel="noopener noreferrer">
+                WhatsApp
+              </a>
             </address>
           </div>
         </div>

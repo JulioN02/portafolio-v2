@@ -20,8 +20,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'footer.terms': 'Términos',
 
     // =========== HOME ===========
-    'home.meta.title': 'Julio Nieto | Desarrollador Full Stack',
-    'home.meta.description': 'Desarrollador Full Stack especializado en React, Node.js y TypeScript. Conoce mi portafolio y experiencia.',
+    'home.meta.title': 'Julio Nieto | Ingeniero de Sistemas y Desarrollador Backend',
+    'home.meta.description': 'Ingeniero de Sistemas y Desarrollador Backend. Consultor independiente y ex Coordinador Logístico Nacional. Node.js, TypeScript, PostgreSQL y más.',
 
     'home.cta.title': '¿Listo para trabajar juntos?',
     'home.cta.text': 'Estoy abierto a nuevas oportunidades laborales y proyectos desafiantes. Si buscas un desarrollador comprometido con la calidad y los resultados, hablemos.',
@@ -29,7 +29,7 @@ export const translations: Record<Language, Record<string, string>> = {
 
     // =========== PROJECTS ===========
     'projects.meta.title': 'Proyectos | Julio Nieto',
-    'projects.meta.description': 'Explora los proyectos en los que he trabajado como desarrollador Full Stack.',
+    'projects.meta.description': 'Explora los proyectos en los que he trabajado como desarrollador backend e ingeniero de sistemas.',
 
     // =========== CONTACT ===========
     'contact.title': 'Contacto',
@@ -39,7 +39,7 @@ export const translations: Record<Language, Record<string, string>> = {
 
     // =========== BLOG ===========
     'blog.meta.title': 'Blog | Julio Nieto',
-    'blog.meta.description': 'Artículos sobre desarrollo web, tecnología y experiencia como desarrollador.',
+    'blog.meta.description': 'Artículos sobre desarrollo backend, ingeniería de software, metodologías y tecnología.',
     'blog.searchPlaceholder': 'Buscar artículos…',
     'blog.searchAriaLabel': 'Buscar artículos',
     'blog.categoryAriaLabel': 'Filtrar por categoría',
@@ -62,8 +62,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'notFound.homeButton': 'Volver al inicio',
 
     // =========== HERO ===========
-    'hero.title': 'Full Stack Developer',
-    'hero.summary': 'Desarrollador Full Stack con experiencia en React, Node.js y TypeScript. Apasionado por construir aplicaciones web escalables y de alto rendimiento. Enfocado en crear soluciones que generen valor real para los usuarios y las empresas.',
+    'hero.title': 'Ingeniero de Sistemas | Desarrollador Backend',
+    'hero.summary': 'Ingeniero de Sistemas enfocado en desarrollo backend. Construyo APIs, integraciones y sistemas web robustos con Node.js, TypeScript y bases de datos relacionales, aplicando TDD y buenas prácticas de arquitectura.',
     'hero.cta.primary': 'Ver Proyectos',
     'hero.cta.secondary': 'Contactar',
 
@@ -71,13 +71,60 @@ export const translations: Record<Language, Record<string, string>> = {
     'profileToggle.sectionTitle': 'Sobre Mí',
     'profileToggle.professional': 'Perfil Profesional',
     'profileToggle.technical': 'Perfil Técnico',
-    'profileToggle.professionalText': 'Soy un desarrollador Full Stack con más de 5 años de experiencia creando soluciones digitales para empresas de diversos sectores. Mi enfoque está en entender las necesidades del negocio y traducirlas en productos funcionales, escalables y mantenibles.\n\nHe liderado equipos de desarrollo, coordinado entregas ágiles y trabajado directamente con stakeholders para garantizar que cada proyecto cumpla con los objetivos de negocio. Me apasiona la calidad del código, la documentación clara y la comunicación efectiva entre equipos técnicos y no técnicos.\n\nMi experiencia abarca desde startups hasta proyectos enterprise, siempre con el compromiso de entregar valor real a través de la tecnología.',
-    'profileToggle.technicalText': 'Especializado en el ecosistema JavaScript/TypeScript con experiencia comprobada en React, Next.js y Node.js. Arquitectura de aplicaciones web modernas utilizando Server Components, API Routes, y patrones de estado con TanStack Query.\n\nEn el backend, domino Node.js con Express, bases de datos relacionales (PostgreSQL, Prisma ORM) y NoSQL (MongoDB). Experiencia en diseño de APIs RESTful, autenticación JWT, y despliegue con Docker.\n\nCompetencias técnicas destacadas:\n• Frontend: React 19, Next.js 15, TypeScript, CSS Modules, Tailwind CSS\n• Backend: Node.js, Express, PostgreSQL, Prisma, MongoDB\n• DevOps: Docker, Linux, Git/GitHub Actions, CI/CD\n• Testing: Jest, React Testing Library, Playwright\n• Herramientas: Figma, VS Code, Postman, Linear',
+    'profileToggle.professionalText': 'Soy Ingeniero de Sistemas y desarrollador backend. Desde Ene 2025 trabajo como consultor independiente en desarrollo de software, diseñando y construyendo APIs, integraciones y sistemas web robustos con Node.js, TypeScript y bases de datos relacionales.\n\nAntes de dedicarme al desarrollo, me desempeñé como Coordinador Logístico Nacional entre Ene 2018 y Ene 2025, un rol donde la disponibilidad y la trazabilidad de la información eran críticas para la operación. Esa experiencia me enseñó a priorizar la confiabilidad, el orden y la comunicación clara, valores que hoy aplico a cada proyecto de software.\n\nMe enfoco en la calidad: pruebas automatizadas, documentación clara y arquitectura mantenible.',
+    'profileToggle.technicalText': 'Especializado en el ecosistema JavaScript/TypeScript con enfoque backend. Construyo APIs RESTful con Node.js y Express, modelado de datos con PostgreSQL y Prisma, y autenticación con JWT y control de acceso basado en roles (RBAC).\n\nAplico TDD (desarrollo guiado por pruebas), SDD (desarrollo guiado por especificaciones) y DDD (diseño dirigido por el dominio) para entregar software confiable y mantenible. También integro desarrollo asistido por IA para acelerar tareas repetitivas sin sacrificar calidad.\n\nCompetencias técnicas destacadas:\n• Backend: Node.js, Express, Nest.js, PostgreSQL, MySQL, Prisma, JWT, RBAC\n• Frontend: React, TypeScript\n• DevOps: Docker, Linux, Git/GitHub, CI/CD, Vercel, Supabase\n• Metodologías: TDD, SDD, DDD\n• Testing: Jest',
 
     // =========== TECH STACK ===========
     'techStack.title': 'Tech Stack',
     'techStack.subtitle': 'Tecnologías con las que trabajo día a día',
     'techStack.slideAria': 'Ir a {category}',
+
+    // =========== TIMELINE ===========
+    'timeline.experienceTitle': 'Experiencia',
+    'timeline.educationTitle': 'Educación',
+    'timeline.languagesTitle': 'Idiomas',
+    'timeline.exp.0.role': 'Consultor independiente',
+    'timeline.exp.0.org': 'Desarrollo de software',
+    'timeline.exp.0.period': 'Ene 2025 – presente',
+    'timeline.exp.0.dateTime': '2025-01',
+    'timeline.exp.1.role': 'Coordinador Logístico Nacional',
+    'timeline.exp.1.org': 'Operación logística',
+    'timeline.exp.1.period': 'Ene 2018 – 2025',
+    'timeline.exp.1.dateTime': '2018-01',
+    'timeline.exp.1.metric': '100% disponibilidad/trazabilidad',
+    'timeline.exp.2.role': 'Soporte técnico',
+    'timeline.exp.2.org': 'Movexa',
+    'timeline.exp.3.role': 'Operador',
+    'timeline.exp.3.org': 'Homecenter',
+    'timeline.edu.0.role': 'Ingeniería de Sistemas',
+    'timeline.edu.0.org': 'UNAD',
+    'timeline.edu.0.period': '2023 – 2028',
+    'timeline.edu.0.dateTime': '2023-01',
+    'timeline.edu.1.role': 'Desarrollo backend y JavaScript',
+    'timeline.edu.1.org': 'PLATZI',
+    'timeline.edu.1.period': '2025 – 2026',
+    'timeline.edu.1.dateTime': '2025-01',
+    'timeline.edu.2.role': 'Desarrollo web',
+    'timeline.edu.2.org': 'TodoCode',
+    'timeline.edu.2.period': '2024',
+    'timeline.edu.2.dateTime': '2024-01',
+    'timeline.languages': 'Español (nativo) · Inglés (A2)',
+
+    // =========== STATS STRIP ===========
+    'statsStrip.title': 'Cifras que respaldan mi trabajo',
+    'statsStrip.availability': 'Disponibilidad y trazabilidad',
+    'statsStrip.logisticsYears': 'Años en coordinación logística nacional',
+    'statsStrip.techCount': 'Tecnologías en mi stack',
+    'statsStrip.englishLevel': 'Nivel de inglés',
+
+    // =========== CONTACT STRIP ===========
+    'contactStrip.title': 'Contacto directo',
+    'contactStrip.email': 'Correo',
+    'contactStrip.phone': 'Teléfono',
+    'contactStrip.whatsapp': 'WhatsApp',
+    'contactStrip.linkedin': 'LinkedIn',
+    'contactStrip.cv': 'Descargar CV',
+    'contactStrip.cvAria': 'Descargar CV (PDF)',
 
     // =========== RECENT PROJECTS ===========
     'recentProjects.title': 'Proyectos Recientes',
@@ -175,8 +222,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'footer.terms': 'Terms',
 
     // =========== HOME ===========
-    'home.meta.title': 'Julio Nieto | Full Stack Developer',
-    'home.meta.description': 'Full Stack Developer specialized in React, Node.js and TypeScript. Check out my portfolio and experience.',
+    'home.meta.title': 'Julio Nieto | Systems Engineer and Backend Developer',
+    'home.meta.description': 'Systems Engineer and Backend Developer. Independent consultant and former National Logistics Coordinator. Node.js, TypeScript, PostgreSQL and more.',
 
     'home.cta.title': 'Ready to work together?',
     'home.cta.text': "I'm open to new job opportunities and challenging projects. If you're looking for a developer committed to quality and results, let's talk.",
@@ -184,7 +231,7 @@ export const translations: Record<Language, Record<string, string>> = {
 
     // =========== PROJECTS ===========
     'projects.meta.title': 'Projects | Julio Nieto',
-    'projects.meta.description': 'Explore the projects I have worked on as a Full Stack Developer.',
+    'projects.meta.description': 'Explore the projects I have worked on as a backend developer and systems engineer.',
 
     // =========== CONTACT ===========
     'contact.title': 'Contact',
@@ -194,7 +241,7 @@ export const translations: Record<Language, Record<string, string>> = {
 
     // =========== BLOG ===========
     'blog.meta.title': 'Blog | Julio Nieto',
-    'blog.meta.description': 'Articles about web development, technology, and development experience.',
+    'blog.meta.description': 'Articles about backend development, software engineering, methodologies and technology.',
     'blog.searchPlaceholder': 'Search articles…',
     'blog.searchAriaLabel': 'Search articles',
     'blog.categoryAriaLabel': 'Filter by category',
@@ -217,8 +264,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'notFound.homeButton': 'Go back home',
 
     // =========== HERO ===========
-    'hero.title': 'Full Stack Developer',
-    'hero.summary': 'Full Stack Developer with experience in React, Node.js and TypeScript. Passionate about building scalable, high-performance web applications. Focused on creating solutions that deliver real value for users and businesses.',
+    'hero.title': 'Systems Engineer | Backend Developer',
+    'hero.summary': 'Systems Engineer focused on backend development. I build robust APIs, integrations and web systems with Node.js, TypeScript and relational databases, applying TDD and sound architecture practices.',
     'hero.cta.primary': 'View Projects',
     'hero.cta.secondary': 'Contact Me',
 
@@ -226,13 +273,60 @@ export const translations: Record<Language, Record<string, string>> = {
     'profileToggle.sectionTitle': 'About Me',
     'profileToggle.professional': 'Professional Profile',
     'profileToggle.technical': 'Technical Profile',
-    'profileToggle.professionalText': "I am a Full Stack Developer with over 5 years of experience creating digital solutions for companies across various industries. My focus is on understanding business needs and translating them into functional, scalable, and maintainable products.\n\nI have led development teams, coordinated agile deliveries, and worked directly with stakeholders to ensure each project meets business objectives. I am passionate about code quality, clear documentation, and effective communication between technical and non-technical teams.\n\nMy experience ranges from startups to enterprise projects, always with the commitment to deliver real value through technology.",
-    'profileToggle.technicalText': "Specialized in the JavaScript/TypeScript ecosystem with proven experience in React, Next.js, and Node.js. Modern web application architecture using Server Components, API Routes, and state management with TanStack Query.\n\nOn the backend, I master Node.js with Express, relational databases (PostgreSQL, Prisma ORM) and NoSQL (MongoDB). Experience designing RESTful APIs, JWT authentication, and Docker deployment.\n\nKey technical skills:\n• Frontend: React 19, Next.js 15, TypeScript, CSS Modules, Tailwind CSS\n• Backend: Node.js, Express, PostgreSQL, Prisma, MongoDB\n• DevOps: Docker, Linux, Git/GitHub Actions, CI/CD\n• Testing: Jest, React Testing Library, Playwright\n• Tools: Figma, VS Code, Postman, Linear",
+    'profileToggle.professionalText': "I am a Systems Engineer and backend developer. Since January 2025 I have been working as an independent software development consultant, designing and building robust APIs, integrations and web systems with Node.js, TypeScript and relational databases.\n\nBefore moving into development, I worked as National Logistics Coordinator from January 2018 to January 2025, a role where information availability and traceability were critical to operations. That experience taught me to prioritize reliability, order and clear communication — values I apply to every software project today.\n\nI focus on quality: automated testing, clear documentation and maintainable architecture.",
+    'profileToggle.technicalText': "Specialized in the JavaScript/TypeScript ecosystem with a backend focus. I build RESTful APIs with Node.js and Express, data modeling with PostgreSQL and Prisma, and authentication with JWT and role-based access control (RBAC).\n\nI apply TDD (test-driven development), SDD (spec-driven development) and DDD (domain-driven design) to deliver reliable, maintainable software. I also integrate AI-assisted development to speed up repetitive tasks without sacrificing quality.\n\nKey technical skills:\n• Backend: Node.js, Express, Nest.js, PostgreSQL, MySQL, Prisma, JWT, RBAC\n• Frontend: React, TypeScript\n• DevOps: Docker, Linux, Git/GitHub, CI/CD, Vercel, Supabase\n• Methodologies: TDD, SDD, DDD\n• Testing: Jest",
 
     // =========== TECH STACK ===========
     'techStack.title': 'Tech Stack',
     'techStack.subtitle': 'Technologies I work with every day',
     'techStack.slideAria': 'Go to {category}',
+
+    // =========== TIMELINE ===========
+    'timeline.experienceTitle': 'Experience',
+    'timeline.educationTitle': 'Education',
+    'timeline.languagesTitle': 'Languages',
+    'timeline.exp.0.role': 'Independent Consultant',
+    'timeline.exp.0.org': 'Software development',
+    'timeline.exp.0.period': 'Jan 2025 – present',
+    'timeline.exp.0.dateTime': '2025-01',
+    'timeline.exp.1.role': 'National Logistics Coordinator',
+    'timeline.exp.1.org': 'Logistics operations',
+    'timeline.exp.1.period': 'Jan 2018 – 2025',
+    'timeline.exp.1.dateTime': '2018-01',
+    'timeline.exp.1.metric': '100% availability/traceability',
+    'timeline.exp.2.role': 'Technical Support',
+    'timeline.exp.2.org': 'Movexa',
+    'timeline.exp.3.role': 'Operator',
+    'timeline.exp.3.org': 'Homecenter',
+    'timeline.edu.0.role': 'Systems Engineering',
+    'timeline.edu.0.org': 'UNAD',
+    'timeline.edu.0.period': '2023 – 2028',
+    'timeline.edu.0.dateTime': '2023-01',
+    'timeline.edu.1.role': 'Backend development and JavaScript',
+    'timeline.edu.1.org': 'PLATZI',
+    'timeline.edu.1.period': '2025 – 2026',
+    'timeline.edu.1.dateTime': '2025-01',
+    'timeline.edu.2.role': 'Web development',
+    'timeline.edu.2.org': 'TodoCode',
+    'timeline.edu.2.period': '2024',
+    'timeline.edu.2.dateTime': '2024-01',
+    'timeline.languages': 'Spanish (native) · English (A2)',
+
+    // =========== STATS STRIP ===========
+    'statsStrip.title': 'Numbers that back my work',
+    'statsStrip.availability': 'Availability and traceability',
+    'statsStrip.logisticsYears': 'Years in national logistics coordination',
+    'statsStrip.techCount': 'Technologies in my stack',
+    'statsStrip.englishLevel': 'English level',
+
+    // =========== CONTACT STRIP ===========
+    'contactStrip.title': 'Direct contact',
+    'contactStrip.email': 'Email',
+    'contactStrip.phone': 'Phone',
+    'contactStrip.whatsapp': 'WhatsApp',
+    'contactStrip.linkedin': 'LinkedIn',
+    'contactStrip.cv': 'Download CV',
+    'contactStrip.cvAria': 'Download CV (PDF)',
 
     // =========== RECENT PROJECTS ===========
     'recentProjects.title': 'Recent Projects',
