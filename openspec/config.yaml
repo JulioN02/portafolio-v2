@@ -4,7 +4,7 @@ schema: spec-driven
 context: |
   Tech stack: pnpm monorepo — Express 4.21 + Prisma 6.3 + PostgreSQL (api), React 19 + Vite 6 + TanStack Query 5 + React Router 7 (frontends), Zod 3.24 + tsup (shared)
   Architecture: API-First with shared Zod schemas — Express routes/controllers/services pattern, Prisma ORM, PostgreSQL 15, JWT auth, soft-delete pattern via deletedAt
-  Testing: Jest 30 + ts-jest (api only), 6 service-level test files, 70% coverage threshold
+  Testing: Jest 30 + ts-jest (api, 264 tests / 21 suites, 70% coverage threshold) + Vitest jsdom (shared 140, client-site 26, recruiter-site 22, admin-panel en CI)
   Style: TypeScript strict mode, no ESLint/Prettier config detected, tsc --noEmit for type checking per package
 
 strict_tdd: true
@@ -16,8 +16,8 @@ testing:
   layers:
     unit:
       available: true
-      tool: Jest 30.3.0 + ts-jest
-      scope: api (services only)
+      tool: Jest 30.3.0 + ts-jest (api) + Vitest (shared, client-site, recruiter-site, admin-panel)
+      scope: api (services) + shared/frontends (componentes, páginas, hooks, i18n)
     integration:
       available: false
       tool: none

@@ -101,13 +101,13 @@ La **planificación activa** vive en `openspec/` en formato SDD (Spec-Driven Dev
 - ✅ Herramientas con lógica condicional (`requiresInstall`)
 - ✅ Casos de Éxito con multimedia
 - ✅ Formularios de contacto con source automático
-- ✅ Blog (lectura pública)
+- ✅ Blog (lectura pública) con carrusel de imágenes unificado (portada + galería, autoplay pausable) y lightbox para imágenes, videos y simuladores
 
 #### Recruiter Site
 - ✅ Home con Hero, ProfileToggle, TechStack carousel
 - ✅ Proyectos unificados con filtros tipo + clasificación
 - ✅ Modal de detalle con DOMPurify
-- ✅ Blog con paginación (solo PUBLISHED)
+- ✅ Blog con paginación (solo PUBLISHED), carrusel de imágenes y lightbox compartidos con client-site
 - ✅ Formulario de contacto reclutadores
 - ✅ ErrorBoundary en todas las rutas
 
@@ -247,11 +247,11 @@ pnpm --filter admin-panel test
 
 | Paquete | Framework | Archivos |
 |---------|-----------|----------|
-| `api` | Jest 30 | `api/src/__tests__/*.service.test.ts` (auth, blog-post, contact, product, projects, successCase, tool, verification-code + setup) — ~99 tests |
-| `@jsoft/shared` | Vitest | `packages/shared/src/schemas/__tests__/index.test.ts` |
-| `client-site` | Vitest | `client-site/src/i18n/LanguageContext.test.tsx` |
-| `recruiter-site` | Vitest | `recruiter-site/src/i18n/LanguageContext.test.tsx`, `recruiter-site/src/pages/NotFoundPage.test.tsx` |
-| `admin-panel` | Vitest | `admin-panel/src/i18n/LanguageContext.test.tsx` |
+| `api` | Jest 30 | `api/src/__tests__/*.service.test.ts` — 264 tests / 21 suites |
+| `@jsoft/shared` | Vitest | `packages/shared/src/**/__tests__/*.test.ts(x)` (schemas, sanitize, MediaCarousel, Lightbox, mediaDelegation) — 140 tests |
+| `client-site` | Vitest | `client-site/src/**/*.test.ts(x)` (BlogPage, BlogPostContent, translations, LanguageContext…) — 26 tests |
+| `recruiter-site` | Vitest | `recruiter-site/src/**/*.test.ts(x)` (BlogPostContent, LanguageContext, NotFoundPage…) — 22 tests |
+| `admin-panel` | Vitest | `admin-panel/src/**/*.test.ts(x)` (suite ejecutada en CI) |
 
 ---
 

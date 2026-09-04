@@ -81,9 +81,13 @@ Project: portafolio-v2 (portafoliov2jss)
 - File naming: `*.service.ts`, `*.routes.ts`, `*.middleware.ts`, `*.schema.ts`, `*.test.ts`
 
 ### Testing
-- **API only**: Jest 30.3.0 + ts-jest, 62 tests across 6 service-level test files, 70% coverage threshold
-- **Frontends**: No testing framework installed
-- **CI**: `pnpm -r run typecheck` + `pnpm -r run build` in CI pipeline
+- **API** (`@jsoft/api`): Jest 30.3.0 + ts-jest, 264 tests across 21 suites, 70% coverage threshold
+- **Shared** (`@jsoft/shared`): Vitest (jsdom) — 140 tests (MediaCarousel, Lightbox, schemas, sanitization)
+- **Client Site** (`@jsoft/client-site`): Vitest (jsdom) — 26 tests (pages, blog components, i18n)
+- **Recruiter Site** (`@jsoft/recruiter-site`): Vitest (jsdom) — 22 tests (blog, contact, pages)
+- **Admin Panel** (`@jsoft/admin-panel`): Vitest — suite ejecutada en CI
+- **ResizeObserver/matchMedia mocks**: presentes en setup de shared, client-site y recruiter-site (requeridos por Embla en jsdom)
+- **CI**: `pnpm -r run typecheck` + tests por paquete + `pnpm -r run build` (workflow `ci.yml`)
 - **E2E**: Not installed
 
 ### Development Workflow
@@ -130,7 +134,7 @@ Project: portafolio-v2 (portafoliov2jss)
 ## Usage Notes
 
 - **Skills Usage**: Load relevant skill when working with its trigger topic
-- **Testing**: Tests exist only in API (`pnpm --filter @jsoft/api test`). No tests for frontends.
+- **Testing**: API con Jest (`pnpm --filter @jsoft/api test`); shared y frontends con Vitest (`pnpm --filter @jsoft/shared test`, `pnpm --filter @jsoft/client-site test`, `pnpm --filter @jsoft/recruiter-site test`, admin-panel en CI).
 - **Linting**: ESLint only has jsx-a11y plugin in frontends; no full eslint config
 - **Type Checking**: Available per package via `tsc --noEmit` — all pass with 0 errors
 - **Formatting**: No formatter configured
