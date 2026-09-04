@@ -100,6 +100,59 @@ describe('Lightbox', () => {
     trigger.remove();
   });
 
+  it('traps Tab focus inside the dialog, wrapping first↔last and never escaping', () => {
+    const onClose = vi.fn();
+    const onIndexChange = vi.fn();
+    render(
+      <>
+        <button type="button">Fuera antes</button>
+        <Lightbox
+          isOpen
+          items={items}
+          initialIndex={0}
+          labels={labels}
+          onClose={onClose}
+          onIndexChange={onIndexChange}
+        />
+        <button type="button">Fuera después</button>
+      </>,
+    );
+
+    const dialog = screen.getByRole('dialog');
+    const dialogButtons = Array.from(dialog.querySelectorAll('button'));
+    // 3 image items → close + prev + next are the only focusable elements.
+    expect(dialogButtons).toHaveLength(3);
+    const first = dialogButtons[0];
+    const middle = dialogButtons[1];
+    const last = dialogButtons[dialogButtons.length - 1];
+
+    // Focus moves into the dialog on open (close button).
+    expect(document.activeElement).toBe(first);
+
+    // Tab from the LAST focusable element wraps back to the FIRST.
+    last.focus();
+    fireEvent.keyDown(dialog, { key: 'Tab' });
+    expect(document.activeElement).toBe(first);
+
+    // Shift+Tab from the FIRST element wraps to the LAST.
+    fireEvent.keyDown(dialog, { key: 'Tab', shiftKey: true });
+    expect(document.activeElement).toBe(last);
+
+    // Non-wrapping Tab from a middle element keeps focus inside the dialog.
+    middle.focus();
+    fireEvent.keyDown(dialog, { key: 'Tab' });
+    expect(document.activeElement).toBe(middle);
+    expect(dialog.contains(document.activeElement)).toBe(true);
+
+    // Focus never escapes to elements outside the dialog.
+    expect(document.activeElement).not.toBe(
+      screen.getByRole('button', { name: 'Fuera antes' }),
+    );
+    expect(document.activeElement).not.toBe(
+      screen.getByRole('button', { name: 'Fuera después' }),
+    );
+  });
+
   it('closes on wheel scroll over the overlay (accumulated deltaY > 25)', () => {
     const { onClose } = renderLightbox();
 
