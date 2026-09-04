@@ -4,24 +4,6 @@
   padding: var(--spacing-2xl) var(--spacing-md);
 }
 
-/* ── Cover Image ── */
-
-.coverWrapper {
-  width: 100%;
-  max-height: 400px;
-  overflow: hidden;
-  border-radius: var(--radius-lg);
-  margin-bottom: var(--spacing-xl);
-  background-color: var(--color-neutral-100);
-}
-
-.coverImage {
-  width: 100%;
-  height: 100%;
-  max-height: 400px;
-  object-fit: cover;
-}
-
 /* ── Header ── */
 
 .header {
@@ -165,10 +147,10 @@
   padding: 0;
 }
 
-/* ── Gallery ── */
+/* ── Gallery (cover-first carousel lives in the shared MediaCarousel) ── */
 
 .gallerySection {
-  margin-bottom: var(--spacing-2xl);
+  margin-bottom: var(--spacing-xl);
 }
 
 .galleryTitle {
@@ -176,38 +158,6 @@
   font-weight: var(--font-weight-bold);
   color: var(--color-neutral-900);
   margin-bottom: var(--spacing-md);
-}
-
-.galleryScroll {
-  display: flex;
-  gap: var(--spacing-sm);
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding-bottom: var(--spacing-sm);
-  -webkit-overflow-scrolling: touch;
-}
-
-.galleryScroll::-webkit-scrollbar {
-  height: 6px;
-}
-
-.galleryScroll::-webkit-scrollbar-track {
-  background: var(--color-neutral-100);
-  border-radius: var(--radius-full);
-}
-
-.galleryScroll::-webkit-scrollbar-thumb {
-  background: var(--color-neutral-300);
-  border-radius: var(--radius-full);
-}
-
-.galleryImage {
-  flex-shrink: 0;
-  width: 280px;
-  height: 200px;
-  object-fit: cover;
-  border-radius: var(--radius-md);
-  scroll-snap-align: start;
 }
 
 /* ── Lessons Learned ── */
