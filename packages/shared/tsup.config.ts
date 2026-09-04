@@ -7,7 +7,7 @@ export default defineConfig({
   splitting: false,
   sourcemap: true,
   clean: true,
-  external: ['zod', 'react', 'react-dom', 'react-router-dom'],
+  external: ['zod', 'react', 'react-dom', 'react-router-dom', 'embla-carousel-react', 'embla-carousel'],
   outDir: 'dist',
   mainFields: ['module', 'main'],
   platform: 'neutral',

@@ -62,3 +62,23 @@ export type {
   SimulatorSectionProps,
   RenderSimulatorEmbedsOptions,
 } from './RichTextEditor/index.js';
+
+// Blog Media (carousel + lightbox)
+export { MediaCarousel } from './MediaCarousel/index.js';
+export type {
+  MediaCarouselProps,
+  MediaCarouselSlide,
+  MediaCarouselLabels,
+  EmblaCarouselType,
+} from './MediaCarousel/index.js';
+
+export { Lightbox } from './Lightbox/index.js';
+export type { LightboxProps, LightboxItem, LightboxLabels } from './Lightbox/index.js';
+export {
+  prepareLightboxMedia,
+  buildMediaItem,
+  useMediaClickDelegation,
+  MEDIA_HOST_CLASS,
+  MEDIA_EXPAND_CLASS,
+  MEDIA_EXPAND_ATTR,
+} from './Lightbox/index.js';

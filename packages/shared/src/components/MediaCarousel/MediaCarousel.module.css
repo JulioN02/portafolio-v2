@@ -1,0 +1,112 @@
+/* MediaCarousel — cover-first blog carousel.
+   NOTE: class names are plain strings (see MediaCarousel.tsx docblock);
+   tsup bundles this file into dist/index.css as-is. */
+
+.mc-region {
+  position: relative;
+  width: 100%;
+  margin-bottom: var(--spacing-xl);
+}
+
+.mc-viewport {
+  overflow: hidden;
+  width: 100%;
+}
+
+.mc-container {
+  display: flex;
+  touch-action: pan-y pinch-zoom;
+  margin-left: calc(1rem * -1);
+}
+
+.mc-slide {
+  flex: 0 0 100%;
+  min-width: 0;
+  padding-left: 1rem;
+}
+
+.mc-slideButton {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  outline-offset: 4px;
+  text-align: left;
+}
+
+/* Fixed 16/9 frame with a neutral background; object-fit:contain guarantees
+   the whole image is visible and centered on both axes, overriding the global
+   `img { max-width:100%; height:auto }` rule with explicit module sizing. */
+.mc-slideFrame {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background-color: var(--color-neutral-100);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.mc-slideImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  user-select: none;
+}
+
+.mc-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.mc-navButton,
+.mc-pauseButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.5rem;
+  height: 2.5rem;
+  padding: 0 var(--spacing-sm);
+  border: 1px solid var(--color-neutral-300);
+  border-radius: var(--radius-full);
+  background-color: var(--color-neutral-0);
+  color: var(--color-neutral-700);
+  font-size: var(--font-size-lg);
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.mc-pauseButton {
+  min-width: 3.25rem;
+}
+
+.mc-navButton:hover,
+.mc-pauseButton:hover {
+  background-color: var(--color-neutral-100);
+  color: var(--color-neutral-900);
+  border-color: var(--color-neutral-400);
+}
+
+.mc-navButton:focus-visible,
+.mc-pauseButton:focus-visible,
+.mc-slideButton:focus-visible {
+  outline: 2px solid var(--color-primary-500);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mc-navButton,
+  .mc-pauseButton,
+  .mc-slideImage {
+    transition: none;
+  }
+}

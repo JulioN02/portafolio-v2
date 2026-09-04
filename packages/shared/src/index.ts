@@ -141,6 +141,23 @@ export type {
   SimulatorPickerLabels,
 } from './components/index.js';
 
+// Blog Media (carousel + lightbox)
+export { MediaCarousel } from './components/index.js';
+export type {
+  MediaCarouselProps,
+  MediaCarouselSlide,
+  MediaCarouselLabels,
+  EmblaCarouselType,
+} from './components/index.js';
+
+export { Lightbox } from './components/index.js';
+export type { LightboxProps, LightboxItem, LightboxLabels } from './components/index.js';
+export {
+  prepareLightboxMedia,
+  buildMediaItem,
+  useMediaClickDelegation,
+} from './components/index.js';
+
 // CSS Variables (import to apply design tokens)
 import './styles/variables.css';
 
@@ -158,3 +175,5 @@ import './components/ui/Textarea/Textarea.module.css';
 import './components/ui/Select/Select.module.css';
 import './components/ui/Checkbox/Checkbox.module.css';
 import './components/RichTextEditor/RichTextEditor.module.css';
+import './components/MediaCarousel/MediaCarousel.module.css';
+import './components/Lightbox/Lightbox.module.css';
