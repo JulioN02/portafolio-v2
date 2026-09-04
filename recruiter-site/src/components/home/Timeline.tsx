@@ -4,7 +4,7 @@ import styles from './Timeline.module.css';
 interface TimelineEntry {
   roleKey: string;
   orgKey: string;
-  periodKey: string;
+  periodKey?: string;
   dateTimeKey?: string;
   metricKey?: string;
 }
@@ -26,8 +26,8 @@ const EXPERIENCE: TimelineEntry[] = [
     dateTimeKey: 'timeline.exp.1.dateTime',
     metricKey: 'timeline.exp.1.metric',
   },
-  { roleKey: 'timeline.exp.2.role', orgKey: 'timeline.exp.2.org', periodKey: 'timeline.exp.2.period' },
-  { roleKey: 'timeline.exp.3.role', orgKey: 'timeline.exp.3.org', periodKey: 'timeline.exp.3.period' },
+  { roleKey: 'timeline.exp.2.role', orgKey: 'timeline.exp.2.org' },
+  { roleKey: 'timeline.exp.3.role', orgKey: 'timeline.exp.3.org' },
 ];
 
 const EDUCATION: TimelineEntry[] = [
@@ -55,7 +55,7 @@ export function Timeline() {
   const { t } = useTranslation();
 
   const renderEntry = (entry: TimelineEntry) => {
-    const period = t(entry.periodKey);
+    const period = entry.periodKey ? t(entry.periodKey) : undefined;
     const dateTime = entry.dateTimeKey ? t(entry.dateTimeKey) : undefined;
     return (
       <li key={entry.roleKey} className={styles.item}>

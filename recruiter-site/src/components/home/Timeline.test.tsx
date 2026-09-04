@@ -56,4 +56,21 @@ describe('Timeline (RHP-3, RHP-4, RHP-11)', () => {
     const { container } = renderWithProviders(<Timeline />);
     expect(container.querySelectorAll('ol').length).toBe(2);
   });
+
+  it('renders undated entries (Movexa, Homecenter) without a period or raw key text', () => {
+    const { container } = renderWithProviders(<Timeline />);
+    // No <time> element may render for the two undated experience entries.
+    const movexaItem = screen.getByRole('heading', { level: 3, name: 'Soporte técnico' }).closest('li');
+    const homecenterItem = screen.getByRole('heading', { level: 3, name: 'Operador' }).closest('li');
+    expect(movexaItem?.querySelector('time')).toBeNull();
+    expect(homecenterItem?.querySelector('time')).toBeNull();
+    // Dated entries still render their period inside <time>.
+    const consultant = screen.getByText('Ene 2025 – presente');
+    const coordinator = screen.getByText('Ene 2018 – 2025');
+    expect(consultant.tagName).toBe('TIME');
+    expect(coordinator.tagName).toBe('TIME');
+    // No raw translation key may leak into the DOM.
+    expect(container.textContent).not.toContain('timeline.exp.2.period');
+    expect(container.textContent).not.toContain('timeline.exp.3.period');
+  });
 });
