@@ -152,6 +152,22 @@ export const simulatorController = {
   }),
 
   /**
+   * DELETE /api/simulators/:id (JWT) — soft-delete. Mirrors the product/tool
+   * delete convention: existence guard first (getMetadata filters deletedAt:
+   * null, so unknown AND already-deleted ids → 404), then the metadata-only
+   * soft-delete (deletedAt), responding { message } on success.
+   */
+  remove: asyncHandler(async (req: Request, res: Response) => {
+    const id = getStringParam(req.params.id);
+    const simulator = await simulatorService.getMetadata(id);
+    if (!simulator) {
+      throw new NotFoundError('Simulator not found');
+    }
+    await simulatorService.softDelete(id);
+    res.json({ message: 'Simulator deleted successfully' });
+  }),
+
+  /**
    * GET /api/simulators/:id/content (PUBLIC) — streams the raw HTML with the
    * sandbox CSP + nosniff + no-store headers. Never DOMPurify-rendered: the
    * content is contained by the sandbox, not by sanitization.

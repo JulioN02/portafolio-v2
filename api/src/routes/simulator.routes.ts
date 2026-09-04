@@ -10,6 +10,7 @@ router.post('/upload', authMiddleware, simulatorUploadMiddleware.single('file'),
 // Admin list + metadata (editor picker / prefill) — JWT required.
 router.get('/', authMiddleware, simulatorController.list);
 router.get('/:id', authMiddleware, simulatorController.getMetadata);
+router.delete('/:id', authMiddleware, simulatorController.remove);
 
 // PUBLIC serving endpoint — sandbox CSP headers, no auth (the iframe src).
 // Registered last so /upload and /:id win for their exact paths.

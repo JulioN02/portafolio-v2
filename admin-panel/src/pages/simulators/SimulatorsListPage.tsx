@@ -3,6 +3,7 @@ import { Loading, ErrorMessage } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useSimulators } from '../../hooks/useSimulators';
 import { SIMULATOR_MAX_SIZE } from '../../api/simulators.api';
+import { ConfirmDeleteModal } from '@/components/shared/ConfirmDeleteModal';
 import { toast } from 'sonner';
 import formStyles from '../../styles/form.module.css';
 import listStyles from '../../components/shared/ListItem.module.css';
@@ -28,13 +29,15 @@ function formatDate(dateStr: string): string {
 
 export function SimulatorsListPage() {
   const { t } = useTranslation();
-  const { useGetAll, useUpload } = useSimulators();
+  const { useGetAll, useUpload, useDelete } = useSimulators();
   const { data: simulators, isLoading, error } = useGetAll();
   const uploadMutation = useUpload();
+  const deleteMutation = useDelete();
 
   const [title, setTitle] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
 
   const handleFileChange = (selected?: File) => {
     setFile(selected ?? null);
@@ -68,6 +71,20 @@ export function SimulatorsListPage() {
         },
       },
     );
+  };
+
+  /** Row delete button → opens the shared confirmation modal (established UX). */
+  const handleDelete = (simulator: { id: string; title: string }) => {
+    setDeleteTarget({ id: simulator.id, title: simulator.title });
+  };
+
+  const handleDeleteConfirm = () => {
+    if (!deleteTarget) return;
+    deleteMutation.mutate(deleteTarget.id, {
+      onSuccess: () => toast.success(t('simulators.deleteSuccess')),
+      onError: () => toast.error(t('simulators.deleteError')),
+    });
+    setDeleteTarget(null);
   };
 
   if (isLoading) return <Loading />;
@@ -129,6 +146,16 @@ export function SimulatorsListPage() {
                     {formatDate(simulator.uploadedAt)}
                   </p>
                 </div>
+                <div className={listStyles.actions}>
+                  <button
+                    type="button"
+                    className={listStyles.actionBtnDanger}
+                    disabled={deleteMutation.isPending}
+                    onClick={() => handleDelete(simulator)}
+                  >
+                    {t('simulators.delete')}
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
@@ -138,6 +165,15 @@ export function SimulatorsListPage() {
           </div>
         )}
       </div>
+
+      <ConfirmDeleteModal
+        isOpen={deleteTarget !== null}
+        title={deleteTarget?.title || ''}
+        entityName={t('simulators.deleteConfirm')}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setDeleteTarget(null)}
+        isLoading={deleteMutation.isPending}
+      />
     </div>
   );
 }

@@ -19,5 +19,13 @@ export function useSimulators() {
       },
     });
 
-  return { useGetAll, useUpload };
+  const useDelete = () =>
+    useMutation({
+      mutationFn: (id: string) => simulatorsApi.remove(id),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['simulators'] });
+      },
+    });
+
+  return { useGetAll, useUpload, useDelete };
 }

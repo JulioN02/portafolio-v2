@@ -88,6 +88,11 @@ describe('Simulator routes (integration)', () => {
       const res = await fetch(`${baseUrl}/cm-sim-1`);
       expect(res.status).toBe(401);
     });
+
+    it('DELETE /:id → 401', async () => {
+      const res = await fetch(`${baseUrl}/cm-sim-1`, { method: 'DELETE' });
+      expect(res.status).toBe(401);
+    });
   });
 
   describe('GET /:id/content (public serving endpoint)', () => {
@@ -168,6 +173,72 @@ describe('Simulator routes (integration)', () => {
       const body = await res.json();
       expect(body.code).toBe('UPLOAD_ERROR');
       expect(mockPrisma.simulator.create).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('DELETE /:id (soft delete)', () => {
+    it('soft-deletes an existing simulator and hides it from list + content', async () => {
+      // Existence check passes (getMetadata → findFirst, deletedAt: null).
+      (mockPrisma.simulator.findFirst as jest.Mock).mockResolvedValue(RECORD);
+      (mockPrisma.simulator.update as jest.Mock).mockResolvedValue({
+        ...RECORD,
+        deletedAt: new Date('2026-09-01T00:00:00.000Z'),
+      });
+
+      const res = await fetch(`${baseUrl}/cm-sim-1`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${adminToken}` },
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.message).toBe('Simulator deleted successfully');
+      expect(mockPrisma.simulator.update).toHaveBeenCalledWith({
+        where: { id: 'cm-sim-1' },
+        data: { deletedAt: expect.any(Date) },
+      });
+
+      // Once soft-deleted the public content endpoint 404s (download filters
+      // deletedAt: null)…
+      (mockPrisma.simulator.findFirst as jest.Mock).mockResolvedValue(null);
+      const contentRes = await fetch(`${baseUrl}/cm-sim-1/content`);
+      expect(contentRes.status).toBe(404);
+      expect(mockedStorage.downloadFile).not.toHaveBeenCalled();
+
+      // …and the admin list no longer returns it.
+      (mockPrisma.simulator.findMany as jest.Mock).mockResolvedValue([]);
+      const listRes = await fetch(`${baseUrl}`, {
+        headers: { Authorization: `Bearer ${adminToken}` },
+      });
+      expect(listRes.status).toBe(200);
+      const listBody = await listRes.json();
+      expect(listBody).toEqual([]);
+    });
+
+    it('returns 404 for an unknown id and never touches the update', async () => {
+      (mockPrisma.simulator.findFirst as jest.Mock).mockResolvedValue(null);
+
+      const res = await fetch(`${baseUrl}/nope`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${adminToken}` },
+      });
+
+      expect(res.status).toBe(404);
+      expect(mockPrisma.simulator.update).not.toHaveBeenCalled();
+    });
+
+    it('returns 404 for an already soft-deleted simulator (invisible to getMetadata)', async () => {
+      // getMetadata filters deletedAt: null → an already-deleted row is as
+      // invisible as an unknown id, so DELETE 404s instead of double-deleting.
+      (mockPrisma.simulator.findFirst as jest.Mock).mockResolvedValue(null);
+
+      const res = await fetch(`${baseUrl}/cm-sim-1`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${adminToken}` },
+      });
+
+      expect(res.status).toBe(404);
+      expect(mockPrisma.simulator.update).not.toHaveBeenCalled();
     });
   });
 });

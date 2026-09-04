@@ -27,6 +27,11 @@ export const simulatorsApi = {
     });
     return data;
   },
+
+  /** DELETE /api/simulators/:id — soft-delete (deletedAt). Returns 200 + { message }. */
+  remove: async (id: string): Promise<void> => {
+    await apiClient.delete(`/simulators/${id}`);
+  },
 };
 
 /**

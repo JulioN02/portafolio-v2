@@ -159,6 +159,10 @@ export const translations: Record<Language, Record<string, string>> = {
     'simulators.colSlug': 'Slug',
     'simulators.colSize': 'Tamaño',
     'simulators.colUploaded': 'Subido',
+    'simulators.delete': 'Eliminar',
+    'simulators.deleteConfirm': 'simulador',
+    'simulators.deleteSuccess': 'Simulador eliminado exitosamente',
+    'simulators.deleteError': 'Error al eliminar el simulador',
 
     // Tools
     'tools.title': 'Herramientas',
@@ -507,6 +511,10 @@ export const translations: Record<Language, Record<string, string>> = {
     'simulators.colSlug': 'Slug',
     'simulators.colSize': 'Size',
     'simulators.colUploaded': 'Uploaded',
+    'simulators.delete': 'Delete',
+    'simulators.deleteConfirm': 'simulator',
+    'simulators.deleteSuccess': 'Simulator deleted successfully',
+    'simulators.deleteError': 'Error deleting simulator',
 
     // Tools
     'tools.title': 'Tools',
