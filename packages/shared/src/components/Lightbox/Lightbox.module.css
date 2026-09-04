@@ -1,0 +1,197 @@
+/* Lightbox — click-to-enlarge overlay for blog media.
+   NOTE: class names are plain strings (see Lightbox.tsx docblock);
+   tsup bundles this file into dist/index.css as-is. The .media-lightbox-host
+   and .media-expand classes are also used by mediaDelegation.ts, which creates
+   those DOM nodes at runtime (no innerHTML). */
+
+.lb-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  animation: lbFadeIn 0.15s ease-out;
+}
+
+.lb-dialog {
+  /* Reserved: dialog wrapper semantics live on the overlay itself. */
+}
+
+.lb-closeButton {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-full);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--color-neutral-0);
+  font-size: var(--font-size-2xl);
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.lb-closeButton:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+.lb-closeButton:focus-visible,
+.lb-navButton:focus-visible {
+  outline: 2px solid var(--color-neutral-0);
+  outline-offset: 2px;
+}
+
+/* Media containment: constrained to ~90vw / 85vh, centered, object-fit
+   contain so nothing is cropped. */
+.lb-mediaWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: min(90vw, 1200px);
+  max-height: 85vh;
+  width: 100%;
+}
+
+.lb-mediaImage {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 85vh;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+}
+
+.lb-mediaVideo {
+  max-width: 100%;
+  max-height: 85vh;
+  width: auto;
+  border-radius: var(--radius-md);
+  background-color: #000;
+}
+
+.lb-mediaIframe {
+  width: 100%;
+  max-width: min(90vw, 1200px);
+  height: 85vh;
+  max-height: 85vh;
+  border: none;
+  border-radius: var(--radius-md);
+  background-color: var(--color-neutral-0);
+}
+
+.lb-navButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-full);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--color-neutral-0);
+  font-size: var(--font-size-2xl);
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.lb-navButton:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+.lb-counter {
+  position: absolute;
+  bottom: var(--spacing-md);
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--color-neutral-0);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  background-color: rgba(0, 0, 0, 0.45);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-full);
+}
+
+/* ── Body-media delegation (runtime-created nodes, no innerHTML) ── */
+
+.media-lightbox-host {
+  position: relative;
+  display: block;
+  margin: var(--spacing-lg) 0;
+}
+
+.media-expand {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.25rem;
+  height: 2.25rem;
+  padding: 0 var(--spacing-xs);
+  border: none;
+  border-radius: var(--radius-full);
+  background-color: rgba(0, 0, 0, 0.55);
+  color: var(--color-neutral-0);
+  font-size: var(--font-size-lg);
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.media-expand:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.media-expand:focus-visible {
+  outline: 2px solid var(--color-neutral-0);
+  outline-offset: 2px;
+}
+
+@keyframes lbFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .lb-overlay {
+    padding: var(--spacing-md);
+    gap: var(--spacing-xs);
+  }
+
+  .lb-mediaWrapper,
+  .lb-mediaIframe {
+    max-width: 94vw;
+  }
+
+  .lb-navButton {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: var(--font-size-xl);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lb-overlay {
+    animation: none;
+  }
+}

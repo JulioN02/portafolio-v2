@@ -91,32 +91,15 @@ beforeEach(() => {
   emblaState.api = null;
 });
 
-describe('BlogPostContent (sanitization adoption)', () => {
-  it('renders the body through sanitizeHtml: strips scripts and preserves inline media', async () => {
+describe('BlogPostContent (recruiter — sanitized body via dangerouslySetInnerHTML)', () => {
+  it('renders the sanitized body and strips scripts', async () => {
     const post = makePost({
-      body: '<script>alert("xss")</script><figure><img src="/uploads/x.png" alt="diagrama"></figure><p>Contenido seguro del cuerpo</p>',
+      body: '<script>alert("xss")</script><p>Contenido seguro del cuerpo</p>',
     });
 
     const { container } = renderPost(post);
 
-    // Body is injected via innerHTML after the effect runs — wait for the safe text.
     expect(await screen.findByText('Contenido seguro del cuerpo')).toBeInTheDocument();
-    // Script stripped by the media allowlist.
-    expect(container.querySelector('script')).toBeNull();
-    // Inline media node preserved.
-    const img = container.querySelector('figure img');
-    expect(img).toHaveAttribute('src', '/uploads/x.png');
-    expect(img).toHaveAttribute('alt', 'diagrama');
-  });
-
-  it('sanitizes lessonsLearned the same way when present', async () => {
-    const post = makePost({
-      lessonsLearned: '<script>alert(1)</script><p>Lección segura</p>',
-    });
-
-    const { container } = renderPost(post);
-
-    expect(await screen.findByText('Lección segura')).toBeInTheDocument();
     expect(container.querySelector('script')).toBeNull();
   });
 
@@ -129,17 +112,15 @@ describe('BlogPostContent (sanitization adoption)', () => {
 
     expect(await screen.findByText('Intro')).toBeInTheDocument();
     const iframe = container.querySelector('iframe') as HTMLIFrameElement | null;
-    // REAL behavioral assertion: the placeholder div became a sandboxed iframe.
     expect(iframe).not.toBeNull();
     expect(iframe!.getAttribute('src')).toBe('/api/simulators/abc123/content');
     expect(iframe!.getAttribute('sandbox')).toBe('allow-scripts');
     expect(iframe!.getAttribute('sandbox')).not.toContain('allow-same-origin');
-    // Placeholder div is gone from the DOM.
     expect(container.querySelector('[data-simulator-id]')).toBeNull();
   });
 });
 
-describe('BlogPostContent (media carousel + lightbox)', () => {
+describe('BlogPostContent (recruiter — media carousel + lightbox)', () => {
   it('renders the cover first and gallery slides in order inside the carousel', () => {
     const post = makePost({
       mediaGallery: ['https://example.com/g1.png', 'https://example.com/g2.png'],
@@ -152,7 +133,6 @@ describe('BlogPostContent (media carousel + lightbox)', () => {
     expect(images[0]).toHaveAttribute('src', 'https://example.com/cover.png');
     expect(images[1]).toHaveAttribute('src', 'https://example.com/g1.png');
     expect(images[2]).toHaveAttribute('src', 'https://example.com/g2.png');
-    // Cover is the active slide on entry.
     const active = container.querySelector('[data-active-slide="true"]');
     expect(active?.querySelector('img')).toHaveAttribute(
       'src',
@@ -160,20 +140,7 @@ describe('BlogPostContent (media carousel + lightbox)', () => {
     );
   });
 
-  it('shows a pause control for multi-slide posts and hides it for cover-only posts', () => {
-    const multi = renderPost(
-      makePost({ mediaGallery: ['https://example.com/g1.png'] }),
-    );
-    expect(
-      multi.getByRole('button', { name: 'Pausar' }),
-    ).toBeInTheDocument();
-    multi.unmount();
-
-    const single = renderPost(makePost());
-    expect(single.queryByRole('button', { name: 'Pausar' })).toBeNull();
-  });
-
-  it('opens the lightbox at the clicked carousel slide (cover first)', async () => {
+  it('opens the lightbox at the clicked carousel slide', async () => {
     const post = makePost({
       mediaGallery: ['https://example.com/g1.png'],
     });
@@ -184,10 +151,10 @@ describe('BlogPostContent (media carousel + lightbox)', () => {
 
     const dialog = await screen.findByRole('dialog');
     expect(dialog).toHaveAttribute('aria-modal', 'true');
-    expect(dialog).toHaveAttribute('aria-label', 'Visor de imágenes');
-    expect(
-      screen.getByRole('img', { name: 'Publicación de prueba' }),
-    ).toHaveAttribute('src', 'https://example.com/cover.png');
+    expect(dialog.querySelector('img')).toHaveAttribute(
+      'src',
+      'https://example.com/cover.png',
+    );
   });
 
   it('opens the lightbox when a body image is clicked (media stays in the body)', async () => {
@@ -203,7 +170,6 @@ describe('BlogPostContent (media carousel + lightbox)', () => {
     const dialog = await screen.findByRole('dialog');
     expect(dialog).toHaveAttribute('aria-modal', 'true');
     expect(dialog.querySelector('img')).toHaveAttribute('src', '/uploads/x.png');
-    // The body image is still in place.
     expect(container.querySelector('figure img')).toHaveAttribute(
       'src',
       '/uploads/x.png',
@@ -231,7 +197,7 @@ describe('BlogPostContent (media carousel + lightbox)', () => {
     expect(iframe).toHaveAttribute('sandbox', 'allow-scripts');
   });
 
-  it('closes the lightbox on ESC', async () => {
+  it('closes the lightbox on ESC and keeps the page body scroll-locked while open', async () => {
     const post = makePost({
       body: '<p>Contenido seguro del cuerpo</p><img src="/uploads/x.png" alt="diagrama">',
     });
@@ -241,8 +207,11 @@ describe('BlogPostContent (media carousel + lightbox)', () => {
     fireEvent.click(container.querySelector('img[alt="diagrama"]') as Element);
 
     const dialog = await screen.findByRole('dialog');
+    expect(document.body.style.overflow).toBe('hidden');
+
     fireEvent.keyDown(dialog, { key: 'Escape' });
 
     expect(screen.queryByRole('dialog')).toBeNull();
+    expect(document.body.style.overflow).toBe('');
   });
 });

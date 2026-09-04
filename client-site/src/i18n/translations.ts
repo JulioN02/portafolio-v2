@@ -237,6 +237,20 @@ export const translations: Record<Language, Record<string, string>> = {
     'blogPost.notFound.message': 'El artículo que buscas no existe o ha sido eliminado.',
     'blogPost.backToBlog': '← Volver al blog',
 
+    // =========== BLOG POST CONTENT (media carousel + lightbox) ===========
+    'blogPostContent.galleryTitle': 'Galería',
+    'blogPostContent.carousel.pause': 'Pausar',
+    'blogPostContent.carousel.play': 'Reanudar',
+    'blogPostContent.carousel.prev': 'Imagen anterior',
+    'blogPostContent.carousel.next': 'Imagen siguiente',
+    'blogPostContent.lightbox.close': 'Cerrar',
+    'blogPostContent.lightbox.prev': 'Anterior',
+    'blogPostContent.lightbox.next': 'Siguiente',
+    'blogPostContent.lightbox.counter': '{current} de {total}',
+    'blogPostContent.lightbox.dialogLabel': 'Visor de imágenes',
+    'blogPostContent.media.expand': 'Ampliar',
+    'blogPostContent.galleryImageAlt': '{title} — Imagen {index} de {total}',
+
     // =========== PRODUCT CAROUSEL ===========
     'productCarousel.loading': 'Cargando productos...',
     'productCarousel.error': 'Error al cargar productos',
@@ -497,6 +511,20 @@ export const translations: Record<Language, Record<string, string>> = {
     'blogPost.notFound.title': 'Article not found',
     'blogPost.notFound.message': 'The article you are looking for does not exist or has been removed.',
     'blogPost.backToBlog': '← Back to blog',
+
+    // =========== BLOG POST CONTENT (media carousel + lightbox) ===========
+    'blogPostContent.galleryTitle': 'Gallery',
+    'blogPostContent.carousel.pause': 'Pause',
+    'blogPostContent.carousel.play': 'Resume',
+    'blogPostContent.carousel.prev': 'Previous image',
+    'blogPostContent.carousel.next': 'Next image',
+    'blogPostContent.lightbox.close': 'Close',
+    'blogPostContent.lightbox.prev': 'Previous',
+    'blogPostContent.lightbox.next': 'Next',
+    'blogPostContent.lightbox.counter': '{current} of {total}',
+    'blogPostContent.lightbox.dialogLabel': 'Image viewer',
+    'blogPostContent.media.expand': 'Expand',
+    'blogPostContent.galleryImageAlt': '{title} — Image {index} of {total}',
 
     // =========== PRODUCT CAROUSEL ===========
     'productCarousel.loading': 'Loading products...',
