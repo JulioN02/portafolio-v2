@@ -52,21 +52,6 @@
   font-size: 0.9em;
 }
 
-.coverWrapper {
-  width: 100%;
-  max-height: 480px;
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin-bottom: var(--spacing-xl);
-}
-
-.coverImage {
-  width: 100%;
-  height: auto;
-  max-height: 480px;
-  object-fit: cover;
-}
-
 .body {
   font-size: var(--font-size-lg);
   line-height: 1.8;
@@ -143,7 +128,7 @@
   font-style: italic;
 }
 
-/* Gallery */
+/* Gallery (cover-first carousel lives in the shared MediaCarousel) */
 .gallery {
   margin-bottom: var(--spacing-2xl);
 }
@@ -153,19 +138,6 @@
   font-weight: var(--font-weight-semibold);
   color: var(--color-neutral-800);
   margin-bottom: var(--spacing-md);
-}
-
-.galleryGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: var(--spacing-md);
-}
-
-.galleryImage {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-  border-radius: var(--radius-md);
 }
 
 /* Lessons */
