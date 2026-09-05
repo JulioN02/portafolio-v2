@@ -95,7 +95,8 @@ La **planificación activa** vive en `openspec/` en formato SDD (Spec-Driven Dev
 - ✅ Settings (perfil, password)
 
 #### Client Site
-- ✅ Home con carruseles destacados
+- ✅ Home con propuesta de valor, stats de confianza, proceso y teaser de blog
+- ✅ Secciones dinámicas (servicios, casos de éxito, productos, herramientas) ordenadas por admin
 - ✅ Servicios con detalle y galería
 - ✅ Productos con catálogo
 - ✅ Herramientas con lógica condicional (`requiresInstall`)
@@ -104,12 +105,16 @@ La **planificación activa** vive en `openspec/` en formato SDD (Spec-Driven Dev
 - ✅ Blog (lectura pública) con carrusel de imágenes unificado (portada + galería, autoplay pausable) y lightbox para imágenes, videos y simuladores
 
 #### Recruiter Site
-- ✅ Home con Hero, ProfileToggle, TechStack carousel
-- ✅ Proyectos unificados con filtros tipo + clasificación
+- ✅ Home con hero backend-first, timeline experiencia/educación, stats verificables, tech stack alineado al CV y contact strip + CV descargable
+- ✅ Proyectos unificados con filtros tipo + clasificación (technicalExplanation en tarjetas y modal)
 - ✅ Modal de detalle con DOMPurify
 - ✅ Blog con paginación (solo PUBLISHED), carrusel de imágenes y lightbox compartidos con client-site
 - ✅ Formulario de contacto reclutadores
 - ✅ ErrorBoundary en todas las rutas
+
+#### Shared
+- ✅ Constantes de contacto centralizadas (`PROFILE` en `@jsoft/shared`) — única fuente de verdad para email, teléfono, WhatsApp, LinkedIn, GitHub y CV
+- ✅ Tokens de diseño con alias `--text-*` → `--font-size-*` y colores WhatsApp
 
 ---
 
