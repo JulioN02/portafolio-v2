@@ -56,28 +56,8 @@
   margin: 0 auto;
 }
 
-.badges {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-lg);
-}
-
-.badge {
-  display: inline-block;
-  background: rgba(255,255,255,0.15);
-  backdrop-filter: blur(10px);
-  color: white;
-  font-size: var(--text-sm);
-  font-weight: var(--font-weight-medium);
-  padding: var(--spacing-xs) var(--spacing-md);
-  border-radius: var(--radius-full);
-  border: 1px solid rgba(255,255,255,0.2);
-}
-
 .title {
-  font-size: var(--text-3xl);
+  font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-bold);
   margin: 0 0 var(--spacing-lg);
   line-height: 1.2;
@@ -85,7 +65,7 @@
 
 @media (min-width: 768px) {
   .title {
-    font-size: var(--text-4xl);
+    font-size: var(--font-size-4xl);
   }
 }
 
@@ -94,10 +74,61 @@
 }
 
 .subtitle {
-  font-size: var(--text-lg);
+  font-size: var(--font-size-lg);
   line-height: var(--line-height-relaxed);
   color: rgba(255,255,255,0.9);
   margin: 0 0 var(--spacing-2xl);
+}
+
+/* ── Trust stats strip (D5) ── */
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--spacing-md);
+  margin: 0 0 var(--spacing-2xl);
+  padding: 0;
+  list-style: none;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  min-width: 150px;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: var(--radius-lg);
+}
+
+.statValue {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-neutral-0);
+  line-height: 1.2;
+}
+
+.statLabel {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: rgba(255,255,255,0.92);
+}
+
+.statSkeleton {
+  display: inline-block;
+  width: 3rem;
+  height: 1.75rem;
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.25);
+}
+
+@media (min-width: 640px) {
+  .stats {
+    flex-wrap: nowrap;
+  }
 }
 
 .ctas {
@@ -136,13 +167,13 @@
 }
 
 .ctaWhatsapp {
-  background: #128C7E;
+  background: var(--color-whatsapp);
   color: var(--color-neutral-0);
 }
 
 @media (hover: hover) {
   .ctaWhatsapp:hover {
-    background: #0E7A6E;
+    background: var(--color-whatsapp-hover);
     transform: translateY(-2px);
     box-shadow: 0 10px 20px -5px rgba(18, 140, 126, 0.4);
   }

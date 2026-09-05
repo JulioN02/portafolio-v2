@@ -76,6 +76,10 @@
   --color-green-accent-text: #4E9A3B;
   --color-green-backend-text: #2D7A4A;
 
+  /* ── WhatsApp Brand Colors ── */
+  --color-whatsapp: #128C7E;
+  --color-whatsapp-hover: #0E7A6E;
+
   /* ========================================
    * Spacing
    * ======================================== */
@@ -101,6 +105,17 @@
   --font-size-2xl: 1.5rem;    /* 24px */
   --font-size-3xl: 1.875rem;  /* 30px */
   --font-size-4xl: 2.25rem;   /* 36px */
+
+  /* ── Legacy --text-* aliases (fix CHC-7: components used --text-* before
+   * these existed; map to the canonical --font-size-* tokens) ── */
+  --text-xs: var(--font-size-xs);
+  --text-sm: var(--font-size-sm);
+  --text-base: var(--font-size-base);
+  --text-lg: var(--font-size-lg);
+  --text-xl: var(--font-size-xl);
+  --text-2xl: var(--font-size-2xl);
+  --text-3xl: var(--font-size-3xl);
+  --text-4xl: var(--font-size-4xl);
 
   --font-weight-normal: 400;
   --font-weight-medium: 500;

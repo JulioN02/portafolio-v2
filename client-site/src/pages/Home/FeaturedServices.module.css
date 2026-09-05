@@ -21,7 +21,7 @@
 }
 
 .title {
-  font-size: var(--text-3xl);
+  font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-bold);
   color: var(--color-blue-base);
   margin: 0 0 var(--spacing-md);
@@ -29,12 +29,12 @@
 
 @media (max-width: 768px) {
   .title {
-    font-size: var(--text-2xl);
+    font-size: var(--font-size-2xl);
   }
 }
 
 .subtitle {
-  font-size: var(--text-lg);
+  font-size: var(--font-size-lg);
   color: var(--color-neutral-600);
   margin: 0;
 }

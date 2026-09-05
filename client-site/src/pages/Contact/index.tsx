@@ -2,6 +2,7 @@ import { useTranslation } from '../../i18n/LanguageContext';
 import { MetaTags } from '../../components/seo/MetaTags';
 import { PageHeader } from '../../components/common/PageHeader';
 import { ContactForm } from '../../components/forms/ContactForm';
+import { PROFILE } from '@jsoft/shared';
 import styles from './Contact.module.css';
 
 export function ContactPage() {
@@ -31,7 +32,7 @@ export function ContactPage() {
                 </span>
                 <div>
                   <h3>{t('contact.email')}</h3>
-                  <a href="mailto:info@jsoftsolutions.com">info@jsoftsolutions.com</a>
+                  <a href={`mailto:${PROFILE.email}`}>{PROFILE.email}</a>
                 </div>
               </div>
 
@@ -43,7 +44,9 @@ export function ContactPage() {
                 </span>
                 <div>
                   <h3>{t('contact.whatsapp')}</h3>
-                  <a href="https://wa.me/573001234567">+57 300 123 4567</a>
+                  <a href={PROFILE.whatsappUrl} target="_blank" rel="noopener noreferrer">
+                    {PROFILE.phoneDisplay}
+                  </a>
                 </div>
               </div>
 

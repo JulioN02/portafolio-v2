@@ -1,16 +1,17 @@
 import { Link } from 'react-router-dom';
+import { PROFILE } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
+import { useProjects } from '../../hooks/useProjects';
 import styles from './Hero.module.css';
-
-const BADGE_KEYS = [
-  'hero.badge.web',
-  'hero.badge.uiux',
-  'hero.badge.consulting',
-  'hero.badge.apps',
-];
 
 export function Hero() {
   const { t } = useTranslation();
+  // limit: 1 → we only need the total count for the "projects delivered" stat.
+  const { data: projectsData, isLoading } = useProjects({ filter: { page: 1, limit: 1 } });
+
+  // Truthful count from the API; null while loading or on error (stat hidden).
+  const projectsTotal = projectsData?.pagination?.total ?? null;
+
   return (
     <section className={styles.hero}>
       <div className={styles.heroBgImage} aria-hidden="true" />
@@ -27,14 +28,6 @@ export function Hero() {
         </svg>
       </div>
       <div className={styles.content}>
-        <div className={styles.badges}>
-          {BADGE_KEYS.map((key) => (
-            <span key={key} className={styles.badge}>
-              {t(key)}
-            </span>
-          ))}
-        </div>
-
         <h1 className={styles.title}>
           {t('hero.title')}
           <span className={styles.highlight}>{t('hero.titleHighlight')}</span>
@@ -44,18 +37,40 @@ export function Hero() {
           {t('hero.subtitle')}
         </p>
 
+        <ul className={styles.stats}>
+          <li className={styles.stat}>
+            <span className={styles.statValue}>{PROFILE.availabilityMetric}</span>
+            <span className={styles.statLabel}>{t('hero.stats.availability')}</span>
+          </li>
+          <li className={styles.stat}>
+            <span className={styles.statValue}>{t('hero.stats.response')}</span>
+          </li>
+          {isLoading && (
+            <li className={styles.stat} role="status">
+              <span className={styles.statSkeleton} aria-hidden="true" />
+              <span className={styles.statLabel}>{t('hero.stats.projects')}</span>
+            </li>
+          )}
+          {!isLoading && projectsTotal !== null && (
+            <li className={styles.stat}>
+              <span className={styles.statValue}>{projectsTotal}</span>
+              <span className={styles.statLabel}>{t('hero.stats.projects')}</span>
+            </li>
+          )}
+        </ul>
+
         <div className={styles.ctas}>
           <Link to="/servicios" className={styles.ctaPrimary}>
             {t('hero.cta.services')}
           </Link>
-          <Link
-            to="https://wa.me/573001234567"
+          <a
+            href={PROFILE.whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
             className={styles.ctaWhatsapp}
           >
             {t('hero.cta.whatsapp')}
-          </Link>
+          </a>
         </div>
       </div>
     </section>

@@ -157,7 +157,7 @@ export function ContactForm({ source = 'general', onSuccess }: ContactFormProps)
 
       {renderField({ id: 'email', label: 'Email', type: 'email', value: formData.email, placeholder: 'tu@email.com', autoComplete: 'email', error: errors.email })}
 
-      {renderField({ id: 'whatsapp', label: 'WhatsApp', type: 'tel', value: formData.whatsapp, placeholder: '+57 300 123 4567', autoComplete: 'tel', error: errors.whatsapp })}
+      {renderField({ id: 'whatsapp', label: 'WhatsApp', type: 'tel', value: formData.whatsapp, placeholder: '+57 300 000 0000', autoComplete: 'tel', error: errors.whatsapp })}
 
       <div className={styles.field}>
         <label htmlFor="message" className={styles.label}>

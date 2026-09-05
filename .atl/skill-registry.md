@@ -1,6 +1,6 @@
 # Skill Registry
 
-Generated: 2026-05-22
+Generated: 2026-09-05
 Project: portafolio-v2 (portafoliov2jss)
 
 ## Skills
@@ -64,14 +64,16 @@ Project: portafolio-v2 (portafoliov2jss)
 - Shared package: Zod schemas, TypeScript types, API client, UI components (`Button`, `Input`, `Card`, `Loading`, `ErrorMessage`, `Modal`, `ProtectedRoute`)
 - CSS variables via `@jsoft/shared` design tokens
 
-### Database Models (7)
+### Database Models (9)
 - `User` — Admin authentication
 - `Service` — with `order`, `featured`, soft-delete
 - `Product` — with `order`, `featured`, soft-delete
 - `Tool` — with `order`, `featured`, soft-delete, `requiresInstall`
 - `SuccessCase` — with media support, soft-delete
-- `BlogPost` — with `PostStatus` enum (DRAFT/PUBLISHED/PRIVATE/ARCHIVED), soft-delete
+- `BlogPost` — with `PostStatus` enum (DRAFT/PUBLISHED/PRIVATE/ARCHIVED), tags, soft-delete
 - `ContactForm` — with `FormOrigin` enum (CLIENT/RECRUITER)
+- `Project` — with tags/classification, technicalExplanation, soft-delete
+- `Simulator` — private bucket, sandboxed embeds
 
 ### Code Conventions
 - TypeScript strict mode (`strict: true`, `noUnusedLocals`, `noUnusedParameters`, `noImplicitReturns`, `noFallthroughCasesInSwitch`)
@@ -79,12 +81,14 @@ Project: portafolio-v2 (portafoliov2jss)
 - ESLint config exists for frontends only (jsx-a11y plugin)
 - No formatter configured
 - File naming: `*.service.ts`, `*.routes.ts`, `*.middleware.ts`, `*.schema.ts`, `*.test.ts`
+- **Contact values MUST come from `PROFILE`** (`packages/shared/src/constants/profile.ts`, exported from `@jsoft/shared`): email jsoftsolutions@gmail.com, phone 300 3727134 (tel:+573003727134), WhatsApp wa.me/573003727134, LinkedIn/GitHub jsoftsolutions, cvUrl /cv/julio-nieto-cv.pdf. Zero hardcoded contact literals in site code.
+- CSS tokens: canonical `--font-size-*`; `--text-*` aliases exist for backward compat; prefer `--font-size-*` in new code.
 
 ### Testing
 - **API** (`@jsoft/api`): Jest 30.3.0 + ts-jest, 264 tests across 21 suites, 70% coverage threshold
-- **Shared** (`@jsoft/shared`): Vitest (jsdom) — 140 tests (MediaCarousel, Lightbox, schemas, sanitization)
-- **Client Site** (`@jsoft/client-site`): Vitest (jsdom) — 26 tests (pages, blog components, i18n)
-- **Recruiter Site** (`@jsoft/recruiter-site`): Vitest (jsdom) — 22 tests (blog, contact, pages)
+- **Shared** (`@jsoft/shared`): Vitest (jsdom) — 148 tests (PROFILE constants, tokens, MediaCarousel, Lightbox, schemas, sanitization)
+- **Client Site** (`@jsoft/client-site`): Vitest (jsdom) — 59 tests (home sections, blog, hooks, i18n)
+- **Recruiter Site** (`@jsoft/recruiter-site`): Vitest (jsdom) — 61 tests (home sections, blog, contact, i18n)
 - **Admin Panel** (`@jsoft/admin-panel`): Vitest — suite ejecutada en CI
 - **ResizeObserver/matchMedia mocks**: presentes en setup de shared, client-site y recruiter-site (requeridos por Embla en jsdom)
 - **CI**: `pnpm -r run typecheck` + tests por paquete + `pnpm -r run build` (workflow `ci.yml`)
@@ -98,30 +102,29 @@ Project: portafolio-v2 (portafoliov2jss)
 - `pnpm -F @jsoft/recruiter-site dev` for recruiter site
 - `pnpm -F @jsoft/admin-panel dev` for admin panel
 - `pnpm -r run typecheck` for type checking (0 errors across all packages)
-- `pnpm --filter @jsoft/api test` for API tests (62/62 passing)
+- `pnpm --filter @jsoft/api test` for API tests (Jest)
+- `pnpm --filter @jsoft/shared test`, `pnpm --filter @jsoft/recruiter-site test`, `pnpm --filter @jsoft/client-site test` for frontend/shared tests (Vitest)
 - Docker Compose for local PostgreSQL (port 5434)
 - Prisma for migrations and client generation
 
-## SDD Context (2026-05-22)
+## SDD Context (2026-09-05)
 
 ### Metodología SDD Habilitada
 - **Fases**: proposal → specs → design → tasks → apply → verify → archive
-- **Persistencia solicitada**: engram (openspec/ already exists — populated with artifacts)
-- **Strict TDD**: ✅ Enabled (API tests only)
+- **Persistencia**: hybrid soportado (engram + openspec). Para cambios nuevos, el owner elige por sesión (precedente: engram-only en home-redesign; hybrid en project-publications)
+- **Strict TDD**: ✅ Enabled (api tests + Vitest en frontends/shared cuando aplica)
 
 ### Existing SDD Artifacts
 - `openspec/config.yaml` — Full configuration
-- `openspec/specs/` — 5 recruiter site specs
-- `openspec/changes/implement-admin-panel/` — Active change
-- `openspec/changes/polish-2/` — Active change (quality pass)
-- `openspec/changes/archive/2026-05-19-implement-recruiter-site/` — Archived change
+- `openspec/specs/` — specs principales sincronizadas (46 archivos)
+- `openspec/changes/archive/` — implement-admin-panel, polish-2, redesign-visual-v1, project-publications, home-redesign (en engram `sdd/home-redesign/*`)
 
 ### Testing Capabilities
 | Layer | Available | Tool |
 |-------|-----------|------|
-| Unit (api) | ✅ | Jest 30.3.0 + ts-jest (62 tests) |
-| Unit (frontends) | ❌ | No instalado |
-| Integration | ❌ | No instalado |
+| Unit (api) | ✅ | Jest 30.3.0 + ts-jest (70% coverage) |
+| Unit (frontends/shared) | ✅ | Vitest — shared 148, recruiter 61, client 59 |
+| Integration (component) | ✅ | @testing-library/react (Vitest) |
 | E2E | ❌ | No instalado |
 
 ### Quality Tools
@@ -135,6 +138,7 @@ Project: portafolio-v2 (portafoliov2jss)
 
 - **Skills Usage**: Load relevant skill when working with its trigger topic
 - **Testing**: API con Jest (`pnpm --filter @jsoft/api test`); shared y frontends con Vitest (`pnpm --filter @jsoft/shared test`, `pnpm --filter @jsoft/client-site test`, `pnpm --filter @jsoft/recruiter-site test`, admin-panel en CI).
+- **Contactos**: usar SIEMPRE `PROFILE` de `@jsoft/shared` — nunca hardcodear valores de contacto en código de sitios)
 - **Linting**: ESLint only has jsx-a11y plugin in frontends; no full eslint config
 - **Type Checking**: Available per package via `tsc --noEmit` — all pass with 0 errors
 - **Formatting**: No formatter configured

@@ -4,6 +4,10 @@
 // Schemas
 export * from './schemas/index.js';
 
+// Constants
+export { PROFILE } from './constants/profile.js';
+export type { ProfileInfo } from './constants/profile.js';
+
 // Types
 export type {
   // Service

@@ -1,0 +1,109 @@
+.section {
+  padding: var(--spacing-3xl) var(--spacing-md);
+  background-color: var(--color-neutral-50);
+}
+
+@media (min-width: 768px) {
+  .section {
+    padding: var(--spacing-3xl) var(--spacing-lg);
+  }
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.title {
+  text-align: center;
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-blue-base);
+  margin: 0 0 var(--spacing-2xl);
+}
+
+/* Engagement steps: 1 col mobile → 2 col tablet → 4 col desktop */
+.steps {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  padding: 0;
+  margin: 0 0 var(--spacing-3xl);
+}
+
+@media (min-width: 640px) {
+  .steps {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .steps {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+  background: var(--color-neutral-0);
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-lg);
+}
+
+.stepNumber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-full);
+  background: var(--color-blue-ui);
+  color: var(--color-neutral-0);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+.stepText {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-neutral-700);
+  line-height: var(--line-height-normal);
+}
+
+/* Why-me differentiators: 1 col mobile → 3 col desktop */
+.whyTitle {
+  text-align: center;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-blue-base);
+  margin: 0 0 var(--spacing-lg);
+}
+
+.whyList {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-sm);
+  padding: 0;
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .whyList {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.whyItem {
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--color-neutral-0);
+  border-left: 4px solid var(--color-green-backend);
+  border-radius: var(--radius-md);
+  color: var(--color-neutral-700);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+}
