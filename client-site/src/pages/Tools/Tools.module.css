@@ -99,3 +99,9 @@
   background-color: var(--color-danger-50);
   border-radius: var(--radius-md);
 }
+
+/* Tool preview→expand modal: wider than the shared default (36rem) so the
+   16/9 carousel + expanded sections fit comfortably. */
+.toolModal {
+  max-width: 48rem;
+}

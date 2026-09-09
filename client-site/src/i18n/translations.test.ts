@@ -34,6 +34,37 @@ describe('i18n blogPostContent keyset', () => {
   });
 });
 
+// tools-ux-improvements keyset (toolDetail preview→expand modal keys)
+const TOOL_DETAIL_KEYS = [
+  'toolDetail.expand',
+  'toolDetail.collapse',
+  'toolDetail.technicalExplanation',
+  'toolDetail.technicalImages',
+  'toolDetail.modalAria',
+] as const;
+
+describe('i18n toolDetail keyset (tools-ux-improvements)', () => {
+  it('has all 5 keys in es and en', () => {
+    for (const key of TOOL_DETAIL_KEYS) {
+      expect(translations.es[key], `es:${key}`).toBeDefined();
+      expect(translations.en[key], `en:${key}`).toBeDefined();
+    }
+  });
+
+  it('uses translated values (not key fallbacks)', () => {
+    expect(translations.es['toolDetail.expand']).toBe('Ver completo');
+    expect(translations.en['toolDetail.expand']).toBe('View full details');
+    expect(translations.es['toolDetail.collapse']).toBe('Ver menos');
+    expect(translations.en['toolDetail.collapse']).toBe('Show less');
+    expect(translations.es['toolDetail.technicalExplanation']).toBe('Detalles técnicos');
+    expect(translations.en['toolDetail.technicalExplanation']).toBe('Technical details');
+    expect(translations.es['toolDetail.technicalImages']).toBe('Imágenes técnicas');
+    expect(translations.en['toolDetail.technicalImages']).toBe('Technical images');
+    expect(translations.es['toolDetail.modalAria']).toBe('Detalles de la herramienta');
+    expect(translations.en['toolDetail.modalAria']).toBe('Tool details');
+  });
+});
+
 // home-redesign keysets (CHC-1 hero.stats, CHC-3 processSection, CHC-5 blogTeaser, CHC-6 cta)
 const HOME_REDESIGN_KEYS = [
   // hero trust stats (CHC-1/2)
