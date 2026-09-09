@@ -48,9 +48,8 @@ const REQUIRED_KEYS = [
   'contactStrip.linkedin',
   'contactStrip.cv',
   'contactStrip.cvAria',
-  // project detail modal preview→expand (tools-ux-improvements)
+  // project detail modal preview (tools-ux-improvements, preview-to-detail-page)
   'projectDetailModal.expand',
-  'projectDetailModal.collapse',
   'projectDetailModal.close',
   'projectDetailModal.loading',
   'projectDetailModal.error',
@@ -65,6 +64,10 @@ const REQUIRED_KEYS = [
   'projectDetailModal.type.successCase',
   'projectDetailModal.type.project',
   'projectDetailModal.type.laboratorio',
+  // entity detail page (preview-to-detail-page)
+  'projectDetailPage.backToProjects',
+  'projectDetailPage.notFound.title',
+  'projectDetailPage.notFound.message',
 ] as const;
 
 const BANNED_CLAIMS = [
@@ -149,14 +152,18 @@ describe('i18n translations (home-redesign RHP-1..RHP-5, RHP-7, RHP-8)', () => {
     expect(translations.en['statsStrip.availability']).toMatch(/traceability/i);
   });
 
-  it('has the projectDetailModal expand/collapse and repo labels in both languages', () => {
+  it('has the projectDetailModal preview labels and the entity detail page labels in both languages', () => {
     expect(translations.es['projectDetailModal.expand']).toBe('Ver completo');
     expect(translations.en['projectDetailModal.expand']).toBe('View full details');
-    expect(translations.es['projectDetailModal.collapse']).toBe('Ver menos');
-    expect(translations.en['projectDetailModal.collapse']).toBe('Show less');
     expect(translations.es['projectDetailModal.viewRepository']).toBe('Ver repositorio →');
     expect(translations.en['projectDetailModal.viewRepository']).toBe('View repository →');
     expect(translations.es['projectDetailModal.type.project']).toBe('Proyecto');
     expect(translations.en['projectDetailModal.type.project']).toBe('Project');
+    expect(translations.es['projectDetailPage.backToProjects']).toBe('← Volver a proyectos');
+    expect(translations.en['projectDetailPage.backToProjects']).toBe('← Back to projects');
+    expect(translations.es['projectDetailPage.notFound.title']).toBe('Detalle no encontrado');
+    expect(translations.en['projectDetailPage.notFound.title']).toBe('Detail not found');
+    expect(translations.es['projectDetailPage.notFound.message']).toMatch(/no existe|ha sido eliminado/i);
+    expect(translations.en['projectDetailPage.notFound.message']).toMatch(/does not exist|has been removed/i);
   });
 });

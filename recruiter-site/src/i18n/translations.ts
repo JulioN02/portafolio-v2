@@ -165,9 +165,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'blogPostContent.media.expand': 'Ampliar',
     'blogPostContent.galleryImageAlt': '{title} — Imagen {index} de {total}',
 
-    // =========== PROJECT DETAIL MODAL (preview→expand) ===========
+    // =========== PROJECT DETAIL MODAL (preview-only) ===========
     'projectDetailModal.expand': 'Ver completo',
-    'projectDetailModal.collapse': 'Ver menos',
     'projectDetailModal.close': 'Cerrar',
     'projectDetailModal.loading': 'Cargando detalles técnicos...',
     'projectDetailModal.error': 'No se pudieron cargar los detalles del proyecto.',
@@ -182,6 +181,11 @@ export const translations: Record<Language, Record<string, string>> = {
     'projectDetailModal.type.successCase': 'Caso de éxito',
     'projectDetailModal.type.project': 'Proyecto',
     'projectDetailModal.type.laboratorio': 'Laboratorio',
+
+    // =========== PROJECT DETAIL PAGE (entity detail) ===========
+    'projectDetailPage.backToProjects': '← Volver a proyectos',
+    'projectDetailPage.notFound.title': 'Detalle no encontrado',
+    'projectDetailPage.notFound.message': 'El elemento que buscas no existe o ha sido eliminado.',
 
     // =========== BLOG CARD ===========
     'blogCard.readArticle': 'Leer artículo: {title}',
@@ -385,9 +389,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'blogPostContent.media.expand': 'Expand',
     'blogPostContent.galleryImageAlt': '{title} — Image {index} of {total}',
 
-    // =========== PROJECT DETAIL MODAL (preview→expand) ===========
+    // =========== PROJECT DETAIL MODAL (preview-only) ===========
     'projectDetailModal.expand': 'View full details',
-    'projectDetailModal.collapse': 'Show less',
     'projectDetailModal.close': 'Close',
     'projectDetailModal.loading': 'Loading technical details...',
     'projectDetailModal.error': 'Could not load the project details.',
@@ -402,6 +405,11 @@ export const translations: Record<Language, Record<string, string>> = {
     'projectDetailModal.type.successCase': 'Success case',
     'projectDetailModal.type.project': 'Project',
     'projectDetailModal.type.laboratorio': 'Lab',
+
+    // =========== PROJECT DETAIL PAGE (entity detail) ===========
+    'projectDetailPage.backToProjects': '← Back to projects',
+    'projectDetailPage.notFound.title': 'Detail not found',
+    'projectDetailPage.notFound.message': 'The item you are looking for does not exist or has been removed.',
 
     // =========== BLOG CARD ===========
     'blogCard.readArticle': 'Read article: {title}',
