@@ -1,6 +1,12 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
-import { renderSimulatorEmbeds, sanitizeHtml } from '@jsoft/shared';
+import {
+  sanitizeHtml,
+  MediaCarousel,
+  Lightbox,
+} from '@jsoft/shared';
+import type { MediaCarouselSlide, LightboxItem, EmblaCarouselType } from '@jsoft/shared';
 import { useProjectDetail } from '../../hooks/useProjects';
+import { useTranslation } from '../../i18n/LanguageContext';
 import type { ProjectSummary } from '../../types';
 import styles from './ProjectDetailModal.module.css';
 
@@ -9,29 +15,42 @@ interface ProjectDetailModalProps {
   onClose: () => void;
 }
 
-/** Maps API type values to Spanish labels */
-const typeLabels: Record<string, string> = {
-  service: 'Servicio',
-  product: 'Producto',
-  tool: 'Herramienta',
-  successCase: 'Caso de Éxito',
-  project: 'Proyecto',
-  laboratorio: 'Laboratorio',
-  SERVICE: 'Servicio',
-  PRODUCT: 'Producto',
-  TOOL: 'Herramienta',
-  SUCCESS_CASE: 'Caso de Éxito',
+interface LightboxState {
+  open: boolean;
+  items: LightboxItem[];
+  index: number;
+}
+
+const CLOSED_LIGHTBOX: LightboxState = { open: false, items: [], index: 0 };
+
+/**
+ * Normalizes API type values (lowercase or UPPERCASE) to the i18n key suffix.
+ * The portfolio aggregation endpoint returns lowercase values; the legacy
+ * UPPERCASE variants are kept as a defensive fallback.
+ */
+const TYPE_KEY_MAP: Record<string, string> = {
+  service: 'service',
+  product: 'product',
+  tool: 'tool',
+  successCase: 'successCase',
+  project: 'project',
+  laboratorio: 'laboratorio',
+  SERVICE: 'service',
+  PRODUCT: 'product',
+  TOOL: 'tool',
+  SUCCESS_CASE: 'successCase',
 };
 
 export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps) {
-  const { data: detail, isLoading, isError, error } = useProjectDetail(
+  const { t } = useTranslation();
+  const { isLoading, isError, error } = useProjectDetail(
     project.type,
     project.slug,
   );
 
   const overlayRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const [expandedImage, setExpandedImage] = useState<string | null>(null);
+  const [lightbox, setLightbox] = useState<LightboxState>(CLOSED_LIGHTBOX);
+  const carouselApiRef = useRef<EmblaCarouselType | null>(null);
 
   // Close on Escape key
   const handleKeyDown = useCallback(
@@ -62,20 +81,47 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
   const projectImages: string[] = project.image
     ? [project.image, ...(project.images?.slice(1) ?? [])]
     : project.images ?? [];
-  const hasMultipleImages = projectImages.length > 1;
-  const isProject = project.type === 'project';
-  const detailRecord = detail as Record<string, unknown> | undefined;
-  const hasTechnicalImages =
-    detail &&
-    Array.isArray(detailRecord?.technicalImages) &&
-    (detailRecord?.technicalImages as string[]).length > 0;
-  const technicalExplanation = detail
-    ? (detailRecord?.technicalExplanation as string | undefined)
-    : project.technicalExplanation;
-  const projectBody = detail ? (detailRecord?.body as string | undefined) : undefined;
-  const projectRepositoryUrl = detail
-    ? (detailRecord?.repositoryUrl as string | undefined)
-    : undefined;
+
+  // Cover-first slides with the shared gallery alt template (D2).
+  const slides: MediaCarouselSlide[] = projectImages.map((src, index) => ({
+    src,
+    alt: t('blogPostContent.galleryImageAlt', {
+      title: project.title,
+      index: index + 1,
+      total: projectImages.length,
+    }),
+  }));
+
+  const carouselLabels = {
+    pause: t('blogPostContent.carousel.pause'),
+    play: t('blogPostContent.carousel.play'),
+    prev: t('blogPostContent.carousel.prev'),
+    next: t('blogPostContent.carousel.next'),
+    regionLabel: t('blogPostContent.galleryTitle'),
+  };
+
+  const lightboxLabels = {
+    close: t('blogPostContent.lightbox.close'),
+    prev: t('blogPostContent.lightbox.prev'),
+    next: t('blogPostContent.lightbox.next'),
+    counter: t('blogPostContent.lightbox.counter'),
+    dialogLabel: t('blogPostContent.lightbox.dialogLabel'),
+  };
+
+  const openFromCarousel = (index: number) => {
+    setLightbox({
+      open: true,
+      items: slides.map(
+        (slide): LightboxItem => ({ kind: 'image', src: slide.src, alt: slide.alt }),
+      ),
+      index,
+    });
+  };
+
+  const closeLightbox = () => setLightbox(CLOSED_LIGHTBOX);
+
+  const typeLabelKey = `projectDetailModal.type.${TYPE_KEY_MAP[project.type] ?? project.type}`;
+  const typeLabel = t(typeLabelKey);
 
   return (
     <div
@@ -90,17 +136,13 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
         {/* ── Header ── */}
         <div className={styles.header}>
           <div className={styles.headerInfo}>
-            <span className={styles.typeIndicator}>
-              {typeLabels[project.type] ?? project.type}
-            </span>
-            <span className={styles.classification}>
-              {project.classification}
-            </span>
+            <span className={styles.typeIndicator}>{typeLabel}</span>
+            <span className={styles.classification}>{project.classification}</span>
           </div>
           <button
             className={styles.closeButton}
             onClick={onClose}
-            aria-label="Cerrar"
+            aria-label={t('projectDetailModal.close')}
           >
             &times;
           </button>
@@ -115,162 +157,46 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
           dangerouslySetInnerHTML={{ __html: sanitizeHtml(project.shortDescription) }}
         />
 
-        {/* ── Main image ── */}
+        {/* ── Cover-first media carousel ── */}
         {projectImages.length > 0 && (
-          <div className={styles.imageSection}>
-            <img
-              src={projectImages[0]}
-              alt={project.title}
-              className={styles.mainImage}
+          <section className={styles.carousel}>
+            <MediaCarousel
+              slides={slides}
+              labels={carouselLabels}
+              apiRef={carouselApiRef}
+              onSlideClick={openFromCarousel}
             />
-          </div>
-        )}
-
-        {/* Expanded image viewer */}
-        {expandedImage && (
-          <div className={styles.expandedImageWrapper}>
-            <button
-              className={styles.expandedClose}
-              onClick={() => setExpandedImage(null)}
-              aria-label="Cerrar imagen expandida"
-            >
-              &times;
-            </button>
-            <img
-              src={expandedImage}
-              alt="Imagen expandida"
-              className={styles.expandedImage}
-            />
-          </div>
-        )}
-
-        {/* Thumbnail gallery */}
-        {projectImages.length > 1 && (
-          <div className={styles.gallery}>
-            {projectImages.slice(1).map((img, i) => (
-              <button
-                key={i}
-                className={styles.galleryThumb}
-                onClick={() => setExpandedImage(img)}
-              >
-                <img
-                  src={img}
-                  alt={`${project.title} - Imagen ${i + 1}`}
-                  className={styles.galleryImg}
-                />
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* ── Image gallery ── */}
-        {hasMultipleImages && (
-          <div className={styles.gallery}>
-            <h3 className={styles.sectionTitle}>Galería</h3>
-            <div className={styles.galleryGrid}>
-              {project.images.slice(1).map((img, i) => (
-                <img
-                  key={i}
-                  src={img}
-                  alt={`${project.title} - Imagen ${i + 2}`}
-                  className={styles.galleryImage}
-                  loading="lazy"
-                />
-              ))}
-            </div>
-          </div>
+          </section>
         )}
 
         {/* ── Loading state ── */}
         {isLoading && (
           <div className={styles.loadingState}>
             <div className={styles.spinner} />
-            <p>Cargando detalles técnicos...</p>
+            <p>{t('projectDetailModal.loading')}</p>
           </div>
         )}
 
         {/* ── Error state ── */}
         {isError && (
           <div className={styles.errorState}>
-            <p>No se pudieron cargar los detalles del proyecto.</p>
+            <p>{t('projectDetailModal.error')}</p>
             <p className={styles.errorDetail}>
-              {error instanceof Error ? error.message : 'Error de conexión'}
+              {error instanceof Error
+                ? error.message
+                : t('projectDetailModal.errorConnection')}
             </p>
           </div>
         )}
 
-        {/* ── Technical explanation (sanitized HTML) — legacy entity types only ── */}
-        {!isLoading && !isError && !isProject && technicalExplanation && (
-          <div className={styles.technicalSection}>
-            <h3 className={styles.sectionTitle}>Detalles Técnicos</h3>
-            <div
-              ref={contentRef}
-              className={styles.technicalContent}
-              dangerouslySetInnerHTML={{
-                __html: renderSimulatorEmbeds(technicalExplanation),
-              }}
-            />
-          </div>
-        )}
-
-        {/* ── Technical images gallery — legacy entity types only ── */}
-        {!isLoading && !isError && !isProject && hasTechnicalImages && (
-          <div className={styles.techImagesSection}>
-            <h3 className={styles.sectionTitle}>Imágenes Técnicas</h3>
-            <div className={styles.techImagesGrid}>
-              {(
-                (detail as Record<string, unknown>)
-                  .technicalImages as string[]
-              ).map((img, i) => (
-                <img
-                  key={i}
-                  src={img}
-                  alt={`${project.title} - Técnico ${i + 1}`}
-                  className={styles.techImage}
-                  loading="lazy"
-                />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* ── Real Project branch: tags + sanitized body + repository ── */}
-        {!isLoading && !isError && isProject && (
-          <>
-            {project.tags && project.tags.length > 0 && (
-              <div className={styles.tagsSection}>
-                {project.tags.map((tag) => (
-                  <span key={tag} className={styles.tagChip}>
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {projectBody && (
-              <div className={styles.technicalSection}>
-                <h3 className={styles.sectionTitle}>Descripción</h3>
-                <div
-                  className={styles.technicalContent}
-                  dangerouslySetInnerHTML={{
-                    __html: renderSimulatorEmbeds(projectBody),
-                  }}
-                />
-              </div>
-            )}
-
-            {projectRepositoryUrl && (
-              <a
-                href={projectRepositoryUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.repoLink}
-              >
-                Ver repositorio →
-              </a>
-            )}
-          </>
-        )}
+        <Lightbox
+          isOpen={lightbox.open}
+          items={lightbox.items}
+          initialIndex={lightbox.index}
+          labels={lightboxLabels}
+          onClose={closeLightbox}
+          onIndexChange={(index) => carouselApiRef.current?.scrollTo(index)}
+        />
       </div>
     </div>
   );
