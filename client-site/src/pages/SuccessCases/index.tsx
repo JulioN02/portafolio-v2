@@ -1,7 +1,10 @@
 import { useState } from 'react';
+import { Modal } from '@jsoft/shared';
+import type { SuccessCaseResponse } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useSuccessCases } from '../../hooks/useSuccessCases';
 import { SuccessCaseCard } from '../../components/successCases/SuccessCaseCard';
+import { EntityPreviewModal } from '../../components/preview/EntityPreviewModal';
 import { Pagination } from '../../components/common/Pagination';
 import { Loading } from '../../components/common/Loading';
 import { MetaTags } from '../../components/seo/MetaTags';
@@ -12,6 +15,7 @@ export function SuccessCasesPage() {
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [industry, setIndustry] = useState<string>('');
+  const [selectedSuccessCase, setSelectedSuccessCase] = useState<SuccessCaseResponse | null>(null);
 
   const { data, isLoading, error } = useSuccessCases({
     filter: {
@@ -70,7 +74,11 @@ export function SuccessCasesPage() {
           <>
             <div className={styles.grid}>
               {data.data.map((successCase) => (
-                <SuccessCaseCard key={successCase.id} successCase={successCase} />
+                <SuccessCaseCard
+                  key={successCase.id}
+                  successCase={successCase}
+                  onSelect={setSelectedSuccessCase}
+                />
               ))}
             </div>
 
@@ -89,6 +97,21 @@ export function SuccessCasesPage() {
           </div>
         )}
       </div>
+
+      {/* Success-case preview modal (zero fetch — fed by the list payload) */}
+      {selectedSuccessCase && (
+        <Modal
+          isOpen
+          onClose={() => setSelectedSuccessCase(null)}
+          title={selectedSuccessCase.title}
+          className={styles.previewModal}
+        >
+          <EntityPreviewModal
+            preview={{ type: 'successCase', entity: selectedSuccessCase }}
+            onClose={() => setSelectedSuccessCase(null)}
+          />
+        </Modal>
+      )}
     </div>
   );
 }

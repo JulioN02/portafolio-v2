@@ -4,7 +4,7 @@ import type { ToolResponse } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useTools, useClassifications } from '../../hooks/useTools';
 import { ToolCard } from '../../components/tools/ToolCard';
-import { ToolDetailModal } from '../../components/tools/ToolDetailModal';
+import { EntityPreviewModal } from '../../components/preview/EntityPreviewModal';
 import { Pagination } from '../../components/common/Pagination';
 import { Loading } from '../../components/common/Loading';
 import { MetaTags } from '../../components/seo/MetaTags';
@@ -91,15 +91,18 @@ export function ToolsPage() {
         )}
       </div>
 
-      {/* Tool preview→expand modal (zero fetch — fed by the list payload) */}
+      {/* Tool preview modal (zero fetch — fed by the list payload) */}
       {selectedTool && (
         <Modal
           isOpen
           onClose={() => setSelectedTool(null)}
           title={selectedTool.title}
-          className={styles.toolModal}
+          className={styles.previewModal}
         >
-          <ToolDetailModal tool={selectedTool} />
+          <EntityPreviewModal
+            preview={{ type: 'tool', entity: selectedTool }}
+            onClose={() => setSelectedTool(null)}
+          />
         </Modal>
       )}
     </div>

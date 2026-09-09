@@ -1,7 +1,10 @@
 import { useState } from 'react';
+import { Modal } from '@jsoft/shared';
+import type { ProductResponse } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useProducts, useClassifications } from '../../hooks/useProducts';
 import { ProductCard } from '../../components/products/ProductCard';
+import { EntityPreviewModal } from '../../components/preview/EntityPreviewModal';
 import { Pagination } from '../../components/common/Pagination';
 import { Loading } from '../../components/common/Loading';
 import { MetaTags } from '../../components/seo/MetaTags';
@@ -13,6 +16,7 @@ export function ProductsPage() {
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [classification, setClassification] = useState<string>('');
+  const [selectedProduct, setSelectedProduct] = useState<ProductResponse | null>(null);
 
   const { data, isLoading, error } = useProducts({
     filter: {
@@ -67,7 +71,7 @@ export function ProductsPage() {
           <>
             <div className={styles.grid}>
               {data.data.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <ProductCard key={product.id} product={product} onSelect={setSelectedProduct} />
               ))}
             </div>
 
@@ -86,6 +90,21 @@ export function ProductsPage() {
           </div>
         )}
       </div>
+
+      {/* Product preview modal (zero fetch — fed by the list payload) */}
+      {selectedProduct && (
+        <Modal
+          isOpen
+          onClose={() => setSelectedProduct(null)}
+          title={selectedProduct.title}
+          className={styles.previewModal}
+        >
+          <EntityPreviewModal
+            preview={{ type: 'product', entity: selectedProduct }}
+            onClose={() => setSelectedProduct(null)}
+          />
+        </Modal>
+      )}
     </div>
   );
 }

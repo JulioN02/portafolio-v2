@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { sanitizeHtml } from '@jsoft/shared';
+import { useSearchParams } from 'react-router-dom';
+import { Modal, sanitizeHtml } from '@jsoft/shared';
+import type { ProjectResponse } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useProjects, useProjectTags } from '../../hooks/useProjects';
 import { Loading } from '../../components/common/Loading';
 import { PageHeader } from '../../components/common/PageHeader';
 import { MetaTags } from '../../components/seo/MetaTags';
+import { EntityPreviewModal } from '../../components/preview/EntityPreviewModal';
 import styles from './Projects.module.css';
 
 const FALLBACK_IMG = 'https://placehold.co/600x400/e5e7eb/9ca3af?text=Sin+imagen';
@@ -15,6 +17,7 @@ export function ProjectsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const tag = searchParams.get('tag') || undefined;
   const [page, setPage] = useState(1);
+  const [selectedProject, setSelectedProject] = useState<ProjectResponse | null>(null);
 
   const { data, isLoading, error } = useProjects({
     filter: {
@@ -88,7 +91,11 @@ export function ProjectsPage() {
                 const imageUrl = project.images && project.images.length > 0 ? project.images[0] : FALLBACK_IMG;
                 return (
                   <article key={project.id} className={styles.card}>
-                    <Link to={`/proyectos/${project.slug}`} className={styles.cardLink}>
+                    <button
+                      type="button"
+                      className={styles.cardButton}
+                      onClick={() => setSelectedProject(project)}
+                    >
                       <div className={styles.imageWrapper}>
                         <img
                           src={imageUrl}
@@ -107,7 +114,7 @@ export function ProjectsPage() {
                           dangerouslySetInnerHTML={{ __html: sanitizeHtml(project.shortDescription) }}
                         />
                       </div>
-                    </Link>
+                    </button>
                   </article>
                 );
               })}
@@ -154,6 +161,21 @@ export function ProjectsPage() {
           </div>
         )}
       </div>
+
+      {/* Project preview modal (zero fetch — fed by the list payload) */}
+      {selectedProject && (
+        <Modal
+          isOpen
+          onClose={() => setSelectedProject(null)}
+          title={selectedProject.title}
+          className={styles.previewModal}
+        >
+          <EntityPreviewModal
+            preview={{ type: 'project', entity: selectedProject }}
+            onClose={() => setSelectedProject(null)}
+          />
+        </Modal>
+      )}
     </div>
   );
 }

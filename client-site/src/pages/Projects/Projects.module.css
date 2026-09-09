@@ -92,11 +92,24 @@
   }
 }
 
-.cardLink {
+.cardButton {
+  /* Button reset — the whole card is one activatable element */
   display: block;
+  width: 100%;
   height: 100%;
-  text-decoration: none;
+  padding: 0;
+  border: none;
+  background: transparent;
   color: inherit;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.cardButton:focus-visible {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: -2px;
+  border-radius: var(--radius-lg);
 }
 
 .imageWrapper {
@@ -199,4 +212,10 @@
   color: var(--color-primary-600);
   cursor: pointer;
   font-size: var(--font-size-sm);
+}
+
+/* Preview modal: wider than the shared default (36rem) so the 16/9 carousel
+   fits comfortably. */
+.previewModal {
+  max-width: 48rem;
 }
