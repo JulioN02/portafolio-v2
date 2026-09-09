@@ -403,6 +403,61 @@
   font-size: inherit;
 }
 
+/* ── Technical sections (technicalExplanation + technicalImages) ── */
+.technicalSection {
+  margin-top: var(--spacing-2xl);
+}
+
+/* The rich body reuses the fullDescription card styles; neutralize the card's
+   own top margin when nested under a technical section. */
+.technicalSection .fullDescription {
+  margin-top: 0;
+}
+
+.sectionTitle {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-neutral-900);
+  margin: 0 0 var(--spacing-lg);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 2px solid var(--color-primary-100);
+}
+
+.technicalGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--spacing-sm);
+}
+
+.technicalThumb {
+  padding: 0;
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-neutral-50);
+  cursor: pointer;
+  aspect-ratio: 4 / 3;
+  transition: border-color var(--transition-fast);
+}
+
+@media (hover: hover) {
+  .technicalThumb:hover {
+    border-color: var(--color-primary-300);
+  }
+}
+
+.technicalThumb:focus-visible {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: 2px;
+}
+
+.technicalImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 /* ── Error State ── */
 .error {
   text-align: center;
