@@ -1,18 +1,19 @@
-import { Link } from 'react-router-dom';
 import { sanitizeHtml } from '@jsoft/shared';
 import type { ProductResponse } from '@jsoft/shared';
 import styles from './ProductCard.module.css';
 
 interface ProductCardProps {
   product: ProductResponse;
+  /** Fired when the card is activated (opens the product preview modal). */
+  onSelect: (product: ProductResponse) => void;
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, onSelect }: ProductCardProps) {
   const imageUrl = product.images[0] || 'https://placehold.co/400x300/e5e7eb/9ca3af?text=Sin+imagen';
 
   return (
     <article className={styles.card}>
-      <Link to={`/productos/${product.slug}`} className={styles.link}>
+      <button type="button" className={styles.link} onClick={() => onSelect(product)}>
         <div className={styles.imageWrapper}>
           <img
             src={imageUrl}
@@ -29,11 +30,11 @@ export function ProductCard({ product }: ProductCardProps) {
           <span className={styles.classification}>{product.classification}</span>
           <h3 className={styles.title}>{product.title}</h3>
           <p
-          className={styles.description}
-          dangerouslySetInnerHTML={{ __html: sanitizeHtml(product.shortDescription) }}
-        />
+            className={styles.description}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(product.shortDescription) }}
+          />
         </div>
-      </Link>
+      </button>
     </article>
   );
 }

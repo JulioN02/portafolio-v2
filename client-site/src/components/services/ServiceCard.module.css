@@ -23,9 +23,24 @@
 }
 
 .link {
+  /* Button reset — the whole card is one activatable element. Also applies to
+     the optional Link fallback (home featured teaser), so keep decoration off. */
   display: block;
-  text-decoration: none;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
   color: inherit;
+  text-align: left;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: -2px;
+  border-radius: var(--radius-lg);
 }
 
 .imageWrapper {

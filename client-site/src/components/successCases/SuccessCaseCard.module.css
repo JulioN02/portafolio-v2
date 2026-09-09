@@ -23,9 +23,22 @@
 }
 
 .link {
+  /* Button reset — the whole card is one activatable element */
   display: block;
-  text-decoration: none;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
   color: inherit;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: -2px;
+  border-radius: var(--radius-lg);
 }
 
 .imageWrapper {
