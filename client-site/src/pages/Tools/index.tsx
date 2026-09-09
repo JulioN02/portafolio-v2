@@ -1,7 +1,10 @@
 import { useState } from 'react';
+import { Modal } from '@jsoft/shared';
+import type { ToolResponse } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useTools, useClassifications } from '../../hooks/useTools';
 import { ToolCard } from '../../components/tools/ToolCard';
+import { ToolDetailModal } from '../../components/tools/ToolDetailModal';
 import { Pagination } from '../../components/common/Pagination';
 import { Loading } from '../../components/common/Loading';
 import { MetaTags } from '../../components/seo/MetaTags';
@@ -13,6 +16,7 @@ export function ToolsPage() {
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [classification, setClassification] = useState<string>('');
+  const [selectedTool, setSelectedTool] = useState<ToolResponse | null>(null);
 
   const { data, isLoading, error } = useTools({
     filter: {
@@ -67,7 +71,7 @@ export function ToolsPage() {
           <>
             <div className={styles.grid}>
               {data.data.map((tool) => (
-                <ToolCard key={tool.id} tool={tool} />
+                <ToolCard key={tool.id} tool={tool} onSelect={setSelectedTool} />
               ))}
             </div>
 
@@ -86,6 +90,18 @@ export function ToolsPage() {
           </div>
         )}
       </div>
+
+      {/* Tool preview→expand modal (zero fetch — fed by the list payload) */}
+      {selectedTool && (
+        <Modal
+          isOpen
+          onClose={() => setSelectedTool(null)}
+          title={selectedTool.title}
+          className={styles.toolModal}
+        >
+          <ToolDetailModal tool={selectedTool} />
+        </Modal>
+      )}
     </div>
   );
 }
