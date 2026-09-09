@@ -48,6 +48,23 @@ const REQUIRED_KEYS = [
   'contactStrip.linkedin',
   'contactStrip.cv',
   'contactStrip.cvAria',
+  // project detail modal preview→expand (tools-ux-improvements)
+  'projectDetailModal.expand',
+  'projectDetailModal.collapse',
+  'projectDetailModal.close',
+  'projectDetailModal.loading',
+  'projectDetailModal.error',
+  'projectDetailModal.errorConnection',
+  'projectDetailModal.fullDescription',
+  'projectDetailModal.technicalExplanation',
+  'projectDetailModal.technicalImages',
+  'projectDetailModal.viewRepository',
+  'projectDetailModal.type.service',
+  'projectDetailModal.type.product',
+  'projectDetailModal.type.tool',
+  'projectDetailModal.type.successCase',
+  'projectDetailModal.type.project',
+  'projectDetailModal.type.laboratorio',
 ] as const;
 
 const BANNED_CLAIMS = [
@@ -130,5 +147,16 @@ describe('i18n translations (home-redesign RHP-1..RHP-5, RHP-7, RHP-8)', () => {
     expect(translations.es['statsStrip.availability']).toMatch(/trazabilidad/i);
     expect(translations.en['statsStrip.availability']).toMatch(/availability/i);
     expect(translations.en['statsStrip.availability']).toMatch(/traceability/i);
+  });
+
+  it('has the projectDetailModal expand/collapse and repo labels in both languages', () => {
+    expect(translations.es['projectDetailModal.expand']).toBe('Ver completo');
+    expect(translations.en['projectDetailModal.expand']).toBe('View full details');
+    expect(translations.es['projectDetailModal.collapse']).toBe('Ver menos');
+    expect(translations.en['projectDetailModal.collapse']).toBe('Show less');
+    expect(translations.es['projectDetailModal.viewRepository']).toBe('Ver repositorio →');
+    expect(translations.en['projectDetailModal.viewRepository']).toBe('View repository →');
+    expect(translations.es['projectDetailModal.type.project']).toBe('Proyecto');
+    expect(translations.en['projectDetailModal.type.project']).toBe('Project');
   });
 });

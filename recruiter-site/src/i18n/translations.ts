@@ -165,6 +165,24 @@ export const translations: Record<Language, Record<string, string>> = {
     'blogPostContent.media.expand': 'Ampliar',
     'blogPostContent.galleryImageAlt': '{title} — Imagen {index} de {total}',
 
+    // =========== PROJECT DETAIL MODAL (preview→expand) ===========
+    'projectDetailModal.expand': 'Ver completo',
+    'projectDetailModal.collapse': 'Ver menos',
+    'projectDetailModal.close': 'Cerrar',
+    'projectDetailModal.loading': 'Cargando detalles técnicos...',
+    'projectDetailModal.error': 'No se pudieron cargar los detalles del proyecto.',
+    'projectDetailModal.errorConnection': 'Error de conexión',
+    'projectDetailModal.fullDescription': 'Descripción',
+    'projectDetailModal.technicalExplanation': 'Detalles técnicos',
+    'projectDetailModal.technicalImages': 'Imágenes técnicas',
+    'projectDetailModal.viewRepository': 'Ver repositorio →',
+    'projectDetailModal.type.service': 'Servicio',
+    'projectDetailModal.type.product': 'Producto',
+    'projectDetailModal.type.tool': 'Herramienta',
+    'projectDetailModal.type.successCase': 'Caso de éxito',
+    'projectDetailModal.type.project': 'Proyecto',
+    'projectDetailModal.type.laboratorio': 'Laboratorio',
+
     // =========== BLOG CARD ===========
     'blogCard.readArticle': 'Leer artículo: {title}',
 
@@ -366,6 +384,24 @@ export const translations: Record<Language, Record<string, string>> = {
     'blogPostContent.lightbox.dialogLabel': 'Image viewer',
     'blogPostContent.media.expand': 'Expand',
     'blogPostContent.galleryImageAlt': '{title} — Image {index} of {total}',
+
+    // =========== PROJECT DETAIL MODAL (preview→expand) ===========
+    'projectDetailModal.expand': 'View full details',
+    'projectDetailModal.collapse': 'Show less',
+    'projectDetailModal.close': 'Close',
+    'projectDetailModal.loading': 'Loading technical details...',
+    'projectDetailModal.error': 'Could not load the project details.',
+    'projectDetailModal.errorConnection': 'Connection error',
+    'projectDetailModal.fullDescription': 'Description',
+    'projectDetailModal.technicalExplanation': 'Technical details',
+    'projectDetailModal.technicalImages': 'Technical images',
+    'projectDetailModal.viewRepository': 'View repository →',
+    'projectDetailModal.type.service': 'Service',
+    'projectDetailModal.type.product': 'Product',
+    'projectDetailModal.type.tool': 'Tool',
+    'projectDetailModal.type.successCase': 'Success case',
+    'projectDetailModal.type.project': 'Project',
+    'projectDetailModal.type.laboratorio': 'Lab',
 
     // =========== BLOG CARD ===========
     'blogCard.readArticle': 'Read article: {title}',
