@@ -34,17 +34,16 @@ describe('i18n blogPostContent keyset', () => {
   });
 });
 
-// tools-ux-improvements keyset (toolDetail preview→expand modal keys)
+// toolDetail keyset — expand doubles as the preview modal's "Ver Completo"
+// label; collapse and modalAria are dead after the preview→detail refactor.
 const TOOL_DETAIL_KEYS = [
   'toolDetail.expand',
-  'toolDetail.collapse',
   'toolDetail.technicalExplanation',
   'toolDetail.technicalImages',
-  'toolDetail.modalAria',
 ] as const;
 
-describe('i18n toolDetail keyset (tools-ux-improvements)', () => {
-  it('has all 5 keys in es and en', () => {
+describe('i18n toolDetail keyset', () => {
+  it('has all 3 keys in es and en', () => {
     for (const key of TOOL_DETAIL_KEYS) {
       expect(translations.es[key], `es:${key}`).toBeDefined();
       expect(translations.en[key], `en:${key}`).toBeDefined();
@@ -54,14 +53,41 @@ describe('i18n toolDetail keyset (tools-ux-improvements)', () => {
   it('uses translated values (not key fallbacks)', () => {
     expect(translations.es['toolDetail.expand']).toBe('Ver completo');
     expect(translations.en['toolDetail.expand']).toBe('View full details');
-    expect(translations.es['toolDetail.collapse']).toBe('Ver menos');
-    expect(translations.en['toolDetail.collapse']).toBe('Show less');
     expect(translations.es['toolDetail.technicalExplanation']).toBe('Detalles técnicos');
     expect(translations.en['toolDetail.technicalExplanation']).toBe('Technical details');
     expect(translations.es['toolDetail.technicalImages']).toBe('Imágenes técnicas');
     expect(translations.en['toolDetail.technicalImages']).toBe('Technical images');
-    expect(translations.es['toolDetail.modalAria']).toBe('Detalles de la herramienta');
-    expect(translations.en['toolDetail.modalAria']).toBe('Tool details');
+  });
+});
+
+// preview-to-detail-page keyset: technical sections on service/product detail pages.
+const SERVICE_DETAIL_TECH_KEYS = [
+  'serviceDetail.technicalExplanation',
+  'serviceDetail.technicalImages',
+] as const;
+
+const PRODUCT_DETAIL_TECH_KEYS = [
+  'productDetail.technicalExplanation',
+  'productDetail.technicalImages',
+] as const;
+
+describe('i18n serviceDetail/productDetail technical keyset (preview-to-detail-page)', () => {
+  it('has every new key in es and en', () => {
+    for (const key of [...SERVICE_DETAIL_TECH_KEYS, ...PRODUCT_DETAIL_TECH_KEYS]) {
+      expect(translations.es[key], `es:${key}`).toBeDefined();
+      expect(translations.en[key], `en:${key}`).toBeDefined();
+    }
+  });
+
+  it('uses translated values (not key fallbacks)', () => {
+    expect(translations.es['serviceDetail.technicalExplanation']).toBe('Detalles técnicos');
+    expect(translations.en['serviceDetail.technicalExplanation']).toBe('Technical details');
+    expect(translations.es['serviceDetail.technicalImages']).toBe('Imágenes técnicas');
+    expect(translations.en['serviceDetail.technicalImages']).toBe('Technical images');
+    expect(translations.es['productDetail.technicalExplanation']).toBe('Detalles técnicos');
+    expect(translations.en['productDetail.technicalExplanation']).toBe('Technical details');
+    expect(translations.es['productDetail.technicalImages']).toBe('Imágenes técnicas');
+    expect(translations.en['productDetail.technicalImages']).toBe('Technical images');
   });
 });
 
