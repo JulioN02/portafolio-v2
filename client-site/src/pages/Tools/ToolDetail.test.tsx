@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import type { ToolResponse } from '@jsoft/shared';
 import { LanguageProvider } from '../../i18n/LanguageContext';
 
-// Deterministic embla substitute (jsdom cannot measure layouts) — the inline
-// ToolDetailModal renders a MediaCarousel, so the same hoisted fake used by
-// BlogPostContent/ToolDetailModal tests applies here.
+// Deterministic embla substitute (jsdom cannot measure layouts) — the full
+// tool page renders a MediaCarousel, so the same hoisted fake used by
+// BlogPostContent/EntityPreviewModal tests applies here.
 const { emblaState } = vi.hoisted(() => ({
   emblaState: {
     slideCount: 3,
@@ -143,8 +143,13 @@ describe('ToolDetailPage', () => {
     );
   });
 
-  it('renders a top back link and the ToolDetailModal inline on success', async () => {
-    const tool = makeTool();
+  it('renders the full tool content inline (no modal) on success', async () => {
+    const tool = makeTool({
+      fullDescription: '<p>Descripción completa de la herramienta</p>',
+      technicalExplanation: '<p>Explicación técnica de la herramienta</p>',
+      technicalImages: ['https://example.com/tech1.png', 'https://example.com/tech2.png'],
+      images: ['https://example.com/cover.png', 'https://example.com/g1.png'],
+    });
     mockQuery.mockReturnValue({ data: tool, isLoading: false, error: null });
 
     const { container } = renderPage();
@@ -155,13 +160,79 @@ describe('ToolDetailPage', () => {
       '/herramientas',
     );
 
-    // The SAME shared modal component renders inline (not an overlay dialog).
-    expect(screen.getByRole('article', { name: 'Detalles de la herramienta' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Herramienta de prueba' })).toBeInTheDocument();
+    // Full content rendered directly in the page — NO modal overlay, NO
+    // inline modal article, NO expanded-state component.
     expect(screen.queryByRole('dialog')).toBeNull();
+    expect(screen.queryByRole('article')).toBeNull();
+    expect(screen.getByRole('heading', { level: 1, name: 'Herramienta de prueba' })).toBeInTheDocument();
+    expect(screen.getByText('Desarrollo')).toBeInTheDocument();
+    expect(screen.getByText('Descripción corta de la herramienta')).toBeInTheDocument();
 
-    // Expanded by default: full description visible without an expand click.
-    expect(await screen.findByText('Descripción completa de la herramienta')).toBeInTheDocument();
+    // Carousel region (MediaCarousel) with cover-first slides.
+    expect(screen.getByRole('region', { name: 'Galería' })).toBeInTheDocument();
+    const carouselImages = container.querySelectorAll('.mc-slide img');
+    expect(carouselImages).toHaveLength(2);
+    expect(carouselImages[0]).toHaveAttribute('src', 'https://example.com/cover.png');
+
+    // Full description + technical explanation headings and sanitized content.
+    expect(
+      await screen.findByRole('heading', { name: 'Descripción completa' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Detalles técnicos' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Descripción completa de la herramienta')).toBeInTheDocument();
+    expect(screen.getByText('Explicación técnica de la herramienta')).toBeInTheDocument();
+
+    // Technical images grid renders each image.
+    const techImages = container.querySelectorAll('img[src^="https://example.com/tech"]');
+    expect(techImages).toHaveLength(2);
+
+    // Scripts never make it into the DOM (sanitized pipeline).
     expect(container.querySelector('script')).toBeNull();
+  });
+
+  it('omits technical sections when the optional fields are absent', async () => {
+    mockQuery.mockReturnValue({ data: makeTool(), isLoading: false, error: null });
+
+    renderPage();
+
+    expect(
+      await screen.findByRole('heading', { name: 'Descripción completa' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Detalles técnicos' })).toBeNull();
+    expect(screen.queryByRole('heading', { name: 'Imágenes técnicas' })).toBeNull();
+  });
+
+  it('shows the requiresInstall badge only when the tool requires installation', async () => {
+    mockQuery.mockReturnValue({
+      data: makeTool({ requiresInstall: true }),
+      isLoading: false,
+      error: null,
+    });
+
+    renderPage();
+
+    expect(await screen.findByText('⚙️ Requiere instalación')).toBeInTheDocument();
+  });
+
+  it('opens the lightbox when a carousel slide is clicked', async () => {
+    mockQuery.mockReturnValue({
+      data: makeTool({ images: ['https://example.com/cover.png', 'https://example.com/g1.png'] }),
+      isLoading: false,
+      error: null,
+    });
+    emblaState.slideCount = 2;
+
+    renderPage();
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Herramienta de prueba — Imagen 1 de 2' }),
+    );
+
+    const dialog = await screen.findByRole('dialog');
+    expect(dialog).toHaveAttribute('aria-label', 'Visor de imágenes');
+    expect(dialog.querySelector('img')).toHaveAttribute('src', 'https://example.com/cover.png');
+    expect(screen.getByText('1 de 2')).toBeInTheDocument();
   });
 });
