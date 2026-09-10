@@ -113,6 +113,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'serviceDetail.includes': 'Incluye:',
     'serviceDetail.requestInfo': 'Solicitar información',
     'serviceDetail.fullDescription': 'Descripción completa',
+    'serviceDetail.technicalExplanation': 'Detalles técnicos',
+    'serviceDetail.technicalImages': 'Imágenes técnicas',
 
     // =========== PRODUCTS ===========
     'products.meta.title': 'Productos | J Soft Solutions',
@@ -138,6 +140,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'productDetail.viewWebsite': 'Ver sitio web del producto',
     'productDetail.requestInfo': 'Solicitar información',
     'productDetail.fullDescription': 'Descripción completa',
+    'productDetail.technicalExplanation': 'Detalles técnicos',
+    'productDetail.technicalImages': 'Imágenes técnicas',
 
     // =========== TOOLS ===========
     'tools.meta.title': 'Herramientas | J Soft Solutions',
@@ -160,10 +164,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'toolDetail.requestInfo': 'Solicitar información',
     'toolDetail.fullDescription': 'Descripción completa',
     'toolDetail.expand': 'Ver completo',
-    'toolDetail.collapse': 'Ver menos',
     'toolDetail.technicalExplanation': 'Detalles técnicos',
     'toolDetail.technicalImages': 'Imágenes técnicas',
-    'toolDetail.modalAria': 'Detalles de la herramienta',
 
     // =========== SUCCESS CASES ===========
     'successCases.meta.title': 'Casos de Éxito | J Soft Solutions',
@@ -405,6 +407,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'serviceDetail.includes': 'Includes:',
     'serviceDetail.requestInfo': 'Request information',
     'serviceDetail.fullDescription': 'Full description',
+    'serviceDetail.technicalExplanation': 'Technical details',
+    'serviceDetail.technicalImages': 'Technical images',
 
     // =========== PRODUCTS ===========
     'products.meta.title': 'Products | J Soft Solutions',
@@ -430,6 +434,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'productDetail.viewWebsite': 'View product website',
     'productDetail.requestInfo': 'Request information',
     'productDetail.fullDescription': 'Full description',
+    'productDetail.technicalExplanation': 'Technical details',
+    'productDetail.technicalImages': 'Technical images',
 
     // =========== TOOLS ===========
     'tools.meta.title': 'Tools | J Soft Solutions',
@@ -452,10 +458,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'toolDetail.requestInfo': 'Request information',
     'toolDetail.fullDescription': 'Full description',
     'toolDetail.expand': 'View full details',
-    'toolDetail.collapse': 'Show less',
     'toolDetail.technicalExplanation': 'Technical details',
     'toolDetail.technicalImages': 'Technical images',
-    'toolDetail.modalAria': 'Tool details',
 
     // =========== SUCCESS CASES ===========
     'successCases.meta.title': 'Success Cases | J Soft Solutions',

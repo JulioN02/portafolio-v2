@@ -1,7 +1,10 @@
 import { useState } from 'react';
+import { Modal } from '@jsoft/shared';
+import type { ServiceResponse } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useServices } from '../../hooks/useServices';
 import { ServiceCard } from '../../components/services/ServiceCard';
+import { EntityPreviewModal } from '../../components/preview/EntityPreviewModal';
 import { Loading } from '../../components/common/Loading';
 import { PageHeader } from '../../components/common/PageHeader';
 import { MetaTags } from '../../components/seo/MetaTags';
@@ -12,6 +15,7 @@ export function ServicesPage() {
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [classification, setClassification] = useState<string>('');
+  const [selectedService, setSelectedService] = useState<ServiceResponse | null>(null);
 
   const { data, isLoading, error } = useServices({
     filter: {
@@ -68,7 +72,7 @@ export function ServicesPage() {
           <>
             <div className={styles.grid}>
               {data.data.map((service) => (
-                <ServiceCard key={service.id} service={service} />
+                <ServiceCard key={service.id} service={service} onSelect={setSelectedService} />
               ))}
             </div>
 
@@ -105,6 +109,21 @@ export function ServicesPage() {
           </div>
         )}
       </div>
+
+      {/* Service preview modal (zero fetch — fed by the list payload) */}
+      {selectedService && (
+        <Modal
+          isOpen
+          onClose={() => setSelectedService(null)}
+          title={selectedService.title}
+          className={styles.previewModal}
+        >
+          <EntityPreviewModal
+            preview={{ type: 'service', entity: selectedService }}
+            onClose={() => setSelectedService(null)}
+          />
+        </Modal>
+      )}
     </div>
   );
 }

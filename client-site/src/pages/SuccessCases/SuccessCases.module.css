@@ -119,3 +119,9 @@
   background-color: var(--color-danger-50);
   border-radius: var(--radius-md);
 }
+
+/* Preview modal: wider than the shared default (36rem) so the 16/9 carousel
+   fits comfortably. */
+.previewModal {
+  max-width: 48rem;
+}

@@ -1,6 +1,7 @@
 import { useState, type SyntheticEvent } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { renderSimulatorEmbeds, sanitizeHtml } from '@jsoft/shared';
+import { renderSimulatorEmbeds, sanitizeHtml, Lightbox } from '@jsoft/shared';
+import type { LightboxItem } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useServiceBySlug } from '../../hooks/useServices';
 import { Loading } from '../../components/common/Loading';
@@ -11,12 +12,21 @@ import styles from './ServiceDetail.module.css';
 
 const FALLBACK_IMG = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="800" height="600" fill="%23e5e7eb"%3E%3Crect width="800" height="600"/%3E%3Ctext x="400" y="300" text-anchor="middle" dy=".3em" font-size="20" fill="%239ca3af"%3ESin imagen%3C/text%3E%3C/svg%3E';
 
+interface LightboxState {
+  open: boolean;
+  items: LightboxItem[];
+  index: number;
+}
+
+const CLOSED_LIGHTBOX: LightboxState = { open: false, items: [], index: 0 };
+
 export function ServiceDetailPage() {
   const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const { data: service, isLoading, error } = useServiceBySlug(slug || '');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [lightbox, setLightbox] = useState<LightboxState>(CLOSED_LIGHTBOX);
 
   if (isLoading) return <Loading fullPage message={t('serviceDetail.loading')} />;
 
@@ -42,6 +52,23 @@ export function ServiceDetailPage() {
 
   const prevImage = () => {
     setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  const technicalImages = service.technicalImages ?? [];
+
+  const openFromTechnicalImage = (index: number) => {
+    const items = technicalImages.map(
+      (src): LightboxItem => ({ kind: 'image', src }),
+    );
+    setLightbox({ open: true, items, index });
+  };
+
+  const lightboxLabels = {
+    close: t('blogPostContent.lightbox.close'),
+    prev: t('blogPostContent.lightbox.prev'),
+    next: t('blogPostContent.lightbox.next'),
+    counter: t('blogPostContent.lightbox.counter'),
+    dialogLabel: t('blogPostContent.lightbox.dialogLabel'),
   };
 
   return (
@@ -144,7 +171,51 @@ export function ServiceDetailPage() {
             <div dangerouslySetInnerHTML={{ __html: renderSimulatorEmbeds(service.fullDescription) }} />
           </div>
         )}
+
+        {/* Technical explanation (rich, sanitized, embeds preserved) */}
+        {service.technicalExplanation && (
+          <section className={styles.technicalSection}>
+            <h2 className={styles.sectionTitle}>{t('serviceDetail.technicalExplanation')}</h2>
+            <div
+              className={styles.fullDescription}
+              dangerouslySetInnerHTML={{ __html: renderSimulatorEmbeds(service.technicalExplanation) }}
+            />
+          </section>
+        )}
+
+        {/* Technical images grid → Lightbox */}
+        {technicalImages.length > 0 && (
+          <section className={styles.technicalSection}>
+            <h2 className={styles.sectionTitle}>{t('serviceDetail.technicalImages')}</h2>
+            <div className={styles.technicalGrid}>
+              {technicalImages.map((src, index) => (
+                <button
+                  key={src}
+                  type="button"
+                  className={styles.technicalThumb}
+                  onClick={() => openFromTechnicalImage(index)}
+                  aria-label={t('blogPostContent.galleryImageAlt', {
+                    title: service.title,
+                    index: index + 1,
+                    total: technicalImages.length,
+                  })}
+                >
+                  <img src={src} alt="" className={styles.technicalImage} loading="lazy" />
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
+
+      {/* Technical images Lightbox */}
+      <Lightbox
+        isOpen={lightbox.open}
+        items={lightbox.items}
+        initialIndex={lightbox.index}
+        labels={lightboxLabels}
+        onClose={() => setLightbox(CLOSED_LIGHTBOX)}
+      />
 
       {/* Contact Modal */}
       <Modal
