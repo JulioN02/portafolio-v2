@@ -115,6 +115,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'serviceDetail.fullDescription': 'Descripción completa',
     'serviceDetail.technicalExplanation': 'Detalles técnicos',
     'serviceDetail.technicalImages': 'Imágenes técnicas',
+    'serviceDetail.viewWebsite': 'Ver sitio web →',
 
     // =========== PRODUCTS ===========
     'products.meta.title': 'Productos | J Soft Solutions',
@@ -166,6 +167,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'toolDetail.expand': 'Ver completo',
     'toolDetail.technicalExplanation': 'Detalles técnicos',
     'toolDetail.technicalImages': 'Imágenes técnicas',
+    'toolDetail.viewWebsite': 'Ver sitio web →',
 
     // =========== SUCCESS CASES ===========
     'successCases.meta.title': 'Casos de Éxito | J Soft Solutions',
@@ -409,6 +411,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'serviceDetail.fullDescription': 'Full description',
     'serviceDetail.technicalExplanation': 'Technical details',
     'serviceDetail.technicalImages': 'Technical images',
+    'serviceDetail.viewWebsite': 'View website →',
 
     // =========== PRODUCTS ===========
     'products.meta.title': 'Products | J Soft Solutions',
@@ -460,6 +463,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'toolDetail.expand': 'View full details',
     'toolDetail.technicalExplanation': 'Technical details',
     'toolDetail.technicalImages': 'Technical images',
+    'toolDetail.viewWebsite': 'View website →',
 
     // =========== SUCCESS CASES ===========
     'successCases.meta.title': 'Success Cases | J Soft Solutions',
