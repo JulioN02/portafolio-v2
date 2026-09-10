@@ -212,13 +212,7 @@ export function ProductForm({ initialData, onSubmit, isLoading }: ProductFormPro
 
         <div className={formStyles.formGroup}>
           <label className={formStyles.formLabel} htmlFor="technicalExplanation">{t('form.technicalExplanation')}</label>
-          <textarea
-            id="technicalExplanation"
-            className={`${formStyles.formInput} ${formStyles.formTextarea}`}
-            value={technicalExplanation}
-            onChange={(e) => setTechnicalExplanation(e.target.value)}
-            placeholder={t('form.technicalExplanationPlaceholder')}
-          />
+          <RichTextEditor value={technicalExplanation} onChange={setTechnicalExplanation} minHeight={200} lang={lang} simulatorApi={simulatorPickerApi} />
           <p className={formStyles.hint}>{t('form.technicalExplanationHint')}</p>
         </div>
 

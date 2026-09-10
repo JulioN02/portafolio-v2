@@ -21,6 +21,7 @@ export function ToolForm({ initialData, onSubmit, isLoading }: ToolFormProps) {
   const [shortDescription, setShortDescription] = useState(initialData?.shortDescription || '');
   const [fullDescription, setFullDescription] = useState(initialData?.fullDescription || '');
   const [images, setImages] = useState<string[]>(initialData?.images || []);
+  const [externalLink, setExternalLink] = useState(initialData?.externalLink || '');
   const [requiresInstall, setRequiresInstall] = useState(initialData?.requiresInstall || false);
   const [featured, setFeatured] = useState(initialData?.featured || false);
   const [status, setStatus] = useState<string>(initialData?.status || 'DRAFT');
@@ -77,6 +78,7 @@ export function ToolForm({ initialData, onSubmit, isLoading }: ToolFormProps) {
         requiresInstall,
         featured,
         status: status as 'DRAFT' | 'PUBLISHED' | 'PRIVATE' | 'ARCHIVED',
+        externalLink: externalLink || undefined,
         technicalExplanation: technicalExplanation || undefined,
         technicalImages,
       };
@@ -153,6 +155,18 @@ export function ToolForm({ initialData, onSubmit, isLoading }: ToolFormProps) {
           <RichTextEditor value={fullDescription} onChange={setFullDescription} minHeight={250} lang={lang} simulatorApi={simulatorPickerApi} />
           {errors.fullDescription && <span className={formStyles.formError}>{errors.fullDescription}</span>}
         </div>
+        <div className={formStyles.formGroup}>
+          <label className={formStyles.formLabel} htmlFor="externalLink">{t('form.externalLink')}</label>
+          <input
+            id="externalLink"
+            type="url"
+            className={formStyles.formInput}
+            value={externalLink}
+            onChange={(e) => setExternalLink(e.target.value)}
+            placeholder={t('form.externalLinkPlaceholder')}
+          />
+          <p className={formStyles.hint}>{t('form.externalLinkHint')}</p>
+        </div>
       </fieldset>
 
       {/* Section 3: Images */}
@@ -188,13 +202,7 @@ export function ToolForm({ initialData, onSubmit, isLoading }: ToolFormProps) {
           <label className={formStyles.formLabel} htmlFor="technicalExplanation">
             {t('form.technicalExplanation')} <span className={formStyles.optional}>{t('common.optional')}</span>
           </label>
-          <textarea
-            id="technicalExplanation"
-            className={`${formStyles.formInput} ${formStyles.formTextarea}`}
-            value={technicalExplanation}
-            onChange={(e) => setTechnicalExplanation(e.target.value)}
-            placeholder={t('form.technicalExplanationPlaceholder')}
-          />
+          <RichTextEditor value={technicalExplanation} onChange={setTechnicalExplanation} minHeight={200} lang={lang} simulatorApi={simulatorPickerApi} />
           <p className={formStyles.hint}>{t('form.technicalExplanationHint')}</p>
         </div>
         <div className={formStyles.formGroup}>
