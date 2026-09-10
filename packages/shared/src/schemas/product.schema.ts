@@ -23,7 +23,13 @@ export const productSchema = z.object({
   status: postStatusEnum.default('DRAFT'),
   
   // Technical fields for recruiters (optional)
-  technicalExplanation: z.string().max(15000).optional(),
+  technicalExplanation: z
+    .string()
+    .max(20000, 'Technical explanation must be at most 20000 characters')
+    .refine((s) => getTextFromHTML(s).length <= 15000, {
+      message: 'Technical explanation text must be at most 15000 characters',
+    })
+    .optional(),
   technicalImages: z.array(z.string().url()).optional(),
 });
 

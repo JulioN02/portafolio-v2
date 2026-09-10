@@ -19,10 +19,17 @@ export const serviceSchema = z.object({
   fullDescription: z.string().min(50, 'Full description must be at least 50 characters'),
   includedItems: z.array(z.string().min(3)).min(1, 'At least one included item is required'),
   images: z.array(z.string().url()).min(1, 'At least one image is required'),
+  externalLink: z.string().url().or(z.literal('')).optional(),
   status: postStatusEnum.default('DRAFT'),
   
   // Technical fields for recruiters (optional)
-  technicalExplanation: z.string().max(15000).optional(),
+  technicalExplanation: z
+    .string()
+    .max(20000, 'Technical explanation must be at most 20000 characters')
+    .refine((s) => getTextFromHTML(s).length <= 15000, {
+      message: 'Technical explanation text must be at most 15000 characters',
+    })
+    .optional(),
   technicalImages: z.array(z.string().url()).optional(),
 });
 
