@@ -18,12 +18,19 @@ export const toolSchema = z.object({
     }, 'Short description must be between 10 and 700 characters'),
   fullDescription: z.string().min(50),
   images: z.array(z.string().url()).min(1),
+  externalLink: z.string().url().or(z.literal('')).optional(),
   requiresInstall: z.boolean().default(false),
   featured: z.boolean().default(false),
   status: postStatusEnum.default('DRAFT'),
   
   // Technical fields for recruiters (optional)
-  technicalExplanation: z.string().max(15000).optional(),
+  technicalExplanation: z
+    .string()
+    .max(20000, 'Technical explanation must be at most 20000 characters')
+    .refine((s) => getTextFromHTML(s).length <= 15000, {
+      message: 'Technical explanation text must be at most 15000 characters',
+    })
+    .optional(),
   technicalImages: z.array(z.string().url()).optional(),
 });
 
