@@ -47,6 +47,7 @@ export function EntityDetailContent({
   const projectBody = detail.body as string | undefined;
   const tags = (detail.tags as string[] | undefined) ?? [];
   const repositoryUrl = detail.repositoryUrl as string | undefined;
+  const externalLink = detail.externalLink as string | undefined;
   const videos = (detail.videos as string[] | undefined) ?? [];
   const links = (detail.links as string[] | undefined) ?? [];
 
@@ -130,6 +131,18 @@ export function EntityDetailContent({
           className={styles.repoLink}
         >
           {t('projectDetailModal.viewRepository')}
+        </a>
+      )}
+
+      {/* ── Service / Product / Tool branch: external website link ── */}
+      {!isProject && !isSuccessCase && externalLink && (
+        <a
+          href={externalLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.externalLink}
+        >
+          {t('projectDetailModal.viewExternalLink')}
         </a>
       )}
 

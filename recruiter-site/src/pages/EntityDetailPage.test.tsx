@@ -271,6 +271,73 @@ describe('EntityDetailPage (per-type content)', () => {
   });
 });
 
+describe('EntityDetailPage external link per type (spec entity-external-links)', () => {
+  it.each([
+    ['service', 'service-external'],
+    ['product', 'product-external'],
+    ['tool', 'tool-external'],
+  ])('renders the view-website link for %s when externalLink is present', async (tipo, href) => {
+    mockDetail.mockReturnValue(
+      resolvedDetail({
+        externalLink: `https://example.com/${href}`,
+        fullDescription: '<p>Descripción completa</p>',
+        images: ['https://example.com/cover.png'],
+      }),
+    );
+
+    renderPage(`/proyectos/${tipo}/prueba`);
+
+    const link = await screen.findByRole('link', { name: 'Ver sitio web →' });
+    expect(link).toHaveAttribute('href', `https://example.com/${href}`);
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  it('omits the view-website link for service/product/tool when externalLink is absent', async () => {
+    mockDetail.mockReturnValue(
+      resolvedDetail({ fullDescription: '<p>Descripción completa</p>' }),
+    );
+
+    renderPage('/proyectos/tool/tool-prueba');
+
+    await screen.findByText('Descripción completa');
+    expect(screen.queryByRole('link', { name: 'Ver sitio web →' })).toBeNull();
+  });
+
+  it('does not render the view-website link for project type (repo link only)', async () => {
+    mockDetail.mockReturnValue(
+      resolvedDetail({
+        body: '<p>Cuerpo</p>',
+        repositoryUrl: 'https://github.com/example/p',
+        externalLink: 'https://example.com/should-not-show',
+        images: [],
+      }),
+    );
+
+    renderPage('/proyectos/project/p');
+
+    await screen.findByText('Cuerpo');
+    expect(screen.getByRole('link', { name: 'Ver repositorio →' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Ver sitio web →' })).toBeNull();
+  });
+
+  it('does not render the view-website link for successCase type (native links only)', () => {
+    mockDetail.mockReturnValue(
+      resolvedDetail({
+        title: 'Caso de prueba',
+        shortDescription: undefined,
+        description: 'Descripción del caso',
+        externalLink: 'https://example.com/should-not-show',
+        images: ['https://example.com/cover.png'],
+      }),
+    );
+
+    renderPage('/proyectos/successCase/caso-prueba');
+
+    expect(screen.queryByRole('link', { name: 'Ver sitio web →' })).toBeNull();
+  });
+});
+
 describe('EntityDetailPage (media + delegation)', () => {
   it('dedups the cover image in the carousel slides', () => {
     mockDetail.mockReturnValue(

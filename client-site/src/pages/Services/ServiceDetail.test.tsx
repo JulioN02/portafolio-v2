@@ -160,3 +160,31 @@ describe('ServiceDetailPage technical sections (spec S11)', () => {
     expect(screen.getByText('1 de 2')).toBeInTheDocument();
   });
 });
+
+describe('ServiceDetailPage external link (spec entity-external-links)', () => {
+  it('renders the view-website link when externalLink is present', async () => {
+    mockQuery.mockReturnValue({
+      data: makeService({ externalLink: 'https://example.com/servicio' }),
+      isLoading: false,
+      error: null,
+    });
+
+    renderPage();
+
+    const link = await screen.findByRole('link', { name: 'Ver sitio web →' });
+    expect(link).toHaveAttribute('href', 'https://example.com/servicio');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  it('omits the view-website link when externalLink is absent', async () => {
+    mockQuery.mockReturnValue({ data: makeService(), isLoading: false, error: null });
+
+    renderPage();
+
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Servicio de prueba' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Ver sitio web →' })).toBeNull();
+  });
+});

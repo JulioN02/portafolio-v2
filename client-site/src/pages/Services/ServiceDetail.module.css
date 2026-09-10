@@ -230,6 +230,28 @@
   margin: 0;
 }
 
+/* ── External Link ── */
+.externalLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--color-primary-50);
+  color: var(--color-primary-700);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  transition: background-color var(--transition-fast);
+  width: fit-content;
+}
+
+@media (hover: hover) {
+  .externalLink:hover {
+    background-color: var(--color-primary-100);
+  }
+}
+
 /* ── Included Items ── */
 .included {
   background: linear-gradient(135deg, var(--color-neutral-50) 0%, var(--color-green-accent-50, #f0fdf4) 100%);

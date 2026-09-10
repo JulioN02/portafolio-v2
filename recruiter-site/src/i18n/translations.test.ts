@@ -58,6 +58,7 @@ const REQUIRED_KEYS = [
   'projectDetailModal.technicalExplanation',
   'projectDetailModal.technicalImages',
   'projectDetailModal.viewRepository',
+  'projectDetailModal.viewExternalLink',
   'projectDetailModal.type.service',
   'projectDetailModal.type.product',
   'projectDetailModal.type.tool',
@@ -157,6 +158,8 @@ describe('i18n translations (home-redesign RHP-1..RHP-5, RHP-7, RHP-8)', () => {
     expect(translations.en['projectDetailModal.expand']).toBe('View full details');
     expect(translations.es['projectDetailModal.viewRepository']).toBe('Ver repositorio →');
     expect(translations.en['projectDetailModal.viewRepository']).toBe('View repository →');
+    expect(translations.es['projectDetailModal.viewExternalLink']).toBe('Ver sitio web →');
+    expect(translations.en['projectDetailModal.viewExternalLink']).toBe('View website →');
     expect(translations.es['projectDetailModal.type.project']).toBe('Proyecto');
     expect(translations.en['projectDetailModal.type.project']).toBe('Project');
     expect(translations.es['projectDetailPage.backToProjects']).toBe('← Volver a proyectos');

@@ -148,6 +148,29 @@
   width: fit-content;
 }
 
+/* ── External Link (aligns under the install badge in the header) ── */
+.externalLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--color-primary-50);
+  color: var(--color-primary-700);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  transition: background-color var(--transition-fast);
+  width: fit-content;
+}
+
+@media (hover: hover) {
+  .externalLink:hover {
+    background-color: var(--color-primary-100);
+  }
+}
+
 /* ── Carousel ── */
 .gallery {
   margin-bottom: var(--spacing-xl);
