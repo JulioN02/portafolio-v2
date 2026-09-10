@@ -97,6 +97,7 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
   const [fullDescription, setFullDescription] = useState(initialData?.fullDescription || '');
   const [status, setStatus] = useState<string>(initialData?.status || 'DRAFT');
   const [images, setImages] = useState<string[]>(initialData?.images || []);
+  const [externalLink, setExternalLink] = useState(initialData?.externalLink || '');
   const [includedItems, setIncludedItems] = useState<string[]>(initialData?.includedItems || []);
   const [technicalExplanation, setTechnicalExplanation] = useState(initialData?.technicalExplanation || '');
   const [technicalImages, setTechnicalImages] = useState<string[]>(initialData?.technicalImages || []);
@@ -143,6 +144,7 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
         includedItems,
         images,
         status: status as ServiceInput['status'],
+        externalLink: externalLink || undefined,
         technicalExplanation: technicalExplanation || undefined,
         technicalImages,
       };
@@ -219,6 +221,18 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
           <RichTextEditor value={fullDescription} onChange={setFullDescription} minHeight={250} lang={lang} />
           {errors.fullDescription && <span className={formStyles.formError}>{errors.fullDescription}</span>}
         </div>
+        <div className={formStyles.formGroup}>
+          <label className={formStyles.formLabel} htmlFor="externalLink">{t('form.externalLink')}</label>
+          <input
+            id="externalLink"
+            type="url"
+            className={formStyles.formInput}
+            value={externalLink}
+            onChange={(e) => setExternalLink(e.target.value)}
+            placeholder={t('form.externalLinkPlaceholder')}
+          />
+          <p className={formStyles.hint}>{t('form.externalLinkHint')}</p>
+        </div>
       </fieldset>
 
       {/* Images Section */}
@@ -260,14 +274,7 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
           <label className={formStyles.formLabel} htmlFor="technicalExplanation">
             {t('services.technicalExplanation')}
           </label>
-          <textarea
-            id="technicalExplanation"
-            className={`${formStyles.formInput} ${formStyles.formTextarea}`}
-            value={technicalExplanation}
-            onChange={(e) => setTechnicalExplanation(e.target.value)}
-            placeholder={t('services.technicalExplanationPlaceholder')}
-            style={{ minHeight: '140px' }}
-          />
+          <RichTextEditor value={technicalExplanation} onChange={setTechnicalExplanation} minHeight={200} lang={lang} />
           <p className={formStyles.hint}>{t('services.technicalExplanationHint')}</p>
         </div>
       </fieldset>
