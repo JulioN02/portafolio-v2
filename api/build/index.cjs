@@ -43380,9 +43380,12 @@ var serviceSchema = external_exports.object({
   fullDescription: external_exports.string().min(50, "Full description must be at least 50 characters"),
   includedItems: external_exports.array(external_exports.string().min(3)).min(1, "At least one included item is required"),
   images: external_exports.array(external_exports.string().url()).min(1, "At least one image is required"),
+  externalLink: external_exports.string().url().or(external_exports.literal("")).optional(),
   status: postStatusEnum.default("DRAFT"),
   // Technical fields for recruiters (optional)
-  technicalExplanation: external_exports.string().max(15e3).optional(),
+  technicalExplanation: external_exports.string().max(2e4, "Technical explanation must be at most 20000 characters").refine((s) => getTextFromHTML(s).length <= 15e3, {
+    message: "Technical explanation text must be at most 15000 characters"
+  }).optional(),
   technicalImages: external_exports.array(external_exports.string().url()).optional()
 });
 var serviceUpdateSchema = serviceSchema.partial();
@@ -43411,7 +43414,9 @@ var productSchema = external_exports.object({
   featured: external_exports.boolean().default(false),
   status: postStatusEnum.default("DRAFT"),
   // Technical fields for recruiters (optional)
-  technicalExplanation: external_exports.string().max(15e3).optional(),
+  technicalExplanation: external_exports.string().max(2e4, "Technical explanation must be at most 20000 characters").refine((s) => getTextFromHTML(s).length <= 15e3, {
+    message: "Technical explanation text must be at most 15000 characters"
+  }).optional(),
   technicalImages: external_exports.array(external_exports.string().url()).optional()
 });
 var productUpdateSchema = productSchema.partial();
@@ -43437,11 +43442,14 @@ var toolSchema = external_exports.object({
   }, "Short description must be between 10 and 700 characters"),
   fullDescription: external_exports.string().min(50),
   images: external_exports.array(external_exports.string().url()).min(1),
+  externalLink: external_exports.string().url().or(external_exports.literal("")).optional(),
   requiresInstall: external_exports.boolean().default(false),
   featured: external_exports.boolean().default(false),
   status: postStatusEnum.default("DRAFT"),
   // Technical fields for recruiters (optional)
-  technicalExplanation: external_exports.string().max(15e3).optional(),
+  technicalExplanation: external_exports.string().max(2e4, "Technical explanation must be at most 20000 characters").refine((s) => getTextFromHTML(s).length <= 15e3, {
+    message: "Technical explanation text must be at most 15000 characters"
+  }).optional(),
   technicalImages: external_exports.array(external_exports.string().url()).optional()
 });
 var toolUpdateSchema = toolSchema.partial();
@@ -43663,6 +43671,7 @@ var SERVICE_SELECT = {
   fullDescription: true,
   includedItems: true,
   images: true,
+  externalLink: true,
   status: true,
   publishedAt: true,
   deletedAt: true,
@@ -43725,6 +43734,7 @@ var serviceService = {
         fullDescription: data.fullDescription,
         includedItems: data.includedItems,
         images: data.images,
+        externalLink: data.externalLink,
         status: data.status && data.status !== "ALL" ? data.status : "DRAFT",
         ...data.status === "PUBLISHED" && { publishedAt: /* @__PURE__ */ new Date() },
         technicalExplanation: data.technicalExplanation,
@@ -43742,6 +43752,7 @@ var serviceService = {
     if (data.fullDescription !== void 0) updateData.fullDescription = data.fullDescription;
     if (data.includedItems !== void 0) updateData.includedItems = data.includedItems;
     if (data.images !== void 0) updateData.images = data.images;
+    if (data.externalLink !== void 0) updateData.externalLink = data.externalLink;
     if (data.status !== void 0) {
       updateData.status = data.status;
       if (data.status === "PUBLISHED") {
@@ -44155,6 +44166,7 @@ var TOOL_SELECT = {
   shortDescription: true,
   fullDescription: true,
   images: true,
+  externalLink: true,
   requiresInstall: true,
   featured: true,
   status: true,
@@ -44227,6 +44239,7 @@ var toolService = {
         shortDescription: data.shortDescription,
         fullDescription: data.fullDescription,
         images: data.images,
+        externalLink: data.externalLink,
         requiresInstall: data.requiresInstall ?? false,
         featured: data.featured ?? false,
         status: data.status && data.status !== "ALL" ? data.status : "DRAFT",
@@ -44245,6 +44258,7 @@ var toolService = {
     if (data.shortDescription !== void 0) updateData.shortDescription = data.shortDescription;
     if (data.fullDescription !== void 0) updateData.fullDescription = data.fullDescription;
     if (data.images !== void 0) updateData.images = data.images;
+    if (data.externalLink !== void 0) updateData.externalLink = data.externalLink;
     if (data.requiresInstall !== void 0) updateData.requiresInstall = data.requiresInstall;
     if (data.featured !== void 0) updateData.featured = data.featured;
     if (data.status !== void 0) {
