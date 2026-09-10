@@ -52,6 +52,13 @@ describe('serviceService', () => {
       expect(result).toEqual(mockService);
     });
 
+    it('includes externalLink in the select', async () => {
+      (mockPrisma.service.findFirst as jest.Mock).mockResolvedValue(mockService);
+      await serviceService.findBySlug('desarrollo-web');
+      const select = (mockPrisma.service.findFirst as jest.Mock).mock.calls[0][0].select;
+      expect(select.externalLink).toBe(true);
+    });
+
     it('propagates errors', async () => {
       (mockPrisma.service.findFirst as jest.Mock).mockRejectedValue(new Error('boom'));
       await expect(serviceService.findBySlug('x')).rejects.toThrow('boom');
@@ -80,6 +87,15 @@ describe('serviceService', () => {
         expect.objectContaining({ data: expect.objectContaining({ status: 'DRAFT' }) }),
       );
       expect(result).toEqual(mockService);
+    });
+
+    it('persists externalLink when provided', async () => {
+      (mockPrisma.service.create as jest.Mock).mockResolvedValue({ ...mockService, externalLink: 'https://example.com' });
+      const result = await serviceService.create({ title: 'S', slug: 's', externalLink: 'https://example.com' } as any);
+      expect(mockPrisma.service.create).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.objectContaining({ externalLink: 'https://example.com' }) }),
+      );
+      expect(result.externalLink).toBe('https://example.com');
     });
 
     it('sets publishedAt when status is PUBLISHED', async () => {
@@ -113,6 +129,24 @@ describe('serviceService', () => {
       expect(mockPrisma.service.update).toHaveBeenCalledWith(
         expect.objectContaining({ data: expect.objectContaining({ status: 'PUBLISHED', publishedAt: expect.any(Date) }) }),
       );
+    });
+
+    it('updates externalLink when a new value is provided', async () => {
+      (mockPrisma.service.update as jest.Mock).mockResolvedValue({ ...mockService, externalLink: 'https://new.example.com' });
+      const result = await serviceService.update('s1', { externalLink: 'https://new.example.com' } as any);
+      expect(mockPrisma.service.update).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id: 's1' }, data: { externalLink: 'https://new.example.com' } }),
+      );
+      expect(result.externalLink).toBe('https://new.example.com');
+    });
+
+    it('preserves externalLink when update omits it', async () => {
+      (mockPrisma.service.update as jest.Mock).mockResolvedValue(mockService);
+      const result = await serviceService.update('s1', { title: 'S2' } as any);
+      expect(mockPrisma.service.update).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id: 's1' }, data: { title: 'S2' } }),
+      );
+      expect(result).toEqual(mockService);
     });
 
     it('propagates errors', async () => {

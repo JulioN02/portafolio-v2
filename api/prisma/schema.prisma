@@ -35,6 +35,7 @@ model Service {
   fullDescription     String
   includedItems       String[]
   images              String[]
+  externalLink        String?
   status              PostStatus  @default(DRAFT)
   deletedAt           DateTime?
 
@@ -90,6 +91,7 @@ model Tool {
   shortDescription  String
   fullDescription   String
   images            String[]
+  externalLink      String?
   requiresInstall   Boolean     @default(false)
   featured          Boolean     @default(false)
   status            PostStatus  @default(DRAFT)

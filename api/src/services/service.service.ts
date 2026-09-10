@@ -12,6 +12,7 @@ const SERVICE_SELECT = {
   fullDescription: true,
   includedItems: true,
   images: true,
+  externalLink: true,
   status: true,
   publishedAt: true,
   deletedAt: true,
@@ -82,6 +83,7 @@ export const serviceService = {
         fullDescription: data.fullDescription,
         includedItems: data.includedItems,
         images: data.images,
+        externalLink: data.externalLink,
         status: (data.status && data.status !== 'ALL') ? data.status : 'DRAFT',
         ...(data.status === 'PUBLISHED' && { publishedAt: new Date() }),
         technicalExplanation: data.technicalExplanation,
@@ -101,6 +103,7 @@ export const serviceService = {
     if (data.fullDescription !== undefined) updateData.fullDescription = data.fullDescription;
     if (data.includedItems !== undefined) updateData.includedItems = data.includedItems;
     if (data.images !== undefined) updateData.images = data.images;
+    if (data.externalLink !== undefined) updateData.externalLink = data.externalLink;
     if (data.status !== undefined) {
       updateData.status = data.status;
       if (data.status === 'PUBLISHED') {

@@ -11,6 +11,7 @@ const TOOL_SELECT = {
   shortDescription: true,
   fullDescription: true,
   images: true,
+  externalLink: true,
   requiresInstall: true,
   featured: true,
   status: true,
@@ -92,6 +93,7 @@ export const toolService = {
         shortDescription: data.shortDescription,
         fullDescription: data.fullDescription,
         images: data.images,
+        externalLink: data.externalLink,
         requiresInstall: data.requiresInstall ?? false,
         featured: data.featured ?? false,
         status: (data.status && data.status !== 'ALL') ? data.status : 'DRAFT',
@@ -112,6 +114,7 @@ export const toolService = {
     if (data.shortDescription !== undefined) updateData.shortDescription = data.shortDescription;
     if (data.fullDescription !== undefined) updateData.fullDescription = data.fullDescription;
     if (data.images !== undefined) updateData.images = data.images;
+    if (data.externalLink !== undefined) updateData.externalLink = data.externalLink;
     if (data.requiresInstall !== undefined) updateData.requiresInstall = data.requiresInstall;
     if (data.featured !== undefined) updateData.featured = data.featured;
     if (data.status !== undefined) {

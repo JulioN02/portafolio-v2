@@ -55,6 +55,13 @@ describe('Tool Service', () => {
 
       expect(result).toBeNull();
     });
+
+    it('includes externalLink in the select', async () => {
+      (mockPrisma.tool.findFirst as jest.Mock).mockResolvedValue({ id: '1' });
+      await toolService.findBySlug('test-tool');
+      const select = (mockPrisma.tool.findFirst as jest.Mock).mock.calls[0][0].select;
+      expect(select.externalLink).toBe(true);
+    });
   });
 
   describe('findFeatured', () => {
@@ -130,6 +137,29 @@ describe('Tool Service', () => {
         select: expect.any(Object),
       });
     });
+
+    it('persists externalLink when provided', async () => {
+      const toolData = {
+        title: 'Tool',
+        slug: 'tool',
+        classification: 'development',
+        shortDescription: 'Short desc',
+        fullDescription: 'Full description',
+        images: ['https://example.com/tool.jpg'],
+        externalLink: 'https://example.com',
+      };
+
+      const mockCreatedTool = { id: '1', ...toolData, deletedAt: null };
+      (mockPrisma.tool.create as jest.Mock).mockResolvedValue(mockCreatedTool);
+
+      const result = await toolService.create(toolData as any);
+
+      expect(mockPrisma.tool.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({ externalLink: 'https://example.com' }),
+        select: expect.any(Object),
+      });
+      expect(result.externalLink).toBe('https://example.com');
+    });
   });
 
   describe('update', () => {
@@ -145,6 +175,27 @@ describe('Tool Service', () => {
       expect(mockPrisma.tool.update).toHaveBeenCalledWith({
         where: { id: '1' },
         data: { requiresInstall: false },
+        select: expect.any(Object),
+      });
+    });
+
+    it('updates externalLink when a new value is provided', async () => {
+      (mockPrisma.tool.update as jest.Mock).mockResolvedValue({ id: '1', externalLink: 'https://new.example.com' });
+      const result = await toolService.update('1', { externalLink: 'https://new.example.com' } as any);
+      expect(mockPrisma.tool.update).toHaveBeenCalledWith({
+        where: { id: '1' },
+        data: { externalLink: 'https://new.example.com' },
+        select: expect.any(Object),
+      });
+      expect(result.externalLink).toBe('https://new.example.com');
+    });
+
+    it('preserves externalLink when update omits it', async () => {
+      (mockPrisma.tool.update as jest.Mock).mockResolvedValue({ id: '1', title: 'Tool' });
+      await toolService.update('1', { title: 'Tool 2' } as any);
+      expect(mockPrisma.tool.update).toHaveBeenCalledWith({
+        where: { id: '1' },
+        data: { title: 'Tool 2' },
         select: expect.any(Object),
       });
     });
