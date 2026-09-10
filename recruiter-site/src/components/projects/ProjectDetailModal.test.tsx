@@ -1,14 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { ProjectDetailModal } from './ProjectDetailModal';
 import { LanguageProvider } from '../../i18n/LanguageContext';
 import type { ProjectSummary } from '../../types';
-
-const mockDetail = vi.fn();
-
-vi.mock('../../hooks/useProjects', () => ({
-  useProjectDetail: (type: string, slug: string) => mockDetail(type, slug),
-}));
 
 // Deterministic embla substitute (jsdom cannot measure layouts). The fake
 // keeps the real hook's public surface and returns a STABLE api across
@@ -66,6 +61,29 @@ vi.mock('embla-carousel-react', () => ({
   },
 }));
 
+/** Detail-route stub so "Ver Completo" navigation can be asserted. */
+function DetailStub() {
+  return <div data-testid="detail-page">detail page</div>;
+}
+
+function renderModal(project: ProjectSummary, onClose = () => undefined) {
+  return render(
+    <MemoryRouter initialEntries={['/proyectos']}>
+      <Routes>
+        <Route path="/proyectos/:tipo/:slug" element={<DetailStub />} />
+        <Route
+          path="*"
+          element={
+            <LanguageProvider>
+              <ProjectDetailModal project={project} onClose={onClose} />
+            </LanguageProvider>
+          }
+        />
+      </Routes>
+    </MemoryRouter>,
+  );
+}
+
 function makeSummary(overrides: Partial<ProjectSummary> = {}): ProjectSummary {
   return {
     id: 'p1',
@@ -80,43 +98,14 @@ function makeSummary(overrides: Partial<ProjectSummary> = {}): ProjectSummary {
   };
 }
 
-function renderModal(project: ProjectSummary, onClose = () => undefined) {
-  return render(
-    <LanguageProvider>
-      <ProjectDetailModal project={project} onClose={onClose} />
-    </LanguageProvider>,
-  );
-}
-
-/** Resolved detail for a plain project row (no extra fields). */
-function resolvedProjectDetail() {
-  return {
-    data: {
-      id: 'p1',
-      title: 'Proyecto de prueba',
-      slug: 'proyecto-prueba',
-      body: '<p>Descripción rica</p>',
-      repositoryUrl: 'https://github.com/example/proyecto',
-      images: [],
-      tags: ['proyecto-rapido', 'web'],
-    },
-    isLoading: false,
-    isError: false,
-    error: null,
-  };
-}
-
 beforeEach(() => {
   emblaState.slideCount = 3;
   emblaState.api = null;
-  mockDetail.mockReset();
   localStorage.setItem('site_language', 'es');
 });
 
 describe('ProjectDetailModal (preview)', () => {
   it('renders i18n type label, classification, title, sanitized shortDescription and the carousel region', () => {
-    mockDetail.mockReturnValue(resolvedProjectDetail());
-
     const { container } = renderModal(
       makeSummary({
         images: ['https://example.com/cover.png', 'https://example.com/g1.png'],
@@ -137,8 +126,6 @@ describe('ProjectDetailModal (preview)', () => {
   });
 
   it('dedups the cover image when project.image matches images[0]', () => {
-    mockDetail.mockReturnValue(resolvedProjectDetail());
-
     const { container } = renderModal(
       makeSummary({
         image: 'https://example.com/cover.png',
@@ -155,7 +142,6 @@ describe('ProjectDetailModal (preview)', () => {
 
   it('uses the English dictionary when the site language is en', () => {
     localStorage.setItem('site_language', 'en');
-    mockDetail.mockReturnValue(resolvedProjectDetail());
 
     renderModal(
       makeSummary({
@@ -173,7 +159,6 @@ describe('ProjectDetailModal (preview)', () => {
 
 describe('ProjectDetailModal (lightbox)', () => {
   it('opens the lightbox at the clicked carousel slide and the counter syncs', async () => {
-    mockDetail.mockReturnValue(resolvedProjectDetail());
     emblaState.slideCount = 2;
 
     renderModal(
@@ -198,334 +183,23 @@ describe('ProjectDetailModal (lightbox)', () => {
   });
 });
 
-describe('ProjectDetailModal (loading / error)', () => {
-  it('shows the i18n loading message while the detail request is pending', () => {
-    mockDetail.mockReturnValue({
-      data: undefined,
-      isLoading: true,
-      isError: false,
-      error: null,
-    });
+describe('ProjectDetailModal (close)', () => {
+  it('closes via the close button and via the backdrop', () => {
+    const onClose = vi.fn();
+    renderModal(makeSummary(), onClose);
 
-    renderModal(makeSummary());
+    fireEvent.click(screen.getByRole('button', { name: 'Cerrar' }));
+    expect(onClose).toHaveBeenCalledTimes(1);
 
-    expect(screen.getByText('Cargando detalles técnicos...')).toBeInTheDocument();
-    // Preview still visible from the grid summary.
-    expect(screen.getByRole('heading', { name: 'Proyecto de prueba' })).toBeInTheDocument();
-  });
-
-  it('shows the i18n error message and the error detail on failure', () => {
-    mockDetail.mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      isError: true,
-      error: new Error('boom'),
-    });
-
-    renderModal(makeSummary());
-
-    expect(screen.getByText('No se pudieron cargar los detalles del proyecto.')).toBeInTheDocument();
-    expect(screen.getByText('boom')).toBeInTheDocument();
-  });
-
-  it('falls back to the i18n connection-error label when error is not an Error instance', () => {
-    mockDetail.mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      isError: true,
-      error: null,
-    });
-
-    renderModal(makeSummary());
-
-    expect(screen.getByText('No se pudieron cargar los detalles del proyecto.')).toBeInTheDocument();
-    expect(screen.getByText('Error de conexión')).toBeInTheDocument();
-  });
-});
-
-describe('ProjectDetailModal (preview→expand)', () => {
-  it('project branch: collapsed by default; expand reveals sanitized body, tags and i18n repository link', async () => {
-    mockDetail.mockReturnValue({
-      data: {
-        id: 'p1',
-        title: 'Proyecto de prueba',
-        slug: 'proyecto-prueba',
-        body: '<p>Descripción rica</p><script>alert("xss")</script><figure><img src="/uploads/x.png" alt="diagrama"></figure>',
-        repositoryUrl: 'https://github.com/example/proyecto',
-        images: [],
-        tags: ['proyecto-rapido', 'web'],
-      },
-      isLoading: false,
-      isError: false,
-      error: null,
-    });
-
-    const { container } = renderModal(makeSummary());
-
-    // Collapsed by default: no body/repo sections yet.
-    expect(screen.queryByText('Descripción rica')).toBeNull();
-    expect(screen.queryByRole('link', { name: 'Ver repositorio →' })).toBeNull();
-
-    const expandButton = screen.getByRole('button', { name: 'Ver completo' });
-    expect(expandButton).toHaveAttribute('aria-expanded', 'false');
-    fireEvent.click(expandButton);
-
-    // Sanitized body: script stripped, safe text + figure/img preserved.
-    expect(await screen.findByText('Descripción rica')).toBeInTheDocument();
-    expect(container.querySelector('script')).toBeNull();
-    expect(container.querySelector('figure img')).toHaveAttribute('src', '/uploads/x.png');
-    // Tags rendered as chips (classification also shows 'proyecto-rapido').
-    expect(screen.getAllByText('proyecto-rapido').length).toBeGreaterThanOrEqual(2);
-    expect(screen.getByText('web')).toBeInTheDocument();
-    // i18n repository link.
-    expect(screen.getByRole('link', { name: 'Ver repositorio →' })).toHaveAttribute(
-      'href',
-      'https://github.com/example/proyecto',
-    );
-    // Legacy technical sections hidden for real projects.
-    expect(screen.queryByRole('heading', { name: 'Detalles técnicos' })).toBeNull();
-    expect(screen.queryByRole('heading', { name: 'Imágenes técnicas' })).toBeNull();
-
-    // Control flips to collapse and content hides again.
-    const collapseButton = screen.getByRole('button', { name: 'Ver menos' });
-    expect(collapseButton).toHaveAttribute('aria-expanded', 'true');
-    fireEvent.click(collapseButton);
-    expect(screen.queryByText('Descripción rica')).toBeNull();
-  });
-
-  it('project branch: hides body and repository sections gracefully when fields are absent', async () => {
-    mockDetail.mockReturnValue({
-      data: {
-        id: 'p1',
-        title: 'Proyecto de prueba',
-        slug: 'proyecto-prueba',
-        body: '',
-        repositoryUrl: undefined,
-        images: [],
-        tags: [],
-      },
-      isLoading: false,
-      isError: false,
-      error: null,
-    });
-
-    renderModal(makeSummary());
-
-    fireEvent.click(screen.getByRole('button', { name: 'Ver completo' }));
-
-    expect(screen.queryByRole('heading', { name: 'Descripción' })).toBeNull();
-    expect(screen.queryByRole('link', { name: 'Ver repositorio →' })).toBeNull();
-  });
-
-  it('tool type: expand reveals fullDescription, technicalExplanation and technicalImages sections', async () => {
-    mockDetail.mockReturnValue({
-      data: {
-        id: 't1',
-        title: 'Tool de prueba',
-        slug: 'tool-prueba',
-        fullDescription: '<p>Descripción completa de la herramienta</p>',
-        technicalExplanation: '<p>Explicación técnica de la herramienta</p>',
-        technicalImages: ['https://example.com/tech1.png', 'https://example.com/tech2.png'],
-        images: [],
-      },
-      isLoading: false,
-      isError: false,
-      error: null,
-    });
-
-    const { container } = renderModal(
-      makeSummary({ type: 'tool', title: 'Tool de prueba' }),
-    );
-
-    // Preview shows no detail sections until expanded.
-    expect(screen.queryByRole('heading', { name: 'Descripción' })).toBeNull();
-
-    fireEvent.click(screen.getByRole('button', { name: 'Ver completo' }));
-
-    expect(await screen.findByRole('heading', { name: 'Descripción' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Detalles técnicos' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Imágenes técnicas' })).toBeInTheDocument();
-    expect(await screen.findByText('Descripción completa de la herramienta')).toBeInTheDocument();
-    expect(screen.getByText('Explicación técnica de la herramienta')).toBeInTheDocument();
-
-    // Technical images grid renders each image.
-    const techImages = container.querySelectorAll('img[src^="https://example.com/tech"]');
-    expect(techImages).toHaveLength(2);
-
-    const collapseButton = screen.getByRole('button', { name: 'Ver menos' });
-    expect(collapseButton).toHaveAttribute('aria-expanded', 'true');
-    fireEvent.click(collapseButton);
-    expect(screen.queryByRole('heading', { name: 'Descripción' })).toBeNull();
-  });
-
-  it('tool type: does not render empty technical section headings when optional fields are absent', async () => {
-    mockDetail.mockReturnValue({
-      data: {
-        id: 't1',
-        title: 'Tool de prueba',
-        slug: 'tool-prueba',
-        fullDescription: '<p>Descripción completa</p>',
-        images: [],
-      },
-      isLoading: false,
-      isError: false,
-      error: null,
-    });
-
-    renderModal(makeSummary({ type: 'tool', title: 'Tool de prueba' }));
-
-    fireEvent.click(screen.getByRole('button', { name: 'Ver completo' }));
-
-    expect(await screen.findByRole('heading', { name: 'Descripción' })).toBeInTheDocument();
-    expect(screen.queryByRole('heading', { name: 'Detalles técnicos' })).toBeNull();
-    expect(screen.queryByRole('heading', { name: 'Imágenes técnicas' })).toBeNull();
-  });
-
-  it('successCase without videos or links hides the expand control', () => {
-    mockDetail.mockReturnValue({
-      data: {
-        id: 's1',
-        title: 'Caso de prueba',
-        slug: 'caso-prueba',
-        videos: [],
-        links: [],
-        images: [],
-      },
-      isLoading: false,
-      isError: false,
-      error: null,
-    });
-
-    renderModal(makeSummary({ type: 'successCase', title: 'Caso de prueba' }));
-
-    expect(screen.queryByRole('button', { name: 'Ver completo' })).toBeNull();
-  });
-
-  it('successCase with videos and links: expand reveals native video and anchor list', async () => {
-    mockDetail.mockReturnValue({
-      data: {
-        id: 's1',
-        title: 'Caso de prueba',
-        slug: 'caso-prueba',
-        videos: ['https://example.com/video.mp4'],
-        links: ['https://example.com/case'],
-        images: [],
-      },
-      isLoading: false,
-      isError: false,
-      error: null,
-    });
-
-    const { container } = renderModal(
-      makeSummary({ type: 'successCase', title: 'Caso de prueba' }),
-    );
-
-    fireEvent.click(screen.getByRole('button', { name: 'Ver completo' }));
-
-    expect(await screen.findByRole('button', { name: 'Ver menos' })).toBeInTheDocument();
-    const video = container.querySelector('video');
-    expect(video).not.toBeNull();
-    expect(video).toHaveAttribute('src', 'https://example.com/video.mp4');
-    expect(video).toHaveAttribute('controls');
-    expect(screen.getByRole('link', { name: 'https://example.com/case' })).toHaveAttribute(
-      'href',
-      'https://example.com/case',
-    );
-  });
-
-  it('disables the expand button while the detail request is loading', () => {
-    mockDetail.mockReturnValue({
-      data: undefined,
-      isLoading: true,
-      isError: false,
-      error: null,
-    });
-
-    renderModal(makeSummary());
-
-    const expandButton = screen.getByRole('button', { name: 'Ver completo' });
-    expect(expandButton).toBeDisabled();
-  });
-
-  it('hides the expand button when the detail request failed', () => {
-    mockDetail.mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      isError: true,
-      error: new Error('boom'),
-    });
-
-    renderModal(makeSummary());
-
-    expect(screen.queryByRole('button', { name: 'Ver completo' })).toBeNull();
-  });
-});
-
-describe('ProjectDetailModal (expanded lightbox)', () => {
-  it('opens a single-item lightbox when a technical image is clicked', async () => {
-    mockDetail.mockReturnValue({
-      data: {
-        id: 't1',
-        title: 'Tool de prueba',
-        slug: 'tool-prueba',
-        fullDescription: '<p>Descripción completa</p>',
-        technicalImages: ['https://example.com/tech1.png'],
-        images: [],
-      },
-      isLoading: false,
-      isError: false,
-      error: null,
-    });
-
-    const { container } = renderModal(
-      makeSummary({ type: 'tool', title: 'Tool de prueba' }),
-    );
-
-    fireEvent.click(screen.getByRole('button', { name: 'Ver completo' }));
-    await screen.findByRole('heading', { name: 'Imágenes técnicas' });
-
-    // The technical thumb is the button wrapping the technical image.
-    const thumb = container
-      .querySelector('img[src="https://example.com/tech1.png"]')
-      ?.closest('button');
-    expect(thumb).not.toBeNull();
-    fireEvent.click(thumb as Element);
-
-    const dialog = await screen.findByRole('dialog', { name: 'Visor de imágenes' });
-    expect(dialog.querySelector('img')).toHaveAttribute('src', 'https://example.com/tech1.png');
-    // Single item → no navigation arrows.
-    expect(screen.queryByRole('button', { name: 'Siguiente' })).toBeNull();
-  });
-
-  it('opens the lightbox when a body image inside the expanded content is clicked (delegation)', async () => {
-    mockDetail.mockReturnValue({
-      data: {
-        id: 'p1',
-        title: 'Proyecto de prueba',
-        slug: 'proyecto-prueba',
-        body: '<p>Descripción rica</p><figure><img src="/uploads/x.png" alt="diagrama"></figure>',
-        images: [],
-        tags: [],
-      },
-      isLoading: false,
-      isError: false,
-      error: null,
-    });
-
-    const { container } = renderModal(makeSummary());
-
-    fireEvent.click(screen.getByRole('button', { name: 'Ver completo' }));
-    await screen.findByText('Descripción rica');
-
-    fireEvent.click(container.querySelector('figure img') as Element);
-
-    const dialog = await screen.findByRole('dialog', { name: 'Visor de imágenes' });
-    expect(dialog.querySelector('img')).toHaveAttribute('src', '/uploads/x.png');
+    // Backdrop click (the overlay itself, not the modal panel).
+    const overlay = document.querySelector('[role="dialog"][aria-label="Proyecto de prueba"]');
+    expect(overlay).not.toBeNull();
+    fireEvent.click(overlay as Element);
+    expect(onClose).toHaveBeenCalledTimes(2);
   });
 
   it('closes the lightbox first on Escape, then the modal on a second Escape', async () => {
     const onClose = vi.fn();
-    mockDetail.mockReturnValue(resolvedProjectDetail());
     emblaState.slideCount = 2;
 
     renderModal(
@@ -550,5 +224,41 @@ describe('ProjectDetailModal (expanded lightbox)', () => {
     // Second Escape: the modal closes.
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('ProjectDetailModal (Ver Completo navigation)', () => {
+  it.each([
+    ['service', 'Servicio'],
+    ['product', 'Producto'],
+    ['tool', 'Tool'],
+    ['successCase', 'Caso de éxito'],
+    ['project', 'Proyecto'],
+  ] as const)(
+    'closes the modal and navigates to /proyectos/%s/:slug for type %s',
+    (type, _typeLabel) => {
+      const onClose = vi.fn();
+      const { unmount } = renderModal(
+        makeSummary({ type, slug: 'mi-slug', title: 'Entidad de prueba' }),
+        onClose,
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: 'Ver completo' }));
+
+      // Modal closes first (state reset in the list page unmounts it)…
+      expect(onClose).toHaveBeenCalledTimes(1);
+      // …then the router lands on /proyectos/:tipo/:slug.
+      expect(screen.getByTestId('detail-page')).toBeInTheDocument();
+      unmount();
+    },
+  );
+
+  it('shows the Ver Completo control for every type, even with minimal preview fields', () => {
+    const { unmount } = renderModal(makeSummary({ type: 'successCase' }));
+    expect(screen.getByRole('button', { name: 'Ver completo' })).toBeInTheDocument();
+    unmount();
+
+    renderModal(makeSummary({ images: [] }));
+    expect(screen.getByRole('button', { name: 'Ver completo' })).toBeInTheDocument();
   });
 });
