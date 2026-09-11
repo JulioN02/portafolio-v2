@@ -31,7 +31,7 @@ describe('authService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     process.env.JWT_SECRET = 'test-secret';
-    process.env.JWT_EXPIRES_IN = '7d';
+    delete process.env.JWT_EXPIRES_IN; // exercise the '12h' default
   });
 
   describe('login', () => {
@@ -47,9 +47,24 @@ describe('authService', () => {
       expect(mockedJwt.sign).toHaveBeenCalledWith(
         expect.objectContaining({ userId: 'u1', role: 'ADMIN' }),
         'test-secret',
-        { expiresIn: '7d' },
+        { expiresIn: '12h', algorithm: 'HS256' },
       );
       expect(result).toEqual({ token: 'token-123', user: { id: 'u1', username: 'admin', role: 'ADMIN' } });
+    });
+
+    it('uses JWT_EXPIRES_IN from the environment when set', async () => {
+      (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
+      mockedBcrypt.compare.mockResolvedValue(true as never);
+      mockedJwt.sign.mockReturnValue('token-123' as never);
+      process.env.JWT_EXPIRES_IN = '30m';
+
+      await login({ username: 'admin', password: 'pass' });
+
+      expect(mockedJwt.sign).toHaveBeenCalledWith(
+        expect.anything(),
+        'test-secret',
+        { expiresIn: '30m', algorithm: 'HS256' },
+      );
     });
 
     it('throws AuthError when user not found', async () => {

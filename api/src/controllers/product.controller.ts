@@ -15,7 +15,8 @@ const getStringParam = (param: string | string[] | undefined): string => {
 };
 
 const getExistingProduct = async (id: string) => {
-  const existing = await productService.findById(id);
+  // Admin-scope lookup: internal flows must see drafts/archived entities.
+  const existing = await productService.findById(id, 'ALL');
   if (!existing) {
     throw new NotFoundError('Product not found');
   }
@@ -46,7 +47,11 @@ export const productController = {
 
   findById: asyncHandler(async (req: Request, res: Response) => {
     const id = getStringParam(req.params.id);
-    const product = await productService.findById(id);
+    // Admin scope passthrough: ?status=ALL disables the PUBLISHED filter.
+    const product = await productService.findById(
+      id,
+      req.query.status === 'ALL' ? 'ALL' : undefined,
+    );
     if (!product) {
       throw new NotFoundError('Product not found');
     }

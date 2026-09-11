@@ -49,6 +49,12 @@ describe('Auth routes (integration)', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    process.env.JWT_SECRET = 'test-secret';
+    process.env.NODE_ENV = 'test';
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   describe('POST /verification-code', () => {
@@ -93,6 +99,95 @@ describe('Auth routes (integration)', () => {
       const body = await res.json();
       expect(body.code).toMatch(/^\d{6}$/);
       expect(body.expiresIn).toBeGreaterThan(0);
+    });
+
+    it('does NOT log the verification code when NODE_ENV=production', async () => {
+      const logSpy = jest.spyOn(console, 'log');
+      process.env.NODE_ENV = 'production';
+
+      const res = await fetch(`${baseUrl}/verification-code`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${validToken}`,
+        },
+        body: '{}',
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      const logged = logSpy.mock.calls.some((call) =>
+        call.some((arg) => typeof arg === 'string' && arg.includes(body.code))
+      );
+      expect(logged).toBe(false);
+    });
+
+    it('logs the verification code when NODE_ENV is not production', async () => {
+      const logSpy = jest.spyOn(console, 'log');
+      process.env.NODE_ENV = 'development';
+
+      const res = await fetch(`${baseUrl}/verification-code`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${validToken}`,
+        },
+        body: '{}',
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      const logged = logSpy.mock.calls.some((call) =>
+        call.some((arg) => typeof arg === 'string' && arg.includes(body.code))
+      );
+      expect(logged).toBe(true);
+    });
+  });
+
+  describe('JWT verification hardening', () => {
+    it('rejects a token signed with HS384 (algorithm pinned to HS256)', async () => {
+      const hs384Token = jwt.sign(
+        { userId: 'test-user-1', username: 'admin', role: 'ADMIN' },
+        'test-secret',
+        { expiresIn: '7d', algorithm: 'HS384' },
+      );
+
+      const res = await fetch(`${baseUrl}/me`, {
+        headers: { Authorization: `Bearer ${hs384Token}` },
+      });
+
+      expect(res.status).toBe(401);
+      const body = await res.json();
+      expect(body.code).toBe('AUTH_ERROR');
+    });
+
+    it('fails closed when JWT_SECRET is missing (contract guard)', async () => {
+      delete process.env.JWT_SECRET;
+
+      const res = await fetch(`${baseUrl}/me`, {
+        headers: { Authorization: `Bearer ${validToken}` },
+      });
+
+      expect(res.status).toBe(401);
+      const body = await res.json();
+      expect(body.code).toBe('AUTH_ERROR');
+    });
+  });
+
+  describe('PATCH /password', () => {
+    it('returns 400 VALIDATION_ERROR for an invalid verification code', async () => {
+      const res = await fetch(`${baseUrl}/password`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${validToken}`,
+        },
+        body: JSON.stringify({ verificationCode: '000000', newPassword: 'newpassword12' }),
+      });
+
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.code).toBe('VALIDATION_ERROR');
     });
   });
 });

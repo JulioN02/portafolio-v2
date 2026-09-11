@@ -15,7 +15,8 @@ const getStringParam = (param: string | string[] | undefined): string => {
 };
 
 const getExistingPost = async (id: string) => {
-  const existing = await blogPostService.findById(id);
+  // Admin-scope lookup: internal flows must see drafts/archived entities.
+  const existing = await blogPostService.findById(id, 'ALL');
   if (!existing) {
     throw new NotFoundError('Blog post not found');
   }
@@ -40,7 +41,12 @@ export const blogPostController = {
 
   findById: asyncHandler(async (req: Request, res: Response) => {
     const id = getStringParam(req.params.id);
-    const post = await blogPostService.findById(id);
+    // Admin scope passthrough: ?status=ALL disables the PUBLISHED filter so
+    // the admin panel can open drafts by id (route already auth-protected).
+    const post = await blogPostService.findById(
+      id,
+      req.query.status === 'ALL' ? 'ALL' : undefined,
+    );
     if (!post) {
       throw new NotFoundError('Blog post not found');
     }

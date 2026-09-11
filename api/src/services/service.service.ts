@@ -59,16 +59,23 @@ export const serviceService = {
     };
   },
 
-  async findBySlug(slug: string) {
+  async findBySlug(slug: string, status: PostStatus | 'ALL' = 'PUBLISHED') {
     return prisma.service.findFirst({
-      where: { slug, deletedAt: null },
+      where: {
+        slug,
+        deletedAt: null,
+        ...(status !== 'ALL' && { status }),
+      },
       select: SERVICE_SELECT,
     });
   },
 
-  async findById(id: string) {
+  async findById(id: string, status: PostStatus | 'ALL' = 'PUBLISHED') {
     return prisma.service.findUnique({
-      where: { id },
+      where: {
+        id,
+        ...(status !== 'ALL' && { status }),
+      },
       select: SERVICE_SELECT,
     });
   },

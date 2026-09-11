@@ -16,6 +16,9 @@
  * brute-forcing the 6-digit code in the meantime.
  */
 
+import { randomInt } from 'node:crypto';
+import { ValidationError } from '../utils/errors.js';
+
 interface VerificationCodeEntry {
   code: string;
   expiresAt: Date;
@@ -30,7 +33,9 @@ class VerificationCodeService {
    * Overwrites any previous unexpired code for the same user.
    */
   generate(userId: string): { code: string; expiresIn: number } {
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    // CSPRNG source: crypto.randomInt (never Math.random — predictable codes
+    // would allow brute-forcing the password-change flow).
+    const code = randomInt(0, 1000000).toString().padStart(6, '0');
     const expiresIn = 10 * 60; // 10 minutes in seconds
 
     this.store.set(userId, {
@@ -44,26 +49,26 @@ class VerificationCodeService {
 
   /**
    * Validate a verification code for a user.
-   * Throws with descriptive messages for each failure mode.
+   * Throws ValidationError (HTTP 400) for each failure mode — never a 500.
    */
   validate(userId: string, code: string): void {
     const entry = this.store.get(userId);
 
     if (!entry) {
-      throw new Error('No verification code found. Please request a new code.');
+      throw new ValidationError('No verification code found. Please request a new code.');
     }
 
     if (entry.used) {
-      throw new Error('This verification code has already been used.');
+      throw new ValidationError('This verification code has already been used.');
     }
 
     if (new Date() > entry.expiresAt) {
       this.store.delete(userId);
-      throw new Error('Verification code has expired. Please request a new code.');
+      throw new ValidationError('Verification code has expired. Please request a new code.');
     }
 
     if (entry.code !== code) {
-      throw new Error('Invalid verification code.');
+      throw new ValidationError('Invalid verification code.');
     }
 
     // Mark as used (single-use)

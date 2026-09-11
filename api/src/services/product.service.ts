@@ -60,9 +60,13 @@ export const productService = {
     };
   },
 
-  async findBySlug(slug: string) {
+  async findBySlug(slug: string, status: PostStatus | 'ALL' = 'PUBLISHED') {
     return prisma.product.findFirst({
-      where: { slug, deletedAt: null },
+      where: {
+        slug,
+        deletedAt: null,
+        ...(status !== 'ALL' && { status }),
+      },
       select: PRODUCT_SELECT,
     });
   },
@@ -76,9 +80,12 @@ export const productService = {
     });
   },
 
-  async findById(id: string) {
+  async findById(id: string, status: PostStatus | 'ALL' = 'PUBLISHED') {
     return prisma.product.findUnique({
-      where: { id },
+      where: {
+        id,
+        ...(status !== 'ALL' && { status }),
+      },
       select: PRODUCT_SELECT,
     });
   },

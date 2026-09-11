@@ -19,7 +19,9 @@ export const blogPostsApi = {
   },
 
   getById: async (id: string): Promise<BlogPostResponse> => {
-    const { data } = await apiClient.get(`/blog-posts/by-id/${id}`);
+    // ?status=ALL: /by-id is PUBLISHED-filtered by default; the admin must
+    // still open drafts/archived posts by id.
+    const { data } = await apiClient.get(`/blog-posts/by-id/${id}`, { params: { status: 'ALL' } });
     return data;
   },
 

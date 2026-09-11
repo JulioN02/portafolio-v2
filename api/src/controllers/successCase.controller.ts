@@ -15,7 +15,8 @@ const getStringParam = (param: string | string[] | undefined): string => {
 };
 
 const getExistingCase = async (id: string) => {
-  const existing = await successCaseService.findById(id);
+  // Admin-scope lookup: internal flows must see drafts/archived entities.
+  const existing = await successCaseService.findById(id, 'ALL');
   if (!existing) {
     throw new NotFoundError('Success case not found');
   }
@@ -46,7 +47,11 @@ export const successCaseController = {
 
   findById: asyncHandler(async (req: Request, res: Response) => {
     const id = getStringParam(req.params.id);
-    const successCase = await successCaseService.findById(id);
+    // Admin scope passthrough: ?status=ALL disables the PUBLISHED filter.
+    const successCase = await successCaseService.findById(
+      id,
+      req.query.status === 'ALL' ? 'ALL' : undefined,
+    );
     if (!successCase) {
       throw new NotFoundError('Success case not found');
     }

@@ -18,7 +18,9 @@ export const successCasesApi = {
   },
 
   getById: async (id: string): Promise<SuccessCaseResponse> => {
-    const { data } = await apiClient.get(`/success-cases/by-id/${id}`);
+    // ?status=ALL: /by-id is now auth-protected and PUBLISHED-filtered by
+    // default; the admin must still open drafts/archived entities by id.
+    const { data } = await apiClient.get(`/success-cases/by-id/${id}`, { params: { status: 'ALL' } });
     return data;
   },
 

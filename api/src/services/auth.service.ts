@@ -30,9 +30,10 @@ export const login = async (credentials: LoginInput): Promise<LoginResponse> => 
   };
 
   const secret = process.env.JWT_SECRET as string;
-  const expiresIn = (process.env.JWT_EXPIRES_IN || '7d') as jwt.SignOptions['expiresIn'];
+  const expiresIn = (process.env.JWT_EXPIRES_IN || '12h') as jwt.SignOptions['expiresIn'];
 
-  const token = jwt.sign(payload, secret, { expiresIn });
+  // algorithm pinned explicitly: tokens must be HS256 to match the verify side.
+  const token = jwt.sign(payload, secret, { expiresIn, algorithm: 'HS256' });
 
   return {
     token,

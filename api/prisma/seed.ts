@@ -3,11 +3,23 @@ import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
+/**
+ * Fail fast: the admin password MUST come from the environment and be >= 12
+ * characters. There is NO default credential. Exits before any DB work.
+ */
+const adminPassword = process.env.ADMIN_INITIAL_PASSWORD;
+if (!adminPassword || adminPassword.length < 12) {
+  console.error(
+    '❌ ADMIN_INITIAL_PASSWORD must be set and at least 12 characters long (e.g. "openssl rand -base64 12").'
+  );
+  process.exit(1);
+}
+
 async function main() {
   console.log('🌱 Starting seed...');
 
   // Create admin user
-  const hashedPassword = await bcrypt.hash('admin123', 10);
+  const hashedPassword = await bcrypt.hash(adminPassword, 10);
   
   const admin = await prisma.user.upsert({
     where: { username: 'admin' },

@@ -68,16 +68,23 @@ export const blogPostService = {
     };
   },
 
-  async findBySlug(slug: string) {
+  async findBySlug(slug: string, status: PostStatus | 'ALL' = 'PUBLISHED') {
     return prisma.blogPost.findFirst({
-      where: { slug, deletedAt: null },
+      where: {
+        slug,
+        deletedAt: null,
+        ...(status !== 'ALL' && { status }),
+      },
       select: BLOG_POST_SELECT,
     });
   },
 
-  async findById(id: string) {
+  async findById(id: string, status: PostStatus | 'ALL' = 'PUBLISHED') {
     return prisma.blogPost.findUnique({
-      where: { id },
+      where: {
+        id,
+        ...(status !== 'ALL' && { status }),
+      },
       select: BLOG_POST_SELECT,
     });
   },

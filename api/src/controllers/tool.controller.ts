@@ -15,7 +15,8 @@ const getStringParam = (param: string | string[] | undefined): string => {
 };
 
 const getExistingTool = async (id: string) => {
-  const existing = await toolService.findById(id);
+  // Admin-scope lookup: internal flows must see drafts/archived entities.
+  const existing = await toolService.findById(id, 'ALL');
   if (!existing) {
     throw new NotFoundError('Tool not found');
   }
@@ -46,7 +47,11 @@ export const toolController = {
 
   findById: asyncHandler(async (req: Request, res: Response) => {
     const id = getStringParam(req.params.id);
-    const tool = await toolService.findById(id);
+    // Admin scope passthrough: ?status=ALL disables the PUBLISHED filter.
+    const tool = await toolService.findById(
+      id,
+      req.query.status === 'ALL' ? 'ALL' : undefined,
+    );
     if (!tool) {
       throw new NotFoundError('Tool not found');
     }

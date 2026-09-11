@@ -54,9 +54,13 @@ export const successCaseService = {
     };
   },
 
-  async findBySlug(slug: string) {
+  async findBySlug(slug: string, status: PostStatus | 'ALL' = 'PUBLISHED') {
     return prisma.successCase.findFirst({
-      where: { slug, deletedAt: null },
+      where: {
+        slug,
+        deletedAt: null,
+        ...(status !== 'ALL' && { status }),
+      },
       select: SUCCESS_CASE_SELECT,
     });
   },
@@ -70,9 +74,12 @@ export const successCaseService = {
     });
   },
 
-  async findById(id: string) {
+  async findById(id: string, status: PostStatus | 'ALL' = 'PUBLISHED') {
     return prisma.successCase.findUnique({
-      where: { id },
+      where: {
+        id,
+        ...(status !== 'ALL' && { status }),
+      },
       select: SUCCESS_CASE_SELECT,
     });
   },

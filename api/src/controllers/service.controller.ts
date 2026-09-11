@@ -15,7 +15,9 @@ const getStringParam = (param: string | string[] | undefined): string => {
 };
 
 const getExistingService = async (id: string) => {
-  const existing = await serviceService.findById(id);
+  // Admin-scope lookup: internal flows (update/delete/restore/status) must see
+  // drafts and archived entities, so no PUBLISHED filter.
+  const existing = await serviceService.findById(id, 'ALL');
   if (!existing) {
     throw new NotFoundError('Service not found');
   }
@@ -40,7 +42,12 @@ export const serviceController = {
 
   findById: asyncHandler(async (req: Request, res: Response) => {
     const id = getStringParam(req.params.id);
-    const service = await serviceService.findById(id);
+    // Admin scope passthrough: ?status=ALL disables the PUBLISHED filter so
+    // the admin panel can open drafts by id; public callers get PUBLISHED only.
+    const service = await serviceService.findById(
+      id,
+      req.query.status === 'ALL' ? 'ALL' : undefined,
+    );
     if (!service) {
       throw new NotFoundError('Service not found');
     }

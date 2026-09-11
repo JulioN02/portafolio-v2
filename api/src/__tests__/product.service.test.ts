@@ -61,7 +61,7 @@ describe('Product Service', () => {
   });
 
   describe('findBySlug', () => {
-    it('should find product by slug', async () => {
+    it('should find product by slug (PUBLISHED by default)', async () => {
       const mockProduct = { id: '1', title: 'Test Product', slug: 'test-product', deletedAt: null };
       (mockPrisma.product.findFirst as jest.Mock).mockResolvedValue(mockProduct);
 
@@ -69,7 +69,20 @@ describe('Product Service', () => {
 
       expect(result).toEqual(mockProduct);
       expect(mockPrisma.product.findFirst).toHaveBeenCalledWith({
-        where: { slug: 'test-product', deletedAt: null },
+        where: { slug: 'test-product', deletedAt: null, status: 'PUBLISHED' },
+        select: expect.any(Object),
+      });
+    });
+
+    it("findBySlug with status 'ALL' returns drafts (no status condition)", async () => {
+      const draft = { id: '9', slug: 'draft-product', status: 'DRAFT' };
+      (mockPrisma.product.findFirst as jest.Mock).mockResolvedValue(draft);
+
+      const result = await productService.findBySlug('draft-product', 'ALL');
+
+      expect(result).toEqual(draft);
+      expect(mockPrisma.product.findFirst).toHaveBeenCalledWith({
+        where: { slug: 'draft-product', deletedAt: null },
         select: expect.any(Object),
       });
     });
@@ -105,7 +118,7 @@ describe('Product Service', () => {
   });
 
   describe('findById', () => {
-    it('should find product by id', async () => {
+    it('should find product by id (PUBLISHED by default)', async () => {
       const mockProduct = { id: '123', title: 'Test Product', deletedAt: null };
       (mockPrisma.product.findUnique as jest.Mock).mockResolvedValue(mockProduct);
 
@@ -113,7 +126,20 @@ describe('Product Service', () => {
 
       expect(result).toEqual(mockProduct);
       expect(mockPrisma.product.findUnique).toHaveBeenCalledWith({
-        where: { id: '123' },
+        where: { id: '123', status: 'PUBLISHED' },
+        select: expect.any(Object),
+      });
+    });
+
+    it("findById with status 'ALL' returns drafts (no status condition)", async () => {
+      const draft = { id: '9', status: 'DRAFT' };
+      (mockPrisma.product.findUnique as jest.Mock).mockResolvedValue(draft);
+
+      const result = await productService.findById('9', 'ALL');
+
+      expect(result).toEqual(draft);
+      expect(mockPrisma.product.findUnique).toHaveBeenCalledWith({
+        where: { id: '9' },
         select: expect.any(Object),
       });
     });

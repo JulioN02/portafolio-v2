@@ -41,7 +41,7 @@ describe('SuccessCase Service', () => {
   });
 
   describe('findBySlug', () => {
-    it('should find success case by slug', async () => {
+    it('should find success case by slug (PUBLISHED by default)', async () => {
       const mockCase = { 
         id: '1', 
         title: 'Test Case', 
@@ -54,6 +54,23 @@ describe('SuccessCase Service', () => {
       const result = await successCaseService.findBySlug('test-case');
 
       expect(result).toEqual(mockCase);
+      expect(mockPrisma.successCase.findFirst).toHaveBeenCalledWith({
+        where: { slug: 'test-case', deletedAt: null, status: 'PUBLISHED' },
+        select: expect.any(Object),
+      });
+    });
+
+    it("findBySlug with status 'ALL' returns drafts (no status condition)", async () => {
+      const draft = { id: '9', slug: 'draft-case', status: 'DRAFT' };
+      (mockPrisma.successCase.findFirst as jest.Mock).mockResolvedValue(draft);
+
+      const result = await successCaseService.findBySlug('draft-case', 'ALL');
+
+      expect(result).toEqual(draft);
+      expect(mockPrisma.successCase.findFirst).toHaveBeenCalledWith({
+        where: { slug: 'draft-case', deletedAt: null },
+        select: expect.any(Object),
+      });
     });
 
     it('should return null when case not found', async () => {
@@ -62,6 +79,34 @@ describe('SuccessCase Service', () => {
       const result = await successCaseService.findBySlug('non-existent');
 
       expect(result).toBeNull();
+    });
+  });
+
+  describe('findById', () => {
+    it('should find success case by id (PUBLISHED by default)', async () => {
+      const mockCase = { id: '123', title: 'Test Case', deletedAt: null };
+      (mockPrisma.successCase.findUnique as jest.Mock).mockResolvedValue(mockCase);
+
+      const result = await successCaseService.findById('123');
+
+      expect(result).toEqual(mockCase);
+      expect(mockPrisma.successCase.findUnique).toHaveBeenCalledWith({
+        where: { id: '123', status: 'PUBLISHED' },
+        select: expect.any(Object),
+      });
+    });
+
+    it("findById with status 'ALL' returns drafts (no status condition)", async () => {
+      const draft = { id: '9', status: 'DRAFT' };
+      (mockPrisma.successCase.findUnique as jest.Mock).mockResolvedValue(draft);
+
+      const result = await successCaseService.findById('9', 'ALL');
+
+      expect(result).toEqual(draft);
+      expect(mockPrisma.successCase.findUnique).toHaveBeenCalledWith({
+        where: { id: '9' },
+        select: expect.any(Object),
+      });
     });
   });
 

@@ -39,13 +39,30 @@ describe('Tool Service', () => {
   });
 
   describe('findBySlug', () => {
-    it('should find tool by slug', async () => {
+    it('should find tool by slug (PUBLISHED by default)', async () => {
       const mockTool = { id: '1', title: 'Test Tool', slug: 'test-tool', deletedAt: null };
       (mockPrisma.tool.findFirst as jest.Mock).mockResolvedValue(mockTool);
 
       const result = await toolService.findBySlug('test-tool');
 
       expect(result).toEqual(mockTool);
+      expect(mockPrisma.tool.findFirst).toHaveBeenCalledWith({
+        where: { slug: 'test-tool', deletedAt: null, status: 'PUBLISHED' },
+        select: expect.any(Object),
+      });
+    });
+
+    it("findBySlug with status 'ALL' returns drafts (no status condition)", async () => {
+      const draft = { id: '9', slug: 'draft-tool', status: 'DRAFT' };
+      (mockPrisma.tool.findFirst as jest.Mock).mockResolvedValue(draft);
+
+      const result = await toolService.findBySlug('draft-tool', 'ALL');
+
+      expect(result).toEqual(draft);
+      expect(mockPrisma.tool.findFirst).toHaveBeenCalledWith({
+        where: { slug: 'draft-tool', deletedAt: null },
+        select: expect.any(Object),
+      });
     });
 
     it('should return null when tool not found', async () => {
@@ -81,6 +98,34 @@ describe('Tool Service', () => {
           take: 3,
         })
       );
+    });
+  });
+
+  describe('findById', () => {
+    it('should find tool by id (PUBLISHED by default)', async () => {
+      const mockTool = { id: '123', title: 'Test Tool', deletedAt: null };
+      (mockPrisma.tool.findUnique as jest.Mock).mockResolvedValue(mockTool);
+
+      const result = await toolService.findById('123');
+
+      expect(result).toEqual(mockTool);
+      expect(mockPrisma.tool.findUnique).toHaveBeenCalledWith({
+        where: { id: '123', status: 'PUBLISHED' },
+        select: expect.any(Object),
+      });
+    });
+
+    it("findById with status 'ALL' returns drafts (no status condition)", async () => {
+      const draft = { id: '9', status: 'DRAFT' };
+      (mockPrisma.tool.findUnique as jest.Mock).mockResolvedValue(draft);
+
+      const result = await toolService.findById('9', 'ALL');
+
+      expect(result).toEqual(draft);
+      expect(mockPrisma.tool.findUnique).toHaveBeenCalledWith({
+        where: { id: '9' },
+        select: expect.any(Object),
+      });
     });
   });
 

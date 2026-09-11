@@ -76,7 +76,7 @@ describe('BlogPost Service', () => {
   });
 
   describe('findBySlug', () => {
-    it('should find blog post by slug', async () => {
+    it('should find blog post by slug (PUBLISHED by default)', async () => {
       const mockPost = { id: '1', title: 'Test Post', slug: 'test-post', deletedAt: null };
       (mockPrisma.blogPost.findFirst as jest.Mock).mockResolvedValue(mockPost);
 
@@ -84,7 +84,20 @@ describe('BlogPost Service', () => {
 
       expect(result).toEqual(mockPost);
       expect(mockPrisma.blogPost.findFirst).toHaveBeenCalledWith({
-        where: { slug: 'test-post', deletedAt: null },
+        where: { slug: 'test-post', deletedAt: null, status: 'PUBLISHED' },
+        select: expect.any(Object),
+      });
+    });
+
+    it("findBySlug with status 'ALL' returns drafts (no status condition)", async () => {
+      const draft = { id: '9', slug: 'draft-post', status: 'DRAFT' };
+      (mockPrisma.blogPost.findFirst as jest.Mock).mockResolvedValue(draft);
+
+      const result = await blogPostService.findBySlug('draft-post', 'ALL');
+
+      expect(result).toEqual(draft);
+      expect(mockPrisma.blogPost.findFirst).toHaveBeenCalledWith({
+        where: { slug: 'draft-post', deletedAt: null },
         select: expect.any(Object),
       });
     });
@@ -99,7 +112,7 @@ describe('BlogPost Service', () => {
   });
 
   describe('findById', () => {
-    it('should find blog post by id', async () => {
+    it('should find blog post by id (PUBLISHED by default)', async () => {
       const mockPost = { id: '123', title: 'Test Post', deletedAt: null };
       (mockPrisma.blogPost.findUnique as jest.Mock).mockResolvedValue(mockPost);
 
@@ -107,7 +120,20 @@ describe('BlogPost Service', () => {
 
       expect(result).toEqual(mockPost);
       expect(mockPrisma.blogPost.findUnique).toHaveBeenCalledWith({
-        where: { id: '123' },
+        where: { id: '123', status: 'PUBLISHED' },
+        select: expect.any(Object),
+      });
+    });
+
+    it("findById with status 'ALL' returns drafts (no status condition)", async () => {
+      const draft = { id: '9', status: 'DRAFT' };
+      (mockPrisma.blogPost.findUnique as jest.Mock).mockResolvedValue(draft);
+
+      const result = await blogPostService.findById('9', 'ALL');
+
+      expect(result).toEqual(draft);
+      expect(mockPrisma.blogPost.findUnique).toHaveBeenCalledWith({
+        where: { id: '9' },
         select: expect.any(Object),
       });
     });
