@@ -67,15 +67,11 @@
   margin: 0;
 }
 
-.metric {
-  display: inline-block;
+.description {
   margin-top: var(--spacing-xs);
-  padding: 2px var(--spacing-sm);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-green-backend-text);
-  background-color: rgba(62, 152, 93, 0.12);
-  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  color: var(--color-neutral-600);
+  line-height: var(--line-height-relaxed);
 }
 
 .languages {

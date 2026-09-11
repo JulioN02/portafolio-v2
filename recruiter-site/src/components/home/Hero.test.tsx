@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { PROFILE } from '@jsoft/shared';
 import { LanguageProvider } from '../../i18n/LanguageContext';
@@ -31,5 +31,18 @@ describe('Hero canonical name (public-pii-minimization / seo)', () => {
     expect(
       screen.queryByRole('heading', { level: 1, name: PROFILE.fullName }),
     ).toBeNull();
+  });
+
+  it('renders the hero tags strip as a semantic list', () => {
+    renderHero();
+    const tags = screen.getByRole('list');
+    const items = within(tags).getAllByRole('listitem');
+    expect(items.map((item) => item.textContent)).toEqual([
+      'Backend',
+      'APIs',
+      'PostgreSQL',
+      'TypeScript',
+      'Node.js',
+    ]);
   });
 });

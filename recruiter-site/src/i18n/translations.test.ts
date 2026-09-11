@@ -6,6 +6,7 @@ const REQUIRED_KEYS = [
   // backend-first hero (RHP-1)
   'hero.title',
   'hero.summary',
+  'hero.tags',
   // truthful profile copy (RHP-2)
   'profileToggle.professionalText',
   'profileToggle.technicalText',
@@ -16,30 +17,50 @@ const REQUIRED_KEYS = [
   'timeline.exp.0.role',
   'timeline.exp.0.org',
   'timeline.exp.0.period',
+  'timeline.exp.0.description',
   'timeline.exp.1.role',
   'timeline.exp.1.org',
   'timeline.exp.1.period',
-  'timeline.exp.1.metric',
+  'timeline.exp.1.description',
   'timeline.exp.2.role',
   'timeline.exp.2.org',
+  'timeline.exp.2.period',
+  'timeline.exp.2.description',
   'timeline.exp.3.role',
   'timeline.exp.3.org',
+  'timeline.exp.3.period',
+  'timeline.exp.3.description',
   'timeline.edu.0.role',
   'timeline.edu.0.org',
   'timeline.edu.0.period',
   'timeline.edu.1.role',
   'timeline.edu.1.org',
   'timeline.edu.1.period',
+  'timeline.edu.1.description',
   'timeline.edu.2.role',
   'timeline.edu.2.org',
   'timeline.edu.2.period',
   'timeline.languages',
   // statsStrip (RHP-5)
   'statsStrip.title',
-  'statsStrip.availability',
-  'statsStrip.logisticsYears',
-  'statsStrip.techCount',
-  'statsStrip.englishLevel',
+  'statsStrip.0.value',
+  'statsStrip.0.label',
+  'statsStrip.1.value',
+  'statsStrip.1.label',
+  'statsStrip.2.value',
+  'statsStrip.2.label',
+  'statsStrip.3.value',
+  'statsStrip.3.label',
+  // areasDeAporte
+  'areasDeAporte.title',
+  'areasDeAporte.0.title',
+  'areasDeAporte.0.description',
+  'areasDeAporte.1.title',
+  'areasDeAporte.1.description',
+  'areasDeAporte.2.title',
+  'areasDeAporte.2.description',
+  'areasDeAporte.3.title',
+  'areasDeAporte.3.description',
   // contactStrip (RHP-7, RHP-8)
   'contactStrip.title',
   'contactStrip.email',
@@ -95,9 +116,9 @@ describe('i18n translations (home-redesign RHP-1..RHP-5, RHP-7, RHP-8)', () => {
     }
   });
 
-  it('uses backend-first hero titles, not Full Stack (RHP-1)', () => {
-    expect(translations.es['hero.title']).toBe('Ingeniero de Sistemas | Desarrollador Backend');
-    expect(translations.en['hero.title']).toBe('Systems Engineer | Backend Developer');
+  it('uses the owner hero title (Software Developer | Backend Developer)', () => {
+    expect(translations.es['hero.title']).toBe('Software Developer | Backend Developer');
+    expect(translations.en['hero.title']).toBe('Software Developer | Backend Developer');
   });
 
   it('contains no "Full Stack" strings anywhere (RHP-1 removed requirement)', () => {
@@ -129,28 +150,39 @@ describe('i18n translations (home-redesign RHP-1..RHP-5, RHP-7, RHP-8)', () => {
     expect(en).toMatch(/2018/);
   });
 
-  it('carries the 100% metric on the coordinator timeline entry (RHP-3)', () => {
-    expect(translations.es['timeline.exp.1.metric']).toContain('100%');
-    expect(translations.es['timeline.exp.1.metric']).toMatch(/disponibilidad/i);
-    expect(translations.es['timeline.exp.1.metric']).toMatch(/trazabilidad/i);
-    expect(translations.en['timeline.exp.1.metric']).toContain('100%');
-    expect(translations.en['timeline.exp.1.metric']).toMatch(/availability/i);
-    expect(translations.en['timeline.exp.1.metric']).toMatch(/traceability/i);
+  it('describes the coordinator entry in both languages (RHP-3)', () => {
+    expect(translations.es['timeline.exp.2.role']).toBe('Coordinador Logístico Nacional');
+    expect(translations.en['timeline.exp.2.role']).toBe('National Logistics Coordinator');
+    expect(translations.es['timeline.exp.2.description']).toMatch(/trazabilidad/i);
+    expect(translations.en['timeline.exp.2.description']).toMatch(/traceability/i);
   });
 
   it('has education entries and languages in the timeline keyset (RHP-4)', () => {
-    expect(translations.es['timeline.edu.0.org']).toBe('UNAD');
-    expect(translations.es['timeline.edu.1.org']).toBe('PLATZI');
-    expect(translations.es['timeline.edu.2.org']).toBe('TodoCode');
+    expect(translations.es['timeline.edu.0.org']).toBe(
+      'Universidad Nacional Abierta y a Distancia (UNAD)',
+    );
+    expect(translations.es['timeline.edu.1.org']).toBe('Platzi');
+    expect(translations.es['timeline.edu.2.org']).toBe('TodoCode Academy');
     expect(translations.es['timeline.languages']).toMatch(/Inglés \(A2\)/i);
     expect(translations.en['timeline.languages']).toMatch(/English \(A2\)/i);
   });
 
-  it('has the statsStrip availability label (RHP-5)', () => {
-    expect(translations.es['statsStrip.availability']).toMatch(/disponibilidad/i);
-    expect(translations.es['statsStrip.availability']).toMatch(/trazabilidad/i);
-    expect(translations.en['statsStrip.availability']).toMatch(/availability/i);
-    expect(translations.en['statsStrip.availability']).toMatch(/traceability/i);
+  it('has the owner statsStrip metrics (RHP-5)', () => {
+    expect(translations.es['statsStrip.0.value']).toBe('7+ años');
+    expect(translations.en['statsStrip.0.value']).toBe('7+ years');
+    expect(translations.es['statsStrip.2.value']).toBe('4+ laboratorios');
+    expect(translations.en['statsStrip.2.value']).toBe('4+ labs');
+    expect(translations.es['statsStrip.3.value']).toBe('Proyectos funcionales');
+    expect(translations.en['statsStrip.3.value']).toBe('Functional projects');
+  });
+
+  it('has the areasDeAporte section in both languages', () => {
+    expect(translations.es['areasDeAporte.title']).toBe('¿Qué puedo aportar?');
+    expect(translations.en['areasDeAporte.title']).toBe('What can I contribute?');
+    expect(translations.es['areasDeAporte.0.title']).toBe('Backend y APIs');
+    expect(translations.en['areasDeAporte.0.title']).toBe('Backend & APIs');
+    expect(translations.es['areasDeAporte.2.description']).toMatch(/PostgreSQL/i);
+    expect(translations.en['areasDeAporte.2.description']).toMatch(/PostgreSQL/i);
   });
 
   it('has the projectDetailModal preview labels and the entity detail page labels in both languages', () => {

@@ -6,6 +6,7 @@ import { ProfileToggle } from '../components/home/ProfileToggle';
 import { StatsStrip } from '../components/home/StatsStrip';
 import { TechStack } from '../components/home/TechStack';
 import { Timeline } from '../components/home/Timeline';
+import { AreasDeAporte } from '../components/home/AreasDeAporte';
 import { RecentProjects } from '../components/home/RecentProjects';
 import { ContactStrip } from '../components/home/ContactStrip';
 import { useTranslation } from '../i18n/LanguageContext';
@@ -34,6 +35,9 @@ export function HomePage() {
 
       {/* Timeline Section */}
       <Timeline />
+
+      {/* Contribution Areas Section */}
+      <AreasDeAporte />
 
       {/* Recent Projects Section */}
       <RecentProjects />

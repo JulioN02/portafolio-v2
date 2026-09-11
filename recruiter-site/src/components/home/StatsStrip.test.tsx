@@ -1,7 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { PROFILE } from '@jsoft/shared';
-import { DATA } from '../../data/tech-stack';
 import { LanguageProvider } from '../../i18n/LanguageContext';
 import { StatsStrip } from './StatsStrip';
 import type { ReactNode } from 'react';
@@ -10,29 +8,27 @@ function renderWithProviders(ui: ReactNode) {
   return render(<LanguageProvider>{ui}</LanguageProvider>);
 }
 
-describe('StatsStrip (RHP-5)', () => {
-  it('renders the 100% availability/traceability metric from PROFILE + translations', () => {
+describe('StatsStrip (profile content)', () => {
+  it('renders the four owner metrics with values and labels', () => {
     renderWithProviders(<StatsStrip />);
-    expect(screen.getByText(PROFILE.availabilityMetric)).toBeInTheDocument();
-    expect(screen.getByText('Disponibilidad y trazabilidad')).toBeInTheDocument();
+
+    expect(screen.getByText('7+ años')).toBeInTheDocument();
+    expect(
+      screen.getByText('Experiencia en coordinación de procesos y operaciones'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('2025–actualidad')).toBeInTheDocument();
+    expect(screen.getByText('Desarrollo de software independiente')).toBeInTheDocument();
+    expect(screen.getByText('4+ laboratorios')).toBeInTheDocument();
+    expect(
+      screen.getByText('Concurrencia, idempotencia, rendimiento y rate limiting'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Proyectos funcionales')).toBeInTheDocument();
+    expect(
+      screen.getByText('Aplicaciones, APIs y herramientas de desarrollo'),
+    ).toBeInTheDocument();
   });
 
-  it('renders the tech count derived from the tech-stack data file', () => {
-    renderWithProviders(<StatsStrip />);
-    const expected = DATA.reduce((acc, domain) => acc + domain.items.length, 0);
-    expect(screen.getByText(String(expected))).toBeInTheDocument();
-    expect(screen.getByText('Tecnologías en mi stack')).toBeInTheDocument();
-  });
-
-  it('renders the logistics years and English level metrics', () => {
-    renderWithProviders(<StatsStrip />);
-    expect(screen.getByText('7')).toBeInTheDocument();
-    expect(screen.getByText('Años en coordinación logística nacional')).toBeInTheDocument();
-    expect(screen.getByText('A2')).toBeInTheDocument();
-    expect(screen.getByText('Nivel de inglés')).toBeInTheDocument();
-  });
-
-  it('uses a description list (dl) for the metrics', () => {
+  it('uses a description list (dl) with one dt/dd pair per metric', () => {
     const { container } = renderWithProviders(<StatsStrip />);
     expect(container.querySelector('dl')).not.toBeNull();
     expect(container.querySelectorAll('dt').length).toBe(4);

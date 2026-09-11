@@ -110,6 +110,27 @@
   max-width: 560px;
 }
 
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tag {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: 0.02em;
+}
+
+.tag:not(:last-child)::after {
+  content: ' · ';
+  color: rgba(255, 255, 255, 0.4);
+}
+
 .ctas {
   display: flex;
   gap: var(--spacing-md);
