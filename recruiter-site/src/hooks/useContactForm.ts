@@ -15,6 +15,10 @@ export interface RecruiterContactFormData {
   budget: string;
   message: string;
   preferredContact: 'EMAIL' | 'PHONE' | 'WHATSAPP';
+  /** Honeypot anti-spam field — must stay empty for humans. */
+  website: string;
+  /** Cloudflare Turnstile token (transient, never persisted server-side). */
+  turnstileToken: string;
 }
 
 /** Clean response shape the component consumes */
@@ -66,7 +70,12 @@ function mapFormToApiInput(data: RecruiterContactFormData): RecruiterContactInpu
 export function useSubmitContact() {
   return useMutation<SubmitContactResult, Error, RecruiterContactFormData>({
     mutationFn: async (formData): Promise<SubmitContactResult> => {
-      const payload = mapFormToApiInput(formData);
+      const payload = {
+        ...mapFormToApiInput(formData),
+        // Anti-spam transient fields (honeypot + Turnstile token).
+        website: formData.website,
+        turnstileToken: formData.turnstileToken,
+      };
 
       const response = await apiClient.post<{
         message: string;

@@ -1,0 +1,8 @@
+.wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.widget {
+  min-height: 65px;
+}

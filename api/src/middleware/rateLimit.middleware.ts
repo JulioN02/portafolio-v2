@@ -33,3 +33,27 @@ export const apiLimiter = rateLimit({
     code: 'RATE_LIMITED',
   },
 });
+
+/**
+ * Dedicated limiter for public contact submission endpoints
+ * (POST /api/contact/client + /api/contact/recruiter).
+ *
+ * - `CONTACT_RATE_LIMIT_MAX` (default 5): submissions per window per IP.
+ * - `CONTACT_RATE_LIMIT_WINDOW_MINUTES` (default 10): window length.
+ *
+ * In-memory (per-process) store: on serverless each isolate counts separately —
+ * documented limitation; honeypot + Turnstile carry the real load.
+ */
+export const contactLimiter = rateLimit({
+  windowMs:
+    (parseInt(process.env.CONTACT_RATE_LIMIT_WINDOW_MINUTES || '10', 10) || 10) *
+    60 *
+    1000,
+  limit: parseInt(process.env.CONTACT_RATE_LIMIT_MAX || '5', 10) || 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    message: 'Too many contact submissions. Please try again later.',
+    code: 'RATE_LIMITED',
+  },
+});

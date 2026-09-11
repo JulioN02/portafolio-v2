@@ -33,6 +33,10 @@ export type { CheckboxProps } from './ui/Checkbox/index.js';
 export { ProtectedRoute } from './auth/ProtectedRoute.js';
 export type { ProtectedRouteProps } from './auth/ProtectedRoute.js';
 
+// Turnstile (contact anti-spam widget)
+export { Turnstile } from './Turnstile/index.js';
+export type { TurnstileProps } from './Turnstile/index.js';
+
 // Error Boundary
 export { ErrorBoundary } from './ui/ErrorBoundary/index.js';
 export type { ErrorBoundaryProps } from './ui/ErrorBoundary/index.js';

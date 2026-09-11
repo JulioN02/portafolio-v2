@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react';
+import { Turnstile } from '@jsoft/shared';
 import { useSubmitContact } from '../../hooks/useContactForm';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { toast } from 'sonner';
@@ -89,6 +90,8 @@ export function RecruiterContactForm() {
     budget: '',
     message: '',
     preferredContact: 'EMAIL',
+    website: '', // honeypot — must stay empty for humans
+    turnstileToken: '',
   });
 
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
@@ -133,6 +136,8 @@ export function RecruiterContactForm() {
           budget: '',
           message: '',
           preferredContact: 'EMAIL',
+          website: '',
+          turnstileToken: '',
         });
         setFieldErrors({});
       },
@@ -145,6 +150,12 @@ export function RecruiterContactForm() {
   const handleRetry = () => {
     mutate(formData);
   };
+
+  /** Maps the anti-spam verification failure to a localized inline message. */
+  const apiErrorMessage =
+    (error as { code?: string } | null)?.code === 'TURNSTILE_FAILED'
+      ? 'Verificación anti-spam fallida. Por favor, inténtalo de nuevo.'
+      : error?.message ?? t('contactForm.error.generic');
 
   /* ── Render ── */
 
@@ -161,6 +172,18 @@ export function RecruiterContactForm() {
 
   return (
     <form className={styles.form} onSubmit={handleSubmit} noValidate>
+      {/* Honeypot anti-spam field — hidden from users, filled only by bots */}
+      <input
+        type="text"
+        name="website"
+        value={formData.website}
+        onChange={handleChange}
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        className={styles.honeypot}
+      />
+
       {/* ── Name ── */}
       <div className={styles.field}>
         <label className={styles.label} htmlFor="name">
@@ -332,9 +355,7 @@ export function RecruiterContactForm() {
       {/* ── API Error ── */}
       {isError && (
         <div className={styles.apiError}>
-          <p className={styles.apiErrorText}>
-            {error?.message ?? t('contactForm.error.generic')}
-          </p>
+          <p className={styles.apiErrorText}>{apiErrorMessage}</p>
           <button
             type="button"
             className={styles.retryButton}
@@ -345,6 +366,11 @@ export function RecruiterContactForm() {
           </button>
         </div>
       )}
+
+      <Turnstile
+        siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined}
+        onTokenChange={(token) => setFormData((prev) => ({ ...prev, turnstileToken: token }))}
+      />
 
       {/* ── Submit ── */}
       <button
