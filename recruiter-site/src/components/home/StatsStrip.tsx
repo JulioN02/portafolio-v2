@@ -1,26 +1,15 @@
-import { PROFILE } from '@jsoft/shared';
-import { DATA } from '../../data/tech-stack';
 import { useTranslation } from '../../i18n/LanguageContext';
 import styles from './StatsStrip.module.css';
 
 /**
- * Years as National Logistics Coordinator (Ene 2018 – Ene 2025),
- * traceable to the timeline entry in translations (RHP-5: no invented metrics).
+ * Metric slots rendered in order. Values and labels live in i18n
+ * (`statsStrip.{index}.value` / `.label`) so both languages stay in sync
+ * and the component carries no hardcoded content.
  */
-const LOGISTICS_YEARS = 7;
-/** English level from the timeline languages line (Español nativo / Inglés A2). */
-const ENGLISH_LEVEL = 'A2';
+const METRIC_SLOTS = [0, 1, 2, 3] as const;
 
 export function StatsStrip() {
   const { t } = useTranslation();
-  const techCount = DATA.reduce((acc, domain) => acc + domain.items.length, 0);
-
-  const stats = [
-    { value: PROFILE.availabilityMetric, label: t('statsStrip.availability') },
-    { value: String(LOGISTICS_YEARS), label: t('statsStrip.logisticsYears') },
-    { value: String(techCount), label: t('statsStrip.techCount') },
-    { value: ENGLISH_LEVEL, label: t('statsStrip.englishLevel') },
-  ];
 
   return (
     <section className={styles.section} aria-labelledby="stats-strip-title">
@@ -29,12 +18,15 @@ export function StatsStrip() {
           {t('statsStrip.title')}
         </h2>
         <dl className={styles.list}>
-          {stats.map((stat) => (
-            <div key={stat.label} className={styles.item}>
-              <dt className={styles.label}>{stat.label}</dt>
-              <dd className={styles.value}>{stat.value}</dd>
-            </div>
-          ))}
+          {METRIC_SLOTS.map((slot) => {
+            const label = t(`statsStrip.${slot}.label`);
+            return (
+              <div key={slot} className={styles.item}>
+                <dt className={styles.label}>{label}</dt>
+                <dd className={styles.value}>{t(`statsStrip.${slot}.value`)}</dd>
+              </div>
+            );
+          })}
         </dl>
       </div>
     </section>

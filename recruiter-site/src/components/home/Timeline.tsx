@@ -3,31 +3,42 @@ import styles from './Timeline.module.css';
 
 interface TimelineEntry {
   roleKey: string;
-  orgKey: string;
+  orgKey?: string;
   periodKey?: string;
   dateTimeKey?: string;
-  metricKey?: string;
+  descriptionKey?: string;
 }
 
 // Experience entries in chronological order (RHP-3).
-// Soporte Movexa and Operador Homecenter have no dates in the design/CV —
-// they render without a <time> element (no invented dates).
 const EXPERIENCE: TimelineEntry[] = [
   {
     roleKey: 'timeline.exp.0.role',
     orgKey: 'timeline.exp.0.org',
     periodKey: 'timeline.exp.0.period',
     dateTimeKey: 'timeline.exp.0.dateTime',
+    descriptionKey: 'timeline.exp.0.description',
   },
   {
     roleKey: 'timeline.exp.1.role',
     orgKey: 'timeline.exp.1.org',
     periodKey: 'timeline.exp.1.period',
     dateTimeKey: 'timeline.exp.1.dateTime',
-    metricKey: 'timeline.exp.1.metric',
+    descriptionKey: 'timeline.exp.1.description',
   },
-  { roleKey: 'timeline.exp.2.role', orgKey: 'timeline.exp.2.org' },
-  { roleKey: 'timeline.exp.3.role', orgKey: 'timeline.exp.3.org' },
+  {
+    roleKey: 'timeline.exp.2.role',
+    orgKey: 'timeline.exp.2.org',
+    periodKey: 'timeline.exp.2.period',
+    dateTimeKey: 'timeline.exp.2.dateTime',
+    descriptionKey: 'timeline.exp.2.description',
+  },
+  {
+    roleKey: 'timeline.exp.3.role',
+    orgKey: 'timeline.exp.3.org',
+    periodKey: 'timeline.exp.3.period',
+    dateTimeKey: 'timeline.exp.3.dateTime',
+    descriptionKey: 'timeline.exp.3.description',
+  },
 ];
 
 const EDUCATION: TimelineEntry[] = [
@@ -42,6 +53,7 @@ const EDUCATION: TimelineEntry[] = [
     orgKey: 'timeline.edu.1.org',
     periodKey: 'timeline.edu.1.period',
     dateTimeKey: 'timeline.edu.1.dateTime',
+    descriptionKey: 'timeline.edu.1.description',
   },
   {
     roleKey: 'timeline.edu.2.role',
@@ -65,8 +77,10 @@ export function Timeline() {
           </time>
         )}
         <h3 className={styles.role}>{t(entry.roleKey)}</h3>
-        <p className={styles.org}>{t(entry.orgKey)}</p>
-        {entry.metricKey && <p className={styles.metric}>{t(entry.metricKey)}</p>}
+        {entry.orgKey && <p className={styles.org}>{t(entry.orgKey)}</p>}
+        {entry.descriptionKey && (
+          <p className={styles.description}>{t(entry.descriptionKey)}</p>
+        )}
       </li>
     );
   };

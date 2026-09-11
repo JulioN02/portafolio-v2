@@ -19,6 +19,10 @@ export function Hero({
   const { t } = useTranslation();
   const resolvedTitle = title ?? t('hero.title');
   const resolvedSummary = summary ?? t('hero.summary');
+  const tags = t('hero.tags')
+    .split('·')
+    .map((tag) => tag.trim())
+    .filter(Boolean);
 
   return (
     <section className={styles.hero}>
@@ -48,6 +52,13 @@ export function Hero({
         <h1 className={styles.name}>{name}</h1>
         <p className={styles.title}>{resolvedTitle}</p>
         <p className={styles.summary}>{resolvedSummary}</p>
+        <ul className={styles.tags}>
+          {tags.map((tag) => (
+            <li key={tag} className={styles.tag}>
+              {tag}
+            </li>
+          ))}
+        </ul>
         <div className={styles.ctas}>
           <Link to="/proyectos" className={styles.ctaPrimary}>
             {t('hero.cta.primary')}
