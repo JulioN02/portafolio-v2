@@ -1,8 +1,12 @@
-.wrapper {
+/* Names are prefixed and must match the inline class names in Turnstile.tsx:
+ * tsup strips CSS-module mappings and emits these as GLOBAL rules, so generic
+ * names like `.wrapper`/`.widget` would risk collisions and never match the
+ * component's `turnstile-wrapper`/`turnstile-widget` class names. */
+.turnstile-wrapper {
   display: flex;
   justify-content: center;
 }
 
-.widget {
+.turnstile-widget {
   min-height: 65px;
 }
