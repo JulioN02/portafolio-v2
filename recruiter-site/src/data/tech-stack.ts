@@ -1,54 +1,75 @@
-export interface TechGroup {
-  category: string;
-  icon: string;
-  items: { name: string; level: string; color: string }[];
+import {
+  NodejsIcon,
+  TypescriptIcon,
+  ExpressIcon,
+  NestjsIcon,
+  PostgresqlIcon,
+  MysqlIcon,
+  PrismaIcon,
+  DockerIcon,
+  LinuxIcon,
+  CicdIcon,
+  GitIcon,
+  ReactIcon,
+  ViteIcon,
+  VanillaIcon,
+  HtmlcssIcon,
+} from '../components/home/techStack/icons';
+
+/** Shared props for tech stack icons (React SVG props). */
+export interface TechIconProps extends React.SVGProps<SVGSVGElement> {}
+
+export interface TechItem {
+  id: string;
+  labelKey: string;
+  Icon: React.ComponentType<TechIconProps>;
 }
 
-// CV-aligned tech stack (RHP-6): only items backed by the CV/profile.
-export const techStack: TechGroup[] = [
+export interface TechDomain {
+  id: string;
+  titleKey: string;
+  items: TechItem[];
+}
+
+/** Data-driven tech stack: 4 system-layer domains, 15 technologies. */
+export const DATA: TechDomain[] = [
   {
-    category: 'Backend',
-    icon: '⚙️',
+    id: 'backend',
+    titleKey: 'techStack.domain.backend',
     items: [
-      { name: 'Node.js', level: 'Avanzado', color: '#339933' },
-      { name: 'Express', level: 'Avanzado', color: '#000000' },
-      { name: 'Nest.js', level: 'Intermedio', color: '#e0234e' },
-      { name: 'PostgreSQL', level: 'Avanzado', color: '#336791' },
-      { name: 'MySQL', level: 'Intermedio', color: '#00758f' },
-      { name: 'Prisma', level: 'Avanzado', color: '#2d3748' },
-      { name: 'JWT', level: 'Avanzado', color: '#000000' },
-      { name: 'RBAC', level: 'Intermedio', color: '#4b5563' },
+      { id: 'nodejs', labelKey: 'techStack.item.nodejs', Icon: NodejsIcon },
+      { id: 'typescript', labelKey: 'techStack.item.typescript', Icon: TypescriptIcon },
+      { id: 'express', labelKey: 'techStack.item.express', Icon: ExpressIcon },
+      { id: 'nestjs', labelKey: 'techStack.item.nestjs', Icon: NestjsIcon },
     ],
   },
   {
-    category: 'Frontend',
-    icon: '🖥️',
+    id: 'data',
+    titleKey: 'techStack.domain.data',
     items: [
-      { name: 'React', level: 'Avanzado', color: '#61dafb' },
-      { name: 'TypeScript', level: 'Avanzado', color: '#3178c6' },
+      { id: 'postgresql', labelKey: 'techStack.item.postgresql', Icon: PostgresqlIcon },
+      { id: 'mysql', labelKey: 'techStack.item.mysql', Icon: MysqlIcon },
+      { id: 'prisma', labelKey: 'techStack.item.prisma', Icon: PrismaIcon },
     ],
   },
   {
-    category: 'Metodologías',
-    icon: '📐',
+    id: 'infrastructure',
+    titleKey: 'techStack.domain.infrastructure',
     items: [
-      { name: 'TDD', level: 'Avanzado', color: '#3E985D' },
-      { name: 'SDD', level: 'Avanzado', color: '#3E985D' },
-      { name: 'DDD', level: 'Intermedio', color: '#3E985D' },
-      { name: 'AI-assisted development', level: 'Avanzado', color: '#7CBD68' },
+      { id: 'docker', labelKey: 'techStack.item.docker', Icon: DockerIcon },
+      { id: 'linux', labelKey: 'techStack.item.linux', Icon: LinuxIcon },
+      { id: 'cicd', labelKey: 'techStack.item.cicd', Icon: CicdIcon },
+      { id: 'git', labelKey: 'techStack.item.git', Icon: GitIcon },
     ],
   },
   {
-    category: 'Plataformas-DevOps',
-    icon: '🛠️',
+    id: 'frontend',
+    titleKey: 'techStack.domain.frontend',
     items: [
-      { name: 'Docker', level: 'Intermedio', color: '#2496ed' },
-      { name: 'Linux', level: 'Avanzado', color: '#fcc624' },
-      { name: 'Git/GitHub', level: 'Avanzado', color: '#f05032' },
-      { name: 'CI/CD', level: 'Avanzado', color: '#4b5563' },
-      { name: 'Vercel', level: 'Avanzado', color: '#000000' },
-      { name: 'Supabase', level: 'Intermedio', color: '#3ecf8e' },
-      { name: 'Jest', level: 'Avanzado', color: '#c21325' },
+      { id: 'react', labelKey: 'techStack.item.react', Icon: ReactIcon },
+      { id: 'vite', labelKey: 'techStack.item.vite', Icon: ViteIcon },
+      { id: 'vanilla', labelKey: 'techStack.item.vanilla', Icon: VanillaIcon },
+      { id: 'htmlcss', labelKey: 'techStack.item.htmlcss', Icon: HtmlcssIcon },
     ],
   },
 ];
