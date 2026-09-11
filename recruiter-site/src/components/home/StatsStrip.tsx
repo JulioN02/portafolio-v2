@@ -1,5 +1,5 @@
 import { PROFILE } from '@jsoft/shared';
-import { techStack } from '../../data/tech-stack';
+import { DATA } from '../../data/tech-stack';
 import { useTranslation } from '../../i18n/LanguageContext';
 import styles from './StatsStrip.module.css';
 
@@ -13,7 +13,7 @@ const ENGLISH_LEVEL = 'A2';
 
 export function StatsStrip() {
   const { t } = useTranslation();
-  const techCount = techStack.reduce((acc, group) => acc + group.items.length, 0);
+  const techCount = DATA.reduce((acc, domain) => acc + domain.items.length, 0);
 
   const stats = [
     { value: PROFILE.availabilityMetric, label: t('statsStrip.availability') },

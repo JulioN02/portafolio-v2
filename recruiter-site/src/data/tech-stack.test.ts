@@ -1,65 +1,73 @@
 import { describe, it, expect } from 'vitest';
-import { techStack } from './tech-stack';
+import { DATA } from './tech-stack';
 
-// CV-aligned tech stack (RHP-6).
-const REQUIRED = [
-  'Nest.js',
-  'JWT',
-  'RBAC',
-  'MySQL',
-  'Prisma',
-  'TDD',
-  'SDD',
-  'DDD',
-  'Vercel',
-  'Supabase',
-  'CI/CD',
-  'AI-assisted development',
+const DOMAIN_IDS = ['backend', 'data', 'infrastructure', 'frontend'] as const;
+
+const DOMAIN_TITLE_KEYS = [
+  'techStack.domain.backend',
+  'techStack.domain.data',
+  'techStack.domain.infrastructure',
+  'techStack.domain.frontend',
 ] as const;
 
-const REMOVED = ['Next.js', 'Vue.js', 'Tailwind', 'MongoDB', 'Figma', 'Linear'] as const;
-
-const KEPT = [
-  'React',
-  'TypeScript',
-  'Node.js',
-  'Express',
-  'PostgreSQL',
-  'Docker',
-  'Git/GitHub',
-  'Linux',
-  'Jest',
+const ITEM_IDS = [
+  'nodejs',
+  'typescript',
+  'express',
+  'nestjs',
+  'postgresql',
+  'mysql',
+  'prisma',
+  'docker',
+  'linux',
+  'cicd',
+  'git',
+  'react',
+  'vite',
+  'vanilla',
+  'htmlcss',
 ] as const;
 
-const allItems = techStack.flatMap((group) => group.items.map((item) => item.name));
+const allItems = DATA.flatMap((domain) => domain.items);
 
-describe('tech-stack data (RHP-6)', () => {
-  it('includes all 12 required CV items', () => {
-    for (const name of REQUIRED) {
-      expect(allItems, `missing: ${name}`).toContain(name);
+describe('tech-stack data (domain-grid redesign)', () => {
+  it('groups 15 technologies under 4 system-layer domains', () => {
+    expect(DATA.map((domain) => domain.id)).toEqual([...DOMAIN_IDS]);
+    expect(allItems).toHaveLength(15);
+  });
+
+  it('uses the i18n title keys for every domain', () => {
+    expect(DATA.map((domain) => domain.titleKey)).toEqual([...DOMAIN_TITLE_KEYS]);
+  });
+
+  it('exposes every tech by id with a label key and an icon component', () => {
+    expect(allItems.map((item) => item.id)).toEqual([...ITEM_IDS]);
+    for (const item of allItems) {
+      expect(item.labelKey, item.id).toBe(`techStack.item.${item.id}`);
+      expect(item.Icon, item.id).toBeTypeOf('function');
     }
   });
 
-  it('excludes all 6 removed tech items', () => {
-    for (const name of REMOVED) {
-      expect(allItems, `should not contain: ${name}`).not.toContain(name);
+  it('has at least one item in every domain', () => {
+    for (const domain of DATA) {
+      expect(domain.items.length, domain.id).toBeGreaterThan(0);
     }
   });
 
-  it('keeps the CV-backed items', () => {
-    for (const name of KEPT) {
-      expect(allItems, `missing: ${name}`).toContain(name);
-    }
-  });
-
-  it('groups items under Backend, Frontend, Metodologías, Plataformas-DevOps', () => {
-    const categories = techStack.map((group) => group.category);
-    expect(categories).toEqual(['Backend', 'Frontend', 'Metodologías', 'Plataformas-DevOps']);
-  });
-
-  it('has at least one item in every group', () => {
-    for (const group of techStack) {
-      expect(group.items.length, group.category).toBeGreaterThan(0);
+  it('drops the old subjective-percentage items from the redesign', () => {
+    const dropped = [
+      'jwt',
+      'rbac',
+      'tdd',
+      'sdd',
+      'ddd',
+      'ai',
+      'vercel',
+      'supabase',
+      'jest',
+    ] as const;
+    for (const id of dropped) {
+      expect(allItems.map((item) => item.id), `should not contain: ${id}`).not.toContain(id);
     }
   });
 });

@@ -1,102 +1,49 @@
-import { useEffect, useCallback, useRef } from 'react';
-import useEmblaCarousel from 'embla-carousel-react';
-import { techStack } from '../../data/tech-stack';
-import { SectionTitle } from '../common/SectionTitle';
 import { useTranslation } from '../../i18n/LanguageContext';
+import { DATA } from '../../data/tech-stack';
 import styles from './TechStack.module.css';
 
-const AUTOPLAY_INTERVAL = 4000;
-
+/**
+ * Tech Stack section — 15 technologies grouped in 4 system-layer cards.
+ * Static and data-driven: no state, effects, timers, or carousel.
+ */
 export function TechStack() {
   const { t } = useTranslation();
-  const autoplayTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    loop: true,
-    align: 'start',
-    skipSnaps: false,
-  });
-
-  const startAutoplay = useCallback(() => {
-    if (autoplayTimerRef.current) clearInterval(autoplayTimerRef.current);
-    autoplayTimerRef.current = setInterval(() => {
-      emblaApi?.scrollNext();
-    }, AUTOPLAY_INTERVAL);
-  }, [emblaApi]);
-
-  const stopAutoplay = useCallback(() => {
-    if (autoplayTimerRef.current) {
-      clearInterval(autoplayTimerRef.current);
-      autoplayTimerRef.current = null;
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-    startAutoplay();
-
-    emblaApi.on('pointerDown', stopAutoplay);
-    emblaApi.on('pointerUp', startAutoplay);
-
-    return () => {
-      stopAutoplay();
-      emblaApi.off('pointerDown', stopAutoplay);
-      emblaApi.off('pointerUp', startAutoplay);
-    };
-  }, [emblaApi, startAutoplay, stopAutoplay]);
 
   return (
-    <section className={styles.section}>
+    <section className={styles.section} aria-labelledby="tech-stack-title">
       <div className={styles.container}>
-        <SectionTitle
-          title={t('techStack.title')}
-          subtitle={t('techStack.subtitle')}
-        />
+        <header>
+          <h2 id="tech-stack-title" className={styles.title}>
+            {t('techStack.title')}
+          </h2>
+          <p className={styles.subtitle}>{t('techStack.subtitle')}</p>
+        </header>
 
-        <div className={styles.embla} ref={emblaRef}>
-          <div className={styles.emblaContainer}>
-            {techStack.map((group) => (
-              <div key={group.category} className={styles.emblaSlide}>
-                <div className={styles.slideHeader}>
-                  <span className={styles.slideIcon}>{group.icon}</span>
-                  <h3 className={styles.slideTitle}>{group.category}</h3>
-                </div>
-                <div className={styles.techList}>
-                  {group.items.map((item) => (
-                    <div key={item.name} className={styles.techCard}>
-                      <div className={styles.techInfo}>
-                        <span className={styles.techName}>{item.name}</span>
-                        <span className={styles.techLevel}>{item.level}</span>
-                      </div>
-                      <div className={styles.levelBar}>
-                        <div
-                          className={styles.levelFill}
-                          style={{
-                            width:
-                              item.level === 'Avanzado'
-                                ? '90%'
-                                : item.level === 'Intermedio'
-                                  ? '60%'
-                                  : '30%',
-                            backgroundColor: item.color,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className={styles.dots}>
-          {techStack.map((group, index) => (
-            <button
-              key={group.category}
-              className={styles.dot}
-              onClick={() => emblaApi?.scrollTo(index)}
-              aria-label={t('techStack.slideAria', { category: group.category })}
-            />
+        <div className={styles.grid}>
+          {DATA.map((domain) => (
+            <article key={domain.id} className={styles.card}>
+              <header>
+                <h3 className={styles.domainTitle}>{t(domain.titleKey)}</h3>
+              </header>
+              <ul className={styles.icons}>
+                {domain.items.map((item) => (
+                  <li key={item.id} className={styles.techItem}>
+                    <button
+                      type="button"
+                      className={styles.techButton}
+                      aria-label={t(item.labelKey)}
+                    >
+                      <item.Icon
+                        className={styles.icon}
+                        aria-hidden="true"
+                        focusable="false"
+                      />
+                      <span className={styles.techName}>{t(item.labelKey)}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </article>
           ))}
         </div>
       </div>

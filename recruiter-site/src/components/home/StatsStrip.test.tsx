@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { PROFILE } from '@jsoft/shared';
-import { techStack } from '../../data/tech-stack';
+import { DATA } from '../../data/tech-stack';
 import { LanguageProvider } from '../../i18n/LanguageContext';
 import { StatsStrip } from './StatsStrip';
 import type { ReactNode } from 'react';
@@ -19,7 +19,7 @@ describe('StatsStrip (RHP-5)', () => {
 
   it('renders the tech count derived from the tech-stack data file', () => {
     renderWithProviders(<StatsStrip />);
-    const expected = techStack.reduce((acc, group) => acc + group.items.length, 0);
+    const expected = DATA.reduce((acc, domain) => acc + domain.items.length, 0);
     expect(screen.getByText(String(expected))).toBeInTheDocument();
     expect(screen.getByText('Tecnologías en mi stack')).toBeInTheDocument();
   });
