@@ -44,8 +44,8 @@ export const authApi = {
     return data;
   },
 
-  sendVerificationCode: async (): Promise<{ code: string; expiresIn: number }> => {
-    const { data } = await apiClient.post<{ code: string; expiresIn: number }>('/auth/verification-code');
+  sendVerificationCode: async (): Promise<{ message: string; expiresIn: number }> => {
+    const { data } = await apiClient.post<{ message: string; expiresIn: number }>('/auth/verification-code');
     return data;
   },
 

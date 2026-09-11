@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
-import { useSendVerificationCode, useChangePassword } from '../../hooks/useAuth';
+import { useSendVerificationCode, useChangePassword, useProfile } from '../../hooks/useAuth';
 import { toast } from 'sonner';
 
 type Step = 'credentials' | 'verification' | 'success';
@@ -9,6 +9,12 @@ export function SecuritySettings() {
   const { t } = useTranslation();
   const { sendCode, isSending, sendError, clearSendError } = useSendVerificationCode();
   const { changePassword, isChanging, changeError, changeSuccess, clearChangeState } = useChangePassword();
+  const { profile, fetchProfile } = useProfile();
+
+  // Load the profile so we can show the email the verification code is sent to.
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile]);
 
   const [step, setStep] = useState<Step>('credentials');
   const [currentPassword, setCurrentPassword] = useState('');
@@ -339,7 +345,9 @@ export function SecuritySettings() {
                   marginTop: '0.25rem',
                 }}
               >
-                {t('settings.verificationCodeSent')}
+                {profile?.email
+                  ? t('settings.verificationCodeSentTo', { email: profile.email })
+                  : t('settings.verificationCodeSent')}
               </div>
             </div>
 

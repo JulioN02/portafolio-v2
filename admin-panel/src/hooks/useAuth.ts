@@ -122,7 +122,7 @@ export function useSendVerificationCode() {
   const [isSending, setIsSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
 
-  const sendCode = useCallback(async (): Promise<{ code: string; expiresIn: number } | null> => {
+  const sendCode = useCallback(async (): Promise<{ message: string; expiresIn: number } | null> => {
     setIsSending(true);
     setSendError(null);
     try {
