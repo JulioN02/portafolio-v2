@@ -162,6 +162,10 @@ export {
   useMediaClickDelegation,
 } from './components/index.js';
 
+// Turnstile (contact anti-spam widget)
+export { Turnstile } from './components/index.js';
+export type { TurnstileProps } from './components/index.js';
+
 // CSS Variables (import to apply design tokens)
 import './styles/variables.css';
 
@@ -181,3 +185,4 @@ import './components/ui/Checkbox/Checkbox.module.css';
 import './components/RichTextEditor/RichTextEditor.module.css';
 import './components/MediaCarousel/MediaCarousel.module.css';
 import './components/Lightbox/Lightbox.module.css';
+import './components/Turnstile/Turnstile.module.css';

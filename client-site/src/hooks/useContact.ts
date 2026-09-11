@@ -9,7 +9,7 @@ interface SubmitContactOptions {
 
 export function useSubmitContact({ onSuccess, onError }: SubmitContactOptions = {}) {
   return useMutation({
-    mutationFn: (data: ClientContactInput & { source?: string }) =>
+    mutationFn: (data: ClientContactInput & { source?: string; turnstileToken?: string }) =>
       apiClient.post('/contact/client', data),
     onSuccess,
     onError,

@@ -1,15 +1,17 @@
 import { Router, IRouter } from 'express';
 import { contactController } from '../controllers/contact.controller.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
+import { contactAntiSpam } from '../middleware/contactAntiSpam.middleware.js';
 
 const router: IRouter = Router();
 
 // Public routes (no authentication required)
 // POST /api/contact/client - Submit contact from client
-router.post('/client', contactController.createClient);
+// Anti-spam chain: honeypot → contactLimiter → Turnstile (optional).
+router.post('/client', ...contactAntiSpam, contactController.createClient);
 
 // POST /api/contact/recruiter - Submit contact from recruiter
-router.post('/recruiter', contactController.createRecruiter);
+router.post('/recruiter', ...contactAntiSpam, contactController.createRecruiter);
 
 // Protected routes (admin only)
 router.use(authMiddleware);

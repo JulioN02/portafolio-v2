@@ -17,6 +17,10 @@ export const clientContactSchema = z.object({
   email: z.string().email('Invalid email format'),
   message: z.string().min(10, 'Message must be at least 10 characters').max(2000),
   source: z.string().min(2).max(100), // "service:Desarrollo Web", "product:ERP", "tool:X", "general"
+  // Honeypot anti-spam backstop: hidden field that must stay empty.
+  // The middleware answers bots before Zod; this schema-level guard protects
+  // if middleware order ever changes. Never persisted (transient field).
+  website: z.string().max(0).optional(),
 });
 
 /**
@@ -28,6 +32,8 @@ export const recruiterContactSchema = z.object({
   email: z.string().email('Invalid email format'),
   whatsapp: z.string().regex(/^\+?[0-9]{10,15}$/).optional(),
   message: z.string().min(10).max(2000),
+  // Honeypot anti-spam backstop (see clientContactSchema above).
+  website: z.string().max(0).optional(),
 });
 
 /**

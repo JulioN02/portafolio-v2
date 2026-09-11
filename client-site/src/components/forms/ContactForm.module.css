@@ -206,3 +206,16 @@
     color: var(--color-primary-700);
   }
 }
+
+/* Honeypot anti-spam field — visually hidden from humans, fillable by bots */
+.honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  border: 0;
+  padding: 0;
+}

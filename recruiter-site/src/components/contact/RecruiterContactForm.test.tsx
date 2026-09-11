@@ -1,0 +1,135 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import type { ReactNode } from 'react';
+import { LanguageProvider } from '../../i18n/LanguageContext';
+import { RecruiterContactForm } from './RecruiterContactForm';
+
+const mockPost = vi.fn();
+
+vi.mock('../../api/client', () => ({
+  apiClient: { post: (path: string, body: unknown) => mockPost(path, body) },
+}));
+
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+});
+
+function wrapper({ children }: { children: ReactNode }) {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <LanguageProvider>{children}</LanguageProvider>
+    </QueryClientProvider>
+  );
+}
+
+function renderForm() {
+  return render(<RecruiterContactForm />, { wrapper });
+}
+
+function fillValidForm() {
+  fireEvent.change(screen.getByLabelText('Nombre completo *'), { target: { value: 'Luis' } });
+  fireEvent.change(screen.getByLabelText('Correo electrónico *'), {
+    target: { value: 'luis@example.com' },
+  });
+  fireEvent.change(screen.getByLabelText('Teléfono *'), { target: { value: '+57 300 111 2233' } });
+  fireEvent.change(screen.getByLabelText('Empresa *'), { target: { value: 'Acme' } });
+  fireEvent.change(screen.getByLabelText('Cargo *'), { target: { value: 'Tech Lead' } });
+  fireEvent.change(screen.getByLabelText('Presupuesto / Rango salarial *'), {
+    target: { value: '$50k' },
+  });
+  fireEvent.change(screen.getByLabelText('Mensaje *'), {
+    target: { value: 'Hola, tengo una oportunidad laboral.' },
+  });
+}
+
+describe('RecruiterContactForm — anti-spam wiring (contact-anti-spam)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockPost.mockResolvedValue({ message: 'Contact form submitted successfully', data: {} });
+    vi.stubEnv('VITE_TURNSTILE_SITE_KEY', '');
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it('renders a visually-hidden honeypot input named website (tabIndex -1, autocomplete off)', () => {
+    const { container } = renderForm();
+
+    const honeypot = container.querySelector('input[name="website"]');
+    expect(honeypot).not.toBeNull();
+    expect(honeypot).toHaveAttribute('tabindex', '-1');
+    expect(honeypot).toHaveAttribute('autocomplete', 'off');
+    expect(honeypot).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('includes website:"" and turnstileToken in the recruiter submit payload', async () => {
+    renderForm();
+    fillValidForm();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar mensaje' }));
+
+    await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
+    const [path, body] = mockPost.mock.calls[0];
+    expect(path).toBe('/contact/recruiter');
+    expect(body.website).toBe('');
+    expect(body).toHaveProperty('turnstileToken');
+  });
+
+  it('renders the Turnstile widget when the site key is set and passes its token into the payload', async () => {
+    const renderMock = vi.fn();
+    vi.stubEnv('VITE_TURNSTILE_SITE_KEY', '0x4AAAAAAA-test');
+    let widgetCallback: ((token: string) => void) | undefined;
+    renderMock.mockImplementation((_el: HTMLElement, options: { callback?: (t: string) => void }) => {
+      widgetCallback = options.callback;
+      return 'widget-1';
+    });
+    window.turnstile = { render: renderMock, remove: vi.fn() };
+
+    renderForm();
+    fillValidForm();
+
+    expect(renderMock).toHaveBeenCalledWith(
+      expect.any(HTMLElement),
+      expect.objectContaining({ sitekey: '0x4AAAAAAA-test' }),
+    );
+
+    act(() => {
+      widgetCallback?.('token-abc');
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar mensaje' }));
+
+    await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
+    const [, body] = mockPost.mock.calls[0];
+    expect(body.turnstileToken).toBe('token-abc');
+  });
+
+  it('does not render the Turnstile widget when the site key is empty', () => {
+    const renderMock = vi.fn();
+    window.turnstile = { render: renderMock, remove: vi.fn() };
+
+    renderForm();
+
+    expect(renderMock).not.toHaveBeenCalled();
+    expect(document.getElementById('cf-turnstile-script')).toBeNull();
+  });
+
+  it('maps a 400 TURNSTILE_FAILED response to an inline error', async () => {
+    mockPost.mockRejectedValue({
+      message: 'Turnstile verification failed',
+      code: 'TURNSTILE_FAILED',
+      status: 400,
+    });
+
+    renderForm();
+    fillValidForm();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar mensaje' }));
+
+    expect(
+      await screen.findByText('Verificación anti-spam fallida. Por favor, inténtalo de nuevo.'),
+    ).toBeInTheDocument();
+  });
+});

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useSubmitContact } from '../../hooks/useContact';
+import { Turnstile } from '@jsoft/shared';
 import { Spinner } from '../common/Spinner';
 import { toast } from 'sonner';
 import styles from './ContactForm.module.css';
@@ -32,7 +33,9 @@ export function ContactForm({ source = 'general', onSuccess }: ContactFormProps)
     email: '',
     whatsapp: '',
     message: '',
+    website: '', // honeypot — must stay empty for humans
   });
+  const [turnstileToken, setTurnstileToken] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [success, setSuccess] = useState(false);
 
@@ -40,10 +43,16 @@ export function ContactForm({ source = 'general', onSuccess }: ContactFormProps)
     onSuccess: () => {
       setSuccess(true);
       toast.success('¡Mensaje enviado con éxito!');
-      setFormData({ firstName: '', lastName: '', email: '', whatsapp: '', message: '' });
+      setFormData({ firstName: '', lastName: '', email: '', whatsapp: '', message: '', website: '' });
+      setTurnstileToken('');
       onSuccess?.();
     },
-    onError: () => {
+    onError: (error) => {
+      const code = (error as { code?: string }).code;
+      if (code === 'TURNSTILE_FAILED') {
+        setErrors({ submit: 'Verificación anti-spam fallida. Por favor, inténtalo de nuevo.' });
+        return;
+      }
       toast.error('Error al enviar el mensaje');
       setErrors({ submit: 'Error al enviar el formulario. Por favor, intenta de nuevo.' });
     },
@@ -88,7 +97,7 @@ export function ContactForm({ source = 'general', onSuccess }: ContactFormProps)
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      submitContact({ ...formData, source });
+      submitContact({ ...formData, source, turnstileToken });
     }
   };
 
@@ -143,6 +152,18 @@ export function ContactForm({ source = 'general', onSuccess }: ContactFormProps)
 
   return (
     <form onSubmit={handleSubmit} className={styles.form} noValidate>
+      {/* Honeypot anti-spam field — hidden from users, filled only by bots */}
+      <input
+        type="text"
+        name="website"
+        value={formData.website}
+        onChange={handleChange}
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        className={styles.honeypot}
+      />
+
       {source && source !== 'general' && (
         <div className={styles.sourceTag}>
           <span className={styles.sourceLabel}>Consultando sobre</span>
@@ -182,6 +203,11 @@ export function ContactForm({ source = 'general', onSuccess }: ContactFormProps)
       {errors.submit && (
         <div className={styles.submitError}>{errors.submit}</div>
       )}
+
+      <Turnstile
+        siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined}
+        onTokenChange={setTurnstileToken}
+      />
 
       <button type="submit" disabled={isPending} className={styles.submitButton}>
         {isPending ? (
