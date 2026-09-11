@@ -33,14 +33,14 @@ export function HomePage() {
       {/* Tech Stack Section */}
       <TechStack />
 
+      {/* Recent Projects Section */}
+      <RecentProjects />
+
       {/* Timeline Section */}
       <Timeline />
 
       {/* Contribution Areas Section */}
       <AreasDeAporte />
-
-      {/* Recent Projects Section */}
-      <RecentProjects />
 
       {/* Contact Strip Section */}
       <ContactStrip />
