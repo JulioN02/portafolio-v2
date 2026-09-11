@@ -4,7 +4,7 @@ import { translations, type Language } from './translations';
 interface LanguageContextType {
   lang: Language;
   setLang: (lang: Language) => void;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
 }
 
 const STORAGE_KEY = 'admin_language';
@@ -32,8 +32,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const t = useCallback(
-    (key: string): string => {
-      return translations[lang][key] ?? key;
+    (key: string, params?: Record<string, string | number>): string => {
+      const value = translations[lang][key] ?? key;
+      if (!params) return value;
+      return Object.entries(params).reduce(
+        (acc, [param, replacement]) =>
+          acc.replace(new RegExp(`\\{${param}\\}`, 'g'), String(replacement)),
+        value
+      );
     },
     [lang]
   );
