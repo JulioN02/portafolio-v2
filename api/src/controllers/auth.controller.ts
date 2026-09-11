@@ -2,9 +2,10 @@ import { Request, Response } from 'express';
 import { AuthRequest } from '../middleware/auth.middleware.js';
 import { login, getUserById, updateProfile, changePassword } from '../services/auth.service.js';
 import { verificationCodeService } from '../services/verification-code.service.js';
+import { sendVerificationCodeEmail } from '../services/email.service.js';
 import { loginSchema, updateProfileSchema, changePasswordSchema } from '@jsoft/shared';
 import { asyncHandler } from '../utils/asyncHandler.js';
-import { NotFoundError } from '../utils/errors.js';
+import { NotFoundError, ValidationError } from '../utils/errors.js';
 
 export const loginHandler = asyncHandler(async (req: Request, res: Response) => {
   const credentials = loginSchema.parse(req.body);
@@ -49,14 +50,23 @@ export const sendVerificationCodeHandler = asyncHandler(async (req: Request, res
     throw new NotFoundError('Not authenticated');
   }
 
-  const result = verificationCodeService.generate(authReq.user.userId);
-  // Gated logging: the code must never be written to console in production.
-  // (The code is still returned in the API response — accepted single-admin risk.)
-  if (process.env.NODE_ENV !== 'production') {
-    console.log(`[DEV] Verification code for user ${authReq.user.userId}: ${result.code}`);
+  const user = await getUserById(authReq.user.userId);
+  if (!user) {
+    throw new NotFoundError('User not found');
   }
 
-  res.json(result);
+  if (!user.email) {
+    throw new ValidationError(
+      'No email configured in your profile. Add one before requesting a verification code.',
+    );
+  }
+
+  const { code, expiresIn } = await verificationCodeService.generate(authReq.user.userId);
+
+  // Deliver the code by email. The plaintext code never leaves the server.
+  await sendVerificationCodeEmail(user.email, code);
+
+  res.json({ message: 'Verification code sent', expiresIn });
 });
 
 export const changePasswordHandler = asyncHandler(async (req: Request, res: Response) => {

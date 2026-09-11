@@ -161,7 +161,7 @@ it('throws CONFLICT when email already taken by another user', async () => {
 
   describe('changePassword', () => {
     it('validates code, hashes password and updates user', async () => {
-      mockedVerification.validate.mockReturnValue(undefined as never);
+      mockedVerification.validate.mockResolvedValue(undefined);
       mockedBcrypt.hash.mockResolvedValue('new-hash' as never);
       (mockPrisma.user.update as jest.Mock).mockResolvedValue({ ...mockUser, password: 'new-hash' });
 

@@ -132,7 +132,7 @@ export const updateProfile = async (userId: string, data: UpdateProfileInput): P
  */
 export const changePassword = async (userId: string, data: ChangePasswordInput): Promise<{ message: string }> => {
   // Validate verification code (throws ValidationError on invalid/expired/used)
-  verificationCodeService.validate(userId, data.verificationCode);
+  await verificationCodeService.validate(userId, data.verificationCode);
 
   // Hash new password
   const hashedPassword = await bcrypt.hash(data.newPassword, 12);

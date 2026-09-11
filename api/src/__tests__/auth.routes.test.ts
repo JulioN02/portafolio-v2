@@ -5,8 +5,23 @@ import jwt from 'jsonwebtoken';
 import authRoutes from '../routes/auth.routes';
 import { errorHandler } from '../middleware/errorHandler.middleware';
 import { PrismaClient } from '@prisma/client';
+import { sendVerificationCodeEmail } from '../services/email.service';
 
 const mockPrisma = new PrismaClient();
+
+// bcrypt is native + slow; the code hash/compare is not what these HTTP
+// integration tests exercise (that lives in verification-code.service.test.ts).
+jest.mock('bcrypt', () => ({
+  hash: jest.fn().mockResolvedValue('hashed-code'),
+  compare: jest.fn().mockResolvedValue(true),
+}));
+
+// Never hit a real SMTP server from tests.
+jest.mock('../services/email.service', () => ({
+  sendVerificationCodeEmail: jest.fn(),
+}));
+
+const mockedSendEmail = sendVerificationCodeEmail as jest.MockedFunction<typeof sendVerificationCodeEmail>;
 
 /**
  * Regression guard for POST /api/auth/verification-code.
@@ -16,7 +31,9 @@ const mockPrisma = new PrismaClient();
  * even with a valid Bearer token. The password-change flow was broken in
  * production because of this. This suite pins the correct behavior:
  *  - no token      → 401 (authMiddleware rejects)
- *  - valid token   → 200 + verification code
+ *  - valid token   → 200, code delivered by email, code NOT in the response
+ *  - no profile email → 400 VALIDATION_ERROR
+ *  - SMTP failure  → 500 (propagated, never a silent success)
  */
 describe('Auth routes (integration)', () => {
   let server: Server;
@@ -51,6 +68,17 @@ describe('Auth routes (integration)', () => {
     jest.clearAllMocks();
     process.env.JWT_SECRET = 'test-secret';
     process.env.NODE_ENV = 'test';
+
+    // Authenticated user WITH a profile email by default.
+    (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue({
+      id: 'test-user-1',
+      username: 'admin',
+      email: 'admin@example.com',
+    });
+    (mockPrisma.verificationCode.deleteMany as jest.Mock).mockResolvedValue({ count: 0 });
+    (mockPrisma.verificationCode.create as jest.Mock).mockResolvedValue({ id: 'vc-1' });
+    (mockPrisma.verificationCode.findFirst as jest.Mock).mockResolvedValue(null);
+    mockedSendEmail.mockResolvedValue(undefined);
   });
 
   afterEach(() => {
@@ -85,7 +113,7 @@ describe('Auth routes (integration)', () => {
       expect(body.code).toBe('AUTH_ERROR');
     });
 
-    it('returns 200 with a verification code when authenticated (regression: was 404)', async () => {
+    it('emails the code to the profile address and never returns it in the response', async () => {
       const res = await fetch(`${baseUrl}/verification-code`, {
         method: 'POST',
         headers: {
@@ -97,13 +125,21 @@ describe('Auth routes (integration)', () => {
 
       expect(res.status).toBe(200);
       const body = await res.json();
-      expect(body.code).toMatch(/^\d{6}$/);
-      expect(body.expiresIn).toBeGreaterThan(0);
+      expect(body).toEqual({ message: 'Verification code sent', expiresIn: 600 });
+      expect(body.code).toBeUndefined();
+
+      expect(mockedSendEmail).toHaveBeenCalledTimes(1);
+      const [to, code] = mockedSendEmail.mock.calls[0];
+      expect(to).toBe('admin@example.com');
+      expect(code).toMatch(/^\d{6}$/);
     });
 
-    it('does NOT log the verification code when NODE_ENV=production', async () => {
-      const logSpy = jest.spyOn(console, 'log');
-      process.env.NODE_ENV = 'production';
+    it('returns 400 VALIDATION_ERROR when the profile has no email', async () => {
+      (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue({
+        id: 'test-user-1',
+        username: 'admin',
+        email: null,
+      });
 
       const res = await fetch(`${baseUrl}/verification-code`, {
         method: 'POST',
@@ -114,17 +150,16 @@ describe('Auth routes (integration)', () => {
         body: '{}',
       });
 
-      expect(res.status).toBe(200);
+      expect(res.status).toBe(400);
       const body = await res.json();
-      const logged = logSpy.mock.calls.some((call) =>
-        call.some((arg) => typeof arg === 'string' && arg.includes(body.code))
-      );
-      expect(logged).toBe(false);
+      expect(body.code).toBe('VALIDATION_ERROR');
+      expect(body.message).toMatch(/no email/i);
+      expect(mockedSendEmail).not.toHaveBeenCalled();
     });
 
-    it('logs the verification code when NODE_ENV is not production', async () => {
-      const logSpy = jest.spyOn(console, 'log');
-      process.env.NODE_ENV = 'development';
+    it('propagates email-send failures as a 500 error (no silent success)', async () => {
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+      mockedSendEmail.mockRejectedValueOnce(new Error('SMTP unavailable'));
 
       const res = await fetch(`${baseUrl}/verification-code`, {
         method: 'POST',
@@ -135,12 +170,10 @@ describe('Auth routes (integration)', () => {
         body: '{}',
       });
 
-      expect(res.status).toBe(200);
+      expect(res.status).toBe(500);
       const body = await res.json();
-      const logged = logSpy.mock.calls.some((call) =>
-        call.some((arg) => typeof arg === 'string' && arg.includes(body.code))
-      );
-      expect(logged).toBe(true);
+      expect(body.code).toBe('INTERNAL_ERROR');
+      expect(consoleErrorSpy).toHaveBeenCalled();
     });
   });
 
