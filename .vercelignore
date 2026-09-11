@@ -3,3 +3,5 @@ api/coverage/
 api/uploads/
 coverage/
 *.log
+.env
+.env.*

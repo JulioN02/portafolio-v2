@@ -81,7 +81,7 @@ Project: portafolio-v2 (portafoliov2jss)
 - ESLint config exists for frontends only (jsx-a11y plugin)
 - No formatter configured
 - File naming: `*.service.ts`, `*.routes.ts`, `*.middleware.ts`, `*.schema.ts`, `*.test.ts`
-- **Contact values MUST come from `PROFILE`** (`packages/shared/src/constants/profile.ts`, exported from `@jsoft/shared`): email jsoftsolutions@gmail.com, phone 300 3727134 (tel:+573003727134), WhatsApp wa.me/573003727134, LinkedIn/GitHub jsoftsolutions, cvUrl /cv/julio-nieto-cv.pdf. Zero hardcoded contact literals in site code.
+- **Contact/profile values MUST come from `PROFILE`** (`packages/shared/src/constants/profile.ts`, exported from `@jsoft/shared`): fullName/name `Julio Manuel Nieto Martinez`, email jsoftsolutions@gmail.com, linkedinUrl `https://linkedin.com/in/jsoftsolutions`, githubUrl `https://github.com/jsoftsolutions`, cvUrl `/cv/Julio_Nieto_CV.pdf`. Phone/WhatsApp PII was removed from the public surface (public-pii-minimization) — PROFILE exposes no phone/whatsapp fields. Zero hardcoded contact literals in site code.
 - CSS tokens: canonical `--font-size-*`; `--text-*` aliases exist for backward compat; prefer `--font-size-*` in new code.
 
 ### Testing

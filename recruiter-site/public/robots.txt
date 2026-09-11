@@ -1,0 +1,6 @@
+# robots.txt — recruiter-site (public surface)
+# Allow all crawlers on the public recruiter routes.
+User-agent: *
+Allow: /
+
+Sitemap: https://YOUR_DOMAIN/sitemap.xml

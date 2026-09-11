@@ -94,6 +94,17 @@ describe('RichTextEditor extensions (serialization)', () => {
     expect(html).not.toContain('<h5');
   });
 
+  it('Link: serializes with the hardened rel/target attributes (v3 StarterKit link disabled)', () => {
+    const editor = createEditor('<p>texto</p>');
+    editor.chain().focus().selectAll().setLink({ href: 'https://example.com' }).run();
+    const html = editor.getHTML();
+    editor.destroy();
+
+    expect(html).toContain('href="https://example.com"');
+    expect(html).toContain('rel="noopener noreferrer"');
+    expect(html).toContain('target="_blank"');
+  });
+
   it('output stays sanitizable: media nodes preserved and scripts stripped by the media allowlist', () => {
     const editor = createEditor(
       '<p>Intro</p><figure><img src="/uploads/x.png" alt="A"></figure><video src="/uploads/v.mp4" controls></video><p>Fin</p>',

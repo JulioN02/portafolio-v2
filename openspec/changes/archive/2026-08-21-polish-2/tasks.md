@@ -126,29 +126,29 @@ Implementation checklist following the design's 3-phase implementation order. Ea
   - `noindex`
 
 - [x] **Add `<MetaTags>` to recruiter-site HomePage** — `recruiter-site/src/pages/HomePage.tsx`
-  - `title="Julián Naranjo | Desarrollador Full Stack"`
+  - `title="Julio Manuel Nieto Martinez | Desarrollador Full Stack"`
   - `description="Desarrollador Full Stack especializado en React, Node.js y TypeScript. Conoce mi portafolio y experiencia."`
 
 - [x] **Add `<MetaTags>` to recruiter-site ProjectsPage** — `recruiter-site/src/pages/ProjectsPage.tsx`
-  - `title="Proyectos | Julián Naranjo"`
+  - `title="Proyectos | Julio Manuel Nieto Martinez"`
   - `description="Explora los proyectos en los que he trabajado como desarrollador Full Stack."`
 
 - [x] **Add `<MetaTags>` to recruiter-site BlogPage** — `recruiter-site/src/pages/BlogPage.tsx`
-  - `title="Blog | Julián Naranjo"`
+  - `title="Blog | Julio Manuel Nieto Martinez"`
   - `description="Artículos sobre desarrollo web, tecnología y experiencia como desarrollador."`
 
 - [x] **Add `<MetaTags>` to recruiter-site BlogPostPage (dynamic)** — `recruiter-site/src/pages/BlogPostPage.tsx`
-  - `title={post.title + " | Julián Naranjo"}`
+  - `title={post.title + " | Julio Manuel Nieto Martinez"}`
   - `description={post.shortDescription}`
   - `ogType="article"`
   - `publishedTime={post.publishedAt?.toISOString()}`
 
 - [x] **Add `<MetaTags>` to recruiter-site ContactPage** — `recruiter-site/src/pages/ContactPage.tsx`
-  - `title="Contacto | Julián Naranjo"`
+  - `title="Contacto | Julio Manuel Nieto Martinez"`
   - `description="¿Listo para trabajar juntos? Contáctame para nuevas oportunidades laborales o proyectos."`
 
 - [x] **Add `<MetaTags>` to recruiter-site NotFoundPage** — `recruiter-site/src/pages/NotFoundPage.tsx`
-  - `title="404 - Página no encontrada | Julián Naranjo"`
+  - `title="404 - Página no encontrada | Julio Manuel Nieto Martinez"`
   - `noindex`
 
 ### 2b. Lazy Loading

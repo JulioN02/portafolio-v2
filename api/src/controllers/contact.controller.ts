@@ -1,7 +1,11 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
 import { contactService } from '../services/contact.service.js';
-import { clientContactSchema, recruiterContactSchema, FormOrigin } from '@jsoft/shared';
+import {
+  clientContactSchema,
+  recruiterContactSchema,
+  contactFormFilterSchema,
+} from '@jsoft/shared';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { NotFoundError } from '../utils/errors.js';
 
@@ -42,14 +46,24 @@ export const contactController = {
    * Get all contact forms (admin only)
    */
   findAll: asyncHandler(async (req: Request, res: Response) => {
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 10;
-    const originType = req.query.originType as FormOrigin | undefined;
-    const search = req.query.search as string | undefined;
-    const isRead = req.query.isRead !== undefined ? req.query.isRead === 'true' : undefined;
-    const isArchived = req.query.isArchived !== undefined ? req.query.isArchived === 'true' : undefined;
-    const isStarred = req.query.isStarred !== undefined ? req.query.isStarred === 'true' : undefined;
-    const label = req.query.label as string | undefined;
+    // contactFormFilterSchema caps `page` (>=1) and `limit` (<=100), replacing
+    // the previous unbounded manual parseInt.
+    //
+    // NOTE: the schema declares the flags as z.coerce.boolean(), which maps ANY
+    // non-empty string (including 'false') to true. The admin panel sends the
+    // tri-state filters as 'true'/'false' query strings, so normalize them to
+    // real booleans BEFORE parsing to preserve the original semantics
+    // (false => unread / not-archived / not-starred).
+    const asBool = (value: unknown): boolean | undefined =>
+      value === undefined ? undefined : value === 'true';
+
+    const { page, limit, originType, search, isRead, isArchived, isStarred, label } =
+      contactFormFilterSchema.parse({
+        ...req.query,
+        isRead: asBool(req.query.isRead),
+        isArchived: asBool(req.query.isArchived),
+        isStarred: asBool(req.query.isStarred),
+      });
 
     const result = await contactService.findAll({ page, limit, originType, search, isRead, isArchived, isStarred, label });
 

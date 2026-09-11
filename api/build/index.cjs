@@ -16070,9 +16070,9 @@ var require_side_channel_weakmap = __commonJS({
   }
 });
 
-// node_modules/.pnpm/side-channel@1.1.0/node_modules/side-channel/index.js
+// node_modules/.pnpm/side-channel@1.1.1/node_modules/side-channel/index.js
 var require_side_channel = __commonJS({
-  "node_modules/.pnpm/side-channel@1.1.0/node_modules/side-channel/index.js"(exports2, module2) {
+  "node_modules/.pnpm/side-channel@1.1.1/node_modules/side-channel/index.js"(exports2, module2) {
     "use strict";
     var $TypeError = require_type();
     var inspect = require_object_inspect();
@@ -16085,7 +16085,8 @@ var require_side_channel = __commonJS({
       var channel = {
         assert: function(key) {
           if (!channel.has(key)) {
-            throw new $TypeError("Side channel does not contain " + inspect(key));
+            var keyDesc = key && Object(key) === key ? "the given object key" : inspect(key);
+            throw new $TypeError("Side channel does not contain " + keyDesc);
           }
         },
         "delete": function(key) {
@@ -16109,9 +16110,9 @@ var require_side_channel = __commonJS({
   }
 });
 
-// node_modules/.pnpm/qs@6.15.2/node_modules/qs/lib/formats.js
+// node_modules/.pnpm/qs@6.16.0/node_modules/qs/lib/formats.js
 var require_formats = __commonJS({
-  "node_modules/.pnpm/qs@6.15.2/node_modules/qs/lib/formats.js"(exports2, module2) {
+  "node_modules/.pnpm/qs@6.16.0/node_modules/qs/lib/formats.js"(exports2, module2) {
     "use strict";
     var replace = String.prototype.replace;
     var percentTwenties = /%20/g;
@@ -16135,12 +16136,13 @@ var require_formats = __commonJS({
   }
 });
 
-// node_modules/.pnpm/qs@6.15.2/node_modules/qs/lib/utils.js
+// node_modules/.pnpm/qs@6.16.0/node_modules/qs/lib/utils.js
 var require_utils = __commonJS({
-  "node_modules/.pnpm/qs@6.15.2/node_modules/qs/lib/utils.js"(exports2, module2) {
+  "node_modules/.pnpm/qs@6.16.0/node_modules/qs/lib/utils.js"(exports2, module2) {
     "use strict";
     var formats = require_formats();
     var getSideChannel = require_side_channel();
+    var defineProperty = require_es_define_property();
     var has = Object.prototype.hasOwnProperty;
     var isArray = Array.isArray;
     var overflowChannel = getSideChannel();
@@ -16188,6 +16190,18 @@ var require_utils = __commonJS({
       }
       return obj;
     };
+    var setProperty = function setProperty2(obj, key, value) {
+      if (key === "__proto__" && defineProperty) {
+        defineProperty(obj, key, {
+          configurable: true,
+          enumerable: true,
+          value,
+          writable: true
+        });
+      } else {
+        obj[key] = value;
+      }
+    };
     var merge = function merge2(target, source, options) {
       if (!source) {
         return target;
@@ -16195,7 +16209,10 @@ var require_utils = __commonJS({
       if (typeof source !== "object" && typeof source !== "function") {
         if (isArray(target)) {
           var nextIndex = target.length;
-          if (options && typeof options.arrayLimit === "number" && nextIndex > options.arrayLimit) {
+          if (options && typeof options.arrayLimit === "number" && nextIndex >= options.arrayLimit) {
+            if (options.throwOnLimitExceeded) {
+              throw new RangeError("Array limit exceeded. Only " + options.arrayLimit + " element" + (options.arrayLimit === 1 ? "" : "s") + " allowed in an array.");
+            }
             return markOverflow(arrayToObject(target.concat(source), options), nextIndex);
           }
           target[nextIndex] = source;
@@ -16226,6 +16243,9 @@ var require_utils = __commonJS({
         }
         var combined = [target].concat(source);
         if (options && typeof options.arrayLimit === "number" && combined.length > options.arrayLimit) {
+          if (options.throwOnLimitExceeded) {
+            throw new RangeError("Array limit exceeded. Only " + options.arrayLimit + " element" + (options.arrayLimit === 1 ? "" : "s") + " allowed in an array.");
+          }
           return markOverflow(arrayToObject(combined, options), combined.length - 1);
         }
         return combined;
@@ -16247,14 +16267,20 @@ var require_utils = __commonJS({
             target[i] = item;
           }
         });
+        if (options && typeof options.arrayLimit === "number" && target.length > options.arrayLimit) {
+          if (options.throwOnLimitExceeded) {
+            throw new RangeError("Array limit exceeded. Only " + options.arrayLimit + " element" + (options.arrayLimit === 1 ? "" : "s") + " allowed in an array.");
+          }
+          return markOverflow(arrayToObject(target, options), target.length - 1);
+        }
         return target;
       }
       return Object.keys(source).reduce(function(acc, key) {
         var value = source[key];
         if (has.call(acc, key)) {
-          acc[key] = merge2(acc[key], value, options);
+          setProperty(acc, key, merge2(acc[key], value, options));
         } else {
-          acc[key] = value;
+          setProperty(acc, key, value);
         }
         if (isOverflow(source) && !isOverflow(acc)) {
           markOverflow(acc, getMaxIndex(source));
@@ -16270,7 +16296,7 @@ var require_utils = __commonJS({
     };
     var assign = function assignSingleSource(target, source) {
       return Object.keys(source).reduce(function(acc, key) {
-        acc[key] = source[key];
+        setProperty(acc, key, source[key]);
         return acc;
       }, target);
     };
@@ -16304,6 +16330,13 @@ var require_utils = __commonJS({
       var out = "";
       for (var j = 0; j < string.length; j += limit) {
         var segment = string.length >= limit ? string.slice(j, j + limit) : string;
+        if (j + limit < string.length) {
+          var last = segment.charCodeAt(segment.length - 1);
+          if (last >= 55296 && last <= 56319) {
+            segment = segment.slice(0, -1);
+            j -= 1;
+          }
+        }
         var arr = [];
         for (var i = 0; i < segment.length; ++i) {
           var c = segment.charCodeAt(i);
@@ -16333,7 +16366,7 @@ var require_utils = __commonJS({
     };
     var compact = function compact2(value) {
       var queue = [{ obj: { o: value }, prop: "o" }];
-      var refs = [];
+      var refs = getSideChannel();
       for (var i = 0; i < queue.length; ++i) {
         var item = queue[i];
         var obj = item.obj[item.prop];
@@ -16341,9 +16374,9 @@ var require_utils = __commonJS({
         for (var j = 0; j < keys.length; ++j) {
           var key = keys[j];
           var val = obj[key];
-          if (typeof val === "object" && val !== null && refs.indexOf(val) === -1) {
+          if (typeof val === "object" && val !== null && !refs.has(val)) {
             queue[queue.length] = { obj, prop: key };
-            refs[refs.length] = val;
+            refs.set(val, true);
           }
         }
       }
@@ -16357,17 +16390,27 @@ var require_utils = __commonJS({
       if (!obj || typeof obj !== "object") {
         return false;
       }
-      return !!(obj.constructor && obj.constructor.isBuffer && obj.constructor.isBuffer(obj));
+      return !!(obj.constructor && typeof obj.constructor.isBuffer === "function" && obj.constructor.isBuffer(obj));
     };
-    var combine = function combine2(a, b, arrayLimit, plainObjects) {
+    var combine = function combine2(a, b, arrayLimit, plainObjects, throwOnLimitExceeded) {
       if (isOverflow(a)) {
-        var newIndex = getMaxIndex(a) + 1;
-        a[newIndex] = b;
+        if (throwOnLimitExceeded) {
+          throw new RangeError("Array limit exceeded. Only " + arrayLimit + " element" + (arrayLimit === 1 ? "" : "s") + " allowed in an array.");
+        }
+        var bValues = isArray(b) ? b : [b];
+        var newIndex = getMaxIndex(a);
+        for (var i = 0; i < bValues.length; ++i) {
+          newIndex += 1;
+          a[newIndex] = bValues[i];
+        }
         setMaxIndex(a, newIndex);
         return a;
       }
       var result = [].concat(a, b);
       if (result.length > arrayLimit) {
+        if (throwOnLimitExceeded) {
+          throw new RangeError("Array limit exceeded. Only " + arrayLimit + " element" + (arrayLimit === 1 ? "" : "s") + " allowed in an array.");
+        }
         return markOverflow(arrayToObject(result, { plainObjects }), result.length - 1);
       }
       return result;
@@ -16399,9 +16442,9 @@ var require_utils = __commonJS({
   }
 });
 
-// node_modules/.pnpm/qs@6.15.2/node_modules/qs/lib/stringify.js
+// node_modules/.pnpm/qs@6.16.0/node_modules/qs/lib/stringify.js
 var require_stringify = __commonJS({
-  "node_modules/.pnpm/qs@6.15.2/node_modules/qs/lib/stringify.js"(exports2, module2) {
+  "node_modules/.pnpm/qs@6.16.0/node_modules/qs/lib/stringify.js"(exports2, module2) {
     "use strict";
     var getSideChannel = require_side_channel();
     var utils = require_utils();
@@ -16435,6 +16478,7 @@ var require_stringify = __commonJS({
       charsetSentinel: false,
       commaRoundTrip: false,
       delimiter: "&",
+      depth: Infinity,
       encode: true,
       encodeDotInKeys: false,
       encoder: utils.encode,
@@ -16454,8 +16498,11 @@ var require_stringify = __commonJS({
       return typeof v === "string" || typeof v === "number" || typeof v === "boolean" || typeof v === "symbol" || typeof v === "bigint";
     };
     var sentinel = {};
-    var stringify = function stringify2(object, prefix, generateArrayPrefix, commaRoundTrip, allowEmptyArrays, strictNullHandling, skipNulls, encodeDotInKeys, encoder, filter, sort, allowDots, serializeDate, format, formatter, encodeValuesOnly, charset, sideChannel) {
+    var stringify = function stringify2(object, prefix, generateArrayPrefix, commaRoundTrip, allowEmptyArrays, strictNullHandling, skipNulls, encodeDotInKeys, encoder, filter, sort, allowDots, serializeDate, format, formatter, encodeValuesOnly, charset, sideChannel, depth, currentDepth) {
       var obj = object;
+      if (currentDepth > depth) {
+        throw new RangeError("Input depth exceeded depth option of " + depth);
+      }
       var tmpSc = sideChannel;
       var step = 0;
       var findFlag = false;
@@ -16473,9 +16520,8 @@ var require_stringify = __commonJS({
           step = 0;
         }
       }
-      if (typeof filter === "function") {
-        obj = filter(prefix, obj);
-      } else if (obj instanceof Date) {
+      obj = typeof filter === "function" ? filter(prefix, obj) : obj;
+      if (obj instanceof Date) {
         obj = serializeDate(obj);
       } else if (generateArrayPrefix === "comma" && isArray(obj)) {
         obj = utils.maybeMap(obj, function(value2) {
@@ -16518,7 +16564,7 @@ var require_stringify = __commonJS({
       }
       var encodedPrefix = encodeDotInKeys ? String(prefix).replace(/\./g, "%2E") : String(prefix);
       var adjustedPrefix = commaRoundTrip && isArray(obj) && obj.length === 1 ? encodedPrefix + "[]" : encodedPrefix;
-      if (allowEmptyArrays && isArray(obj) && obj.length === 0) {
+      if (allowEmptyArrays && isArray(obj) && obj.length === 0 && Object.keys(obj).length === 0) {
         return adjustedPrefix + "[]";
       }
       for (var j = 0; j < objKeys.length; ++j) {
@@ -16550,7 +16596,9 @@ var require_stringify = __commonJS({
           formatter,
           encodeValuesOnly,
           charset,
-          valueSideChannel
+          valueSideChannel,
+          depth,
+          currentDepth + 1
         ));
       }
       return values;
@@ -16605,6 +16653,7 @@ var require_stringify = __commonJS({
         charsetSentinel: typeof opts.charsetSentinel === "boolean" ? opts.charsetSentinel : defaults.charsetSentinel,
         commaRoundTrip: !!opts.commaRoundTrip,
         delimiter: typeof opts.delimiter === "undefined" ? defaults.delimiter : opts.delimiter,
+        depth: typeof opts.depth === "number" ? opts.depth : defaults.depth,
         encode: typeof opts.encode === "boolean" ? opts.encode : defaults.encode,
         encodeDotInKeys: typeof opts.encodeDotInKeys === "boolean" ? opts.encodeDotInKeys : defaults.encodeDotInKeys,
         encoder: typeof opts.encoder === "function" ? opts.encoder : defaults.encoder,
@@ -16652,9 +16701,10 @@ var require_stringify = __commonJS({
         if (options.skipNulls && value === null) {
           continue;
         }
+        var encodedKey = options.encodeDotInKeys ? String(key).replace(/\./g, "%2E") : String(key);
         pushToArray(keys, stringify(
           value,
-          key,
+          encodedKey,
           generateArrayPrefix,
           commaRoundTrip,
           options.allowEmptyArrays,
@@ -16670,7 +16720,9 @@ var require_stringify = __commonJS({
           options.formatter,
           options.encodeValuesOnly,
           options.charset,
-          sideChannel
+          sideChannel,
+          options.depth,
+          0
         ));
       }
       var joined = keys.join(options.delimiter);
@@ -16687,9 +16739,9 @@ var require_stringify = __commonJS({
   }
 });
 
-// node_modules/.pnpm/qs@6.15.2/node_modules/qs/lib/parse.js
+// node_modules/.pnpm/qs@6.16.0/node_modules/qs/lib/parse.js
 var require_parse = __commonJS({
-  "node_modules/.pnpm/qs@6.15.2/node_modules/qs/lib/parse.js"(exports2, module2) {
+  "node_modules/.pnpm/qs@6.16.0/node_modules/qs/lib/parse.js"(exports2, module2) {
     "use strict";
     var utils = require_utils();
     var has = Object.prototype.hasOwnProperty;
@@ -16725,6 +16777,17 @@ var require_parse = __commonJS({
     };
     var parseArrayValue = function(val, options, currentArrayLength) {
       if (val && typeof val === "string" && options.comma && val.indexOf(",") > -1) {
+        if (options.throwOnLimitExceeded) {
+          var commaCount = 0;
+          var commaIndex = val.indexOf(",");
+          while (commaIndex > -1) {
+            commaCount += 1;
+            if (commaCount >= options.arrayLimit) {
+              throw new RangeError("Array limit exceeded. Only " + options.arrayLimit + " element" + (options.arrayLimit === 1 ? "" : "s") + " allowed in an array.");
+            }
+            commaIndex = val.indexOf(",", commaIndex + 1);
+          }
+        }
         return val.split(",");
       }
       if (options.throwOnLimitExceeded && currentArrayLength >= options.arrayLimit) {
@@ -16796,10 +16859,7 @@ var require_parse = __commonJS({
           val = isArray(val) ? [val] : val;
         }
         if (options.comma && isArray(val) && val.length > options.arrayLimit) {
-          if (options.throwOnLimitExceeded) {
-            throw new RangeError("Array limit exceeded. Only " + options.arrayLimit + " element" + (options.arrayLimit === 1 ? "" : "s") + " allowed in an array.");
-          }
-          val = utils.combine([], val, options.arrayLimit, options.plainObjects);
+          val = utils.combine([], val, options.arrayLimit, options.plainObjects, options.throwOnLimitExceeded);
         }
         if (key !== null) {
           var existing = has.call(obj, key);
@@ -16808,7 +16868,8 @@ var require_parse = __commonJS({
               obj[key],
               val,
               options.arrayLimit,
-              options.plainObjects
+              options.plainObjects,
+              options.throwOnLimitExceeded
             );
           } else if (!existing || options.duplicates === "last") {
             obj[key] = val;
@@ -16835,7 +16896,8 @@ var require_parse = __commonJS({
               [],
               leaf,
               options.arrayLimit,
-              options.plainObjects
+              options.plainObjects,
+              options.throwOnLimitExceeded
             );
           }
         } else {
@@ -17005,9 +17067,9 @@ var require_parse = __commonJS({
   }
 });
 
-// node_modules/.pnpm/qs@6.15.2/node_modules/qs/lib/index.js
+// node_modules/.pnpm/qs@6.16.0/node_modules/qs/lib/index.js
 var require_lib2 = __commonJS({
-  "node_modules/.pnpm/qs@6.15.2/node_modules/qs/lib/index.js"(exports2, module2) {
+  "node_modules/.pnpm/qs@6.16.0/node_modules/qs/lib/index.js"(exports2, module2) {
     "use strict";
     var stringify = require_stringify();
     var parse = require_parse();
@@ -38093,8 +38155,13 @@ var authMiddleware = (req, _res, next) => {
     return;
   }
   const token = authHeader.slice(7);
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    next(new AuthError("JWT_SECRET is not configured"));
+    return;
+  }
   try {
-    const decoded = import_jsonwebtoken.default.verify(token, process.env.JWT_SECRET || "");
+    const decoded = import_jsonwebtoken.default.verify(token, secret, { algorithms: ["HS256"] });
     req.user = decoded;
     next();
   } catch {
@@ -39129,6 +39196,16 @@ var apiLimiter = rate_limit_default({
     code: "RATE_LIMITED"
   }
 });
+var contactLimiter = rate_limit_default({
+  windowMs: (parseInt(process.env.CONTACT_RATE_LIMIT_WINDOW_MINUTES || "10", 10) || 10) * 60 * 1e3,
+  limit: parseInt(process.env.CONTACT_RATE_LIMIT_MAX || "5", 10) || 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    message: "Too many contact submissions. Please try again later.",
+    code: "RATE_LIMITED"
+  }
+});
 
 // api/src/services/auth.service.ts
 var import_bcrypt = __toESM(require("bcrypt"), 1);
@@ -39136,6 +39213,7 @@ var import_jsonwebtoken2 = __toESM(require_jsonwebtoken(), 1);
 var import_client = require("@prisma/client");
 
 // api/src/services/verification-code.service.ts
+var import_node_crypto2 = require("node:crypto");
 var VerificationCodeService = class {
   store = /* @__PURE__ */ new Map();
   /**
@@ -39143,7 +39221,7 @@ var VerificationCodeService = class {
    * Overwrites any previous unexpired code for the same user.
    */
   generate(userId) {
-    const code = Math.floor(1e5 + Math.random() * 9e5).toString();
+    const code = (0, import_node_crypto2.randomInt)(0, 1e6).toString().padStart(6, "0");
     const expiresIn = 10 * 60;
     this.store.set(userId, {
       code,
@@ -39154,22 +39232,22 @@ var VerificationCodeService = class {
   }
   /**
    * Validate a verification code for a user.
-   * Throws with descriptive messages for each failure mode.
+   * Throws ValidationError (HTTP 400) for each failure mode — never a 500.
    */
   validate(userId, code) {
     const entry = this.store.get(userId);
     if (!entry) {
-      throw new Error("No verification code found. Please request a new code.");
+      throw new ValidationError("No verification code found. Please request a new code.");
     }
     if (entry.used) {
-      throw new Error("This verification code has already been used.");
+      throw new ValidationError("This verification code has already been used.");
     }
     if (/* @__PURE__ */ new Date() > entry.expiresAt) {
       this.store.delete(userId);
-      throw new Error("Verification code has expired. Please request a new code.");
+      throw new ValidationError("Verification code has expired. Please request a new code.");
     }
     if (entry.code !== code) {
-      throw new Error("Invalid verification code.");
+      throw new ValidationError("Invalid verification code.");
     }
     entry.used = true;
   }
@@ -39202,8 +39280,8 @@ var login = async (credentials) => {
     role: "ADMIN"
   };
   const secret = process.env.JWT_SECRET;
-  const expiresIn = process.env.JWT_EXPIRES_IN || "7d";
-  const token = import_jsonwebtoken2.default.sign(payload, secret, { expiresIn });
+  const expiresIn = process.env.JWT_EXPIRES_IN || "12h";
+  const token = import_jsonwebtoken2.default.sign(payload, secret, { expiresIn, algorithm: "HS256" });
   return {
     token,
     user: {
@@ -43524,14 +43602,20 @@ var clientContactSchema = external_exports.object({
   whatsapp: external_exports.string().regex(/^\+?[0-9]{10,15}$/, "Invalid WhatsApp number format").optional(),
   email: external_exports.string().email("Invalid email format"),
   message: external_exports.string().min(10, "Message must be at least 10 characters").max(2e3),
-  source: external_exports.string().min(2).max(100)
+  source: external_exports.string().min(2).max(100),
   // "service:Desarrollo Web", "product:ERP", "tool:X", "general"
+  // Honeypot anti-spam backstop: hidden field that must stay empty.
+  // The middleware answers bots before Zod; this schema-level guard protects
+  // if middleware order ever changes. Never persisted (transient field).
+  website: external_exports.string().max(0).optional()
 });
 var recruiterContactSchema = external_exports.object({
   firstName: external_exports.string().min(2).max(50),
   email: external_exports.string().email("Invalid email format"),
   whatsapp: external_exports.string().regex(/^\+?[0-9]{10,15}$/).optional(),
-  message: external_exports.string().min(10).max(2e3)
+  message: external_exports.string().min(10).max(2e3),
+  // Honeypot anti-spam backstop (see clientContactSchema above).
+  website: external_exports.string().max(0).optional()
 });
 var contactFormSchema = external_exports.discriminatedUnion("originType", [
   clientContactSchema.extend({ originType: external_exports.literal("CLIENT") }),
@@ -43551,7 +43635,7 @@ var contactFormFilterSchema = external_exports.object({
 // packages/shared/src/schemas/login.schema.ts
 var loginSchema = external_exports.object({
   username: external_exports.string().min(3, "Username must be at least 3 characters").max(50),
-  password: external_exports.string().min(6, "Password must be at least 6 characters")
+  password: external_exports.string().min(12, "Password must be at least 12 characters")
 });
 var jwtPayloadSchema = external_exports.object({
   userId: external_exports.string(),
@@ -43586,7 +43670,7 @@ var updateProfileSchema = external_exports.object({
 var sendVerificationCodeSchema = external_exports.object({});
 var changePasswordSchema = external_exports.object({
   verificationCode: external_exports.string().length(6, "Code must be exactly 6 characters"),
-  newPassword: external_exports.string().min(6, "Password must be at least 6 characters")
+  newPassword: external_exports.string().min(12, "Password must be at least 12 characters")
 });
 
 // api/src/utils/asyncHandler.ts
@@ -43631,7 +43715,9 @@ var sendVerificationCodeHandler = asyncHandler(async (req, res) => {
     throw new NotFoundError("Not authenticated");
   }
   const result = verificationCodeService.generate(authReq.user.userId);
-  console.log(`[DEV] Verification code for user ${authReq.user.userId}: ${result.code}`);
+  if (false) {
+    console.log(`[DEV] Verification code for user ${authReq.user.userId}: ${result.code}`);
+  }
   res.json(result);
 });
 var changePasswordHandler = asyncHandler(async (req, res) => {
@@ -43712,15 +43798,22 @@ var serviceService = {
       }
     };
   },
-  async findBySlug(slug) {
+  async findBySlug(slug, status = "PUBLISHED") {
     return prisma2.service.findFirst({
-      where: { slug, deletedAt: null },
+      where: {
+        slug,
+        deletedAt: null,
+        ...status !== "ALL" && { status }
+      },
       select: SERVICE_SELECT
     });
   },
-  async findById(id) {
+  async findById(id, status = "PUBLISHED") {
     return prisma2.service.findUnique({
-      where: { id },
+      where: {
+        id,
+        ...status !== "ALL" && { status }
+      },
       select: SERVICE_SELECT
     });
   },
@@ -43809,7 +43902,7 @@ var getStringParam = (param) => {
   return param || "";
 };
 var getExistingService = async (id) => {
-  const existing = await serviceService.findById(id);
+  const existing = await serviceService.findById(id, "ALL");
   if (!existing) {
     throw new NotFoundError("Service not found");
   }
@@ -43831,7 +43924,10 @@ var serviceController = {
   }),
   findById: asyncHandler(async (req, res) => {
     const id = getStringParam(req.params.id);
-    const service = await serviceService.findById(id);
+    const service = await serviceService.findById(
+      id,
+      req.query.status === "ALL" ? "ALL" : void 0
+    );
     if (!service) {
       throw new NotFoundError("Service not found");
     }
@@ -43882,13 +43978,13 @@ var serviceController = {
 var router2 = (0, import_express2.Router)();
 router2.get("/", serviceController.findAll);
 router2.get("/classifications", serviceController.getClassifications);
-router2.get("/:slug", serviceController.findBySlug);
-router2.get("/by-id/:id", serviceController.findById);
+router2.get("/by-id/:id", authMiddleware, serviceController.findById);
 router2.post("/", authMiddleware, serviceController.create);
 router2.put("/:id", authMiddleware, serviceController.update);
 router2.delete("/:id", authMiddleware, serviceController.delete);
 router2.patch("/:id/restore", authMiddleware, serviceController.restore);
 router2.patch("/:id/status", authMiddleware, serviceController.updateStatus);
+router2.get("/:slug", serviceController.findBySlug);
 var service_routes_default = router2;
 
 // api/src/routes/product.routes.ts
@@ -43948,9 +44044,13 @@ var productService = {
       }
     };
   },
-  async findBySlug(slug) {
+  async findBySlug(slug, status = "PUBLISHED") {
     return prisma3.product.findFirst({
-      where: { slug, deletedAt: null },
+      where: {
+        slug,
+        deletedAt: null,
+        ...status !== "ALL" && { status }
+      },
       select: PRODUCT_SELECT
     });
   },
@@ -43962,9 +44062,12 @@ var productService = {
       take: limit
     });
   },
-  async findById(id) {
+  async findById(id, status = "PUBLISHED") {
     return prisma3.product.findUnique({
-      where: { id },
+      where: {
+        id,
+        ...status !== "ALL" && { status }
+      },
       select: PRODUCT_SELECT
     });
   },
@@ -44053,7 +44156,7 @@ var getStringParam2 = (param) => {
   return param || "";
 };
 var getExistingProduct = async (id) => {
-  const existing = await productService.findById(id);
+  const existing = await productService.findById(id, "ALL");
   if (!existing) {
     throw new NotFoundError("Product not found");
   }
@@ -44080,7 +44183,10 @@ var productController = {
   }),
   findById: asyncHandler(async (req, res) => {
     const id = getStringParam2(req.params.id);
-    const product = await productService.findById(id);
+    const product = await productService.findById(
+      id,
+      req.query.status === "ALL" ? "ALL" : void 0
+    );
     if (!product) {
       throw new NotFoundError("Product not found");
     }
@@ -44142,14 +44248,14 @@ var router3 = (0, import_express3.Router)();
 router3.get("/", productController.findAll);
 router3.get("/featured", productController.findFeatured);
 router3.get("/classifications", productController.getClassifications);
-router3.get("/:slug", productController.findBySlug);
-router3.get("/by-id/:id", productController.findById);
+router3.get("/by-id/:id", authMiddleware, productController.findById);
 router3.post("/", authMiddleware, productController.create);
 router3.put("/:id", authMiddleware, productController.update);
 router3.delete("/:id", authMiddleware, productController.delete);
 router3.patch("/:id/restore", authMiddleware, productController.restore);
 router3.patch("/:id/featured", authMiddleware, productController.toggleFeatured);
 router3.patch("/:id/status", authMiddleware, productController.updateStatus);
+router3.get("/:slug", productController.findBySlug);
 var product_routes_default = router3;
 
 // api/src/routes/tool.routes.ts
@@ -44210,9 +44316,13 @@ var toolService = {
       }
     };
   },
-  async findBySlug(slug) {
+  async findBySlug(slug, status = "PUBLISHED") {
     return prisma4.tool.findFirst({
-      where: { slug, deletedAt: null },
+      where: {
+        slug,
+        deletedAt: null,
+        ...status !== "ALL" && { status }
+      },
       select: TOOL_SELECT
     });
   },
@@ -44224,9 +44334,12 @@ var toolService = {
       take: limit
     });
   },
-  async findById(id) {
+  async findById(id, status = "PUBLISHED") {
     return prisma4.tool.findUnique({
-      where: { id },
+      where: {
+        id,
+        ...status !== "ALL" && { status }
+      },
       select: TOOL_SELECT
     });
   },
@@ -44317,7 +44430,7 @@ var getStringParam3 = (param) => {
   return param || "";
 };
 var getExistingTool = async (id) => {
-  const existing = await toolService.findById(id);
+  const existing = await toolService.findById(id, "ALL");
   if (!existing) {
     throw new NotFoundError("Tool not found");
   }
@@ -44344,7 +44457,10 @@ var toolController = {
   }),
   findById: asyncHandler(async (req, res) => {
     const id = getStringParam3(req.params.id);
-    const tool = await toolService.findById(id);
+    const tool = await toolService.findById(
+      id,
+      req.query.status === "ALL" ? "ALL" : void 0
+    );
     if (!tool) {
       throw new NotFoundError("Tool not found");
     }
@@ -44406,14 +44522,14 @@ var router4 = (0, import_express4.Router)();
 router4.get("/", toolController.findAll);
 router4.get("/featured", toolController.findFeatured);
 router4.get("/classifications", toolController.getClassifications);
-router4.get("/:slug", toolController.findBySlug);
-router4.get("/by-id/:id", toolController.findById);
+router4.get("/by-id/:id", authMiddleware, toolController.findById);
 router4.post("/", authMiddleware, toolController.create);
 router4.put("/:id", authMiddleware, toolController.update);
 router4.delete("/:id", authMiddleware, toolController.delete);
 router4.patch("/:id/restore", authMiddleware, toolController.restore);
 router4.patch("/:id/featured", authMiddleware, toolController.toggleFeatured);
 router4.patch("/:id/status", authMiddleware, toolController.updateStatus);
+router4.get("/:slug", toolController.findBySlug);
 var tool_routes_default = router4;
 
 // api/src/routes/successCase.routes.ts
@@ -44467,9 +44583,13 @@ var successCaseService = {
       }
     };
   },
-  async findBySlug(slug) {
+  async findBySlug(slug, status = "PUBLISHED") {
     return prisma5.successCase.findFirst({
-      where: { slug, deletedAt: null },
+      where: {
+        slug,
+        deletedAt: null,
+        ...status !== "ALL" && { status }
+      },
       select: SUCCESS_CASE_SELECT
     });
   },
@@ -44481,9 +44601,12 @@ var successCaseService = {
       take: limit
     });
   },
-  async findById(id) {
+  async findById(id, status = "PUBLISHED") {
     return prisma5.successCase.findUnique({
-      where: { id },
+      where: {
+        id,
+        ...status !== "ALL" && { status }
+      },
       select: SUCCESS_CASE_SELECT
     });
   },
@@ -44555,7 +44678,7 @@ var getStringParam4 = (param) => {
   return param || "";
 };
 var getExistingCase = async (id) => {
-  const existing = await successCaseService.findById(id);
+  const existing = await successCaseService.findById(id, "ALL");
   if (!existing) {
     throw new NotFoundError("Success case not found");
   }
@@ -44582,7 +44705,10 @@ var successCaseController = {
   }),
   findById: asyncHandler(async (req, res) => {
     const id = getStringParam4(req.params.id);
-    const successCase = await successCaseService.findById(id);
+    const successCase = await successCaseService.findById(
+      id,
+      req.query.status === "ALL" ? "ALL" : void 0
+    );
     if (!successCase) {
       throw new NotFoundError("Success case not found");
     }
@@ -44629,13 +44755,13 @@ var successCaseController = {
 var router5 = (0, import_express5.Router)();
 router5.get("/", successCaseController.findAll);
 router5.get("/recent", successCaseController.findRecent);
-router5.get("/:slug", successCaseController.findBySlug);
-router5.get("/by-id/:id", successCaseController.findById);
+router5.get("/by-id/:id", authMiddleware, successCaseController.findById);
 router5.post("/", authMiddleware, successCaseController.create);
 router5.put("/:id", authMiddleware, successCaseController.update);
 router5.delete("/:id", authMiddleware, successCaseController.delete);
 router5.patch("/:id/restore", authMiddleware, successCaseController.restore);
 router5.patch("/:id/status", authMiddleware, successCaseController.updateStatus);
+router5.get("/:slug", successCaseController.findBySlug);
 var successCase_routes_default = router5;
 
 // api/src/routes/project.routes.ts
@@ -45817,14 +45943,13 @@ var contactController = {
    * Get all contact forms (admin only)
    */
   findAll: asyncHandler(async (req, res) => {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const originType = req.query.originType;
-    const search = req.query.search;
-    const isRead = req.query.isRead !== void 0 ? req.query.isRead === "true" : void 0;
-    const isArchived = req.query.isArchived !== void 0 ? req.query.isArchived === "true" : void 0;
-    const isStarred = req.query.isStarred !== void 0 ? req.query.isStarred === "true" : void 0;
-    const label = req.query.label;
+    const asBool = (value) => value === void 0 ? void 0 : value === "true";
+    const { page, limit, originType, search, isRead, isArchived, isStarred, label } = contactFormFilterSchema.parse({
+      ...req.query,
+      isRead: asBool(req.query.isRead),
+      isArchived: asBool(req.query.isArchived),
+      isStarred: asBool(req.query.isStarred)
+    });
     const result = await contactService.findAll({ page, limit, originType, search, isRead, isArchived, isStarred, label });
     res.json(result);
   }),
@@ -45900,10 +46025,61 @@ var contactController = {
   })
 };
 
+// api/src/middleware/turnstile.middleware.ts
+var SITEVERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+function rejectTurnstile(res) {
+  res.status(400).json({
+    message: "Turnstile verification failed",
+    code: "TURNSTILE_FAILED"
+  });
+}
+async function turnstileVerify(req, res, next) {
+  const secret = process.env.TURNSTILE_SECRET_KEY;
+  if (!secret) {
+    return next();
+  }
+  const token = req.body?.turnstileToken;
+  if (typeof token !== "string" || token.trim() === "") {
+    rejectTurnstile(res);
+    return;
+  }
+  try {
+    const form = new URLSearchParams({
+      secret,
+      response: token,
+      remoteip: req.ip ?? ""
+    });
+    const response = await fetch(SITEVERIFY_URL, {
+      method: "POST",
+      body: form
+    });
+    const result = await response.json();
+    if (result.success !== true) {
+      rejectTurnstile(res);
+      return;
+    }
+    next();
+  } catch {
+    rejectTurnstile(res);
+  }
+}
+
+// api/src/middleware/contactAntiSpam.middleware.ts
+var HONEYPOT_FIELD = "website";
+function honeypotMiddleware(req, res, next) {
+  const website = req.body?.[HONEYPOT_FIELD];
+  if (typeof website === "string" && website.trim() !== "") {
+    res.status(200).json({ message: "Contact form submitted successfully" });
+    return;
+  }
+  next();
+}
+var contactAntiSpam = [honeypotMiddleware, contactLimiter, turnstileVerify];
+
 // api/src/routes/contact.routes.ts
 var router9 = (0, import_express9.Router)();
-router9.post("/client", contactController.createClient);
-router9.post("/recruiter", contactController.createRecruiter);
+router9.post("/client", ...contactAntiSpam, contactController.createClient);
+router9.post("/recruiter", ...contactAntiSpam, contactController.createRecruiter);
 router9.use(authMiddleware);
 router9.get("/", contactController.findAll);
 router9.get("/stats/summary", contactController.getStats);
@@ -45979,15 +46155,22 @@ var blogPostService = {
       }
     };
   },
-  async findBySlug(slug) {
+  async findBySlug(slug, status = "PUBLISHED") {
     return prisma9.blogPost.findFirst({
-      where: { slug, deletedAt: null },
+      where: {
+        slug,
+        deletedAt: null,
+        ...status !== "ALL" && { status }
+      },
       select: BLOG_POST_SELECT
     });
   },
-  async findById(id) {
+  async findById(id, status = "PUBLISHED") {
     return prisma9.blogPost.findUnique({
-      where: { id },
+      where: {
+        id,
+        ...status !== "ALL" && { status }
+      },
       select: BLOG_POST_SELECT
     });
   },
@@ -46089,7 +46272,7 @@ var getStringParam6 = (param) => {
   return param || "";
 };
 var getExistingPost = async (id) => {
-  const existing = await blogPostService.findById(id);
+  const existing = await blogPostService.findById(id, "ALL");
   if (!existing) {
     throw new NotFoundError("Blog post not found");
   }
@@ -46111,7 +46294,10 @@ var blogPostController = {
   }),
   findById: asyncHandler(async (req, res) => {
     const id = getStringParam6(req.params.id);
-    const post = await blogPostService.findById(id);
+    const post = await blogPostService.findById(
+      id,
+      req.query.status === "ALL" ? "ALL" : void 0
+    );
     if (!post) {
       throw new NotFoundError("Blog post not found");
     }

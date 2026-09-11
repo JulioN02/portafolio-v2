@@ -1,6 +1,7 @@
 import express, { type Express } from 'express';
 import { Server } from 'http';
 import type { AddressInfo } from 'net';
+import jwt from 'jsonwebtoken';
 import type { PrismaClient } from '@prisma/client';
 
 // Real fetch captured BEFORE the Turnstile suites mock global.fetch — client
@@ -415,5 +416,82 @@ describe('POST /api/contact — Turnstile disabled (graceful fallback)', () => {
 
     expect(res.status).toBe(201);
     expect(prisma.contactForm.create).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('GET /api/contact — findAll page/limit cap (dependency-and-config-hygiene)', () => {
+  let server: Server;
+  let baseUrl: string;
+  let prisma: PrismaClient;
+
+  function authHeader(): Record<string, string> {
+    const token = jwt.sign(
+      { userId: 'admin-1', username: 'admin', role: 'ADMIN' },
+      'test-secret',
+      { expiresIn: '12h' },
+    );
+    return { Authorization: `Bearer ${token}` };
+  }
+
+  beforeAll(async () => {
+    process.env.JWT_SECRET = 'test-secret';
+    const built = await buildApp({ TURNSTILE_SECRET_KEY: undefined });
+    ({ server, baseUrl } = await startServer(built.app));
+    prisma = built.prisma;
+  });
+
+  afterAll(() => {
+    server.close();
+    delete process.env.JWT_SECRET;
+  });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (prisma.contactForm.findMany as jest.Mock).mockResolvedValue([]);
+    (prisma.contactForm.count as jest.Mock).mockResolvedValue(0);
+  });
+
+  it('rejects an oversized ?limit=500 (schema cap is 100) before any query', async () => {
+    const res = await realFetch(`${baseUrl}/?limit=500`, { headers: authHeader() });
+
+    expect(res.status).toBe(400);
+    expect(prisma.contactForm.findMany).not.toHaveBeenCalled();
+  });
+
+  it('accepts the boundary ?limit=100 and forwards take=100 to the query', async () => {
+    const res = await realFetch(`${baseUrl}/?limit=100`, { headers: authHeader() });
+
+    expect(res.status).toBe(200);
+    expect(prisma.contactForm.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ skip: 0, take: 100 }),
+    );
+  });
+
+  it('applies schema defaults (page 1 / limit 20) when the query is empty', async () => {
+    const res = await realFetch(`${baseUrl}/`, { headers: authHeader() });
+
+    expect(res.status).toBe(200);
+    expect(prisma.contactForm.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ skip: 0, take: 20 }),
+    );
+  });
+
+  it('preserves the tri-state isRead=false (unread) filter semantics', async () => {
+    const res = await realFetch(`${baseUrl}/?isRead=false`, { headers: authHeader() });
+
+    expect(res.status).toBe(200);
+    // isRead=false must reach the service as false → where.readAt === null.
+    expect(prisma.contactForm.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: expect.objectContaining({ readAt: null }) }),
+    );
+  });
+
+  it('maps isRead=true (read) to where.readAt = { not: null }', async () => {
+    const res = await realFetch(`${baseUrl}/?isRead=true`, { headers: authHeader() });
+
+    expect(res.status).toBe(200);
+    expect(prisma.contactForm.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: expect.objectContaining({ readAt: { not: null } }) }),
+    );
   });
 });
