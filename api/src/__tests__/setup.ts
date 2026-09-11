@@ -10,6 +10,17 @@ jest.mock('@prisma/client', () => {
       update: jest.fn(),
       count: jest.fn(),
     },
+    verificationCode: {
+      findMany: jest.fn(),
+      findFirst: jest.fn(),
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      updateMany: jest.fn(),
+      delete: jest.fn(),
+      deleteMany: jest.fn(),
+      count: jest.fn(),
+    },
     product: {
       findMany: jest.fn(),
       findFirst: jest.fn(),
