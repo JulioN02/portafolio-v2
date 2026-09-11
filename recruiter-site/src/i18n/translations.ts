@@ -21,11 +21,11 @@ export const translations: Record<Language, Record<string, string>> = {
 
     // =========== HOME ===========
     'home.meta.title': '{name} | Ingeniero de Sistemas y Desarrollador Backend',
-    'home.meta.description': 'Ingeniero de Sistemas y Desarrollador Backend. Consultor independiente y ex Coordinador Logístico Nacional. Node.js, TypeScript, PostgreSQL y más.',
+    'home.meta.description': 'Desarrollador backend. Diseño y construyo APIs, sistemas de negocio y herramientas con TypeScript, Node.js y PostgreSQL, aplicando testing y arquitectura mantenible.',
 
-    'home.cta.title': '¿Listo para trabajar juntos?',
-    'home.cta.text': 'Estoy abierto a nuevas oportunidades laborales y proyectos desafiantes. Si buscas un desarrollador comprometido con la calidad y los resultados, hablemos.',
-    'home.cta.button': 'Contáctame',
+    'home.cta.title': '¿Buscas un desarrollador backend?',
+    'home.cta.text': 'Actualmente estoy abierto a oportunidades laborales y proyectos de software relacionados con backend, APIs, sistemas de negocio y automatización. Si tienes una necesidad, una vacante o un proyecto donde mi perfil pueda aportar, puedes contactarme directamente.',
+    'home.cta.button': 'Hablemos',
 
     // =========== PROJECTS ===========
     'projects.meta.title': 'Proyectos | {name}',
@@ -63,7 +63,7 @@ export const translations: Record<Language, Record<string, string>> = {
 
     // =========== HERO ===========
     'hero.title': 'Ingeniero de Sistemas | Desarrollador Backend',
-    'hero.summary': 'Ingeniero de Sistemas enfocado en desarrollo backend. Construyo APIs, integraciones y sistemas web robustos con Node.js, TypeScript y bases de datos relacionales, aplicando TDD y buenas prácticas de arquitectura.',
+    'hero.summary': 'Desarrollo APIs, sistemas de negocio y aplicaciones orientadas a procesos reales con TypeScript, Node.js y PostgreSQL, aplicando buenas prácticas de ingeniería, testing y arquitectura mantenible.',
     'hero.cta.primary': 'Ver Proyectos',
     'hero.cta.secondary': 'Contactar',
 
@@ -71,8 +71,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'profileToggle.sectionTitle': 'Sobre Mí',
     'profileToggle.professional': 'Perfil Profesional',
     'profileToggle.technical': 'Perfil Técnico',
-    'profileToggle.professionalText': 'Soy Ingeniero de Sistemas y desarrollador backend. Desde Ene 2025 trabajo como consultor independiente en desarrollo de software, diseñando y construyendo APIs, integraciones y sistemas web robustos con Node.js, TypeScript y bases de datos relacionales.\n\nAntes de dedicarme al desarrollo, me desempeñé como Coordinador Logístico Nacional entre Ene 2018 y Ene 2025, un rol donde la disponibilidad y la trazabilidad de la información eran críticas para la operación. Esa experiencia me enseñó a priorizar la confiabilidad, el orden y la comunicación clara, valores que hoy aplico a cada proyecto de software.\n\nMe enfoco en la calidad: pruebas automatizadas, documentación clara y arquitectura mantenible.',
-    'profileToggle.technicalText': 'Especializado en el ecosistema JavaScript/TypeScript con enfoque backend. Construyo APIs RESTful con Node.js y Express, modelado de datos con PostgreSQL y Prisma, y autenticación con JWT y control de acceso basado en roles (RBAC).\n\nAplico TDD (desarrollo guiado por pruebas), SDD (desarrollo guiado por especificaciones) y DDD (diseño dirigido por el dominio) para entregar software confiable y mantenible. También integro desarrollo asistido por IA para acelerar tareas repetitivas sin sacrificar calidad.\n\nCompetencias técnicas destacadas:\n• Backend: Node.js, Express, Nest.js, PostgreSQL, MySQL, Prisma, JWT, RBAC\n• Frontend: React, TypeScript\n• DevOps: Docker, Linux, Git/GitHub, CI/CD, Vercel, Supabase\n• Metodologías: TDD, SDD, DDD\n• Testing: Jest',
+    'profileToggle.professionalText': 'Soy Software Developer enfocado en backend y actualmente estudiante de Ingeniería de Sistemas. Desde Ene 2025 desarrollo proyectos y soluciones de software de forma independiente, participando en el análisis de necesidades, el modelado de datos, el diseño de APIs, la implementación, el testing y la documentación.\n\nMi experiencia previa como Coordinador Logístico Nacional entre 2018 y 2025 me permitió trabajar durante años con procesos, inventarios, trazabilidad, información crítica y continuidad operativa. Esa experiencia influye directamente en mi forma de desarrollar software: primero comprendo el problema y el proceso, y después diseño la solución.\n\nActualmente me enfoco en construir APIs, sistemas de gestión, herramientas de desarrollo y aplicaciones orientadas a procesos de negocio, con especial interés en la confiabilidad, la consistencia de datos y la mantenibilidad del software. Mi objetivo profesional es integrarme a un equipo de desarrollo donde pueda aportar desde backend y seguir creciendo como ingeniero de software.',
+    'profileToggle.technicalText': 'Mi enfoque principal es el desarrollo backend con TypeScript y Node.js, complementado con PostgreSQL para el modelado y la gestión de datos relacionales.\n\nDiseño y desarrollo APIs REST, lógica de negocio, autenticación, control de acceso e integraciones, utilizando herramientas como Express, NestJS, Prisma y Docker.\n\nEn mis proyectos aplico principios de ingeniería orientados a la confiabilidad y la mantenibilidad del software: TDD, desarrollo guiado por especificaciones, arquitectura modular, modelado de dominio, testing, transacciones, concurrencia e idempotencia.',
 
     // =========== TECH STACK ===========
     'techStack.title': 'Tech Stack',
@@ -120,16 +120,16 @@ export const translations: Record<Language, Record<string, string>> = {
     'timeline.edu.0.dateTime': '2023-01',
     'timeline.edu.1.role': 'Desarrollo backend y JavaScript',
     'timeline.edu.1.org': 'PLATZI',
-    'timeline.edu.1.period': '2025 – 2026',
+    'timeline.edu.1.period': '2025 – Actualidad',
     'timeline.edu.1.dateTime': '2025-01',
     'timeline.edu.2.role': 'Desarrollo web',
     'timeline.edu.2.org': 'TodoCode',
-    'timeline.edu.2.period': '2024',
+    'timeline.edu.2.period': '2024 – Actualidad',
     'timeline.edu.2.dateTime': '2024-01',
     'timeline.languages': 'Español (nativo) · Inglés (A2)',
 
     // =========== STATS STRIP ===========
-    'statsStrip.title': 'Cifras que respaldan mi trabajo',
+    'statsStrip.title': 'Cifras y evidencia profesional',
     'statsStrip.availability': 'Disponibilidad y trazabilidad',
     'statsStrip.logisticsYears': 'Años en coordinación logística nacional',
     'statsStrip.techCount': 'Tecnologías en mi stack',
@@ -264,11 +264,11 @@ export const translations: Record<Language, Record<string, string>> = {
 
     // =========== HOME ===========
     'home.meta.title': '{name} | Systems Engineer and Backend Developer',
-    'home.meta.description': 'Systems Engineer and Backend Developer. Independent consultant and former National Logistics Coordinator. Node.js, TypeScript, PostgreSQL and more.',
+    'home.meta.description': 'Backend developer. I design and build APIs, business systems and tools with TypeScript, Node.js and PostgreSQL, applying testing and maintainable architecture.',
 
-    'home.cta.title': 'Ready to work together?',
-    'home.cta.text': "I'm open to new job opportunities and challenging projects. If you're looking for a developer committed to quality and results, let's talk.",
-    'home.cta.button': 'Contact Me',
+    'home.cta.title': 'Looking for a backend developer?',
+    'home.cta.text': 'I am currently open to job opportunities and software projects related to backend, APIs, business systems and automation. If you have a need, a vacancy or a project where my profile can contribute, you can contact me directly.',
+    'home.cta.button': "Let's talk",
 
     // =========== PROJECTS ===========
     'projects.meta.title': 'Projects | {name}',
@@ -306,7 +306,7 @@ export const translations: Record<Language, Record<string, string>> = {
 
     // =========== HERO ===========
     'hero.title': 'Systems Engineer | Backend Developer',
-    'hero.summary': 'Systems Engineer focused on backend development. I build robust APIs, integrations and web systems with Node.js, TypeScript and relational databases, applying TDD and sound architecture practices.',
+    'hero.summary': 'I build APIs, business systems and applications focused on real-world processes with TypeScript, Node.js and PostgreSQL, applying sound engineering practices, testing and maintainable architecture.',
     'hero.cta.primary': 'View Projects',
     'hero.cta.secondary': 'Contact Me',
 
@@ -314,8 +314,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'profileToggle.sectionTitle': 'About Me',
     'profileToggle.professional': 'Professional Profile',
     'profileToggle.technical': 'Technical Profile',
-    'profileToggle.professionalText': "I am a Systems Engineer and backend developer. Since January 2025 I have been working as an independent software development consultant, designing and building robust APIs, integrations and web systems with Node.js, TypeScript and relational databases.\n\nBefore moving into development, I worked as National Logistics Coordinator from January 2018 to January 2025, a role where information availability and traceability were critical to operations. That experience taught me to prioritize reliability, order and clear communication — values I apply to every software project today.\n\nI focus on quality: automated testing, clear documentation and maintainable architecture.",
-    'profileToggle.technicalText': "Specialized in the JavaScript/TypeScript ecosystem with a backend focus. I build RESTful APIs with Node.js and Express, data modeling with PostgreSQL and Prisma, and authentication with JWT and role-based access control (RBAC).\n\nI apply TDD (test-driven development), SDD (spec-driven development) and DDD (domain-driven design) to deliver reliable, maintainable software. I also integrate AI-assisted development to speed up repetitive tasks without sacrificing quality.\n\nKey technical skills:\n• Backend: Node.js, Express, Nest.js, PostgreSQL, MySQL, Prisma, JWT, RBAC\n• Frontend: React, TypeScript\n• DevOps: Docker, Linux, Git/GitHub, CI/CD, Vercel, Supabase\n• Methodologies: TDD, SDD, DDD\n• Testing: Jest",
+    'profileToggle.professionalText': "I am a backend-focused Software Developer and currently a Systems Engineering student. Since Jan 2025 I have been developing software projects and solutions independently, working across requirements analysis, data modeling, API design, implementation, testing and documentation.\n\nMy previous experience as National Logistics Coordinator between 2018 and 2025 gave me years of hands-on work with processes, inventories, traceability, critical information and operational continuity. That experience directly shapes how I build software: I first understand the problem and the process, then design the solution.\n\nI am currently focused on building APIs, management systems, developer tools and business-process applications, with a strong interest in reliability, data consistency and software maintainability. My professional goal is to join a development team where I can contribute from the backend and continue growing as a software engineer.",
+    'profileToggle.technicalText': "My main focus is backend development with TypeScript and Node.js, complemented by PostgreSQL for relational data modeling and management.\n\nI design and build REST APIs, business logic, authentication, access control and integrations, using tools such as Express, NestJS, Prisma and Docker.\n\nIn my projects I apply engineering principles focused on software reliability and maintainability: TDD, spec-driven development, modular architecture, domain modeling, testing, transactions, concurrency and idempotency.",
 
     // =========== TECH STACK ===========
     'techStack.title': 'Tech Stack',
@@ -363,16 +363,16 @@ export const translations: Record<Language, Record<string, string>> = {
     'timeline.edu.0.dateTime': '2023-01',
     'timeline.edu.1.role': 'Backend development and JavaScript',
     'timeline.edu.1.org': 'PLATZI',
-    'timeline.edu.1.period': '2025 – 2026',
+    'timeline.edu.1.period': '2025 – Present',
     'timeline.edu.1.dateTime': '2025-01',
     'timeline.edu.2.role': 'Web development',
     'timeline.edu.2.org': 'TodoCode',
-    'timeline.edu.2.period': '2024',
+    'timeline.edu.2.period': '2024 – Present',
     'timeline.edu.2.dateTime': '2024-01',
     'timeline.languages': 'Spanish (native) · English (A2)',
 
     // =========== STATS STRIP ===========
-    'statsStrip.title': 'Numbers that back my work',
+    'statsStrip.title': 'Numbers and professional evidence',
     'statsStrip.availability': 'Availability and traceability',
     'statsStrip.logisticsYears': 'Years in national logistics coordination',
     'statsStrip.techCount': 'Technologies in my stack',
