@@ -27,8 +27,9 @@ router.get('/me', authMiddleware, meHandler);
 router.patch('/profile', authMiddleware, updateProfileHandler);
 
 // POST /api/auth/verification-code - Request verification code (protected)
+// Requires authMiddleware: the handler reads req.user (the target of the code).
 // Strict rate limit too: the 6-digit code is brute-forceable, so cap attempts.
-router.post('/verification-code', authLimiter, sendVerificationCodeHandler);
+router.post('/verification-code', authMiddleware, authLimiter, sendVerificationCodeHandler);
 
 // PATCH /api/auth/password - Change password with verification code (protected)
 router.patch('/password', authMiddleware, changePasswordHandler);

@@ -43652,7 +43652,7 @@ router.post("/logout", authMiddleware, (_req, res) => {
 });
 router.get("/me", authMiddleware, meHandler);
 router.patch("/profile", authMiddleware, updateProfileHandler);
-router.post("/verification-code", authLimiter, sendVerificationCodeHandler);
+router.post("/verification-code", authMiddleware, authLimiter, sendVerificationCodeHandler);
 router.patch("/password", authMiddleware, changePasswordHandler);
 var auth_routes_default = router;
 
