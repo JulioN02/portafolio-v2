@@ -80,17 +80,17 @@ describe('Hero trust stats (D5 / CHC-2)', () => {
   });
 });
 
-describe('Hero CTAs (CHC-1 / CIN-3)', () => {
+describe('Hero CTAs (public-pii-minimization)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockUseProjects.mockReturnValue(okState);
   });
 
-  it('points the WhatsApp CTA to the canonical PROFILE URL (573003727134)', () => {
-    renderHero();
-    const whatsapp = screen.getByRole('link', { name: 'Escríbeme por WhatsApp' });
-    expect(whatsapp).toHaveAttribute('href', PROFILE.whatsappUrl);
-    expect(PROFILE.whatsappUrl).toContain('573003727134');
+  it('renders no WhatsApp CTA and no PII literals', () => {
+    const { container } = renderHero();
+    expect(screen.queryByRole('link', { name: 'Escríbeme por WhatsApp' })).toBeNull();
+    expect(container.innerHTML).not.toMatch(/wa\.me|tel:/i);
+    expect(container.innerHTML).not.toContain('3727134');
   });
 
   it('keeps the primary CTA pointing to /servicios', () => {

@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { PROFILE } from '@jsoft/shared';
 import { LanguageProvider } from '../../i18n/LanguageContext';
 import { CTA } from './CTA';
 
@@ -15,18 +14,13 @@ function renderCta() {
   );
 }
 
-describe('CTA conversion channels (CHC-6 / CIN-3/5)', () => {
-  it('renders a phone action with the canonical href and display format', () => {
-    renderCta();
-    const phone = screen.getByRole('link', { name: /Llámanos/ });
-    expect(phone).toHaveAttribute('href', PROFILE.phoneHref);
-    expect(phone).toHaveTextContent(PROFILE.phoneDisplay);
-  });
-
-  it('renders a WhatsApp action with the canonical URL', () => {
-    renderCta();
-    const whatsapp = screen.getByRole('link', { name: 'Escríbenos por WhatsApp' });
-    expect(whatsapp).toHaveAttribute('href', PROFILE.whatsappUrl);
+describe('CTA conversion channels (public-pii-minimization)', () => {
+  it('renders no phone or WhatsApp link and no PII literals', () => {
+    const { container } = renderCta();
+    expect(screen.queryByRole('link', { name: /Llámanos/ })).toBeNull();
+    expect(screen.queryByRole('link', { name: /WhatsApp/ })).toBeNull();
+    expect(container.innerHTML).not.toMatch(/wa\.me|tel:/i);
+    expect(container.innerHTML).not.toContain('3727134');
   });
 
   it('keeps a contact-form link to /contacto', () => {

@@ -20,7 +20,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'footer.terms': 'Términos',
 
     // =========== HOME ===========
-    'home.meta.title': 'Julio Nieto | Ingeniero de Sistemas y Desarrollador Backend',
+    'home.meta.title': '{name} | Ingeniero de Sistemas y Desarrollador Backend',
     'home.meta.description': 'Ingeniero de Sistemas y Desarrollador Backend. Consultor independiente y ex Coordinador Logístico Nacional. Node.js, TypeScript, PostgreSQL y más.',
 
     'home.cta.title': '¿Listo para trabajar juntos?',
@@ -28,7 +28,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'home.cta.button': 'Contáctame',
 
     // =========== PROJECTS ===========
-    'projects.meta.title': 'Proyectos | Julio Nieto',
+    'projects.meta.title': 'Proyectos | {name}',
     'projects.meta.description': 'Explora los proyectos en los que he trabajado como desarrollador backend e ingeniero de sistemas.',
 
     // =========== CONTACT ===========
@@ -38,7 +38,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'contact.alternative': 'También puedes contactarme por',
 
     // =========== BLOG ===========
-    'blog.meta.title': 'Blog | Julio Nieto',
+    'blog.meta.title': 'Blog | {name}',
     'blog.meta.description': 'Artículos sobre desarrollo backend, ingeniería de software, metodologías y tecnología.',
     'blog.searchPlaceholder': 'Buscar artículos…',
     'blog.searchAriaLabel': 'Buscar artículos',
@@ -55,7 +55,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'blogPost.viewAll': 'Ver todos los artículos',
 
     // =========== NOT FOUND ===========
-    'notFound.meta.title': '404 - Página no encontrada | Julio Nieto',
+    'notFound.meta.title': '404 - Página no encontrada | {name}',
     'notFound.code': '404',
     'notFound.title': 'Página no encontrada',
     'notFound.description': 'La página que buscas no existe o ha sido movida.',
@@ -120,8 +120,8 @@ export const translations: Record<Language, Record<string, string>> = {
     // =========== CONTACT STRIP ===========
     'contactStrip.title': 'Contacto directo',
     'contactStrip.email': 'Correo',
-    'contactStrip.phone': 'Teléfono',
-    'contactStrip.whatsapp': 'WhatsApp',
+    'contactStrip.phone': '',
+    'contactStrip.whatsapp': '',
     'contactStrip.linkedin': 'LinkedIn',
     'contactStrip.cv': 'Descargar CV',
     'contactStrip.cvAria': 'Descargar CV (PDF)',
@@ -245,7 +245,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'footer.terms': 'Terms',
 
     // =========== HOME ===========
-    'home.meta.title': 'Julio Nieto | Systems Engineer and Backend Developer',
+    'home.meta.title': '{name} | Systems Engineer and Backend Developer',
     'home.meta.description': 'Systems Engineer and Backend Developer. Independent consultant and former National Logistics Coordinator. Node.js, TypeScript, PostgreSQL and more.',
 
     'home.cta.title': 'Ready to work together?',
@@ -253,7 +253,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'home.cta.button': 'Contact Me',
 
     // =========== PROJECTS ===========
-    'projects.meta.title': 'Projects | Julio Nieto',
+    'projects.meta.title': 'Projects | {name}',
     'projects.meta.description': 'Explore the projects I have worked on as a backend developer and systems engineer.',
 
     // =========== CONTACT ===========
@@ -263,7 +263,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'contact.alternative': 'You can also reach me at',
 
     // =========== BLOG ===========
-    'blog.meta.title': 'Blog | Julio Nieto',
+    'blog.meta.title': 'Blog | {name}',
     'blog.meta.description': 'Articles about backend development, software engineering, methodologies and technology.',
     'blog.searchPlaceholder': 'Search articles…',
     'blog.searchAriaLabel': 'Search articles',
@@ -280,7 +280,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'blogPost.viewAll': 'View all articles',
 
     // =========== NOT FOUND ===========
-    'notFound.meta.title': '404 - Page Not Found | Julio Nieto',
+    'notFound.meta.title': '404 - Page Not Found | {name}',
     'notFound.code': '404',
     'notFound.title': 'Page Not Found',
     'notFound.description': 'The page you are looking for does not exist or has been moved.',
@@ -345,8 +345,8 @@ export const translations: Record<Language, Record<string, string>> = {
     // =========== CONTACT STRIP ===========
     'contactStrip.title': 'Direct contact',
     'contactStrip.email': 'Email',
-    'contactStrip.phone': 'Phone',
-    'contactStrip.whatsapp': 'WhatsApp',
+    'contactStrip.phone': '',
+    'contactStrip.whatsapp': '',
     'contactStrip.linkedin': 'LinkedIn',
     'contactStrip.cv': 'Download CV',
     'contactStrip.cvAria': 'Download CV (PDF)',

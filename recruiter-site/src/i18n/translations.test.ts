@@ -169,4 +169,26 @@ describe('i18n translations (home-redesign RHP-1..RHP-5, RHP-7, RHP-8)', () => {
     expect(translations.es['projectDetailPage.notFound.message']).toMatch(/no existe|ha sido eliminado/i);
     expect(translations.en['projectDetailPage.notFound.message']).toMatch(/does not exist|has been removed/i);
   });
+
+  it('keeps the phone/WhatsApp keys as empty values (public-pii-minimization)', () => {
+    for (const key of ['contactStrip.phone', 'contactStrip.whatsapp']) {
+      expect(translations.es[key], `es:${key}`).toBe('');
+      expect(translations.en[key], `en:${key}`).toBe('');
+    }
+  });
+
+  it('uses the {name} token in meta titles and never hardcodes a personal name (seo)', () => {
+    const metaKeys = [
+      'home.meta.title',
+      'projects.meta.title',
+      'blog.meta.title',
+      'notFound.meta.title',
+    ] as const;
+    for (const key of metaKeys) {
+      expect(translations.es[key], `es:${key}`).toContain('{name}');
+      expect(translations.en[key], `en:${key}`).toContain('{name}');
+      expect(translations.es[key], `es:${key}`).not.toContain('Julio');
+      expect(translations.en[key], `en:${key}`).not.toContain('Julio');
+    }
+  });
 });

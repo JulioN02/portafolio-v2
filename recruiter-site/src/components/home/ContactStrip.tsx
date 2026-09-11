@@ -13,17 +13,6 @@ export function ContactStrip() {
       external: false,
     },
     {
-      href: PROFILE.phoneHref,
-      label: t('contactStrip.phone'),
-      value: PROFILE.phoneDisplay,
-      external: false,
-    },
-    {
-      href: PROFILE.whatsappUrl,
-      label: t('contactStrip.whatsapp'),
-      external: true,
-    },
-    {
       href: PROFILE.linkedinUrl,
       label: t('contactStrip.linkedin'),
       external: true,

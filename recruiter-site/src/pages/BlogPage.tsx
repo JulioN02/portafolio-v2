@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { MetaTags } from '../components/seo/MetaTags';
+import { buildMetaTitle } from '../components/seo/buildMetaTitle';
 import { BlogGrid } from '../components/blog/BlogGrid';
 import { useBlogCategories, useBlogTags } from '../hooks/useBlogPosts';
 import { useTranslation } from '../i18n/LanguageContext';
@@ -63,7 +64,7 @@ export function BlogPage() {
   return (
     <main>
       <MetaTags
-        title={t('blog.meta.title')}
+        title={buildMetaTitle(t('blog.meta.title'))}
         description={t('blog.meta.description')}
       />
       <div className={styles.filters}>
