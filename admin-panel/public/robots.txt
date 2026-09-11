@@ -1,0 +1,4 @@
+# robots.txt — admin-panel (private back-office)
+# Never index or crawl the admin panel.
+User-agent: *
+Disallow: /

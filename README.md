@@ -19,11 +19,19 @@ Portafolio web profesional con **dos superficies públicas** (clientes y recluta
 
 ### Credenciales de Admin
 
-| Campo | Valor |
-|-------|-------|
-| Usuario | `admin` |
-| Contraseña | `admin123` |
-| URL login | http://localhost:5175/login |
+No hay contraseña por defecto. El usuario admin se crea/actualiza con la
+variable de entorno `ADMIN_INITIAL_PASSWORD` (mínimo 12 caracteres):
+
+```bash
+export ADMIN_INITIAL_PASSWORD="$(openssl rand -base64 24)"
+pnpm --filter api db:seed
+```
+
+- Si `ADMIN_INITIAL_PASSWORD` falta o tiene menos de 12 caracteres, el seed
+  **falla con exit code 1** y no crea ningún admin (fail-fast; no existe contraseña por defecto).
+- El usuario es `admin`; la URL de login es http://localhost:5175/login.
+- **Cambia la contraseña tras el primer login** desde Settings → Password
+  (la nueva contraseña también debe tener mínimo 12 caracteres).
 
 ---
 
@@ -113,7 +121,7 @@ La **planificación activa** vive en `openspec/` en formato SDD (Spec-Driven Dev
 - ✅ ErrorBoundary en todas las rutas
 
 #### Shared
-- ✅ Constantes de contacto centralizadas (`PROFILE` en `@jsoft/shared`) — única fuente de verdad para email, teléfono, WhatsApp, LinkedIn, GitHub y CV
+- ✅ Constantes de perfil centralizadas (`PROFILE` en `@jsoft/shared`) — única fuente de verdad para nombre canónico, email, LinkedIn, GitHub y CV. El teléfono/WhatsApp de Julio se removió de la superficie pública (PII minimization)
 - ✅ Tokens de diseño con alias `--text-*` → `--font-size-*` y colores WhatsApp
 
 ---
@@ -134,6 +142,11 @@ git clone git@github.com:JulioN02/portafolio-v2.git
 cd portafolio-v2
 pnpm install   # el postinstall ejecuta `prisma generate`
 ```
+
+> **Pendiente (owner)**: decidir el handle canónico de GitHub para `PROFILE.githubUrl`
+> (`JulioN02` vs `jsoftsolutions`). Hoy `PROFILE.githubUrl` apunta a
+> `github.com/jsoftsolutions` mientras el remote del repo usa `JulioN02`.
+> No se cambia el URL sin confirmación del owner (TSK-39).
 
 ### 2. Variables de entorno
 
@@ -193,13 +206,14 @@ pnpm dev
 | `DATABASE_URL` | Supabase **transaction pooler** (puerto `6543`, `?pgbouncer=true`) — usada por la API en runtime | `postgresql://postgres.<ref>:<pass>@<region>.pooler.supabase.com:6543/postgres?pgbouncer=true` |
 | `DIRECT_URL` | Supabase **session mode** (puerto `5432`) para el **Prisma CLI** (migraciones/generate). **REQUERIDA** por `schema.prisma` | `postgresql://postgres.<ref>:<pass>@<region>.pooler.supabase.com:5432/postgres` |
 | `JWT_SECRET` | Clave secreta JWT (32+ chars) | `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
-| `JWT_EXPIRES_IN` | Expiración del token | `7d` |
+| `JWT_EXPIRES_IN` | Expiración del token | `12h` |
 | `SUPABASE_PROJECT_ID` | ID del proyecto Supabase (Storage) | `xxxxxxxx` |
 | `SUPABASE_SERVICE_KEY` | Service key de Supabase (Storage, uploads) | `sb_secret_...` |
 | `SUPABASE_BUCKET` | Bucket público para uploads (debe coincidir con el creado en Supabase) | `general` |
 | `NODE_ENV` | Entorno | `development` / `production` |
 | `PORT` | Puerto del servidor | `3000` |
 | `CORS_ORIGIN` | Orígenes permitidos (separados por coma) | `http://localhost:5173,http://localhost:5174,http://localhost:5175` |
+| `ADMIN_INITIAL_PASSWORD` | Contraseña inicial del admin (seed, mínimo 12 chars). **No** hay default | `openssl rand -base64 24` |
 
 > **Nota**: `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` **solo** las necesitan consumidores no-API (p. ej. si algún frontend hablara directo con Supabase). La API solo requiere `SUPABASE_PROJECT_ID` + `SUPABASE_SERVICE_KEY` para Storage.
 
@@ -274,6 +288,18 @@ pnpm --filter admin-panel test
 ## 🔐 Seguridad
 
 Ver [SECURITY.md](./SECURITY.md) para la política de seguridad y cómo reportar vulnerabilidades.
+
+### Retención de PII de contacto
+
+Los mensajes de contacto (nombre, email, teléfono/WhatsApp del visitante y
+mensaje) se conservan un máximo de **24 meses** desde su creación. Pasado ese
+plazo deben purgarse.
+
+- La superficie pública de Julio (client/recruiter) ya **no** expone su
+  teléfono ni WhatsApp; solo email + formulario.
+- **Follow-up pendiente**: job de purga automatizada (cron) que elimine los
+  `ContactForm` con `createdAt` mayor a 24 meses. Hoy es un proceso manual
+  documentado, no automatizado.
 
 ---
 

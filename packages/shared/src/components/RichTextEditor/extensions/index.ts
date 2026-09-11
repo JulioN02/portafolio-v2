@@ -18,6 +18,12 @@ export function buildEditorExtensions() {
   return [
     StarterKit.configure({
       heading: { levels: [1, 2, 3, 4] },
+      // TipTap v3 bundles Link + Underline inside StarterKit. Disable them here
+      // so the explicitly configured versions below are the single registration
+      // (avoids duplicate extension names and guarantees our Link security
+      // attributes — rel=noopener noreferrer, target=_blank — are the ones used).
+      link: false,
+      underline: false,
     }),
     Underline,
     Link.configure({

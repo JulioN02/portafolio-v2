@@ -22,7 +22,7 @@ Marca cada paso como ✅ cuando funcione correctamente o ❌ si falla.
 
 - [ ] **WF-01.1** Ir a http://localhost:5175/login
 - [ ] **WF-01.2** Ingresar credenciales incorrectas → ver mensaje de error
-- [ ] **WF-01.3** Ingresar `admin` / `admin123` → redirige al dashboard
+- [ ] **WF-01.3** Ingresar usuario `admin` y la contraseña definida en `ADMIN_INITIAL_PASSWORD` al correr el seed (mínimo 12 caracteres; no hay contraseña por defecto) → redirige al dashboard
 - [ ] **WF-01.4** Recargar página → sigue autenticado (JWT en localStorage)
 - [ ] **WF-01.5** Cerrar sesión (botón en sidebar) → redirige al login
 - [ ] **WF-01.6** Intentar acceder a `/dashboard` sin token → redirige a `/login`
