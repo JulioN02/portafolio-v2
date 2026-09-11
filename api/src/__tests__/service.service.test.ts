@@ -42,14 +42,25 @@ describe('serviceService', () => {
   });
 
   describe('findBySlug', () => {
-    it('finds a service by slug (non-deleted)', async () => {
+    it('finds a service by slug (non-deleted, PUBLISHED by default)', async () => {
       (mockPrisma.service.findFirst as jest.Mock).mockResolvedValue(mockService);
       const result = await serviceService.findBySlug('desarrollo-web');
       expect(mockPrisma.service.findFirst).toHaveBeenCalledWith({
-        where: { slug: 'desarrollo-web', deletedAt: null },
+        where: { slug: 'desarrollo-web', deletedAt: null, status: 'PUBLISHED' },
         select: expect.any(Object),
       });
       expect(result).toEqual(mockService);
+    });
+
+    it("findBySlug with status 'ALL' returns drafts (no status condition)", async () => {
+      const draft = { id: 's9', slug: 'draft-svc', status: 'DRAFT' };
+      (mockPrisma.service.findFirst as jest.Mock).mockResolvedValue(draft);
+      const result = await serviceService.findBySlug('draft-svc', 'ALL');
+      expect(mockPrisma.service.findFirst).toHaveBeenCalledWith({
+        where: { slug: 'draft-svc', deletedAt: null },
+        select: expect.any(Object),
+      });
+      expect(result).toEqual(draft);
     });
 
     it('includes externalLink in the select', async () => {
@@ -66,11 +77,25 @@ describe('serviceService', () => {
   });
 
   describe('findById', () => {
-    it('finds a service by id', async () => {
+    it('finds a service by id (PUBLISHED by default)', async () => {
       (mockPrisma.service.findUnique as jest.Mock).mockResolvedValue(mockService);
       const result = await serviceService.findById('s1');
-      expect(mockPrisma.service.findUnique).toHaveBeenCalledWith({ where: { id: 's1' }, select: expect.any(Object) });
+      expect(mockPrisma.service.findUnique).toHaveBeenCalledWith({
+        where: { id: 's1', status: 'PUBLISHED' },
+        select: expect.any(Object),
+      });
       expect(result).toEqual(mockService);
+    });
+
+    it("findById with status 'ALL' returns drafts (no status condition)", async () => {
+      const draft = { id: 's9', status: 'DRAFT' };
+      (mockPrisma.service.findUnique as jest.Mock).mockResolvedValue(draft);
+      const result = await serviceService.findById('s9', 'ALL');
+      expect(mockPrisma.service.findUnique).toHaveBeenCalledWith({
+        where: { id: 's9' },
+        select: expect.any(Object),
+      });
+      expect(result).toEqual(draft);
     });
 
     it('propagates errors', async () => {

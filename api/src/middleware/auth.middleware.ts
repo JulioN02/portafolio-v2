@@ -29,8 +29,19 @@ export const authMiddleware = (
 
   const token = authHeader.slice(7);
 
+  // FAIL CLOSED: never attempt verification without a configured secret.
+  // The old `process.env.JWT_SECRET || ''` fallback silently verified against
+  // an empty key; an unset secret must now reject every request.
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    next(new AuthError('JWT_SECRET is not configured'));
+    return;
+  }
+
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || '') as JwtPayload;
+    // Pin the algorithm: only HS256-signed tokens are accepted. An attacker
+    // signing with HS384/RS256 must NOT be verified.
+    const decoded = jwt.verify(token, secret, { algorithms: ['HS256'] }) as JwtPayload;
     req.user = decoded;
     next();
   } catch {

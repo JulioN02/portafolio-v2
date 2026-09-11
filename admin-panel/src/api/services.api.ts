@@ -19,7 +19,9 @@ export const servicesApi = {
   },
 
   getById: async (id: string): Promise<ServiceResponse> => {
-    const { data } = await apiClient.get(`/services/by-id/${id}`);
+    // ?status=ALL: /by-id is now auth-protected and PUBLISHED-filtered by
+    // default; the admin must still open drafts/archived entities by id.
+    const { data } = await apiClient.get(`/services/by-id/${id}`, { params: { status: 'ALL' } });
     return data;
   },
 

@@ -50,7 +50,11 @@ export const sendVerificationCodeHandler = asyncHandler(async (req: Request, res
   }
 
   const result = verificationCodeService.generate(authReq.user.userId);
-  console.log(`[DEV] Verification code for user ${authReq.user.userId}: ${result.code}`);
+  // Gated logging: the code must never be written to console in production.
+  // (The code is still returned in the API response — accepted single-admin risk.)
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`[DEV] Verification code for user ${authReq.user.userId}: ${result.code}`);
+  }
 
   res.json(result);
 });
