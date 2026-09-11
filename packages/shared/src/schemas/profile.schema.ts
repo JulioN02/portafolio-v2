@@ -20,7 +20,7 @@ export const sendVerificationCodeSchema = z.object({});
  */
 export const changePasswordSchema = z.object({
   verificationCode: z.string().length(6, 'Code must be exactly 6 characters'),
-  newPassword: z.string().min(6, 'Password must be at least 6 characters'),
+  newPassword: z.string().min(12, 'Password must be at least 12 characters'),
 });
 
 /**
