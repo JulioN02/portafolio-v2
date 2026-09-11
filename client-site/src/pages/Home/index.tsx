@@ -2,7 +2,6 @@ import { useTranslation } from '../../i18n/LanguageContext';
 import { MetaTags } from '../../components/seo/MetaTags';
 import { Hero } from './Hero';
 import { ProcessSection } from './ProcessSection';
-import { TechStack } from '../../components/techStack/TechStack';
 import { BlogTeaser } from './BlogTeaser';
 import { FeaturedServices } from './FeaturedServices';
 import { SuccessCaseCarousel } from '../../components/successCases/SuccessCaseCarousel';
@@ -38,7 +37,6 @@ export function HomePage() {
       />
       <Hero />
       <ProcessSection />
-      <TechStack />
       {orderedKeys.map((key) => {
         const Component = SECTION_COMPONENTS[key];
         return Component ? <Component key={key} /> : null;
