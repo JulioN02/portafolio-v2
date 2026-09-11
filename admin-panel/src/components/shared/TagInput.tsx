@@ -41,6 +41,7 @@ export function TagInput({
   const { t } = useTranslation();
   const [input, setInput] = useState('');
   const [internalError, setInternalError] = useState<string | undefined>(undefined);
+  const [isOpen, setIsOpen] = useState(false);
 
   const { data: suggestions = [] } = useQuery({
     queryKey: ['tag-suggestions', suggestionsUrl],
@@ -53,6 +54,11 @@ export function TagInput({
     if (!query) return suggestions;
     return suggestions.filter((tag) => tag.toLowerCase().includes(query));
   }, [suggestions, input]);
+
+  // Combobox behavior: the list is only shown while the input is focused.
+  // Rendering it unconditionally left an absolutely-positioned dropdown on
+  // top of the tag chips, blocking their remove buttons.
+  const showSuggestions = isOpen && filteredSuggestions.length > 0;
 
   const addTag = (raw: string): boolean => {
     const tag = raw.trim();
@@ -72,6 +78,10 @@ export function TagInput({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Escape') {
+      setIsOpen(false);
+      return;
+    }
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
       if (addTag(input)) setInput('');
@@ -79,6 +89,7 @@ export function TagInput({
   };
 
   const handleBlur = () => {
+    setIsOpen(false);
     if (input) {
       addTag(input);
       setInput('');
@@ -104,14 +115,15 @@ export function TagInput({
           className={`${styles.input} ${shownError ? styles.inputError : ''}`}
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           onBlur={handleBlur}
           placeholder={placeholder ?? t('projects.tagsHint')}
           role="combobox"
-          aria-expanded={filteredSuggestions.length > 0}
+          aria-expanded={showSuggestions}
           aria-autocomplete="list"
         />
-        {filteredSuggestions.length > 0 && (
+        {showSuggestions && (
           <ul className={styles.suggestions} role="listbox">
             {filteredSuggestions.map((tag) => (
               <li key={tag}>
