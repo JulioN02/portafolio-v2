@@ -10,10 +10,11 @@ function renderWithProviders(ui: ReactNode) {
 }
 
 describe('Footer social links (CIN-3)', () => {
-  it('points WhatsApp to the canonical PROFILE URL', () => {
-    renderWithProviders(<Footer />);
-    const whatsapp = screen.getByRole('link', { name: 'WhatsApp' });
-    expect(whatsapp).toHaveAttribute('href', PROFILE.whatsappUrl);
+  it('renders no WhatsApp link and no PII literals (public-pii-minimization)', () => {
+    const { container } = renderWithProviders(<Footer />);
+    expect(screen.queryByRole('link', { name: 'WhatsApp' })).toBeNull();
+    expect(container.innerHTML).not.toMatch(/wa\.me|tel:/i);
+    expect(container.innerHTML).not.toContain('3727134');
   });
 
   it('points LinkedIn to the canonical PROFILE URL', () => {

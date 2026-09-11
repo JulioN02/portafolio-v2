@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
+import { PROFILE } from '@jsoft/shared';
 import { EntityDetailPage } from './EntityDetailPage';
 import { LanguageProvider } from '../i18n/LanguageContext';
 
@@ -416,5 +417,17 @@ describe('EntityDetailPage (media + delegation)', () => {
 
     const dialog = await screen.findByRole('dialog', { name: 'Visor de imágenes' });
     expect(dialog.querySelector('img')).toHaveAttribute('src', '/uploads/x.png');
+  });
+});
+
+describe('EntityDetailPage canonical title (seo)', () => {
+  it('uses PROFILE.fullName in the document title', async () => {
+    mockDetail.mockReturnValue(resolvedDetail({ title: 'Tool de prueba' }));
+
+    renderPage('/proyectos/tool/tool-prueba');
+
+    await waitFor(() =>
+      expect(document.title).toBe(`Tool de prueba | ${PROFILE.fullName}`),
+    );
   });
 });

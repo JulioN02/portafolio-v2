@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { PROFILE } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import styles from './Hero.module.css';
 
@@ -10,7 +11,7 @@ interface HeroProps {
 }
 
 export function Hero({
-  name = 'Julio Nieto',
+  name = PROFILE.fullName,
   title,
   summary,
   avatarUrl,

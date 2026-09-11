@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { MetaTags } from '../components/seo/MetaTags';
+import { buildMetaTitle } from '../components/seo/buildMetaTitle';
 import { Hero } from '../components/home/Hero';
 import { ProfileToggle } from '../components/home/ProfileToggle';
 import { StatsStrip } from '../components/home/StatsStrip';
@@ -16,7 +17,7 @@ export function HomePage() {
   return (
     <div className={styles.page}>
       <MetaTags
-        title={t('home.meta.title')}
+        title={buildMetaTitle(t('home.meta.title'))}
         description={t('home.meta.description')}
       />
       {/* Hero Section */}

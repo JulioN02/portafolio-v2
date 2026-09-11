@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { MetaTags } from '../components/seo/MetaTags';
+import { buildMetaTitle } from '../components/seo/buildMetaTitle';
 import { useTranslation } from '../i18n/LanguageContext';
 import styles from './NotFoundPage.module.css';
 
@@ -8,7 +9,7 @@ export function NotFoundPage() {
   return (
     <main className={styles.page}>
       <MetaTags
-        title={t('notFound.meta.title')}
+        title={buildMetaTitle(t('notFound.meta.title'))}
         noindex
       />
       <div className={styles.content}>

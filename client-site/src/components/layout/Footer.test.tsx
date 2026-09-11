@@ -16,13 +16,11 @@ function renderFooter() {
 }
 
 describe('Footer contact sweep (CIN-1/3/4)', () => {
-  it('points WhatsApp links (social icon + contact block) to the canonical PROFILE URL', () => {
-    renderFooter();
-    const whatsappLinks = screen.getAllByRole('link', { name: 'WhatsApp' });
-    expect(whatsappLinks.length).toBeGreaterThanOrEqual(2);
-    for (const link of whatsappLinks) {
-      expect(link).toHaveAttribute('href', PROFILE.whatsappUrl);
-    }
+  it('renders no WhatsApp link and no PII literals (public-pii-minimization)', () => {
+    const { container } = renderFooter();
+    expect(screen.queryByRole('link', { name: 'WhatsApp' })).toBeNull();
+    expect(container.innerHTML).not.toMatch(/wa\.me|tel:/i);
+    expect(container.innerHTML).not.toContain('3727134');
   });
 
   it('points LinkedIn and GitHub to the canonical jsoftsolutions handles', () => {

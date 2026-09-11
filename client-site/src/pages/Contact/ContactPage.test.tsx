@@ -31,10 +31,12 @@ describe('ContactPage sweep (CIN-2/3/4/5)', () => {
     expect(email).toHaveAttribute('href', `mailto:${PROFILE.email}`);
   });
 
-  it('renders WhatsApp with the canonical URL and the canonical display phone', () => {
-    renderPage();
-    const whatsapp = screen.getByRole('link', { name: PROFILE.phoneDisplay });
-    expect(whatsapp).toHaveAttribute('href', PROFILE.whatsappUrl);
+  it('renders no WhatsApp or phone link, keeping the email (public-pii-minimization)', () => {
+    const { container } = renderPage();
+    expect(screen.queryByRole('link', { name: /WhatsApp/ })).toBeNull();
+    expect(screen.queryByRole('link', { name: /Llámanos/ })).toBeNull();
+    expect(container.innerHTML).not.toMatch(/wa\.me|tel:/i);
+    expect(container.innerHTML).not.toContain('3727134');
   });
 
   it('contains no mismatched contact values (CIN-4)', () => {

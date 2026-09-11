@@ -63,14 +63,6 @@ export function Hero() {
           <Link to="/servicios" className={styles.ctaPrimary}>
             {t('hero.cta.services')}
           </Link>
-          <a
-            href={PROFILE.whatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.ctaWhatsapp}
-          >
-            {t('hero.cta.whatsapp')}
-          </a>
         </div>
       </div>
     </section>

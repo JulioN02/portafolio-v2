@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { PROFILE } from '@jsoft/shared';
 import { useBlogPostBySlug } from '../hooks/useBlogPosts';
 import { MetaTags } from '../components/seo/MetaTags';
 import { useTranslation } from '../i18n/LanguageContext';
@@ -57,7 +58,7 @@ export function BlogPostPage() {
   return (
     <main className={styles.page}>
       <MetaTags
-        title={`${post.title} | Julio Nieto`}
+        title={`${post.title} | ${PROFILE.fullName}`}
         description={post.shortDescription}
         ogType="article"
         publishedTime={post.publishedAt instanceof Date ? post.publishedAt.toISOString() : post.publishedAt ?? undefined}

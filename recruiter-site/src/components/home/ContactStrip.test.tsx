@@ -9,7 +9,7 @@ function renderWithProviders(ui: ReactNode) {
   return render(<LanguageProvider>{ui}</LanguageProvider>);
 }
 
-describe('ContactStrip (RHP-7, RHP-8)', () => {
+describe('ContactStrip (public-pii-minimization)', () => {
   it('renders the email anchor with the canonical mailto href', () => {
     renderWithProviders(<ContactStrip />);
     const email = screen.getByRole('link', { name: new RegExp(PROFILE.email) });
@@ -17,21 +17,19 @@ describe('ContactStrip (RHP-7, RHP-8)', () => {
     expect(email).not.toHaveAttribute('target');
   });
 
-  it('renders the phone anchor with the canonical tel href and display', () => {
-    renderWithProviders(<ContactStrip />);
-    const phone = screen.getByRole('link', { name: new RegExp(PROFILE.phoneDisplay) });
-    expect(phone).toHaveAttribute('href', PROFILE.phoneHref);
+  it('renders no phone or WhatsApp link and no PII literals', () => {
+    const { container } = renderWithProviders(<ContactStrip />);
+    expect(screen.queryByRole('link', { name: /WhatsApp/ })).toBeNull();
+    expect(screen.queryByRole('link', { name: /Teléfono|Phone/ })).toBeNull();
+    expect(container.innerHTML).not.toMatch(/wa\.me|tel:/i);
+    expect(container.innerHTML).not.toContain('3727134');
   });
 
-  it('renders WhatsApp and LinkedIn anchors with canonical URLs and noopener rel', () => {
+  it('renders the LinkedIn anchor with canonical URL and noopener rel', () => {
     renderWithProviders(<ContactStrip />);
-    const whatsapp = screen.getByRole('link', { name: 'WhatsApp' });
-    expect(whatsapp).toHaveAttribute('href', PROFILE.whatsappUrl);
-    expect(whatsapp).toHaveAttribute('target', '_blank');
-    expect(whatsapp).toHaveAttribute('rel', 'noopener noreferrer');
-
     const linkedin = screen.getByRole('link', { name: 'LinkedIn' });
     expect(linkedin).toHaveAttribute('href', PROFILE.linkedinUrl);
+    expect(linkedin).toHaveAttribute('target', '_blank');
     expect(linkedin).toHaveAttribute('rel', 'noopener noreferrer');
   });
 

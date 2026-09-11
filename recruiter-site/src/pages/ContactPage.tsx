@@ -4,12 +4,8 @@ import { RecruiterContactForm } from '../components/contact/RecruiterContactForm
 import { useTranslation } from '../i18n/LanguageContext';
 
 // Contact values come from the shared canonical PROFILE constants (CIN-3).
+// Phone/WhatsApp PII removed for public launch (public-pii-minimization).
 const socialLinks = [
-  {
-    href: PROFILE.whatsappUrl,
-    label: 'WhatsApp',
-    icon: '📱',
-  },
   {
     href: PROFILE.linkedinUrl,
     label: 'LinkedIn',

@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
-import { sanitizeHtml, MediaCarousel, Lightbox } from '@jsoft/shared';
+import { PROFILE, sanitizeHtml, MediaCarousel, Lightbox } from '@jsoft/shared';
 import type {
   EmblaCarouselType,
   MediaCarouselSlide,
@@ -170,7 +170,7 @@ export function EntityDetailPage() {
 
   return (
     <main className={styles.page}>
-      <MetaTags title={`${title} | Julio Nieto`} description={shortDescription} />
+      <MetaTags title={`${title} | ${PROFILE.fullName}`} description={shortDescription} />
       <div className={styles.container}>
         <div className={styles.backLink}>
           <Link to="/proyectos">{t('projectDetailPage.backToProjects')}</Link>

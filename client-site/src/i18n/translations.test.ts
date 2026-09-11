@@ -140,8 +140,14 @@ describe('i18n home-redesign keysets (parity es/en)', () => {
     expect(translations.en['processSection.whyMe.title']).toBe('Why work with me?');
     expect(translations.es['blogTeaser.title']).toBe('Últimos artículos');
     expect(translations.en['blogTeaser.viewAll']).toContain('View all');
-    expect(translations.es['cta.phone']).toBe('Llámanos');
     expect(translations.en['cta.form']).toBe('Send a message via the form');
+  });
+
+  it('keeps the phone/WhatsApp keys as empty values (public-pii-minimization)', () => {
+    for (const key of ['cta.phone', 'cta.whatsapp', 'hero.cta.whatsapp', 'contact.whatsapp']) {
+      expect(translations.es[key], `es:${key}`).toBe('');
+      expect(translations.en[key], `en:${key}`).toBe('');
+    }
   });
 });
 
