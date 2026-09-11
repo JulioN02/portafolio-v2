@@ -144,3 +144,60 @@ describe('i18n home-redesign keysets (parity es/en)', () => {
     expect(translations.en['cta.form']).toBe('Send a message via the form');
   });
 });
+
+// techStack keyset (TS-1.3): 21 keys — title, subtitle, 4 domains, 15 tech names.
+// Must exist in BOTH es and en with real translated values (not key fallbacks).
+const TECH_STACK_KEYS = [
+  'techStack.title',
+  'techStack.subtitle',
+  'techStack.domain.backend',
+  'techStack.domain.data',
+  'techStack.domain.infrastructure',
+  'techStack.domain.frontend',
+  'techStack.item.nodejs',
+  'techStack.item.typescript',
+  'techStack.item.express',
+  'techStack.item.nestjs',
+  'techStack.item.postgresql',
+  'techStack.item.mysql',
+  'techStack.item.prisma',
+  'techStack.item.docker',
+  'techStack.item.linux',
+  'techStack.item.cicd',
+  'techStack.item.git',
+  'techStack.item.react',
+  'techStack.item.vite',
+  'techStack.item.vanilla',
+  'techStack.item.htmlcss',
+] as const;
+
+describe('i18n techStack keyset (parity es/en)', () => {
+  it('has all 21 keys in es and en with non-empty values', () => {
+    for (const key of TECH_STACK_KEYS) {
+      expect(translations.es[key], `es:${key}`).toBeDefined();
+      expect(translations.en[key], `en:${key}`).toBeDefined();
+      expect(translations.es[key], `es:${key}`).not.toBe('');
+      expect(translations.en[key], `en:${key}`).not.toBe('');
+      expect(translations.es[key], `es:${key}`).not.toBe(key);
+      expect(translations.en[key], `en:${key}`).not.toBe(key);
+    }
+  });
+
+  it('uses translated values (not key fallbacks)', () => {
+    expect(translations.es['techStack.title']).toBe('Tech Stack');
+    expect(translations.en['techStack.title']).toBe('Tech Stack');
+    expect(translations.es['techStack.subtitle']).toContain('capas del sistema');
+    expect(translations.en['techStack.subtitle']).toContain('system layer');
+    expect(translations.es['techStack.domain.backend']).toBe('Backend & Core');
+    expect(translations.en['techStack.domain.backend']).toBe('Backend & Core');
+    expect(translations.es['techStack.domain.data']).toBe('Datos & Persistencia');
+    expect(translations.en['techStack.domain.data']).toBe('Data & Persistence');
+    expect(translations.es['techStack.domain.infrastructure']).toBe('Infraestructura');
+    expect(translations.en['techStack.domain.infrastructure']).toBe('Infrastructure');
+    expect(translations.es['techStack.item.nodejs']).toBe('Node.js');
+    expect(translations.en['techStack.item.nodejs']).toBe('Node.js');
+    expect(translations.en['techStack.item.prisma']).toBe('Prisma ORM');
+    expect(translations.es['techStack.item.vanilla']).toBe('Vanilla JS');
+    expect(translations.en['techStack.item.htmlcss']).toBe('HTML & CSS');
+  });
+});
