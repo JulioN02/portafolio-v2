@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
+import { LanguageProvider } from '../../i18n/LanguageContext';
 import { ContactForm } from './ContactForm';
 
 const mockPost = vi.fn();
@@ -15,7 +16,11 @@ const queryClient = new QueryClient({
 });
 
 function wrapper({ children }: { children: ReactNode }) {
-  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <LanguageProvider>{children}</LanguageProvider>
+    </QueryClientProvider>
+  );
 }
 
 function renderForm() {
@@ -188,5 +193,66 @@ describe('ContactForm — phone normalization + format validation', () => {
       await screen.findByText('El nombre debe tener al menos 2 caracteres'),
     ).toBeInTheDocument();
     expect(mockPost).not.toHaveBeenCalled();
+  });
+});
+
+describe('ContactForm — success card (i18n + auto-reset)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockPost.mockResolvedValue({ message: 'Contact form submitted successfully', data: {} });
+    vi.stubEnv('VITE_TURNSTILE_SITE_KEY', '');
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.useRealTimers();
+  });
+
+  it('shows the i18n success title and message after a successful submit', async () => {
+    renderForm();
+    fillValidForm();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar mensaje' }));
+
+    expect(await screen.findByText('¡Mensaje enviado!')).toBeInTheDocument();
+    expect(
+      screen.getByText('¡Gracias por escribirme! Te responderé lo antes posible.'),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Enviar otro mensaje' })).toBeInTheDocument();
+  });
+
+  it('the manual reset button returns to the form immediately', async () => {
+    renderForm();
+    fillValidForm();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar mensaje' }));
+    expect(await screen.findByText('¡Mensaje enviado!')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar otro mensaje' }));
+
+    expect(screen.queryByText('¡Mensaje enviado!')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Enviar mensaje' })).toBeInTheDocument();
+  });
+
+  it('auto-resets the success card back to the form after ~5 seconds', async () => {
+    vi.useFakeTimers();
+    renderForm();
+    fillValidForm();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar mensaje' }));
+
+    // Flush the async mutation microtasks so onSuccess commits the success state.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(0);
+    });
+
+    expect(screen.getByText('¡Mensaje enviado!')).toBeInTheDocument();
+
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
+
+    expect(screen.queryByText('¡Mensaje enviado!')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Enviar mensaje' })).toBeInTheDocument();
   });
 });

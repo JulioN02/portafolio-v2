@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSubmitContact } from '../../hooks/useContact';
 import { Turnstile, normalizePhone, PHONE_REGEX } from '@jsoft/shared';
 import { Spinner } from '../common/Spinner';
+import { useTranslation } from '../../i18n/LanguageContext';
 import { toast } from 'sonner';
 import styles from './ContactForm.module.css';
 
@@ -27,6 +28,7 @@ const formatSourceLabel = (source: string): string => {
 };
 
 export function ContactForm({ source = 'general', onSuccess }: ContactFormProps) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -42,7 +44,7 @@ export function ContactForm({ source = 'general', onSuccess }: ContactFormProps)
   const { mutate: submitContact, isPending } = useSubmitContact({
     onSuccess: () => {
       setSuccess(true);
-      toast.success('¡Mensaje enviado con éxito!');
+      toast.success(t('contactForm.toast.success'));
       setFormData({ firstName: '', lastName: '', email: '', whatsapp: '', message: '', website: '' });
       setTurnstileToken('');
       onSuccess?.();
@@ -53,10 +55,19 @@ export function ContactForm({ source = 'general', onSuccess }: ContactFormProps)
         setErrors({ submit: 'Verificación anti-spam fallida. Por favor, inténtalo de nuevo.' });
         return;
       }
-      toast.error('Error al enviar el mensaje');
+      toast.error(t('contactForm.toast.error'));
       setErrors({ submit: 'Error al enviar el formulario. Por favor, intenta de nuevo.' });
     },
   });
+
+  // Auto-reset the success card back to the form after ~5s.
+  useEffect(() => {
+    if (!success) return;
+    const timeoutId = setTimeout(() => {
+      setSuccess(false);
+    }, 5000);
+    return () => clearTimeout(timeoutId);
+  }, [success]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -145,10 +156,10 @@ export function ContactForm({ source = 'general', onSuccess }: ContactFormProps)
     return (
       <div className={styles.success}>
         <div className={styles.successIcon}>✓</div>
-        <h3>¡Mensaje enviado!</h3>
-        <p>Gracias por contactarme. Te responderé lo antes posible.</p>
+        <h3>{t('contactForm.success.title')}</h3>
+        <p>{t('contactForm.success.message')}</p>
         <button onClick={() => setSuccess(false)} className={styles.resetButton}>
-          Enviar otro mensaje
+          {t('contactForm.success.reset')}
         </button>
       </div>
     );

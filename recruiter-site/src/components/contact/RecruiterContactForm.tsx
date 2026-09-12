@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { Turnstile, normalizePhone, PHONE_REGEX } from '@jsoft/shared';
 import { useSubmitContact } from '../../hooks/useContactForm';
 import { useTranslation } from '../../i18n/LanguageContext';
@@ -100,8 +100,17 @@ export function RecruiterContactForm() {
 
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
-  const { mutate, isPending, isError, error, isSuccess, data } =
+  const { mutate, isPending, isError, error, isSuccess, data, reset } =
     useSubmitContact();
+
+  // Auto-reset the success card back to the form after ~5s.
+  useEffect(() => {
+    if (!isSuccess) return;
+    const timeoutId = setTimeout(() => {
+      reset();
+    }, 5000);
+    return () => clearTimeout(timeoutId);
+  }, [isSuccess, reset]);
 
   /* ── Handlers ── */
 
@@ -129,7 +138,7 @@ export function RecruiterContactForm() {
 
     mutate(formData, {
       onSuccess: () => {
-        toast.success('¡Mensaje enviado con éxito!');
+        toast.success(t('contactForm.toast.success'));
         // Reset form
         setFormData({
           name: '',
@@ -146,7 +155,7 @@ export function RecruiterContactForm() {
         setFieldErrors({});
       },
       onError: () => {
-        toast.error('Error al enviar el mensaje');
+        toast.error(t('contactForm.toast.error'));
       },
     });
   };
@@ -169,7 +178,14 @@ export function RecruiterContactForm() {
       <div className={styles.successCard}>
         <div className={styles.successIcon}>✓</div>
         <h3 className={styles.successTitle}>{t('contactForm.success.title')}</h3>
-        <p className={styles.successMessage}>{data.message}</p>
+        <p className={styles.successMessage}>{t('contactForm.success.message')}</p>
+        <button
+          type="button"
+          className={styles.resetButton}
+          onClick={() => reset()}
+        >
+          {t('contactForm.success.reset')}
+        </button>
       </div>
     );
   }

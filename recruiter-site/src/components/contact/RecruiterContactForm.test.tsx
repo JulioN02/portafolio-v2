@@ -201,3 +201,71 @@ describe('RecruiterContactForm — phone normalization + min-length validation',
     expect(mockPost).not.toHaveBeenCalled();
   });
 });
+
+describe('RecruiterContactForm — success card (i18n + auto-reset)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockPost.mockResolvedValue({ message: 'Contact form submitted successfully', data: {} });
+    vi.stubEnv('VITE_TURNSTILE_SITE_KEY', '');
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.useRealTimers();
+  });
+
+  it('shows the i18n success title and message, NOT the API message', async () => {
+    renderForm();
+    fillValidForm();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar mensaje' }));
+
+    expect(await screen.findByText('¡Mensaje enviado!')).toBeInTheDocument();
+    expect(
+      screen.getByText('¡Gracias por escribirme! Te responderé lo antes posible.'),
+    ).toBeInTheDocument();
+    // The spanglish fix: the raw English API message must never surface.
+    expect(screen.queryByText('Contact form submitted successfully')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Enviar otro mensaje' })).toBeInTheDocument();
+  });
+
+  it('the manual reset button returns to the form immediately', async () => {
+    renderForm();
+    fillValidForm();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar mensaje' }));
+    expect(await screen.findByText('¡Mensaje enviado!')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar otro mensaje' }));
+
+    await waitFor(() => {
+      expect(screen.queryByText('¡Mensaje enviado!')).not.toBeInTheDocument();
+    });
+    expect(screen.getByRole('button', { name: 'Enviar mensaje' })).toBeInTheDocument();
+  });
+
+  it('auto-resets the success card back to the form after ~5 seconds', async () => {
+    const setTimeoutSpy = vi.spyOn(window, 'setTimeout');
+    renderForm();
+    fillValidForm();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar mensaje' }));
+    expect(await screen.findByText('¡Mensaje enviado!')).toBeInTheDocument();
+
+    // The component schedules a single 5000ms auto-reset timer.
+    const autoResetTimer = setTimeoutSpy.mock.calls.find(([, delay]) => delay === 5000);
+    expect(autoResetTimer).toBeDefined();
+    const autoResetCallback = autoResetTimer![0] as () => void;
+
+    act(() => {
+      autoResetCallback();
+    });
+
+    await waitFor(() => {
+      expect(screen.queryByText('¡Mensaje enviado!')).not.toBeInTheDocument();
+    });
+    expect(screen.getByRole('button', { name: 'Enviar mensaje' })).toBeInTheDocument();
+
+    setTimeoutSpy.mockRestore();
+  });
+});

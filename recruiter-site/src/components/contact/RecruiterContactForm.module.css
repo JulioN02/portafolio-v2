@@ -214,6 +214,7 @@
   max-width: 480px;
   margin: 0 auto;
   gap: var(--spacing-md);
+  animation: slideUp 0.4s ease-out;
 }
 
 .successIcon {
@@ -239,6 +240,26 @@
   font-size: var(--font-size-base);
   color: #4a5568;
   line-height: var(--line-height-relaxed);
+}
+
+.resetButton {
+  margin-top: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-lg);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary-700);
+  background-color: transparent;
+  border: 1.5px solid var(--color-primary-300);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+@media (hover: hover) {
+  .resetButton:hover {
+    background-color: var(--color-primary-50);
+    border-color: var(--color-primary-500);
+  }
 }
 
 /* Honeypot anti-spam field — visually hidden from humans, fillable by bots */

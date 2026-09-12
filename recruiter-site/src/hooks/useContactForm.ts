@@ -57,7 +57,7 @@ function mapFormToApiInput(data: RecruiterContactFormData): RecruiterContactInpu
  *
  * Usage:
  * ```ts
- * const { mutate, isPending, isSuccess, isError, error, data } = useSubmitContact();
+ * const { mutate, isPending, isSuccess, isError, error, data, reset } = useSubmitContact();
  * ```
  *
  * Returns:
@@ -67,6 +67,7 @@ function mapFormToApiInput(data: RecruiterContactFormData): RecruiterContactInpu
  * - isError            – true if the request failed
  * - error              – Error object with details
  * - data               – SubmitContactResult on success (null otherwise)
+ * - reset              – clears the mutation state (isSuccess flips back to false)
  */
 export function useSubmitContact() {
   return useMutation<SubmitContactResult, Error, RecruiterContactFormData>({

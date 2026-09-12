@@ -296,6 +296,13 @@ export const translations: Record<Language, Record<string, string>> = {
     'successCaseCarousel.title': 'Casos de Éxito',
     'successCaseCarousel.subtitle': 'Proyectos que han transformado negocios',
     'successCaseCarousel.viewProject': 'Ver proyecto',
+
+    // =========== CONTACT FORM ===========
+    'contactForm.success.title': '¡Mensaje enviado!',
+    'contactForm.success.message': '¡Gracias por escribirme! Te responderé lo antes posible.',
+    'contactForm.success.reset': 'Enviar otro mensaje',
+    'contactForm.toast.success': '¡Mensaje enviado con éxito!',
+    'contactForm.toast.error': 'Error al enviar el mensaje',
   },
   en: {
     // =========== HEADER ===========
@@ -592,5 +599,12 @@ export const translations: Record<Language, Record<string, string>> = {
     'successCaseCarousel.title': 'Success Cases',
     'successCaseCarousel.subtitle': 'Projects that have transformed businesses',
     'successCaseCarousel.viewProject': 'View project',
+
+    // =========== CONTACT FORM ===========
+    'contactForm.success.title': 'Message sent!',
+    'contactForm.success.message': 'Thanks for reaching out! I will get back to you as soon as possible.',
+    'contactForm.success.reset': 'Send another message',
+    'contactForm.toast.success': 'Message sent successfully!',
+    'contactForm.toast.error': 'Error sending the message',
   },
 };
