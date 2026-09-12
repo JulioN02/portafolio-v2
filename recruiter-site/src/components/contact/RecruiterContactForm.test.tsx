@@ -133,3 +133,71 @@ describe('RecruiterContactForm — anti-spam wiring (contact-anti-spam)', () => 
     ).toBeInTheDocument();
   });
 });
+
+describe('RecruiterContactForm — phone normalization + min-length validation', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockPost.mockResolvedValue({ message: 'Contact form submitted successfully', data: {} });
+    vi.stubEnv('VITE_TURNSTILE_SITE_KEY', '');
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it('normalizes the phone field to canonical digits before submitting', async () => {
+    renderForm();
+    fillValidForm();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar mensaje' }));
+
+    await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
+    const [, body] = mockPost.mock.calls[0];
+    expect(body.whatsapp).toBe('+573001112233');
+  });
+
+  it('shows a validation error when the normalized phone is not 10–15 digits', async () => {
+    renderForm();
+    fillValidForm();
+    fireEvent.change(screen.getByLabelText('Teléfono *'), {
+      target: { value: '1-234-567' },
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar mensaje' }));
+
+    expect(
+      await screen.findByText('Ingrese un número de teléfono válido (ej. +57 300 000 0000)'),
+    ).toBeInTheDocument();
+    expect(mockPost).not.toHaveBeenCalled();
+  });
+
+  it('shows a validation error for a name shorter than 2 characters', async () => {
+    renderForm();
+    fillValidForm();
+    fireEvent.change(screen.getByLabelText('Nombre completo *'), {
+      target: { value: 'A' },
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar mensaje' }));
+
+    expect(
+      await screen.findByText('El nombre debe tener al menos 2 caracteres'),
+    ).toBeInTheDocument();
+    expect(mockPost).not.toHaveBeenCalled();
+  });
+
+  it('shows a validation error for a message shorter than 10 characters', async () => {
+    renderForm();
+    fillValidForm();
+    fireEvent.change(screen.getByLabelText('Mensaje *'), {
+      target: { value: 'Hola' },
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar mensaje' }));
+
+    expect(
+      await screen.findByText('El mensaje debe tener al menos 10 caracteres'),
+    ).toBeInTheDocument();
+    expect(mockPost).not.toHaveBeenCalled();
+  });
+});

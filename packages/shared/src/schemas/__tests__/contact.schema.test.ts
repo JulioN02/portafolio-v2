@@ -68,6 +68,31 @@ describe('Contact schemas — website honeypot backstop', () => {
     });
   });
 
+  describe('clientContactSchema whatsapp — normalization', () => {
+    it.each([
+      ['300 372 7134', '3003727134'],
+      ['+57 300-372-7134', '+573003727134'],
+      ['(300) 372-7134', '3003727134'],
+      ['300.372.7134', '3003727134'],
+    ])('accepts %s and normalizes to %s', (input, expected) => {
+      const result = clientContactSchema.safeParse({ ...validClient, whatsapp: input });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.whatsapp).toBe(expected);
+      }
+    });
+
+    it('rejects non-numeric input', () => {
+      const result = clientContactSchema.safeParse({ ...validClient, whatsapp: 'abc' });
+      expect(result.success).toBe(false);
+    });
+
+    it('rejects a number with too few digits', () => {
+      const result = clientContactSchema.safeParse({ ...validClient, whatsapp: '123' });
+      expect(result.success).toBe(false);
+    });
+  });
+
   describe('recruiterContactSchema', () => {
     it('rejects a non-empty website value', () => {
       const result = recruiterContactSchema.safeParse({
@@ -106,6 +131,30 @@ describe('Contact schemas — website honeypot backstop', () => {
       if (result.success) {
         expect(result.data).not.toHaveProperty('turnstileToken');
       }
+    });
+  });
+
+  describe('recruiterContactSchema whatsapp — normalization', () => {
+    it.each([
+      ['300 372 7134', '3003727134'],
+      ['+57 300-372-7134', '+573003727134'],
+      ['(300) 372-7134', '3003727134'],
+    ])('accepts %s and normalizes to %s', (input, expected) => {
+      const result = recruiterContactSchema.safeParse({ ...validRecruiter, whatsapp: input });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.whatsapp).toBe(expected);
+      }
+    });
+
+    it('rejects non-numeric input', () => {
+      const result = recruiterContactSchema.safeParse({ ...validRecruiter, whatsapp: 'abc' });
+      expect(result.success).toBe(false);
+    });
+
+    it('rejects a number with too few digits', () => {
+      const result = recruiterContactSchema.safeParse({ ...validRecruiter, whatsapp: '123' });
+      expect(result.success).toBe(false);
     });
   });
 });

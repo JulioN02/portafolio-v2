@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { Turnstile } from '@jsoft/shared';
+import { Turnstile, normalizePhone, PHONE_REGEX } from '@jsoft/shared';
 import { useSubmitContact } from '../../hooks/useContactForm';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { toast } from 'sonner';
@@ -33,6 +33,8 @@ function createValidationErrors(
 
   if (!data.name.trim()) {
     errors.name = t('contactForm.error.nameRequired');
+  } else if (data.name.trim().length < 2) {
+    errors.name = t('contactForm.error.nameMin');
   }
 
   if (!data.email.trim()) {
@@ -43,7 +45,7 @@ function createValidationErrors(
 
   if (!data.phone.trim()) {
     errors.phone = t('contactForm.error.phoneRequired');
-  } else if (!phoneRegex.test(data.phone)) {
+  } else if (!phoneRegex.test(data.phone) || !PHONE_REGEX.test(normalizePhone(data.phone))) {
     errors.phone = t('contactForm.error.phoneInvalid');
   }
 
@@ -61,6 +63,8 @@ function createValidationErrors(
 
   if (!data.message.trim()) {
     errors.message = t('contactForm.error.messageRequired');
+  } else if (data.message.trim().length < 10) {
+    errors.message = t('contactForm.error.messageMin');
   }
 
   if (!data.preferredContact) {

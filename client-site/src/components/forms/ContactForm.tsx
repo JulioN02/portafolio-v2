@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useSubmitContact } from '../../hooks/useContact';
-import { Turnstile } from '@jsoft/shared';
+import { Turnstile, normalizePhone, PHONE_REGEX } from '@jsoft/shared';
 import { Spinner } from '../common/Spinner';
 import { toast } from 'sonner';
 import styles from './ContactForm.module.css';
@@ -72,6 +72,8 @@ export function ContactForm({ source = 'general', onSuccess }: ContactFormProps)
 
     if (!formData.firstName.trim()) {
       newErrors.firstName = 'El nombre es requerido';
+    } else if (formData.firstName.trim().length < 2) {
+      newErrors.firstName = 'El nombre debe tener al menos 2 caracteres';
     }
     if (!formData.lastName.trim()) {
       newErrors.lastName = 'El apellido es requerido';
@@ -83,6 +85,8 @@ export function ContactForm({ source = 'general', onSuccess }: ContactFormProps)
     }
     if (!formData.whatsapp.trim()) {
       newErrors.whatsapp = 'El WhatsApp es requerido';
+    } else if (!PHONE_REGEX.test(normalizePhone(formData.whatsapp))) {
+      newErrors.whatsapp = 'Ingrese un número de WhatsApp válido';
     }
     if (!formData.message.trim()) {
       newErrors.message = 'El mensaje es requerido';
@@ -178,7 +182,7 @@ export function ContactForm({ source = 'general', onSuccess }: ContactFormProps)
 
       {renderField({ id: 'email', label: 'Email', type: 'email', value: formData.email, placeholder: 'tu@email.com', autoComplete: 'email', error: errors.email })}
 
-      {renderField({ id: 'whatsapp', label: 'WhatsApp', type: 'tel', value: formData.whatsapp, placeholder: '+57 300 000 0000', autoComplete: 'tel', error: errors.whatsapp })}
+      {renderField({ id: 'whatsapp', label: 'WhatsApp', type: 'tel', value: formData.whatsapp, placeholder: '+573000000000', autoComplete: 'tel', error: errors.whatsapp })}
 
       <div className={styles.field}>
         <label htmlFor="message" className={styles.label}>

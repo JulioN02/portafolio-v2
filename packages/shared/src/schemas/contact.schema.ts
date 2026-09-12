@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { normalizePhone, PHONE_REGEX } from '../utils/phone.js';
 
 /**
  * Enum for contact form origin type
@@ -7,13 +8,31 @@ export const formOriginEnum = z.enum(['CLIENT', 'RECRUITER']);
 export type FormOrigin = z.infer<typeof formOriginEnum>;
 
 /**
+ * Lenient pre-normalization shape: accepts digits plus common human formatting
+ * (spaces, dashes, parentheses, dots) with an optional leading `+`. The value
+ * is then normalized to canonical digits and re-validated against PHONE_REGEX.
+ */
+const PHONE_INPUT_REGEX = /^\+?[\d\s().()-]{7,20}$/;
+
+/**
+ * WhatsApp/phone field shared by both contact schemas. Accepts human-friendly
+ * formats (matching what the public forms allow), normalizes to digits-only,
+ * and only then enforces the canonical 10–15 digit rule.
+ */
+const whatsappSchema = z
+  .string()
+  .regex(PHONE_INPUT_REGEX, 'Invalid WhatsApp number format')
+  .transform(normalizePhone)
+  .refine((v) => PHONE_REGEX.test(v), 'Invalid WhatsApp number format');
+
+/**
  * Schema for client contact form
  * Used when a client contacts from the client site (services, products, tools)
  */
 export const clientContactSchema = z.object({
   firstName: z.string().min(2, 'First name must be at least 2 characters').max(50),
   lastName: z.string().min(2).max(50).optional(),
-  whatsapp: z.string().regex(/^\+?[0-9]{10,15}$/, 'Invalid WhatsApp number format').optional(),
+  whatsapp: whatsappSchema.optional(),
   email: z.string().email('Invalid email format'),
   message: z.string().min(10, 'Message must be at least 10 characters').max(2000),
   source: z.string().min(2).max(100), // "service:Desarrollo Web", "product:ERP", "tool:X", "general"
@@ -30,7 +49,7 @@ export const clientContactSchema = z.object({
 export const recruiterContactSchema = z.object({
   firstName: z.string().min(2).max(50),
   email: z.string().email('Invalid email format'),
-  whatsapp: z.string().regex(/^\+?[0-9]{10,15}$/).optional(),
+  whatsapp: whatsappSchema.optional(),
   message: z.string().min(10).max(2000),
   // Honeypot anti-spam backstop (see clientContactSchema above).
   website: z.string().max(0).optional(),

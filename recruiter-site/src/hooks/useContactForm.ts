@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { apiClient } from '../api/client';
+import { normalizePhone } from '@jsoft/shared';
 import type { RecruiterContactInput } from '@jsoft/shared';
 
 /**
@@ -44,7 +45,7 @@ function mapFormToApiInput(data: RecruiterContactFormData): RecruiterContactInpu
   return {
     firstName: data.name,
     email: data.email,
-    whatsapp: data.phone || undefined,
+    whatsapp: data.phone ? normalizePhone(data.phone) : undefined,
     message: `${data.message}\n\n---\n${extras}`,
   };
 }
