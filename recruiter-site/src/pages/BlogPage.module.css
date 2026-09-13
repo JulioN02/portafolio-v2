@@ -68,8 +68,10 @@
 .tagFilters {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: var(--spacing-sm);
-  margin-top: var(--spacing-sm);
+  margin: var(--spacing-sm) auto 0;
+  max-width: 1100px;
   padding: var(--spacing-md);
   background-color: var(--color-neutral-50);
   border-radius: var(--radius-md);
