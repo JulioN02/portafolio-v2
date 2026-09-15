@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Define the API contract for authenticated admin profile management: updating profile fields (username/email), generating verification codes, and changing passwords.
+Define the API contract for authenticated admin profile management: updating profile fields (username/email) and changing passwords with TOTP 2FA verification.
 
 ---
 
@@ -64,89 +64,96 @@ On success (`200`), the system MUST return the updated user object: `{ id, usern
 
 ---
 
-### Requirement: Request Verification Code — `POST /auth/verification-code`
-
-Generates a 6-digit numeric verification code, stores it in-memory with a 10-minute TTL, and returns it (dev mode only — in production this would be emailed).
-
-- **Method**: `POST`
-- **Auth**: `authMiddleware` (JWT required)
-- **Body**: none required (empty body or `{}`)
-- **Response**: `{ code: "123456", expiresIn: 600 }`
-
-The system MUST generate a 6-digit numeric code (000000–999999).
-The system MUST store the code associated with the user's ID in an in-memory `Map`.
-The system MUST set a TTL of 600 seconds (10 minutes) per code.
-The system MUST return the code in the response body in dev environments.
-The system MUST overwrite any previous unexpired code for the same user.
-
-#### Scenario: Generate code successfully (dev mode)
-
-- GIVEN an authenticated admin user with a known email
-- WHEN they send `POST /auth/verification-code`
-- THEN the response status is `200`
-- AND the body contains `{ code: <6-digit-string>, expiresIn: 600 }`
-- AND `<6-digit-string>` matches `/^\d{6}$/`
-
-#### Scenario: Regenerate overwrites previous code
-
-- GIVEN the user has an active verification code "123456"
-- WHEN they send `POST /auth/verification-code` again
-- THEN the new code replaces "123456" in memory
-- AND the old code becomes invalid
-
----
-
 ### Requirement: Change Password — `PATCH /auth/password`
 
-Changes the user's password after verifying a valid verification code.
+Changes the authenticated user's password. The `currentPassword` MUST be validated server-side; when 2FA is enabled, a valid TOTP code or a single-use recovery code is required.
 
 - **Method**: `PATCH`
-- **Auth**: `authMiddleware` (JWT required)
-- **Body**: `{ code: string, newPassword: string }`
-- **Validation**: `newPassword` MUST be at least 6 characters
+- **Auth**: `authMiddleware` (JWT required) + `authLimiter` (5 requests / 15 min)
+- **Body**: `{ currentPassword: string, totpCode?: string, recoveryCode?: string, newPassword: string }`
 
-The system MUST reject with `400` if `code` is missing, malformed, or expired (TTL exceeded).
-The system MUST reject with `400` if `newPassword` is less than 6 characters.
-The system MUST reject with `400` if `code` does not match the stored code for this user.
-The system MUST delete the code after successful verification (single-use).
-The system MUST hash the new password with bcrypt before storing.
-The system MUST NOT invalidate existing JWT sessions (current session remains active).
-On success (`200`), the system MUST return `{ message: "Password updated successfully" }`.
+The system MUST reject with `403 FORBIDDEN` if `currentPassword` is missing or does not match the stored hash.
+The system MUST reject with `400` if `newPassword` is fewer than 12 characters.
 
-#### Scenario: Successful password change
+If `User.twoFactorEnabled = true`:
+- The system MUST require `currentPassword` AND exactly one of `totpCode` | `recoveryCode` (XOR). Neither present → `400`; both present → `400`.
+- `totpCode` MUST verify within TOTP window 1 (`400` if invalid).
+- `recoveryCode` MUST match a stored bcrypt hash (`400` if invalid) and MUST be consumed (single-use).
 
-- GIVEN the user has a valid verification code "654321" for their account
-- WHEN they send `PATCH /auth/password` with `{ code: "654321", newPassword: "newPass123" }`
-- THEN the response status is `200`
-- AND the response body indicates success
-- AND the code "654321" is removed from memory (single-use)
+If `User.twoFactorEnabled = false`:
+- `totpCode`/`recoveryCode` MUST NOT be required and MUST be ignored if present.
 
-#### Scenario: Wrong verification code
+On success (`200`), the system MUST store the new password hashed with bcrypt (cost 12) and MUST return `{ message: "Password updated successfully" }`. Existing JWT sessions MUST remain valid.
 
-- GIVEN the user has a valid verification code "654321"
-- WHEN they send `PATCH /auth/password` with `{ code: "000000", newPassword: "newPass123" }`
-- THEN the response status is `400`
-- AND the body contains an error message about invalid code
+The system MUST reject with `429` when the `authLimiter` limit is exceeded.
 
-#### Scenario: Expired code
+- Prisma: `User.password` (update), `User.twoFactorEnabled` (read), `User.recoveryCodes` (read + consume)
 
-- GIVEN the verification code was generated more than 10 minutes ago
-- WHEN the user sends `PATCH /auth/password` with that code
-- THEN the response status is `400`
-- AND the body indicates the code has expired
+#### Scenario: Success, 2FA disabled
+
+- GIVEN `twoFactorEnabled = false` and correct `currentPassword`
+- WHEN they `PATCH /auth/password { currentPassword, newPassword }`
+- THEN `200` and the new password hash is stored
+
+#### Scenario: Wrong current password, 2FA disabled
+
+- GIVEN `twoFactorEnabled = false`
+- WHEN they `PATCH /auth/password { currentPassword: "wrong", newPassword }`
+- THEN `403` and password unchanged
+
+#### Scenario: Success, 2FA enabled, TOTP
+
+- GIVEN `twoFactorEnabled = true`
+- WHEN they `PATCH /auth/password { currentPassword, totpCode: "<valid>", newPassword }`
+- THEN `200` and the new password hash is stored
+
+#### Scenario: Success, 2FA enabled, recovery code
+
+- GIVEN `twoFactorEnabled = true`
+- WHEN they `PATCH /auth/password { currentPassword, recoveryCode: "<valid>", newPassword }`
+- THEN `200`, password updated, and the recovery code is consumed
+
+#### Scenario: Recovery code reused
+
+- GIVEN the recovery code was consumed by a previous change
+- WHEN it is submitted again
+- THEN `400` and password unchanged
+
+#### Scenario: Neither TOTP nor recovery provided
+
+- GIVEN `twoFactorEnabled = true`
+- WHEN they `PATCH /auth/password { currentPassword, newPassword }`
+- THEN `400`
+
+#### Scenario: Both TOTP and recovery provided
+
+- GIVEN `twoFactorEnabled = true`
+- WHEN they `PATCH /auth/password { currentPassword, totpCode, recoveryCode, newPassword }`
+- THEN `400`
+
+#### Scenario: Wrong TOTP code
+
+- GIVEN `twoFactorEnabled = true`
+- WHEN they `PATCH /auth/password { currentPassword, totpCode: "000000", newPassword }`
+- THEN `400` and password unchanged
 
 #### Scenario: Password too short
 
 - GIVEN any state
-- WHEN the user sends `PATCH /auth/password` with `{ code: "654321", newPassword: "abc" }`
-- THEN the response status is `400`
-- AND the body contains a validation error for `newPassword`
+- WHEN they `PATCH /auth/password` with `newPassword` of 11 characters
+- THEN `400` with a validation error for `newPassword`
+
+#### Scenario: Rate-limited password change
+
+- GIVEN the admin exceeded 5 requests in 15 minutes
+- WHEN they `PATCH /auth/password`
+- THEN `429`
 
 ---
 
-### Requirement: GET /auth/me — Include email in response
+### Requirement: GET /auth/me — include email and 2FA status
 
-The existing `GET /auth/me` endpoint MUST include the `email` field in its response when the field is non-null.
+The existing `GET /auth/me` endpoint MUST include the `email` field in its response when the field is non-null, and MUST include `twoFactorEnabled` (boolean) reflecting `User.twoFactorEnabled`.
 
 #### Scenario: Profile returns email
 
@@ -159,3 +166,9 @@ The existing `GET /auth/me` endpoint MUST include the `email` field in its respo
 - GIVEN the admin user has NOT set an email
 - WHEN they send `GET /auth/me`
 - THEN the response includes `{ email: null }` or omits email
+
+#### Scenario: Profile returns 2FA status
+
+- GIVEN the admin user has 2FA enabled
+- WHEN they send `GET /auth/me`
+- THEN the response includes `{ twoFactorEnabled: true }`

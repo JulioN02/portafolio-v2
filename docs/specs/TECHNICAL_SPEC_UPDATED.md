@@ -355,6 +355,20 @@ portafolio-v2/
 ### Auth
 - `POST /api/auth/login` — Login admin
 - `POST /api/auth/logout` — Logout (opcional, JWT es stateless)
+- `GET /api/auth/me` — Perfil actual (incluye `twoFactorEnabled`)
+- `PATCH /api/auth/profile` — Actualizar perfil (requiere `currentPassword`)
+- `PATCH /api/auth/password` — Cambiar contraseña: `{ currentPassword, totpCode?, recoveryCode?, newPassword }`
+  (min 12; cuando 2FA está activa se exige exactamente uno de `totpCode` | `recoveryCode`; authLimiter 5/15min)
+- `POST /api/auth/2fa/setup` — Iniciar 2FA: genera secreto TOTP cifrado (AES-256-GCM) y devuelve
+  `{ otpauthUrl, qrDataUrl, secret }` (`twoFactorEnabled` permanece `false`); 409 si ya está activa
+- `POST /api/auth/2fa/enable` — Activar 2FA: verifica `totpCode` (ventana 1) y devuelve los 10 códigos
+  de recuperación `XXXX-XXXX` (bcrypt, un solo uso, mostrados una única vez)
+- `POST /api/auth/2fa/disable` — Desactivar 2FA: requiere `currentPassword` (403 si es incorrecta) + `totpCode`
+
+TODOS los endpoints 2FA y el cambio de contraseña están protegidos por `authMiddleware` + `authLimiter`
+(5 intentos / 15 min). Variable de entorno requerida: `TOTP_ENCRYPTION_KEY` (base64 de 32 bytes) para el
+cifrado del secreto TOTP en reposo; si falta, la API falla con 500. El flujo de código por email
+(`POST /api/auth/verification-code`, nodemailer, modelo `VerificationCode`) fue eliminado.
 
 ### Servicios
 - `GET /api/services` — Listado (con paginación, filtros: featured, classification)

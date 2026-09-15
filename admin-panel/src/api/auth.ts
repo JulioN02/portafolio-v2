@@ -1,5 +1,13 @@
 import { apiClient } from './client';
-import { LoginInput, LoginResponse, JwtPayload, UpdateProfileInput, UpdateProfileResponse } from '@jsoft/shared';
+import {
+  LoginInput,
+  LoginResponse,
+  JwtPayload,
+  UpdateProfileInput,
+  UpdateProfileResponse,
+  TwoFactorSetupResponse,
+  TwoFactorEnableResponse,
+} from '@jsoft/shared';
 import { jwtDecode } from 'jwt-decode';
 
 export interface UserProfile {
@@ -7,6 +15,14 @@ export interface UserProfile {
   username: string;
   email: string | null;
   role: 'ADMIN';
+  twoFactorEnabled: boolean;
+}
+
+export interface ChangePasswordPayload {
+  currentPassword: string;
+  totpCode?: string;
+  recoveryCode?: string;
+  newPassword: string;
 }
 
 export const authApi = {
@@ -15,11 +31,11 @@ export const authApi = {
     localStorage.setItem('admin_token', data.token);
     return data;
   },
-  
+
   logout: () => {
     localStorage.removeItem('admin_token');
   },
-  
+
   getCurrentUser: (): JwtPayload | null => {
     const token = localStorage.getItem('admin_token');
     if (!token) return null;
@@ -29,7 +45,7 @@ export const authApi = {
       return null;
     }
   },
-  
+
   isAuthenticated: (): boolean => {
     return !!localStorage.getItem('admin_token');
   },
@@ -44,16 +60,26 @@ export const authApi = {
     return data;
   },
 
-  sendVerificationCode: async (): Promise<{ message: string; expiresIn: number }> => {
-    const { data } = await apiClient.post<{ message: string; expiresIn: number }>('/auth/verification-code');
+  setup2fa: async (): Promise<TwoFactorSetupResponse> => {
+    const { data } = await apiClient.post<TwoFactorSetupResponse>('/auth/2fa/setup');
     return data;
   },
 
-  changePassword: async (verificationCode: string, newPassword: string): Promise<{ message: string }> => {
-    const { data } = await apiClient.patch<{ message: string }>('/auth/password', {
-      verificationCode,
-      newPassword,
+  enable2fa: async (totpCode: string): Promise<TwoFactorEnableResponse> => {
+    const { data } = await apiClient.post<TwoFactorEnableResponse>('/auth/2fa/enable', { totpCode });
+    return data;
+  },
+
+  disable2fa: async (currentPassword: string, totpCode: string): Promise<{ message: string }> => {
+    const { data } = await apiClient.post<{ message: string }>('/auth/2fa/disable', {
+      currentPassword,
+      totpCode,
     });
+    return data;
+  },
+
+  changePassword: async (body: ChangePasswordPayload): Promise<{ message: string }> => {
+    const { data } = await apiClient.patch<{ message: string }>('/auth/password', body);
     return data;
   },
 };

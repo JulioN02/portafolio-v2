@@ -24,10 +24,10 @@ describe('Password policy (min 12)', () => {
     });
   });
 
-  describe('changePasswordSchema.newPassword', () => {
+  describe('changePasswordSchema (new contract)', () => {
     it('rejects a newPassword shorter than 12 characters', () => {
       const result = changePasswordSchema.safeParse({
-        verificationCode: '123456',
+        currentPassword: 'old-pass',
         newPassword: 'elevenchars',
       });
       expect(result.success).toBe(false);
@@ -36,15 +36,25 @@ describe('Password policy (min 12)', () => {
       }
     });
 
-    it('accepts a newPassword of 12 characters with a valid 6-digit code', () => {
+    it('accepts a newPassword of 12 characters with currentPassword only', () => {
       const result = changePasswordSchema.safeParse({
-        verificationCode: '123456',
+        currentPassword: 'old-pass',
         newPassword: 'twelvechars12',
       });
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data.newPassword).toBe('twelvechars12');
       }
+    });
+
+    it('rejects both a TOTP code and a recovery code together', () => {
+      const result = changePasswordSchema.safeParse({
+        currentPassword: 'old-pass',
+        totpCode: '123456',
+        recoveryCode: 'ABCD-2345',
+        newPassword: 'twelvechars12',
+      });
+      expect(result.success).toBe(false);
     });
   });
 });

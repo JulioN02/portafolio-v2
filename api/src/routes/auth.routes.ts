@@ -5,8 +5,10 @@ import {
   loginHandler,
   meHandler,
   updateProfileHandler,
-  sendVerificationCodeHandler,
   changePasswordHandler,
+  setupTwoFactorHandler,
+  enableTwoFactorHandler,
+  disableTwoFactorHandler,
 } from '../controllers/auth.controller.js';
 
 const router: IRouter = Router();
@@ -26,12 +28,15 @@ router.get('/me', authMiddleware, meHandler);
 // PATCH /api/auth/profile - Update profile (protected)
 router.patch('/profile', authMiddleware, updateProfileHandler);
 
-// POST /api/auth/verification-code - Request verification code (protected)
-// Requires authMiddleware: the handler reads req.user (the target of the code).
-// Strict rate limit too: the 6-digit code is brute-forceable, so cap attempts.
-router.post('/verification-code', authMiddleware, authLimiter, sendVerificationCodeHandler);
+// 2FA management (protected + rate limited): TOTP codes are brute-forceable,
+// so every 2FA endpoint shares the strict authLimiter (5 tries / 15 min).
+router.post('/2fa/setup', authMiddleware, authLimiter, setupTwoFactorHandler);
+router.post('/2fa/enable', authMiddleware, authLimiter, enableTwoFactorHandler);
+router.post('/2fa/disable', authMiddleware, authLimiter, disableTwoFactorHandler);
 
-// PATCH /api/auth/password - Change password with verification code (protected)
-router.patch('/password', authMiddleware, changePasswordHandler);
+// PATCH /api/auth/password - Change password (protected + rate limited)
+// currentPassword is validated server-side; when 2FA is enabled exactly one of
+// totpCode | recoveryCode is required (XOR).
+router.patch('/password', authMiddleware, authLimiter, changePasswordHandler);
 
 export default router;
