@@ -31,8 +31,9 @@ import {
   siteSectionUpdateSchema,
   siteSectionReorderSchema,
   updateProfileSchema,
-  sendVerificationCodeSchema,
   changePasswordSchema,
+  twoFactorEnableBodySchema,
+  twoFactorDisableBodySchema,
   postStatusEnum,
   formOriginEnum,
 } from '../index';
@@ -79,12 +80,16 @@ describe('Shared schemas', () => {
     ['siteSectionUpdateSchema', siteSectionUpdateSchema],
     ['siteSectionReorderSchema', siteSectionReorderSchema],
     ['updateProfileSchema', updateProfileSchema],
-    ['sendVerificationCodeSchema', sendVerificationCodeSchema],
-    ['changePasswordSchema', changePasswordSchema],
+    ['twoFactorEnableBodySchema', twoFactorEnableBodySchema],
+    ['twoFactorDisableBodySchema', twoFactorDisableBodySchema],
   ] as const;
 
   it.each(objectSchemas)('%s is a ZodObject', (_name, schema) => {
     expect(schema._def.typeName).toBe('ZodObject');
+  });
+
+  it('changePasswordSchema is a ZodEffects (superRefine XOR guard)', () => {
+    expect(changePasswordSchema._def.typeName).toBe('ZodEffects');
   });
 
   it('contactFormSchema is a ZodDiscriminatedUnion', () => {

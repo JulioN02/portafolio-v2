@@ -64,15 +64,24 @@ export type {
 
 export type {
   UpdateProfileInput,
-  SendVerificationCodeInput,
-  ChangePasswordInput,
 } from '../schemas/profile.schema.js';
 
 export type {
   UpdateProfileResponse,
-  SendVerificationCodeResponse,
-  ChangePasswordResponse,
 } from '../schemas/profile.schema.js';
+
+export type {
+  TwoFactorEnableInput,
+  TwoFactorDisableInput,
+  ChangePasswordInput,
+} from '../schemas/twoFactor.schema.js';
+
+export type {
+  TwoFactorSetupResponse,
+  TwoFactorEnableResponse,
+  TwoFactorDisableResponse,
+  ChangePasswordResponse,
+} from '../schemas/twoFactor.schema.js';
 
 // Common types
 export interface PaginationParams {

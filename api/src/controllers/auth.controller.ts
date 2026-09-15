@@ -1,11 +1,23 @@
 import { Request, Response } from 'express';
 import { AuthRequest } from '../middleware/auth.middleware.js';
-import { login, getUserById, updateProfile, changePassword } from '../services/auth.service.js';
-import { verificationCodeService } from '../services/verification-code.service.js';
-import { sendVerificationCodeEmail } from '../services/email.service.js';
-import { loginSchema, updateProfileSchema, changePasswordSchema } from '@jsoft/shared';
+import {
+  login,
+  getUserById,
+  updateProfile,
+  changePassword,
+  setupTwoFactor,
+  enableTwoFactor,
+  disableTwoFactor,
+} from '../services/auth.service.js';
+import {
+  loginSchema,
+  updateProfileSchema,
+  changePasswordSchema,
+  twoFactorEnableBodySchema,
+  twoFactorDisableBodySchema,
+} from '@jsoft/shared';
 import { asyncHandler } from '../utils/asyncHandler.js';
-import { NotFoundError, ValidationError } from '../utils/errors.js';
+import { NotFoundError } from '../utils/errors.js';
 
 export const loginHandler = asyncHandler(async (req: Request, res: Response) => {
   const credentials = loginSchema.parse(req.body);
@@ -29,6 +41,7 @@ export const meHandler = asyncHandler(async (req: Request, res: Response) => {
     username: user.username,
     email: user.email,
     role: 'ADMIN',
+    twoFactorEnabled: user.twoFactorEnabled,
   });
 });
 
@@ -44,31 +57,6 @@ export const updateProfileHandler = asyncHandler(async (req: Request, res: Respo
   res.json(result);
 });
 
-export const sendVerificationCodeHandler = asyncHandler(async (req: Request, res: Response) => {
-  const authReq = req as AuthRequest;
-  if (!authReq.user) {
-    throw new NotFoundError('Not authenticated');
-  }
-
-  const user = await getUserById(authReq.user.userId);
-  if (!user) {
-    throw new NotFoundError('User not found');
-  }
-
-  if (!user.email) {
-    throw new ValidationError(
-      'No email configured in your profile. Add one before requesting a verification code.',
-    );
-  }
-
-  const { code, expiresIn } = await verificationCodeService.generate(authReq.user.userId);
-
-  // Deliver the code by email. The plaintext code never leaves the server.
-  await sendVerificationCodeEmail(user.email, code);
-
-  res.json({ message: 'Verification code sent', expiresIn });
-});
-
 export const changePasswordHandler = asyncHandler(async (req: Request, res: Response) => {
   const authReq = req as AuthRequest;
   if (!authReq.user) {
@@ -77,6 +65,40 @@ export const changePasswordHandler = asyncHandler(async (req: Request, res: Resp
 
   const data = changePasswordSchema.parse(req.body);
   const result = await changePassword(authReq.user.userId, data);
+
+  res.json(result);
+});
+
+export const setupTwoFactorHandler = asyncHandler(async (req: Request, res: Response) => {
+  const authReq = req as AuthRequest;
+  if (!authReq.user) {
+    throw new NotFoundError('Not authenticated');
+  }
+
+  const result = await setupTwoFactor(authReq.user.userId, authReq.user.username);
+  res.json(result);
+});
+
+export const enableTwoFactorHandler = asyncHandler(async (req: Request, res: Response) => {
+  const authReq = req as AuthRequest;
+  if (!authReq.user) {
+    throw new NotFoundError('Not authenticated');
+  }
+
+  const data = twoFactorEnableBodySchema.parse(req.body);
+  const result = await enableTwoFactor(authReq.user.userId, data.totpCode);
+
+  res.json(result);
+});
+
+export const disableTwoFactorHandler = asyncHandler(async (req: Request, res: Response) => {
+  const authReq = req as AuthRequest;
+  if (!authReq.user) {
+    throw new NotFoundError('Not authenticated');
+  }
+
+  const data = twoFactorDisableBodySchema.parse(req.body);
+  const result = await disableTwoFactor(authReq.user.userId, data);
 
   res.json(result);
 });

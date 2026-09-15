@@ -1,153 +1,245 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
-import { useSendVerificationCode, useChangePassword, useProfile } from '../../hooks/useAuth';
+import {
+  useChangePassword,
+  useProfile,
+  useSetup2fa,
+  useEnable2fa,
+  useDisable2fa,
+} from '../../hooks/useAuth';
+import type { ChangePasswordPayload } from '../../api/auth';
+import type { TwoFactorSetupResponse } from '@jsoft/shared';
 import { toast } from 'sonner';
 
-type Step = 'credentials' | 'verification' | 'success';
+/** Normalize a recovery code: trim, uppercase, accept both XXXX-XXXX and XXXXXXXXXX. */
+function normalizeRecoveryCode(raw: string): string {
+  const compact = raw.trim().toUpperCase().replace(/\s+/g, '');
+  if (compact.length === 8 && !compact.includes('-')) {
+    return `${compact.slice(0, 4)}-${compact.slice(4)}`;
+  }
+  return compact;
+}
+
+const TOTP_CODE_REGEX = /^\d{6}$/;
+const RECOVERY_CODE_REGEX = /^[A-Za-z0-9]{4}-[A-Za-z0-9]{4}$/;
+
+/** 2FA enable flow: idle -> setup (QR + secret) -> recovery-codes (shown once). */
+type EnableFlow = 'idle' | 'setup' | 'recovery-codes';
+
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '0.5rem',
+  borderRadius: '6px',
+  border: '1px solid #d1d5db',
+  background: '#fff',
+  color: '#111827',
+};
+
+const labelStyle: React.CSSProperties = {
+  display: 'block',
+  fontSize: '0.875rem',
+  color: '#6b7280',
+  marginBottom: '0.25rem',
+};
+
+const errorBoxStyle: React.CSSProperties = {
+  color: '#dc2626',
+  fontSize: '0.875rem',
+  padding: '0.5rem',
+  background: '#fef2f2',
+  borderRadius: '6px',
+};
+
+const primaryButtonStyle: React.CSSProperties = {
+  padding: '0.625rem 1.25rem',
+  borderRadius: '6px',
+  border: 'none',
+  background: '#3b82f6',
+  color: '#fff',
+  fontWeight: '500',
+  cursor: 'pointer',
+};
 
 export function SecuritySettings() {
   const { t } = useTranslation();
-  const { sendCode, isSending, sendError, clearSendError } = useSendVerificationCode();
-  const { changePassword, isChanging, changeError, changeSuccess, clearChangeState } = useChangePassword();
   const { profile, fetchProfile } = useProfile();
+  const { changePassword, isChanging, changeError, changeSuccess, clearChangeState } = useChangePassword();
+  const { setup2fa, isSettingUp, setupError, clearSetupError } = useSetup2fa();
+  const { enable2fa, isEnabling, enableError, clearEnableError } = useEnable2fa();
+  const { disable2fa, isDisabling, disableError, disableSuccess, clearDisableState } = useDisable2fa();
 
-  // Load the profile so we can show the email the verification code is sent to.
+  // Load the profile so the 2FA status drives the UI (enable vs disable section).
   useEffect(() => {
     fetchProfile();
   }, [fetchProfile]);
 
-  const [step, setStep] = useState<Step>('credentials');
+  // ── Password change form state ────────────────────────────────────────────
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [verificationCode, setVerificationCode] = useState('');
-  const [validationError, setValidationError] = useState<string | null>(null);
+  const [passwordTotp, setPasswordTotp] = useState('');
+  const [passwordRecovery, setPasswordRecovery] = useState('');
+  const [useRecovery, setUseRecovery] = useState(false);
+  const [passwordValidationError, setPasswordValidationError] = useState<string | null>(null);
 
-  // Resend cooldown (30s)
-  const [resendCooldown, setResendCooldown] = useState(0);
-  const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // ── 2FA enable flow state ─────────────────────────────────────────────────
+  const [enableFlow, setEnableFlow] = useState<EnableFlow>('idle');
+  const [setupData, setSetupData] = useState<TwoFactorSetupResponse | null>(null);
+  const [recoveryCodes, setRecoveryCodes] = useState<string[] | null>(null);
+  const [enableTotp, setEnableTotp] = useState('');
+  const [enableValidationError, setEnableValidationError] = useState<string | null>(null);
 
-  // Store newPassword across steps (not exposed to user after Step 2 renders)
-  const newPasswordRef = useRef('');
+  // ── 2FA disable form state ────────────────────────────────────────────────
+  const [disablePassword, setDisablePassword] = useState('');
+  const [disableTotp, setDisableTotp] = useState('');
+  const [disableValidationError, setDisableValidationError] = useState<string | null>(null);
 
-  // Reset resend cooldown timer
-  const startCooldown = useCallback(() => {
-    setResendCooldown(30);
-    cooldownRef.current = setInterval(() => {
-      setResendCooldown((prev) => {
-        if (prev <= 1) {
-          if (cooldownRef.current) clearInterval(cooldownRef.current);
-          cooldownRef.current = null;
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  }, []);
-
-  // Cleanup interval on unmount
-  useEffect(() => {
-    return () => {
-      if (cooldownRef.current) clearInterval(cooldownRef.current);
-    };
-  }, []);
-
-  // Reset to Step 1 after success (3s delay)
-  useEffect(() => {
-    if (changeSuccess) {
-      toast.success('Contraseña actualizada');
-      setStep('success');
-      const timer = setTimeout(() => {
-        resetForm();
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [changeSuccess]);
-
-  useEffect(() => {
-    if (changeError) {
-      toast.error(changeError);
-    }
-  }, [changeError]);
-
-  const resetForm = () => {
-    setStep('credentials');
+  const resetPasswordForm = useCallback(() => {
     setCurrentPassword('');
     setNewPassword('');
     setConfirmPassword('');
-    setVerificationCode('');
-    setValidationError(null);
+    setPasswordTotp('');
+    setPasswordRecovery('');
+    setUseRecovery(false);
+    setPasswordValidationError(null);
     clearChangeState();
-    clearSendError();
-    newPasswordRef.current = '';
-  };
+  }, [clearChangeState]);
 
-  // Step 1: Submit credentials → send verification code
-  const handleStep1Submit = async (e: React.FormEvent) => {
+  // Success card auto-reset (5s)
+  useEffect(() => {
+    if (changeSuccess) {
+      toast.success(changeSuccess);
+      const timer = setTimeout(resetPasswordForm, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [changeSuccess, resetPasswordForm]);
+
+  // ── Password change ───────────────────────────────────────────────────────
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setValidationError(null);
-    clearSendError();
+    setPasswordValidationError(null);
+    clearChangeState();
 
-    // Client-side validation
     if (!currentPassword) {
-      setValidationError(t('settings.currentPasswordRequired'));
+      setPasswordValidationError(t('settings.currentPasswordRequired'));
       return;
     }
-
-    if (newPassword.length < 6) {
-      setValidationError(t('settings.passwordMinLength'));
+    if (newPassword.length < 12) {
+      setPasswordValidationError(t('settings.passwordMinLength'));
       return;
     }
-
     if (newPassword !== confirmPassword) {
-      setValidationError(t('settings.passwordMismatch'));
+      setPasswordValidationError(t('settings.passwordMismatch'));
       return;
     }
 
-    // Store new password for later use
-    newPasswordRef.current = newPassword;
+    let body: ChangePasswordPayload;
+    if (profile?.twoFactorEnabled) {
+      if (!useRecovery) {
+        if (!TOTP_CODE_REGEX.test(passwordTotp)) {
+          setPasswordValidationError(t('settings.totpCode'));
+          return;
+        }
+        body = { currentPassword, totpCode: passwordTotp, newPassword };
+      } else {
+        const normalized = normalizeRecoveryCode(passwordRecovery);
+        if (!RECOVERY_CODE_REGEX.test(normalized)) {
+          setPasswordValidationError(t('settings.recoveryCode'));
+          return;
+        }
+        body = { currentPassword, recoveryCode: normalized, newPassword };
+      }
+    } else {
+      // 2FA disabled: totp/recovery are not sent at all.
+      body = { currentPassword, newPassword };
+    }
 
-    // Send verification code
-    const result = await sendCode();
-    if (result) {
-      setStep('verification');
-      startCooldown();
+    const ok = await changePassword(body);
+    if (!ok) {
+      // Errors (403 "Current password is incorrect", 429 rate limit, 400 bad
+      // code) are surfaced inline; the form data is preserved.
+      setPasswordValidationError(changeError || t('settings.passwordChangeError'));
     }
   };
 
-  // Step 2: Submit code → change password
-  const handleStep2Submit = async (e: React.FormEvent) => {
+  // ── 2FA enable flow ───────────────────────────────────────────────────────
+  const handleEnableStart = async () => {
+    clearSetupError();
+    clearEnableError();
+    setEnableValidationError(null);
+    const data = await setup2fa();
+    if (data) {
+      setSetupData(data);
+      setEnableFlow('setup');
+    }
+  };
+
+  const handleEnableSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setValidationError(null);
-    clearChangeState();
+    setEnableValidationError(null);
+    clearEnableError();
+    if (!TOTP_CODE_REGEX.test(enableTotp)) {
+      setEnableValidationError(t('settings.totpCode'));
+      return;
+    }
+    const result = await enable2fa(enableTotp);
+    if (result) {
+      setRecoveryCodes(result.recoveryCodes);
+      setEnableFlow('recovery-codes');
+      setEnableTotp('');
+    }
+  };
 
-    if (!verificationCode || verificationCode.length !== 6) {
-      setValidationError(t('settings.codeRequired'));
+  const handleEnableCancel = () => {
+    // Cancelling must NOT change twoFactorEnabled.
+    setEnableFlow('idle');
+    setSetupData(null);
+    setEnableTotp('');
+    setEnableValidationError(null);
+    clearSetupError();
+    clearEnableError();
+  };
+
+  const handleRecoveryDone = () => {
+    setEnableFlow('idle');
+    setRecoveryCodes(null);
+    setSetupData(null);
+    // Refresh profile so the UI flips to the disable section.
+    fetchProfile();
+  };
+
+  const handleCopyRecoveryCodes = async () => {
+    if (!recoveryCodes) return;
+    try {
+      await navigator.clipboard.writeText(recoveryCodes.join('\n'));
+      toast.success(t('settings.recoveryCodesCopied'));
+    } catch {
+      // Clipboard unavailable — codes remain on screen, nothing persisted.
+    }
+  };
+
+  // ── 2FA disable ───────────────────────────────────────────────────────────
+  const handleDisableSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setDisableValidationError(null);
+    clearDisableState();
+
+    if (!disablePassword) {
+      setDisableValidationError(t('settings.currentPasswordRequired'));
+      return;
+    }
+    if (!TOTP_CODE_REGEX.test(disableTotp)) {
+      setDisableValidationError(t('settings.totpCode'));
       return;
     }
 
-    const success = await changePassword(verificationCode, newPasswordRef.current);
-    if (!success) {
-      // Stay on step 2, error shown
+    const ok = await disable2fa(disablePassword, disableTotp);
+    if (ok) {
+      toast.success(t('settings.twoFactorDisabled'));
+      setDisablePassword('');
+      setDisableTotp('');
+      fetchProfile();
     }
-  };
-
-  // Resend code
-  const handleResend = async () => {
-    if (resendCooldown > 0) return;
-
-    clearSendError();
-    const result = await sendCode();
-    if (result) {
-      setVerificationCode('');
-      startCooldown();
-    }
-  };
-
-  // Handle code input change (only digits, max 6)
-  const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/\D/g, '').slice(0, 6);
-    setVerificationCode(value);
   };
 
   return (
@@ -163,307 +255,319 @@ export function SecuritySettings() {
         {t('settings.security')}
       </h2>
 
-      {/* Step 1: Credentials */}
-      {step === 'credentials' && (
-        <form onSubmit={handleStep1Submit}>
-          <div style={{ display: 'grid', gap: '1rem', maxWidth: '400px' }}>
-            <div>
-              <label
-                style={{
-                  display: 'block',
-                  fontSize: '0.875rem',
-                  color: '#6b7280',
-                  marginBottom: '0.25rem',
-                }}
-              >
-                {t('settings.currentPassword')}
-              </label>
-              <input
-                type="password"
-                required
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                disabled={isSending}
-                style={{
-                  width: '100%',
-                  padding: '0.5rem',
-                  borderRadius: '6px',
-                  border: '1px solid #d1d5db',
-                  background: '#fff',
-                  color: '#111827',
-                }}
-              />
+      {/* ── Two-factor authentication section ─────────────────────────────── */}
+      <div style={{ marginBottom: '2rem', maxWidth: '400px' }}>
+        {profile === null ? null : !profile.twoFactorEnabled && enableFlow === 'idle' ? (
+          <div style={{ display: 'grid', gap: '0.75rem' }}>
+            <div style={{ fontSize: '0.875rem', color: '#374151' }}>
+              {t('settings.twoFactorDisabled')}
             </div>
-
             <div>
-              <label
-                style={{
-                  display: 'block',
-                  fontSize: '0.875rem',
-                  color: '#6b7280',
-                  marginBottom: '0.25rem',
-                }}
-              >
-                {t('settings.newPassword')}
-              </label>
-              <input
-                type="password"
-                required
-                minLength={6}
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                disabled={isSending}
-                style={{
-                  width: '100%',
-                  padding: '0.5rem',
-                  borderRadius: '6px',
-                  border: '1px solid #d1d5db',
-                  background: '#fff',
-                  color: '#111827',
-                }}
-              />
-            </div>
-
-            <div>
-              <label
-                style={{
-                  display: 'block',
-                  fontSize: '0.875rem',
-                  color: '#6b7280',
-                  marginBottom: '0.25rem',
-                }}
-              >
-                {t('settings.confirmPassword')}
-              </label>
-              <input
-                type="password"
-                required
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                disabled={isSending}
-                style={{
-                  width: '100%',
-                  padding: '0.5rem',
-                  borderRadius: '6px',
-                  border: '1px solid #d1d5db',
-                  background: '#fff',
-                  color: '#111827',
-                }}
-              />
-            </div>
-
-            {/* Validation error */}
-            {validationError && (
-              <div
-                style={{
-                  color: '#dc2626',
-                  fontSize: '0.875rem',
-                  padding: '0.5rem',
-                  background: '#fef2f2',
-                  borderRadius: '6px',
-                }}
-              >
-                {validationError}
-              </div>
-            )}
-
-            {/* API error */}
-            {sendError && (
-              <div
-                style={{
-                  color: '#dc2626',
-                  fontSize: '0.875rem',
-                  padding: '0.5rem',
-                  background: '#fef2f2',
-                  borderRadius: '6px',
-                }}
-              >
-                {sendError}
-              </div>
-            )}
-
-            <div style={{ marginTop: '0.5rem' }}>
-              <button
-                type="submit"
-                disabled={isSending}
-                style={{
-                  padding: '0.625rem 1.25rem',
-                  borderRadius: '6px',
-                  border: 'none',
-                  background: isSending ? '#93c5fd' : '#3b82f6',
-                  color: '#fff',
-                  fontWeight: '500',
-                  cursor: isSending ? 'not-allowed' : 'pointer',
-                }}
-              >
-                {isSending ? t('settings.sendingCode') : t('settings.sendCode')}
+              <button type="button" onClick={handleEnableStart} disabled={isSettingUp} style={primaryButtonStyle}>
+                {isSettingUp ? t('common.loading') : t('settings.enable2fa')}
               </button>
             </div>
+            {setupError && <div style={errorBoxStyle}>{setupError}</div>}
           </div>
-        </form>
-      )}
+        ) : null}
 
-      {/* Step 2: Verification Code */}
-      {step === 'verification' && (
-        <form onSubmit={handleStep2Submit}>
-          <div style={{ display: 'grid', gap: '1rem', maxWidth: '400px' }}>
-            <div>
-              <label
-                style={{
-                  display: 'block',
-                  fontSize: '0.875rem',
-                  color: '#6b7280',
-                  marginBottom: '0.25rem',
-                }}
-              >
-                {t('settings.verificationCode')}
-              </label>
-              <input
-                type="text"
-                inputMode="numeric"
-                value={verificationCode}
-                onChange={handleCodeChange}
-                placeholder={t('settings.verificationCodePlaceholder')}
-                disabled={isChanging}
-                style={{
-                  width: '100%',
-                  padding: '0.5rem',
-                  borderRadius: '6px',
-                  border: '1px solid #d1d5db',
-                  background: '#fff',
-                  color: '#111827',
-                  fontFamily: 'monospace',
-                  fontSize: '1.25rem',
-                  letterSpacing: '0.5rem',
-                  textAlign: 'center',
-                }}
+        {enableFlow === 'setup' && setupData && (
+          <div style={{ display: 'grid', gap: '1rem' }}>
+            <div style={{ fontSize: '0.875rem', color: '#374151' }}>
+              {t('settings.twoFactorSetup')}
+            </div>
+
+            <div style={{ display: 'grid', gap: '0.75rem' }}>
+              <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0 }}>
+                {t('settings.scanQr')}
+              </p>
+              <img
+                src={setupData.qrDataUrl}
+                alt="TOTP QR"
+                style={{ width: '180px', height: '180px', borderRadius: '6px' }}
               />
-              <div
-                style={{
-                  fontSize: '0.75rem',
-                  color: '#6b7280',
-                  marginTop: '0.25rem',
-                }}
-              >
-                {profile?.email
-                  ? t('settings.verificationCodeSentTo', { email: profile.email })
-                  : t('settings.verificationCodeSent')}
-              </div>
-            </div>
-
-            {/* Validation error */}
-            {validationError && (
-              <div
-                style={{
-                  color: '#dc2626',
-                  fontSize: '0.875rem',
-                  padding: '0.5rem',
-                  background: '#fef2f2',
-                  borderRadius: '6px',
-                }}
-              >
-                {validationError}
-              </div>
-            )}
-
-            {/* API error */}
-            {changeError && (
-              <div
-                style={{
-                  color: '#dc2626',
-                  fontSize: '0.875rem',
-                  padding: '0.5rem',
-                  background: '#fef2f2',
-                  borderRadius: '6px',
-                }}
-              >
-                {changeError}
-              </div>
-            )}
-
-            <div style={{ marginTop: '0.5rem' }}>
-              <button
-                type="submit"
-                disabled={isChanging || verificationCode.length !== 6}
-                style={{
-                  padding: '0.625rem 1.25rem',
-                  borderRadius: '6px',
-                  border: 'none',
-                  background: isChanging || verificationCode.length !== 6 ? '#93c5fd' : '#3b82f6',
-                  color: '#fff',
-                  fontWeight: '500',
-                  cursor: isChanging || verificationCode.length !== 6 ? 'not-allowed' : 'pointer',
-                }}
-              >
-                {isChanging ? t('settings.changing') : t('settings.changePassword')}
-              </button>
-            </div>
-
-            {/* Resend code */}
-            <div style={{ marginTop: '0.25rem' }}>
-              {resendCooldown > 0 ? (
-                <span
+              <div>
+                <span style={labelStyle}>{t('settings.manualEntry')}</span>
+                <code
                   style={{
+                    display: 'block',
+                    padding: '0.5rem',
+                    background: '#f3f4f6',
+                    borderRadius: '6px',
                     fontSize: '0.875rem',
-                    color: '#9ca3af',
+                    wordBreak: 'break-all',
+                    color: '#111827',
                   }}
                 >
-                  {t('settings.resendCooldown').replace('{seconds}', String(resendCooldown))}
-                </span>
-              ) : (
+                  {setupData.secret}
+                </code>
+              </div>
+            </div>
+
+            <form onSubmit={handleEnableSubmit} style={{ display: 'grid', gap: '0.75rem' }}>
+              <div>
+                <label style={labelStyle}>{t('settings.totpCode')}</label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={enableTotp}
+                  onChange={(e) => setEnableTotp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  disabled={isEnabling}
+                  style={{ ...inputStyle, fontFamily: 'monospace', letterSpacing: '0.25rem' }}
+                />
+              </div>
+
+              {enableValidationError && <div style={errorBoxStyle}>{enableValidationError}</div>}
+              {enableError && <div style={errorBoxStyle}>{enableError}</div>}
+
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button type="submit" disabled={isEnabling} style={primaryButtonStyle}>
+                  {isEnabling ? t('common.loading') : t('settings.verifyCode')}
+                </button>
                 <button
                   type="button"
-                  onClick={handleResend}
-                  disabled={isSending}
+                  onClick={handleEnableCancel}
+                  disabled={isEnabling}
                   style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#3b82f6',
-                    cursor: isSending ? 'not-allowed' : 'pointer',
-                    fontSize: '0.875rem',
-                    padding: 0,
-                    textDecoration: 'underline',
-                    opacity: isSending ? 0.5 : 1,
+                    padding: '0.625rem 1.25rem',
+                    borderRadius: '6px',
+                    border: '1px solid #d1d5db',
+                    background: '#fff',
+                    color: '#374151',
+                    cursor: 'pointer',
                   }}
                 >
-                  {isSending ? t('settings.sendingCode') : t('settings.resendCode')}
+                  {t('common.cancel')}
                 </button>
-              )}
-            </div>
+              </div>
+            </form>
+          </div>
+        )}
 
-            {/* Send error for resend */}
-            {sendError && (
-              <div
+        {enableFlow === 'recovery-codes' && recoveryCodes && (
+          <div style={{ display: 'grid', gap: '1rem' }}>
+            <div style={{ fontSize: '0.875rem', color: '#374151' }}>
+              {t('settings.recoveryCodesTitle')}
+            </div>
+            <div
+              style={{
+                color: '#92400e',
+                fontSize: '0.875rem',
+                padding: '0.75rem',
+                background: '#fffbeb',
+                borderRadius: '6px',
+              }}
+            >
+              {t('settings.recoveryCodesWarning')}
+            </div>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, 1fr)',
+                gap: '0.5rem',
+                fontFamily: 'monospace',
+                fontSize: '0.875rem',
+                color: '#111827',
+              }}
+            >
+              {recoveryCodes.map((code) => (
+                <div key={code} style={{ padding: '0.5rem', background: '#f3f4f6', borderRadius: '6px' }}>
+                  {code}
+                </div>
+              ))}
+            </div>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <button type="button" onClick={handleCopyRecoveryCodes} style={primaryButtonStyle}>
+                {t('settings.copyRecoveryCodes')}
+              </button>
+              <button
+                type="button"
+                onClick={handleRecoveryDone}
                 style={{
-                  color: '#dc2626',
-                  fontSize: '0.875rem',
-                  padding: '0.5rem',
-                  background: '#fef2f2',
+                  padding: '0.625rem 1.25rem',
                   borderRadius: '6px',
+                  border: '1px solid #d1d5db',
+                  background: '#fff',
+                  color: '#374151',
+                  cursor: 'pointer',
                 }}
               >
-                {sendError}
-              </div>
-            )}
+                {t('settings.finish')}
+              </button>
+            </div>
           </div>
-        </form>
-      )}
+        )}
 
-      {/* Success step (displayed for 3 seconds before reset) */}
-      {step === 'success' && changeSuccess && (
-        <div
-          style={{
-            color: '#16a34a',
-            fontSize: '0.875rem',
-            padding: '1rem',
-            background: '#f0fdf4',
-            borderRadius: '6px',
-            maxWidth: '400px',
-          }}
-        >
-          {changeSuccess}
+        {profile?.twoFactorEnabled && (
+          <div style={{ display: 'grid', gap: '1rem' }}>
+            <div
+              style={{
+                color: '#166534',
+                fontSize: '0.875rem',
+                padding: '0.75rem',
+                background: '#f0fdf4',
+                borderRadius: '6px',
+              }}
+            >
+              {t('settings.twoFactorEnabled')}
+            </div>
+
+            <form onSubmit={handleDisableSubmit} style={{ display: 'grid', gap: '0.75rem' }}>
+              <div>
+                <label style={labelStyle}>{t('settings.currentPassword')}</label>
+                <input
+                  type="password"
+                  required
+                  value={disablePassword}
+                  onChange={(e) => setDisablePassword(e.target.value)}
+                  disabled={isDisabling}
+                  style={inputStyle}
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>{t('settings.totpCode')}</label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={disableTotp}
+                  onChange={(e) => setDisableTotp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  disabled={isDisabling}
+                  style={{ ...inputStyle, fontFamily: 'monospace', letterSpacing: '0.25rem' }}
+                />
+              </div>
+
+              {disableValidationError && <div style={errorBoxStyle}>{disableValidationError}</div>}
+              {disableError && <div style={errorBoxStyle}>{disableError}</div>}
+              {disableSuccess && (
+                <div style={{ ...errorBoxStyle, color: '#166534', background: '#f0fdf4' }}>
+                  {disableSuccess}
+                </div>
+              )}
+
+              <div>
+                <button type="submit" disabled={isDisabling} style={primaryButtonStyle}>
+                  {isDisabling ? t('common.loading') : t('settings.disable2fa')}
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+      </div>
+
+      {/* ── Single-step password change ───────────────────────────────────── */}
+      <form onSubmit={handlePasswordSubmit}>
+        <div style={{ display: 'grid', gap: '1rem', maxWidth: '400px' }}>
+          <div>
+            <label style={labelStyle}>{t('settings.currentPassword')}</label>
+            <input
+              type="password"
+              required
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              disabled={isChanging}
+              style={inputStyle}
+            />
+          </div>
+
+          <div>
+            <label style={labelStyle}>{t('settings.newPassword')}</label>
+            <input
+              type="password"
+              required
+              minLength={12}
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              disabled={isChanging}
+              style={inputStyle}
+            />
+          </div>
+
+          <div>
+            <label style={labelStyle}>{t('settings.confirmPassword')}</label>
+            <input
+              type="password"
+              required
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              disabled={isChanging}
+              style={inputStyle}
+            />
+          </div>
+
+          {profile?.twoFactorEnabled && (
+            <div style={{ display: 'grid', gap: '0.75rem' }}>
+              {!useRecovery ? (
+                <div>
+                  <label style={labelStyle}>{t('settings.totpCode')}</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={passwordTotp}
+                    onChange={(e) => setPasswordTotp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    disabled={isChanging}
+                    style={{ ...inputStyle, fontFamily: 'monospace', letterSpacing: '0.25rem' }}
+                  />
+                </div>
+              ) : (
+                <div>
+                  <label style={labelStyle}>{t('settings.recoveryCode')}</label>
+                  <input
+                    type="text"
+                    value={passwordRecovery}
+                    onChange={(e) => setPasswordRecovery(e.target.value)}
+                    placeholder="XXXX-XXXX"
+                    disabled={isChanging}
+                    style={{ ...inputStyle, fontFamily: 'monospace' }}
+                  />
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={() => {
+                  setUseRecovery((v) => !v);
+                  setPasswordTotp('');
+                  setPasswordRecovery('');
+                }}
+                disabled={isChanging}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#3b82f6',
+                  cursor: 'pointer',
+                  fontSize: '0.875rem',
+                  padding: 0,
+                  textDecoration: 'underline',
+                  textAlign: 'left',
+                }}
+              >
+                {useRecovery ? t('settings.totpCode') : t('settings.useRecoveryCode')}
+              </button>
+            </div>
+          )}
+
+          {passwordValidationError && <div style={errorBoxStyle}>{passwordValidationError}</div>}
+          {changeError && <div style={errorBoxStyle}>{changeError}</div>}
+          {changeSuccess && (
+            <div
+              style={{
+                color: '#166534',
+                fontSize: '0.875rem',
+                padding: '0.75rem',
+                background: '#f0fdf4',
+                borderRadius: '6px',
+              }}
+            >
+              {changeSuccess}
+            </div>
+          )}
+
+          <div style={{ marginTop: '0.5rem' }}>
+            <button type="submit" disabled={isChanging} style={primaryButtonStyle}>
+              {isChanging ? t('settings.changing') : t('settings.changePassword')}
+            </button>
+          </div>
         </div>
-      )}
+      </form>
     </div>
   );
 }
