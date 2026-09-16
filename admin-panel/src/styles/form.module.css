@@ -16,8 +16,8 @@
   --color-secondary-text: #595959;
   --color-success: #52c41a;
   --color-warning: #faad14;
-  --color-error: #ff4d4f;
-  --color-error-bg: #fff2f0;
+  --color-error: var(--color-danger-500);
+  --color-error-bg: var(--color-danger-50);
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
@@ -238,7 +238,7 @@ select.formInput {
 }
 
 .inputError:focus {
-  box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.12) !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12) !important;
 }
 
 .formError {
