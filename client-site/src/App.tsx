@@ -45,10 +45,17 @@ function App() {
         </Route>
       </Routes>
       <Toaster
-        richColors
         position="top-right"
         closeButton
         duration={4000}
+        toastOptions={{
+          classNames: {
+            toast: 'jss-toast',
+            closeButton: 'jss-toast-close',
+            title: 'jss-toast-title',
+            description: 'jss-toast-description',
+          },
+        }}
       />
     </>
   );

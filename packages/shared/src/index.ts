@@ -170,6 +170,9 @@ export type { TurnstileProps } from './components/index.js';
 // CSS Variables (import to apply design tokens)
 import './styles/variables.css';
 
+// Sonner toast theme (design-token driven notifications)
+import './styles/toast.css';
+
 // Component CSS — imported explicitly so tsup bundles them into dist/index.css.
 // We use inline class name strings in components (not CSS module bindings)
 // because tsup strips module JS mappings, but the CSS is still valid.

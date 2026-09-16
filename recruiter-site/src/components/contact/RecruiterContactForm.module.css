@@ -67,7 +67,7 @@
 
 .inputError:focus {
   border-color: var(--color-danger-500, #e53e3e);
-  box-shadow: 0 0 0 2px rgba(229, 62, 62, 0.15);
+  box-shadow: 0 0 0 2px var(--color-danger-100);
 }
 
 /* ── Select ── */
@@ -101,8 +101,8 @@
 
 .apiError {
   padding: var(--spacing-md);
-  background-color: #fff5f5;
-  border: 1px solid #fed7d7;
+  background-color: var(--color-danger-50);
+  border: 1px solid var(--color-danger-200);
   border-radius: var(--radius-sm);
   display: flex;
   flex-direction: column;
@@ -130,9 +130,9 @@
 
 @media (hover: hover) {
   .retryButton:hover {
-    background-color: #fff5f5;
-    color: #c53030;
-    border-color: #c53030;
+    background-color: var(--color-danger-50);
+    color: var(--color-danger-700);
+    border-color: var(--color-danger-700);
   }
 }
 
@@ -208,8 +208,8 @@
   align-items: center;
   text-align: center;
   padding: var(--spacing-2xl) var(--spacing-lg);
-  background-color: #f0fff4;
-  border: 2px solid #c6f6d5;
+  background-color: var(--color-success-50);
+  border: 2px solid var(--color-success-200);
   border-radius: var(--radius-lg);
   max-width: 480px;
   margin: 0 auto;
@@ -226,19 +226,19 @@
   font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-bold);
   color: var(--color-neutral-0);
-  background-color: #38a169;
+  background-color: var(--color-success-600);
   border-radius: 50%;
 }
 
 .successTitle {
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-bold);
-  color: #276749;
+  color: var(--color-success-700);
 }
 
 .successMessage {
   font-size: var(--font-size-base);
-  color: #4a5568;
+  color: var(--color-neutral-600);
   line-height: var(--line-height-relaxed);
 }
 

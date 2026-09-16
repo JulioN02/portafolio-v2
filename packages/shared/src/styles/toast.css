@@ -1,0 +1,166 @@
+/**
+ * Sonner Toast Theme — @jsoft/shared design tokens
+ * J Soft Solutions Portfolio Design System
+ *
+ * Unified notification/toast look for client-site, recruiter-site and
+ * admin-panel. Consumed via `@jsoft/shared/styles/toast.css` (resolved by the
+ * `./styles/*` export in packages/shared/package.json) and applied through the
+ * Toaster `toastOptions.classNames` hook configured identically in each site:
+ *
+ *   <Toaster
+ *     position="top-right"
+ *     duration={4000}
+ *     closeButton
+ *     toastOptions={{
+ *       classNames: {
+ *         toast: 'jss-toast',
+ *         closeButton: 'jss-toast-close',
+ *         title: 'jss-toast-title',
+ *         description: 'jss-toast-description',
+ *       },
+ *     }}
+ *   />
+ *
+ * WHY the selectors are heavily specific:
+ * sonner v2 injects its own stylesheet at runtime on Toaster mount — AFTER
+ * this static file — so any property we override must win on SPECIFICITY,
+ * not on stylesheet order. Reference specificity of sonner's injected rules:
+ *   - `[data-sonner-toaster][dir=ltr]`               → (0,2,0)  close-position vars
+ *   - `[data-sonner-toast][data-styled=true]`        → (0,2,0)  container
+ *   - `... [data-title] / [data-description]`        → (0,3,0)
+ *   - `... [data-icon]`                              → (0,3,0)
+ *   - `... [data-close-button]`                      → (0,3,0)  hover (0,4,0)
+ *   - dark theme `... [data-close-button]`           → (0,4,0)  hover (0,5,0)
+ *
+ * Every rule below is prefixed with `[data-sonner-toaster]` (+ the jss-*
+ * classes applied via the classNames hook) so it is strictly more specific
+ * than sonner's, in light AND dark themes.
+ *
+ * The close-button POSITION variables use `!important` because sonner's
+ * `[data-sonner-toaster][dir=ltr]` rule ties our specificity while being
+ * injected later — `!important` on the custom-property declarations is the
+ * only guarantee (custom properties honour cascade priority like any other
+ * declaration).
+ */
+
+/* ────────────────────────────────────────────────
+ * Close button placement — RIGHT, fully INSIDE the toast
+ *
+ * sonner v2 anchors the close button to the LEFT, half-outside the corner
+ * (`--toast-close-button-start: 0; --toast-close-button-transform:
+ * translate(-35%, -35%)`). We mirror the shared Modal closeButton pattern
+ * instead: top-right, fully inside the container.
+ * ──────────────────────────────────────────────── */
+[data-sonner-toaster][dir='ltr'] {
+  --toast-close-button-start: unset !important;
+  --toast-close-button-end: 6px !important;
+  --toast-close-button-transform: none !important;
+}
+
+/* ────────────────────────────────────────────────
+ * Toast container — base look (default / loading toasts)
+ * Neutral card; variants below override background/border/text color.
+ * Beats sonner's `[data-sonner-toast][data-styled=true]` (0,2,0).
+ * ──────────────────────────────────────────────── */
+[data-sonner-toaster] .jss-toast[data-sonner-toast][data-styled='true'] {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-sm); /* 14px (sonner default is 13px) */
+  padding: var(--spacing-md); /* 16px */
+  background-color: var(--color-neutral-0);
+  border: 1px solid var(--color-neutral-200);
+  color: var(--color-neutral-900);
+  border-radius: var(--radius-lg); /* 8px */
+  box-shadow: var(--shadow-md);
+}
+
+/* Keyboard focus — restore a visible, token-driven focus ring that sonner's
+ * focus-visible box-shadow would otherwise lose to the base rule above. */
+[data-sonner-toaster] [data-sonner-toast][data-styled='true']:focus-visible {
+  box-shadow: var(--shadow-md), 0 0 0 2px var(--color-primary-200);
+}
+
+/* ────────────────────────────────────────────────
+ * Variants — token-driven success / error / warning / info
+ * Each rule beats the base container (same specificity, later in file) and
+ * sonner's own `[data-sonner-toast][data-styled=true]` rule. `data-type` is
+ * always rendered by sonner, so variants work even without the classNames
+ * hook. Icon colours ride on `currentColor` (sonner icons use fill=currentColor).
+ * ──────────────────────────────────────────────── */
+
+/* Success */
+[data-sonner-toaster] [data-sonner-toast][data-styled='true'][data-type='success'] {
+  background-color: var(--color-success-50);
+  border-color: var(--color-success-100);
+  color: var(--color-success-700);
+}
+
+[data-sonner-toaster] [data-sonner-toast][data-styled='true'][data-type='success'] [data-icon] {
+  color: var(--color-success-500);
+}
+
+/* Error / danger */
+[data-sonner-toaster] [data-sonner-toast][data-styled='true'][data-type='error'] {
+  background-color: var(--color-danger-50);
+  border-color: var(--color-danger-100);
+  color: var(--color-danger-700);
+}
+
+[data-sonner-toaster] [data-sonner-toast][data-styled='true'][data-type='error'] [data-icon] {
+  color: var(--color-danger-500);
+}
+
+/* Warning */
+[data-sonner-toaster] [data-sonner-toast][data-styled='true'][data-type='warning'] {
+  background-color: var(--color-warning-50);
+  border-color: var(--color-warning-100);
+  color: var(--color-warning-700);
+}
+
+[data-sonner-toaster] [data-sonner-toast][data-styled='true'][data-type='warning'] [data-icon] {
+  color: var(--color-warning-500);
+}
+
+/* Info — brand blue (primary palette) */
+[data-sonner-toaster] [data-sonner-toast][data-styled='true'][data-type='info'] {
+  background-color: var(--color-primary-50);
+  border-color: var(--color-primary-100);
+  color: var(--color-primary-700);
+}
+
+[data-sonner-toaster] [data-sonner-toast][data-styled='true'][data-type='info'] [data-icon] {
+  color: var(--color-primary-500);
+}
+
+/* ────────────────────────────────────────────────
+ * Title & description — neutral, readable on every variant
+ * Beats sonner's `... [data-title]` / `... [data-description]` (0,3,0).
+ * ──────────────────────────────────────────────── */
+[data-sonner-toaster] [data-sonner-toast][data-styled='true'] [data-title].jss-toast-title {
+  color: var(--color-neutral-900);
+}
+
+[data-sonner-toaster] [data-sonner-toast][data-styled='true'] [data-description].jss-toast-description {
+  color: var(--color-neutral-600);
+}
+
+/* ────────────────────────────────────────────────
+ * Close button — transparent, full radius, subtle hover
+ * Mirrors the shared Modal closeButton pattern. Beats sonner's close-button
+ * rule (0,3,0 / dark 0,4,0); the X glyph uses currentColor so it inherits the
+ * toast's variant text colour. `opacity .6 → 1` on hover gives the "clean
+ * close" affordance without a painted background.
+ * ──────────────────────────────────────────────── */
+[data-sonner-toaster] [data-sonner-toast][data-styled='true'] [data-close-button].jss-toast-close {
+  top: 6px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  opacity: 0.6;
+  border-radius: var(--radius-full);
+  transition: opacity var(--transition-fast), background-color var(--transition-fast);
+}
+
+[data-sonner-toaster] [data-sonner-toast][data-styled='true'] [data-close-button].jss-toast-close:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.06);
+}

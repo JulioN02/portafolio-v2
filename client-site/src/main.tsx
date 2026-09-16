@@ -7,6 +7,7 @@ import { ErrorBoundary } from '@jsoft/shared';
 import { LanguageProvider } from './i18n/LanguageContext';
 import App from './App';
 import '@jsoft/shared/styles/variables.css';
+import '@jsoft/shared/styles/toast.css';
 import '@jsoft/shared/dist/index.css';
 import './styles/globals.css';
 
