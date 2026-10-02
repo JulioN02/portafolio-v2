@@ -1,22 +1,23 @@
 import express, { Express, Request, Response } from 'express';
-import cors from 'cors';
+import cors, { type CorsOptions } from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 
 import authRoutes from './routes/auth.routes.js';
-import serviceRoutes from './routes/service.routes.js';
-import productRoutes from './routes/product.routes.js';
-import toolRoutes from './routes/tool.routes.js';
-import successCaseRoutes from './routes/successCase.routes.js';
-import projectRoutes from './routes/project.routes.js';
+import serviceRoutes, { adminServiceRoutes } from './routes/service.routes.js';
+import productRoutes, { adminProductRoutes } from './routes/product.routes.js';
+import toolRoutes, { adminToolRoutes } from './routes/tool.routes.js';
+import successCaseRoutes, { adminSuccessCaseRoutes } from './routes/successCase.routes.js';
+import projectRoutes, { adminProjectRoutes } from './routes/project.routes.js';
 import portfolioRoutes from './routes/portfolio.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
 import contactRoutes from './routes/contact.routes.js';
-import blogPostRoutes from './routes/blog-post.routes.js';
+import blogPostRoutes, { adminBlogPostRoutes } from './routes/blog-post.routes.js';
 import siteSectionRoutes from './routes/siteSection.routes.js';
 import simulatorRoutes from './routes/simulator.routes.js';
 import { errorHandler } from './middleware/errorHandler.middleware.js';
 import { apiLimiter } from './middleware/rateLimit.middleware.js';
+import { ForbiddenError } from './utils/errors.js';
 
 dotenv.config();
 
@@ -58,12 +59,34 @@ app.use(helmet({
 // (including the public endpoints) is throttled.
 app.use('/api', apiLimiter);
 
-// CORS configuration
-const corsOptions = {
-  origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:5173', 'http://localhost:4173'],
+// CORS configuration. Origins are trimmed and compared exactly; wildcard
+// credentials are rejected rather than silently weakening the policy.
+const configuredCorsOrigins = process.env.CORS_ORIGIN
+  ?.split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+const corsOrigins = configuredCorsOrigins?.length
+  ? configuredCorsOrigins
+  : ['http://localhost:5173', 'http://localhost:4173'];
+if (corsOrigins.includes('*')) {
+  throw new Error('CORS_ORIGIN must contain explicit origins when credentials are enabled');
+}
+const corsOptions: CorsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || corsOrigins.includes(origin)) {
+      callback(null, true);
+      return;
+    }
+
+    callback(new ForbiddenError('Origin is not allowed'));
+  },
   credentials: true,
 };
 app.use(cors(corsOptions));
+app.use((_req: Request, res: Response, next) => {
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  next();
+});
 
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
@@ -85,6 +108,12 @@ app.use('/api/portfolio/projects', portfolioRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/blog-posts', blogPostRoutes);
+app.use('/api/admin/services', adminServiceRoutes);
+app.use('/api/admin/products', adminProductRoutes);
+app.use('/api/admin/tools', adminToolRoutes);
+app.use('/api/admin/success-cases', adminSuccessCaseRoutes);
+app.use('/api/admin/projects', adminProjectRoutes);
+app.use('/api/admin/blog-posts', adminBlogPostRoutes);
 app.use('/api/site-sections', siteSectionRoutes);
 app.use('/api/simulators', simulatorRoutes);
 
@@ -93,7 +122,15 @@ app.use(errorHandler);
 
 // 404 handler
 app.use((_req: Request, res: Response) => {
-  res.status(404).json({ message: 'Not Found', code: 'NOT_FOUND' });
+  res.status(404).json({
+    message: 'Not Found',
+    code: 'NOT_FOUND',
+    error: {
+      code: 'NOT_FOUND',
+      message: 'Not Found',
+      fields: {},
+    },
+  });
 });
 
 export default app;

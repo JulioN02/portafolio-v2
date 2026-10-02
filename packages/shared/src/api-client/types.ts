@@ -31,6 +31,7 @@ export interface ApiClientError {
   status: number;
   code?: string;
   details?: Record<string, string[]>;
+  fields?: Record<string, string[]>;
 }
 
 /** Response wrapper for typed responses */

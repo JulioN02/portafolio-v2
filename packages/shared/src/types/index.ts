@@ -127,3 +127,5 @@ export interface ApiSuccess<T> {
   data: T;
   message?: string;
 }
+
+export type PublicExternalLink = string | null;

@@ -6,6 +6,7 @@ import {
   projectFilterSchema,
   projectReorderSchema,
   postStatusEnum,
+  publicProjectQuerySchema,
 } from '@jsoft/shared';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { NotFoundError, ValidationError } from '../utils/errors.js';
@@ -25,14 +26,15 @@ const getExistingProject = async (id: string) => {
 
 export const projectController = {
   findAll: asyncHandler(async (req: Request, res: Response) => {
-    const filter = projectFilterSchema.parse(req.query);
-    const result = await projectService.findAll(filter);
+    const filter = publicProjectQuerySchema.parse(req.query);
+    const result = await projectService.findAllPublic(filter);
     res.json(result);
   }),
 
   findBySlug: asyncHandler(async (req: Request, res: Response) => {
+    publicProjectQuerySchema.parse(req.query);
     const slug = getStringParam(req.params.slug);
-    const project = await projectService.findBySlug(slug);
+    const project = await projectService.findPublicBySlug(slug);
     if (!project) {
       throw new NotFoundError('Project not found');
     }
@@ -100,8 +102,14 @@ export const projectController = {
     res.json(project);
   }),
 
-  getTags: asyncHandler(async (_req: Request, res: Response) => {
+  getTags: asyncHandler(async (req: Request, res: Response) => {
+    publicProjectQuerySchema.parse(req.query);
     const tags = await projectService.getTags();
     res.json(tags);
+  }),
+
+  findAllAdmin: asyncHandler(async (req: Request, res: Response) => {
+    const filter = projectFilterSchema.parse(req.query);
+    res.json(await projectService.findAll(filter));
   }),
 };

@@ -5,6 +5,7 @@ import {
   serviceUpdateSchema,
   serviceFilterSchema,
   serviceStatusSchema,
+  publicServiceQuerySchema,
 } from '@jsoft/shared';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { NotFoundError } from '../utils/errors.js';
@@ -26,14 +27,15 @@ const getExistingService = async (id: string) => {
 
 export const serviceController = {
   findAll: asyncHandler(async (req: Request, res: Response) => {
-    const filter = serviceFilterSchema.parse(req.query);
-    const result = await serviceService.findAll(filter);
+    const filter = publicServiceQuerySchema.parse(req.query);
+    const result = await serviceService.findAllPublic(filter);
     res.json(result);
   }),
 
   findBySlug: asyncHandler(async (req: Request, res: Response) => {
+    publicServiceQuerySchema.parse(req.query);
     const slug = getStringParam(req.params.slug);
-    const service = await serviceService.findBySlug(slug);
+    const service = await serviceService.findPublicBySlug(slug);
     if (!service) {
       throw new NotFoundError('Service not found');
     }
@@ -91,8 +93,14 @@ export const serviceController = {
     res.json(service);
   }),
 
-  getClassifications: asyncHandler(async (_req: Request, res: Response) => {
-    const classifications = await serviceService.getClassifications();
+  getClassifications: asyncHandler(async (req: Request, res: Response) => {
+    publicServiceQuerySchema.parse(req.query);
+    const classifications = await serviceService.getPublicClassifications();
     res.json(classifications);
+  }),
+
+  findAllAdmin: asyncHandler(async (req: Request, res: Response) => {
+    const filter = serviceFilterSchema.parse(req.query);
+    res.json(await serviceService.findAll(filter));
   }),
 };

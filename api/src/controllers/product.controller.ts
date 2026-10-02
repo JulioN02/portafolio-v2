@@ -5,6 +5,7 @@ import {
   productUpdateSchema,
   productFilterSchema,
   productStatusSchema,
+  publicProductQuerySchema,
 } from '@jsoft/shared';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { NotFoundError, ValidationError } from '../utils/errors.js';
@@ -25,14 +26,15 @@ const getExistingProduct = async (id: string) => {
 
 export const productController = {
   findAll: asyncHandler(async (req: Request, res: Response) => {
-    const filter = productFilterSchema.parse(req.query);
-    const result = await productService.findAll(filter);
+    const filter = publicProductQuerySchema.parse(req.query);
+    const result = await productService.findAllPublic(filter);
     res.json(result);
   }),
 
   findBySlug: asyncHandler(async (req: Request, res: Response) => {
+    publicProductQuerySchema.parse(req.query);
     const slug = getStringParam(req.params.slug);
-    const product = await productService.findBySlug(slug);
+    const product = await productService.findPublicBySlug(slug);
     if (!product) {
       throw new NotFoundError('Product not found');
     }
@@ -40,8 +42,9 @@ export const productController = {
   }),
 
   findFeatured: asyncHandler(async (req: Request, res: Response) => {
-    const limit = parseInt(req.query.limit as string) || 3;
-    const products = await productService.findFeatured(limit);
+    const filter = publicProductQuerySchema.parse(req.query);
+    const limit = req.query.limit === undefined ? 3 : Math.min(filter.limit, 12);
+    const products = await productService.findPublicFeatured(limit);
     res.json(products);
   }),
 
@@ -106,8 +109,14 @@ export const productController = {
     res.json(product);
   }),
 
-  getClassifications: asyncHandler(async (_req: Request, res: Response) => {
-    const classifications = await productService.getClassifications();
+  getClassifications: asyncHandler(async (req: Request, res: Response) => {
+    publicProductQuerySchema.parse(req.query);
+    const classifications = await productService.getPublicClassifications();
     res.json(classifications);
+  }),
+
+  findAllAdmin: asyncHandler(async (req: Request, res: Response) => {
+    const filter = productFilterSchema.parse(req.query);
+    res.json(await productService.findAll(filter));
   }),
 };

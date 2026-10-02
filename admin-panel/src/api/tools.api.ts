@@ -10,7 +10,7 @@ export const toolsApi = {
     if (filters?.featured !== undefined) params.append('featured', String(filters.featured));
     params.append('status', filters?.status || 'ALL');
 
-    const { data } = await apiClient.get(`/tools?${params}`);
+    const { data } = await apiClient.get(`/admin/tools?${params}`);
     return data;
   },
 

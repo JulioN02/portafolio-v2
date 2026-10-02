@@ -1,6 +1,7 @@
-import { PrismaClient, PostStatus } from '@prisma/client';
-import { ProjectInput, ProjectUpdateInput, ProjectFilterInput } from '@jsoft/shared';
+import { Prisma, PrismaClient, PostStatus } from '@prisma/client';
+import { ProjectInput, ProjectUpdateInput, ProjectFilterInput, PublicProjectQuery } from '@jsoft/shared';
 import { ValidationError } from '../utils/errors.js';
+import { PUBLIC_PROJECT_SELECT, selectPublicProject } from './public.selectors.js';
 
 const prisma = new PrismaClient();
 
@@ -23,6 +24,53 @@ const PROJECT_SELECT = {
 } as const;
 
 export const projectService = {
+  async findAllPublic(filter: PublicProjectQuery) {
+    const { page, limit, tag, search } = filter;
+    const where: Prisma.ProjectWhereInput = {
+      status: 'PUBLISHED',
+      deletedAt: null,
+      ...(tag && { tags: { hasSome: [tag] } }),
+    };
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { shortDescription: { contains: search, mode: 'insensitive' } },
+        { body: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    const [projects, total] = await Promise.all([
+      prisma.project.findMany({
+        where,
+        select: PUBLIC_PROJECT_SELECT,
+        orderBy: [{ createdAt: 'desc' }],
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.project.count({ where }),
+    ]);
+
+    return {
+      data: projects.map(selectPublicProject),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page * limit < total,
+        hasPrev: page > 1,
+      },
+    };
+  },
+
+  async findPublicBySlug(slug: string) {
+    const project = await prisma.project.findFirst({
+      where: { slug, status: 'PUBLISHED', deletedAt: null },
+      select: PUBLIC_PROJECT_SELECT,
+    });
+    return project ? selectPublicProject(project) : null;
+  },
+
   async findAll(filter?: ProjectFilterInput) {
     const { status, tag, search, page = 1, limit = 10 } = filter || {};
     const skip = (page - 1) * limit;
@@ -177,6 +225,6 @@ export const projectService = {
       select: { tags: true },
     });
     const tags = [...new Set(projects.flatMap((project) => project.tags))].sort();
-    return tags;
+    return tags.slice(0, 100);
   },
 };

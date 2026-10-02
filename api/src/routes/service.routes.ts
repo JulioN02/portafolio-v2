@@ -25,3 +25,6 @@ router.patch('/:id/status', authMiddleware, serviceController.updateStatus);
 router.get('/:slug', serviceController.findBySlug);
 
 export default router;
+
+export const adminServiceRoutes: IRouter = Router();
+adminServiceRoutes.get('/', authMiddleware, serviceController.findAllAdmin);

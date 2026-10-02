@@ -9,7 +9,7 @@ export const servicesApi = {
     if (filters?.classification) params.append('classification', filters.classification);
     params.append('status', filters?.status || 'ALL');
 
-    const { data } = await apiClient.get(`/services?${params}`);
+    const { data } = await apiClient.get(`/admin/services?${params}`);
     return data;
   },
 
