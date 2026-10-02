@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { sanitizeHtml } from '@jsoft/shared';
 import type { ServiceResponse } from '@jsoft/shared';
 import styles from './ServiceCard.module.css';
+import { getEvidenceSummary } from './serviceEvidence';
 
 interface ServiceCardProps {
   service: ServiceResponse;
@@ -15,6 +16,7 @@ interface ServiceCardProps {
 
 export function ServiceCard({ service, onSelect }: ServiceCardProps) {
   const imageUrl = service.images[0] || 'https://placehold.co/400x300/e5e7eb/9ca3af?text=Sin+imagen';
+  const evidence = getEvidenceSummary(service);
 
   const content = (
     <>
@@ -34,6 +36,14 @@ export function ServiceCard({ service, onSelect }: ServiceCardProps) {
           className={styles.description}
           dangerouslySetInnerHTML={{ __html: sanitizeHtml(service.shortDescription) }}
         />
+        {(evidence.gallery > 0 || evidence.technical > 0 || evidence.included > 0 || evidence.hasDemo) && (
+          <p className={styles.evidence} aria-label="Evidencia disponible">
+            {evidence.gallery > 0 && `${evidence.gallery} imágenes`}
+            {evidence.technical > 0 && `${evidence.gallery > 0 ? ' · ' : ''}${evidence.technical} detalles técnicos`}
+            {evidence.included > 0 && `${evidence.gallery > 0 || evidence.technical > 0 ? ' · ' : ''}${evidence.included} incluidos`}
+            {evidence.hasDemo && ' · Demo disponible'}
+          </p>
+        )}
       </div>
     </>
   );

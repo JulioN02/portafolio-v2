@@ -105,3 +105,10 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+.evidence {
+  margin: var(--spacing-sm) 0 0;
+  color: var(--color-primary-600);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-relaxed);
+}
