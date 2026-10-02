@@ -1,5 +1,6 @@
-import { PrismaClient, PostStatus } from '@prisma/client';
-import { SuccessCaseInput, SuccessCaseUpdateInput, SuccessCaseFilterInput } from '@jsoft/shared';
+import { Prisma, PrismaClient, PostStatus } from '@prisma/client';
+import { SuccessCaseInput, SuccessCaseUpdateInput, SuccessCaseFilterInput, PublicSuccessCaseQuery } from '@jsoft/shared';
+import { PUBLIC_SUCCESS_CASE_SELECT, selectPublicSuccessCase } from './public.selectors.js';
 
 const prisma = new PrismaClient();
 
@@ -19,6 +20,51 @@ const SUCCESS_CASE_SELECT = {
 } as const;
 
 export const successCaseService = {
+  async findAllPublic(filter: PublicSuccessCaseQuery) {
+    const { page, limit } = filter;
+    const where: Prisma.SuccessCaseWhereInput = { status: 'PUBLISHED', deletedAt: null };
+    const [successCases, total] = await Promise.all([
+      prisma.successCase.findMany({
+        where,
+        select: PUBLIC_SUCCESS_CASE_SELECT,
+        orderBy: [{ createdAt: 'desc' }],
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.successCase.count({ where }),
+    ]);
+
+    return {
+      data: successCases.map(selectPublicSuccessCase),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page * limit < total,
+        hasPrev: page > 1,
+      },
+    };
+  },
+
+  async findPublicBySlug(slug: string) {
+    const successCase = await prisma.successCase.findFirst({
+      where: { slug, status: 'PUBLISHED', deletedAt: null },
+      select: PUBLIC_SUCCESS_CASE_SELECT,
+    });
+    return successCase ? selectPublicSuccessCase(successCase) : null;
+  },
+
+  async findPublicRecent(limit = 3) {
+    const successCases = await prisma.successCase.findMany({
+      where: { status: 'PUBLISHED', deletedAt: null },
+      select: PUBLIC_SUCCESS_CASE_SELECT,
+      orderBy: [{ createdAt: 'desc' }],
+      take: Math.min(limit, 12),
+    });
+    return successCases.slice(0, 12).map(selectPublicSuccessCase);
+  },
+
   async findAll(filter?: SuccessCaseFilterInput) {
     const { status, page = 1, limit = 10 } = filter || {};
     const skip = (page - 1) * limit;

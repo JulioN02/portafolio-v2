@@ -5,6 +5,7 @@ import {
   successCaseUpdateSchema,
   successCaseFilterSchema,
   successCaseStatusSchema,
+  publicSuccessCaseQuerySchema,
 } from '@jsoft/shared';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { NotFoundError } from '../utils/errors.js';
@@ -25,14 +26,15 @@ const getExistingCase = async (id: string) => {
 
 export const successCaseController = {
   findAll: asyncHandler(async (req: Request, res: Response) => {
-    const filter = successCaseFilterSchema.parse(req.query);
-    const result = await successCaseService.findAll(filter);
+    const filter = publicSuccessCaseQuerySchema.parse(req.query);
+    const result = await successCaseService.findAllPublic(filter);
     res.json(result);
   }),
 
   findBySlug: asyncHandler(async (req: Request, res: Response) => {
+    publicSuccessCaseQuerySchema.parse(req.query);
     const slug = getStringParam(req.params.slug);
-    const successCase = await successCaseService.findBySlug(slug);
+    const successCase = await successCaseService.findPublicBySlug(slug);
     if (!successCase) {
       throw new NotFoundError('Success case not found');
     }
@@ -40,8 +42,9 @@ export const successCaseController = {
   }),
 
   findRecent: asyncHandler(async (req: Request, res: Response) => {
-    const limit = parseInt(req.query.limit as string) || 3;
-    const successCases = await successCaseService.findRecent(limit);
+    const filter = publicSuccessCaseQuerySchema.parse(req.query);
+    const limit = req.query.limit === undefined ? 3 : Math.min(filter.limit, 12);
+    const successCases = await successCaseService.findPublicRecent(limit);
     res.json(successCases);
   }),
 
@@ -93,5 +96,10 @@ export const successCaseController = {
     await getExistingCase(id);
     const successCase = await successCaseService.updateStatus(id, status);
     res.json(successCase);
+  }),
+
+  findAllAdmin: asyncHandler(async (req: Request, res: Response) => {
+    const filter = successCaseFilterSchema.parse(req.query);
+    res.json(await successCaseService.findAll(filter));
   }),
 };

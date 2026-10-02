@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { tagsSchema } from './tags.schema.js';
 import { getTextFromHTML } from '../utils/getTextFromHTML.js';
+import { safeExternalLinkSchema } from './public.schema.js';
 
 /**
  * Enum for blog post status
@@ -24,9 +25,9 @@ export const blogPostSchema = z.object({
       return len >= 10 && len <= 700;
     }, 'Short description must be between 10 and 700 characters'),
   coverImage: z.string().url(),
-  mediaGallery: z.array(z.string().url()).optional(),
+  mediaGallery: z.array(z.string().url()).max(12).optional(),
   body: z.string().min(100, 'Body must be at least 100 characters').max(50000),
-  externalLink: z.string().url().optional(),
+  externalLink: safeExternalLinkSchema,
   lessonsLearned: z.string().max(20000).optional(),
   status: postStatusEnum.default('DRAFT'),
 });

@@ -4,6 +4,7 @@ import { postStatusEnum } from './blogPost.schema.js';
 export { tagsSchema } from './tags.schema.js';
 import { tagsSchema } from './tags.schema.js';
 import { getTextFromHTML } from '../utils/getTextFromHTML.js';
+import { safeExternalLinkSchema } from './public.schema.js';
 
 /**
  * Schema for Project entity
@@ -20,8 +21,8 @@ export const projectSchema = z.object({
       return len >= 10 && len <= 700;
     }, 'Short description must be between 10 and 700 characters'),
   body: z.string().min(100, 'Body must be at least 100 characters').max(50000),
-  images: z.array(z.string().url()).optional(),
-  repositoryUrl: z.string().url().optional(),
+  images: z.array(z.string().url()).max(12).optional(),
+  repositoryUrl: safeExternalLinkSchema,
   tags: tagsSchema.optional(),
   featured: z.boolean().default(false),
   order: z.number().int().min(0).default(0),

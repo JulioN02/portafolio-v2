@@ -1,5 +1,6 @@
-import { PrismaClient, PostStatus } from '@prisma/client';
-import { BlogPostInput, BlogPostUpdateInput, BlogPostFilterInput } from '@jsoft/shared';
+import { Prisma, PrismaClient, PostStatus } from '@prisma/client';
+import { BlogPostInput, BlogPostUpdateInput, BlogPostFilterInput, PublicBlogPostQuery } from '@jsoft/shared';
+import { PUBLIC_BLOG_POST_SELECT, selectPublicBlogPost } from './public.selectors.js';
 
 const prisma = new PrismaClient();
 
@@ -23,6 +24,54 @@ const BLOG_POST_SELECT = {
 } as const;
 
 export const blogPostService = {
+  async findAllPublic(filter: PublicBlogPostQuery) {
+    const { page, limit, category, tag, search } = filter;
+    const where: Prisma.BlogPostWhereInput = {
+      status: 'PUBLISHED',
+      deletedAt: null,
+      ...(category && { category }),
+      ...(tag && { tags: { hasSome: [tag] } }),
+    };
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { shortDescription: { contains: search, mode: 'insensitive' } },
+        { body: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    const [posts, total] = await Promise.all([
+      prisma.blogPost.findMany({
+        where,
+        select: PUBLIC_BLOG_POST_SELECT,
+        orderBy: [{ createdAt: 'desc' }],
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.blogPost.count({ where }),
+    ]);
+
+    return {
+      data: posts.map(selectPublicBlogPost),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page * limit < total,
+        hasPrev: page > 1,
+      },
+    };
+  },
+
+  async findPublicBySlug(slug: string) {
+    const post = await prisma.blogPost.findFirst({
+      where: { slug, status: 'PUBLISHED', deletedAt: null },
+      select: PUBLIC_BLOG_POST_SELECT,
+    });
+    return post ? selectPublicBlogPost(post) : null;
+  },
+
   async findAll(filter?: BlogPostFilterInput) {
     const { status, category, tag, page = 1, limit = 10 } = filter || {};
     const skip = (page - 1) * limit;
@@ -179,7 +228,18 @@ export const blogPostService = {
       distinct: ['category'],
       orderBy: { category: 'asc' },
     });
-    return result.map((item: { category: string }) => item.category);
+    return result.map((item: { category: string }) => item.category).slice(0, 100);
+  },
+
+  async getPublicCategories() {
+    const result = await prisma.blogPost.findMany({
+      where: { status: 'PUBLISHED', deletedAt: null },
+      select: { category: true },
+      distinct: ['category'],
+      orderBy: { category: 'asc' },
+      take: 100,
+    });
+    return result.map((item: { category: string }) => item.category).slice(0, 100);
   },
 
   /** Distinct tags among PUBLISHED, non-deleted posts, sorted. */
@@ -188,6 +248,6 @@ export const blogPostService = {
       where: { status: 'PUBLISHED', deletedAt: null },
       select: { tags: true },
     });
-    return [...new Set(posts.flatMap((post) => post.tags))].sort();
+    return [...new Set(posts.flatMap((post) => post.tags))].sort().slice(0, 100);
   },
 };

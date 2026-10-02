@@ -26,3 +26,6 @@ router.patch('/:id/status', authMiddleware, blogPostController.updateStatus);
 router.get('/:slug', blogPostController.findBySlug);
 
 export default router;
+
+export const adminBlogPostRoutes: IRouter = Router();
+adminBlogPostRoutes.get('/', authMiddleware, blogPostController.findAllAdmin);

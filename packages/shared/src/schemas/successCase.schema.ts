@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { postStatusEnum } from './blogPost.schema.js';
+import { httpsUrlSchema } from './public.schema.js';
 
 /**
  * Schema for SuccessCase entity
@@ -9,9 +10,9 @@ export const successCaseSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters').max(100),
   slug: z.string().min(3).max(100).regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'Slug must be lowercase with hyphens'),
   description: z.string().min(10).max(1000),
-  images: z.array(z.string().url()).min(1),
-  videos: z.array(z.string().url()).optional(),
-  links: z.array(z.string().url()).optional(),
+  images: z.array(z.string().url()).min(1).max(12),
+  videos: z.array(httpsUrlSchema).max(12).optional(),
+  links: z.array(httpsUrlSchema).max(12).optional(),
   status: postStatusEnum.default('DRAFT'),
 });
 

@@ -26,3 +26,6 @@ router.patch('/:id/reorder', authMiddleware, projectController.reorder);
 router.get('/:slug', projectController.findBySlug);
 
 export default router;
+
+export const adminProjectRoutes: IRouter = Router();
+adminProjectRoutes.get('/', authMiddleware, projectController.findAllAdmin);

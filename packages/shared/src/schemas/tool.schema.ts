@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { postStatusEnum } from './blogPost.schema.js';
 import { getTextFromHTML } from '../utils/getTextFromHTML.js';
+import { safeExternalLinkSchema } from './public.schema.js';
 
 /**
  * Schema for Tool entity
@@ -17,8 +18,8 @@ export const toolSchema = z.object({
       return len >= 10 && len <= 700;
     }, 'Short description must be between 10 and 700 characters'),
   fullDescription: z.string().min(50),
-  images: z.array(z.string().url()).min(1),
-  externalLink: z.string().url().or(z.literal('')).optional(),
+  images: z.array(z.string().url()).min(1).max(12),
+  externalLink: safeExternalLinkSchema,
   requiresInstall: z.boolean().default(false),
   featured: z.boolean().default(false),
   status: postStatusEnum.default('DRAFT'),
@@ -31,7 +32,7 @@ export const toolSchema = z.object({
       message: 'Technical explanation text must be at most 15000 characters',
     })
     .optional(),
-  technicalImages: z.array(z.string().url()).optional(),
+  technicalImages: z.array(z.string().url()).max(12).optional(),
 });
 
 /**

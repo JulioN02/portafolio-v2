@@ -1,5 +1,6 @@
-import { PrismaClient, PostStatus } from '@prisma/client';
-import { ProductInput, ProductUpdateInput, ProductFilterInput } from '@jsoft/shared';
+import { Prisma, PrismaClient, PostStatus } from '@prisma/client';
+import { ProductInput, ProductUpdateInput, ProductFilterInput, PublicProductQuery } from '@jsoft/shared';
+import { PUBLIC_PRODUCT_SELECT, selectPublicProduct } from './public.selectors.js';
 
 const prisma = new PrismaClient();
 
@@ -23,6 +24,56 @@ const PRODUCT_SELECT = {
 } as const;
 
 export const productService = {
+  async findAllPublic(filter: PublicProductQuery) {
+    const { page, limit, featured, classification } = filter;
+    const where: Prisma.ProductWhereInput = {
+      status: 'PUBLISHED',
+      deletedAt: null,
+      ...(featured !== undefined && { featured }),
+      ...(classification && { classification }),
+    };
+    const [products, total] = await Promise.all([
+      prisma.product.findMany({
+        where,
+        select: PUBLIC_PRODUCT_SELECT,
+        orderBy: [{ createdAt: 'desc' }],
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.product.count({ where }),
+    ]);
+
+    return {
+      data: products.map(selectPublicProduct),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page * limit < total,
+        hasPrev: page > 1,
+      },
+    };
+  },
+
+  async findPublicBySlug(slug: string) {
+    const product = await prisma.product.findFirst({
+      where: { slug, status: 'PUBLISHED', deletedAt: null },
+      select: PUBLIC_PRODUCT_SELECT,
+    });
+    return product ? selectPublicProduct(product) : null;
+  },
+
+  async findPublicFeatured(limit = 3) {
+    const products = await prisma.product.findMany({
+      where: { featured: true, status: 'PUBLISHED', deletedAt: null },
+      select: PUBLIC_PRODUCT_SELECT,
+      orderBy: [{ createdAt: 'desc' }],
+      take: Math.min(limit, 12),
+    });
+    return products.slice(0, 12).map(selectPublicProduct);
+  },
+
   async findAll(filter?: ProductFilterInput) {
     const { featured, status, classification, page = 1, limit = 10 } = filter || {};
     const skip = (page - 1) * limit;
@@ -173,6 +224,17 @@ export const productService = {
       distinct: ['classification'],
       orderBy: { classification: 'asc' },
     });
-    return result.map((item: { classification: string }) => item.classification);
+    return result.map((item: { classification: string }) => item.classification).slice(0, 100);
+  },
+
+  async getPublicClassifications() {
+    const result = await prisma.product.findMany({
+      where: { status: 'PUBLISHED', deletedAt: null },
+      select: { classification: true },
+      distinct: ['classification'],
+      orderBy: { classification: 'asc' },
+      take: 100,
+    });
+    return result.map((item: { classification: string }) => item.classification).slice(0, 100);
   },
 };

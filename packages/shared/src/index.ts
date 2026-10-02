@@ -61,7 +61,18 @@ export type {
 
   // Simulators
   SimulatorResponse,
+  PublicExternalLink,
 } from './types/index.js';
+
+export type {
+  PublicService,
+  PublicProduct,
+  PublicTool,
+  PublicSuccessCase,
+  PublicProject,
+  PublicBlogPost,
+  PublicPortfolioItem,
+} from './public.types.js';
 
 // API Client
 export { createApiClient } from './api-client/index.js';
