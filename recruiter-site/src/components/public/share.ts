@@ -1,0 +1,1 @@
+export function buildSafeShareUrl(raw: string): string | null { try { const url = new URL(raw); if (url.protocol !== 'http:' && url.protocol !== 'https:') return null; url.username = ''; url.password = ''; url.search = ''; url.hash = ''; return url.toString(); } catch { return null; } }

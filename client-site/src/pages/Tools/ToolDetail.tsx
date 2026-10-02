@@ -217,7 +217,7 @@ export function ToolDetailPage() {
                     total: technicalImages.length,
                   })}
                 >
-                  <img src={src} alt="" className={styles.technicalImage} loading="lazy" />
+                  <img src={src} alt={t('blogPostContent.galleryImageAlt', { title: tool.title, index: index + 1, total: technicalImages.length })} className={styles.technicalImage} loading="lazy" />
                 </button>
               ))}
             </div>

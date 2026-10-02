@@ -166,7 +166,7 @@ export function EntityDetailContent({
                   total: technicalImages.length,
                 })}
               >
-                <img src={img} alt="" className={styles.techImage} loading="lazy" />
+                <img src={img} alt={`Imagen técnica ${index + 1} de ${title}`} className={styles.techImage} loading="lazy" />
               </button>
             ))}
           </div>

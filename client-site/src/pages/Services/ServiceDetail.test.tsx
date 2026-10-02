@@ -116,6 +116,8 @@ describe('ServiceDetailPage technical sections (spec S11)', () => {
     // Technical images grid renders each image.
     const techImages = container.querySelectorAll('img[src^="https://example.com/tech"]');
     expect(techImages).toHaveLength(2);
+    expect(techImages[0]).toHaveAttribute('alt', 'Servicio de prueba — Imagen 1 de 2');
+    expect(techImages[1]).toHaveAttribute('alt', 'Servicio de prueba — Imagen 2 de 2');
 
     // Scripts never make it into the DOM (sanitized pipeline).
     expect(container.querySelector('script')).toBeNull();
