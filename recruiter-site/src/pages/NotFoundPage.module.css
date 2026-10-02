@@ -18,11 +18,7 @@
   font-size: clamp(80px, 20vw, 120px);
   font-weight: var(--font-weight-bold);
   line-height: 1;
-  background: linear-gradient(
-    135deg,
-    var(--color-primary-500),
-    var(--color-primary-300)
-  );
+  background: linear-gradient(135deg, var(--color-blue-base), var(--color-green-accent));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -32,7 +28,7 @@
 .message {
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-neutral-800);
+  color: var(--color-blue-base);
   margin-bottom: var(--spacing-sm);
 }
 
@@ -46,25 +42,65 @@
 .homeButton {
   display: inline-flex;
   align-items: center;
+  min-height: 44px;
   padding: var(--spacing-sm) var(--spacing-xl);
-  background-color: var(--color-primary-600);
+  background-color: var(--color-blue-ui);
   color: var(--color-neutral-0);
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
   text-decoration: none;
   border-radius: var(--radius-full);
-  transition: all var(--transition-fast);
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
 }
-.actions { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--spacing-sm); }
-.secondaryButton { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: var(--spacing-sm) var(--spacing-lg); border: 1px solid var(--color-primary-600); border-radius: var(--radius-md); color: var(--color-primary-700); font-weight: var(--font-weight-semibold); text-decoration: none; }
-.homeButton:focus-visible, .secondaryButton:focus-visible { outline: 3px solid var(--color-primary-500); outline-offset: 3px; }
-@media (max-width: 560px) { .actions { flex-direction: column; width: 100%; } .homeButton, .secondaryButton { width: 100%; justify-content: center; } }
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.secondaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border: 1px solid var(--color-blue-ui);
+  border-radius: var(--radius-md);
+  color: var(--color-blue-ui);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+}
+
+.homeButton:focus-visible,
+.secondaryButton:focus-visible {
+  outline: 3px solid var(--color-blue-ui);
+  outline-offset: 3px;
+}
+
+@media (max-width: 560px) {
+  .actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .homeButton,
+  .secondaryButton {
+    width: 100%;
+    justify-content: center;
+  }
+}
 
 @media (hover: hover) {
   .homeButton:hover {
-    background-color: var(--color-primary-700);
+    background-color: var(--color-blue-medium);
     color: var(--color-neutral-0);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .secondaryButton:hover {
+    background-color: var(--color-blue-light);
   }
 }
