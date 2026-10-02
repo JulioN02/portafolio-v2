@@ -18,9 +18,7 @@ export function NotFoundPage() {
           <p className={styles.message}>
             {t('notFound.message')}
           </p>
-          <Link to="/" className={styles.button}>
-            {t('notFound.goHome')}
-          </Link>
+          <div className={styles.actions}><Link to="/" className={styles.button}>{t('notFound.goHome')}</Link><Link to="/servicios" className={styles.secondaryButton}>Ver servicios</Link><Link to="/contacto" className={styles.secondaryButton}>Contactar</Link></div>
         </div>
       </div>
     </div>

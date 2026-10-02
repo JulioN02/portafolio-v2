@@ -9,6 +9,7 @@ import type {
 import { useTranslation } from '../i18n/LanguageContext';
 import { useProjectDetail } from '../hooks/useProjects';
 import { MetaTags } from '../components/seo/MetaTags';
+import { ShareButton } from '../components/public/ShareButton';
 import { EntityDetailContent } from '../components/projects/EntityDetailContent';
 import { normalizeEntityType } from '../constants/entityRoutes';
 import styles from './EntityDetailPage.module.css';
@@ -29,7 +30,7 @@ const CLOSED_LIGHTBOX: LightboxState = { open: false, items: [], index: 0 };
 export function EntityDetailPage() {
   const { t } = useTranslation();
   const { tipo = '', slug = '' } = useParams<{ tipo: string; slug: string }>();
-  const { data: detail, isLoading, isError, error, refetch } = useProjectDetail(tipo, slug);
+  const { data: detail, isLoading, isError, refetch } = useProjectDetail(tipo, slug);
   const [lightbox, setLightbox] = useState<LightboxState>(CLOSED_LIGHTBOX);
   const carouselApiRef = useRef<EmblaCarouselType | null>(null);
 
@@ -50,7 +51,7 @@ export function EntityDetailPage() {
             <Link to="/proyectos">{t('projectDetailPage.backToProjects')}</Link>
           </div>
           <div className={styles.errorState}>
-            <div className={styles.errorIcon}>🔍</div>
+            <div className={styles.errorIcon} aria-hidden="true">?</div>
             <h1 className={styles.errorTitle}>{t('projectDetailPage.notFound.title')}</h1>
             <p className={styles.errorMessage}>{t('projectDetailPage.notFound.message')}</p>
           </div>
@@ -67,7 +68,7 @@ export function EntityDetailPage() {
           <div className={styles.backLink}>
             <Link to="/proyectos">{t('projectDetailPage.backToProjects')}</Link>
           </div>
-          <div className={styles.loadingState}>
+          <div className={styles.loadingState} role="status" aria-live="polite">
             <div className={styles.skeleton} />
             <p className={styles.loadingText}>{t('projectDetailModal.loading')}</p>
           </div>
@@ -84,19 +85,15 @@ export function EntityDetailPage() {
           <div className={styles.backLink}>
             <Link to="/proyectos">{t('projectDetailPage.backToProjects')}</Link>
           </div>
-          <div className={styles.errorState}>
-            <div className={styles.errorIcon}>⚠️</div>
+          <div className={styles.errorState} role={isError ? 'alert' : 'status'}>
+              <div className={styles.errorIcon} aria-hidden="true">!</div>
             <h1 className={styles.errorTitle}>
               {isError
                 ? t('projectDetailModal.error')
                 : t('projectDetailPage.notFound.title')}
             </h1>
             <p className={styles.errorMessage}>
-              {isError
-                ? error instanceof Error
-                  ? error.message
-                  : t('projectDetailModal.errorConnection')
-                : t('projectDetailPage.notFound.message')}
+              {isError ? t('projectDetailModal.errorConnection') : t('projectDetailPage.notFound.message')}
             </p>
             {isError && (
               <button type="button" className={styles.retryButton} onClick={() => refetch()}>
@@ -206,6 +203,8 @@ export function EntityDetailPage() {
           title={title}
           onOpenLightbox={(items, index) => setLightbox({ open: true, items, index })}
         />
+
+        <ShareButton title={title} />
 
         <Lightbox
           isOpen={lightbox.open}

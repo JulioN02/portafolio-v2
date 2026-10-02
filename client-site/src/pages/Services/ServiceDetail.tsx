@@ -8,6 +8,7 @@ import { Loading } from '../../components/common/Loading';
 import { Modal } from '@jsoft/shared';
 import { ContactForm } from '../../components/forms/ContactForm';
 import { MetaTags } from '../../components/seo/MetaTags';
+import { ShareButton } from '../../components/public/ShareButton';
 import styles from './ServiceDetail.module.css';
 
 const FALLBACK_IMG = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="800" height="600" fill="%23e5e7eb"%3E%3Crect width="800" height="600"/%3E%3Ctext x="400" y="300" text-anchor="middle" dy=".3em" font-size="20" fill="%239ca3af"%3ESin imagen%3C/text%3E%3C/svg%3E';
@@ -32,7 +33,7 @@ export function ServiceDetailPage() {
 
   if (error || !service) {
     return (
-      <div className={styles.error}>
+      <div className={styles.error} role="alert">
         <h2>{t('serviceDetail.notFound.title')}</h2>
         <p>{t('serviceDetail.notFound.message')}</p>
         <Link to="/servicios" className={styles.backLink}>
@@ -176,6 +177,7 @@ export function ServiceDetailPage() {
             >
               {t('serviceDetail.requestInfo')}
             </button>
+            <ShareButton title={service.title} />
           </div>
         </div>
 

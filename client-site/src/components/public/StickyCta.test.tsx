@@ -4,12 +4,8 @@ import { PROFILE } from '@jsoft/shared';
 import { StickyCta } from './StickyCta';
 
 describe('StickyCta', () => {
-  it('keeps the approved profile contact action keyboard reachable', () => {
+  it('exposes a client-specific accessible contact action', () => {
     render(<StickyCta />);
-
-    expect(screen.getByRole('link', { name: 'Contactar para oportunidades por correo electrónico' })).toHaveAttribute(
-      'href',
-      `mailto:${PROFILE.email}`,
-    );
+    expect(screen.getByRole('link', { name: 'Solicitar una propuesta por correo electrónico' })).toHaveAttribute('href', `mailto:${PROFILE.email}`);
   });
 });
