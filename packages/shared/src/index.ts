@@ -92,6 +92,14 @@ export { buildPublicMetadata, h1DiffersFromTitle } from './publicSeo.js';
 export type { PublicMetadata } from './publicSeo.js';
 export { getPublicImageSemantics } from './publicMedia.js';
 export type { PublicImageKind, PublicImageSemantics } from './publicMedia.js';
+export {
+  SERVICE_CLASSIFICATIONS,
+  SERVICE_PROBLEM_ENTRIES,
+  resolveServiceClassification,
+  serviceMatchesClassification,
+  isSafeExternalDemo,
+} from './serviceGrowth.js';
+export type { ServiceClassification } from './serviceGrowth.js';
 export { getTextFromHTML } from './utils/getTextFromHTML.js';
 export { normalizePhone, PHONE_REGEX } from './utils/phone.js';
 

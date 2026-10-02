@@ -1,6 +1,6 @@
 import { useState, type SyntheticEvent } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { renderSimulatorEmbeds, sanitizeHtml, Lightbox } from '@jsoft/shared';
+import { renderSimulatorEmbeds, sanitizeHtml, Lightbox, isSafeExternalDemo } from '@jsoft/shared';
 import type { LightboxItem } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useServiceBySlug } from '../../hooks/useServices';
@@ -142,7 +142,7 @@ export function ServiceDetailPage() {
             />
 
             {/* External Link */}
-            {service.externalLink && (
+            {isSafeExternalDemo(service.externalLink) && (
               <a
                 href={service.externalLink}
                 target="_blank"

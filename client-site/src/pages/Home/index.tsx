@@ -4,6 +4,7 @@ import { Hero } from './Hero';
 import { ProcessSection } from './ProcessSection';
 import { BlogTeaser } from './BlogTeaser';
 import { FeaturedServices } from './FeaturedServices';
+import { ProblemEntrySection } from './ProblemEntrySection';
 import { SuccessCaseCarousel } from '../../components/successCases/SuccessCaseCarousel';
 import { ProductCarousel } from '../../components/products/ProductCarousel';
 import { ToolCarousel } from '../../components/tools/ToolCarousel';
@@ -37,6 +38,7 @@ export function HomePage() {
       />
       <Hero />
       <ProcessSection />
+      <ProblemEntrySection />
       {orderedKeys.map((key) => {
         const Component = SECTION_COMPONENTS[key];
         return Component ? <Component key={key} /> : null;
