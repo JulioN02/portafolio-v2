@@ -9,3 +9,24 @@
   margin: 0;
   padding: 0;
 }
+
+.public-sticky-cta { display: none; }
+@media (max-width: 767px) {
+  body {
+    --public-sticky-cta-space: calc(4rem + env(safe-area-inset-bottom, 0px) + env(keyboard-inset-height, 0px));
+    padding-bottom: var(--public-sticky-cta-space);
+    scroll-padding-bottom: var(--public-sticky-cta-space);
+  }
+  .public-sticky-cta {
+    display: block;
+    position: fixed;
+    z-index: 20;
+    right: 1rem;
+    bottom: calc(1rem + env(safe-area-inset-bottom, 0px) + env(keyboard-inset-height, 0px));
+    padding: .75rem 1rem;
+    border-radius: 999px;
+    background: var(--color-blue-ui);
+    color: white;
+    box-shadow: 0 .25rem 1rem rgb(0 0 0 / 20%);
+  }
+}

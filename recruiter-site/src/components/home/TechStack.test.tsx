@@ -80,10 +80,9 @@ describe('TechStack (domain-grid redesign)', () => {
     expect(labelledBy).toBe('tech-stack-title');
     expect(container.querySelector(`#${labelledBy}`)?.tagName).toBe('H2');
 
-    expect(screen.getAllByRole('button')).toHaveLength(15);
-    for (const tech of TECH_NAMES) {
-      expect(screen.getByRole('button', { name: tech })).toBeInTheDocument();
-    }
+    const buttons = screen.getAllByRole('button');
+    expect(buttons).toHaveLength(15);
+    expect(buttons.map((button) => button.getAttribute('aria-label'))).toEqual(TECH_NAMES);
   });
 
   it('renders every tech as a non-submitting button (type="button")', () => {

@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { Layout } from './components/layout/Layout';
 import { HomePage } from './pages/Home';
@@ -13,6 +13,8 @@ import { BlogPostPage } from './pages/Blog/BlogPost';
 import { NotFoundPage } from './pages/NotFound';
 import { ErrorBoundary } from '@jsoft/shared';
 import { Loading } from './components/common/Loading';
+import { PrivacyPage } from './pages/Legal/Privacy';
+import { TermsPage } from './pages/Legal/Terms';
 
 const ServiceDetailPage = lazy(() => import('./pages/Services/ServiceDetail').then(m => ({ default: m.ServiceDetailPage })));
 const ProductDetailPage = lazy(() => import('./pages/Products/ProductDetail').then(m => ({ default: m.ProductDetailPage })));
@@ -40,8 +42,10 @@ function App() {
           <Route path="/blog" element={<ErrorBoundary><BlogPage /></ErrorBoundary>} />
           <Route path="/blog/:slug" element={<ErrorBoundary><BlogPostPage /></ErrorBoundary>} />
           <Route path="/contacto" element={<ErrorBoundary><ContactPage /></ErrorBoundary>} />
+          <Route path="/privacidad" element={<PrivacyPage />} />
+          <Route path="/terminos" element={<TermsPage />} />
           <Route path="/404" element={<ErrorBoundary><NotFoundPage /></ErrorBoundary>} />
-          <Route path="*" element={<Navigate to="/404" replace />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
       <Toaster

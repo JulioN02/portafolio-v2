@@ -10,6 +10,8 @@ import { ContactPage } from './pages/ContactPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { ErrorBoundary } from '@jsoft/shared';
 import { useTranslation } from './i18n/LanguageContext';
+import { PrivacyPage } from './pages/Legal/Privacy';
+import { TermsPage } from './pages/Legal/Terms';
 
 const EntityDetailPage = lazy(() =>
   import('./pages/EntityDetailPage').then((m) => ({ default: m.EntityDetailPage })),
@@ -45,6 +47,8 @@ function App() {
           <Route path="/blog" element={<ErrorBoundary><BlogPage /></ErrorBoundary>} />
           <Route path="/blog/:slug" element={<ErrorBoundary><BlogPostPage /></ErrorBoundary>} />
           <Route path="/contacto" element={<ErrorBoundary><ContactPage /></ErrorBoundary>} />
+          <Route path="/privacidad" element={<PrivacyPage />} />
+          <Route path="/terminos" element={<TermsPage />} />
           <Route path="*" element={<ErrorBoundary><NotFoundPage /></ErrorBoundary>} />
         </Route>
       </Routes>
