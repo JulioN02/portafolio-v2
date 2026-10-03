@@ -106,11 +106,13 @@ export function createApiClient(config: ApiClientConfig) {
       let errorBody: ApiClientError;
       try {
         const parsed = await response.json();
+        const normalized = parsed.error ?? parsed;
         errorBody = {
-          message: parsed.message ?? response.statusText,
+          message: normalized.message ?? response.statusText,
           status: response.status,
-          code: parsed.code,
-          details: parsed.details,
+          code: normalized.code,
+          details: normalized.fields ?? normalized.details,
+          fields: normalized.fields,
         };
       } catch {
         errorBody = {

@@ -9,7 +9,7 @@ export const blogPostsApi = {
     params.append('status', filter?.status || 'ALL');
     if (filter?.category) params.append('category', filter.category);
 
-    const { data } = await apiClient.get(`/blog-posts?${params}`);
+    const { data } = await apiClient.get(`/admin/blog-posts?${params}`);
     return data;
   },
 

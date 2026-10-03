@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { PUBLIC_MAX_AGGREGATE, PublicPortfolioQuery } from '@jsoft/shared';
 
 const prisma = new PrismaClient();
 
@@ -49,10 +50,10 @@ const toProjectSummary = (item: {
   title: item.title,
   slug: item.slug,
   classification: item.tags[0] || '',
-  tags: item.tags,
-  shortDescription: item.shortDescription,
+  tags: item.tags.slice(0, 20),
+  shortDescription: item.shortDescription.slice(0, 700),
   image: item.images[0] || '',
-  images: item.images,
+  images: item.images.slice(0, 12),
   featured: item.featured,
   createdAt: item.createdAt,
 });
@@ -72,16 +73,17 @@ const toLabSummary = (item: {
   title: item.title,
   slug: item.slug,
   classification: item.tags[0] || '',
-  shortDescription: item.shortDescription,
+  shortDescription: item.shortDescription.slice(0, 700),
   image: item.coverImage,
-  images: [item.coverImage, ...item.mediaGallery].filter(Boolean),
+  images: [item.coverImage, ...item.mediaGallery].filter(Boolean).slice(0, 12),
   createdAt: item.createdAt,
 });
 
 export const portfolioService = {
-  async findAll(filter?: PortfolioFilter) {
+  async findAll(filter?: PublicPortfolioQuery | PortfolioFilter) {
     const { page = 1, limit = 10, classification, type } = filter || {};
-    const skip = (page - 1) * limit;
+    const boundedLimit = Math.min(limit, PUBLIC_MAX_AGGREGATE);
+    const skip = (page - 1) * boundedLimit;
 
     const queries: Promise<PortfolioProjectSummary[]>[] = [];
 
@@ -104,6 +106,7 @@ export const portfolioService = {
             createdAt: true,
           },
           orderBy: [{ createdAt: 'desc' }],
+          take: PUBLIC_MAX_AGGREGATE,
         }).then((items) => items.map(toProjectSummary)),
       );
     }
@@ -125,15 +128,16 @@ export const portfolioService = {
             createdAt: true,
           },
           orderBy: [{ createdAt: 'desc' }],
+          take: PUBLIC_MAX_AGGREGATE,
         }).then((items) => items.map((item) => ({
           id: item.id,
           type: 'service' as const,
           title: item.title,
           slug: item.slug,
           classification: item.classification,
-          shortDescription: item.shortDescription,
-          image: item.images[0] || '',
-          images: item.images,
+           shortDescription: item.shortDescription.slice(0, 700),
+           image: item.images[0] || '',
+           images: item.images.slice(0, 12),
           createdAt: item.createdAt,
         }))),
       );
@@ -157,15 +161,16 @@ export const portfolioService = {
             createdAt: true,
           },
           orderBy: [{ createdAt: 'desc' }],
+          take: PUBLIC_MAX_AGGREGATE,
         }).then((items) => items.map((item) => ({
           id: item.id,
           type: 'product' as const,
           title: item.title,
           slug: item.slug,
           classification: item.classification,
-          shortDescription: item.shortDescription,
-          image: item.images[0] || '',
-          images: item.images,
+           shortDescription: item.shortDescription.slice(0, 700),
+           image: item.images[0] || '',
+           images: item.images.slice(0, 12),
           featured: item.featured,
           createdAt: item.createdAt,
         }))),
@@ -190,15 +195,16 @@ export const portfolioService = {
             createdAt: true,
           },
           orderBy: [{ createdAt: 'desc' }],
+          take: PUBLIC_MAX_AGGREGATE,
         }).then((items) => items.map((item) => ({
           id: item.id,
           type: 'tool' as const,
           title: item.title,
           slug: item.slug,
           classification: item.classification,
-          shortDescription: item.shortDescription,
-          image: item.images[0] || '',
-          images: item.images,
+           shortDescription: item.shortDescription.slice(0, 700),
+           image: item.images[0] || '',
+           images: item.images.slice(0, 12),
           featured: item.featured,
           createdAt: item.createdAt,
         }))),
@@ -220,15 +226,16 @@ export const portfolioService = {
             createdAt: true,
           },
           orderBy: [{ createdAt: 'desc' }],
+          take: PUBLIC_MAX_AGGREGATE,
         }).then((items) => items.map((item) => ({
           id: item.id,
           type: 'successCase' as const,
           title: item.title,
           slug: item.slug,
           classification: 'success-case',
-          shortDescription: item.description,
-          image: item.images[0] || '',
-          images: item.images,
+           shortDescription: item.description.slice(0, 1_000),
+           image: item.images[0] || '',
+           images: item.images.slice(0, 12),
           createdAt: item.createdAt,
         }))),
       );
@@ -256,6 +263,7 @@ export const portfolioService = {
             createdAt: true,
           },
           orderBy: [{ createdAt: 'desc' }],
+          take: PUBLIC_MAX_AGGREGATE,
         }).then((items) => items.map(toLabSummary)),
       );
     }
@@ -269,19 +277,20 @@ export const portfolioService = {
     const total = allProjects.length;
 
     return {
-      data: allProjects.slice(skip, skip + limit),
+      data: allProjects.slice(skip, skip + boundedLimit),
       pagination: {
         page,
-        limit,
+        limit: boundedLimit,
         total,
-        totalPages: Math.ceil(total / limit),
-        hasNext: page * limit < total,
+        totalPages: Math.ceil(total / boundedLimit),
+        hasNext: page * boundedLimit < total,
         hasPrev: page > 1,
       },
     };
   },
 
   async findRecent(limit = 3): Promise<PortfolioProjectSummary[]> {
+    const boundedLimit = Math.min(limit, PUBLIC_MAX_AGGREGATE);
     const projectSelect = {
       id: true, title: true, slug: true, tags: true, shortDescription: true,
       images: true, featured: true, order: true, createdAt: true,
@@ -304,31 +313,31 @@ export const portfolioService = {
     } as const;
 
     const [projects, services, products, tools, successCases, labPosts] = await Promise.all([
-      prisma.project.findMany({ where: PUBLISHED, select: projectSelect, orderBy: [{ createdAt: 'desc' }], take: limit })
+      prisma.project.findMany({ where: PUBLISHED, select: projectSelect, orderBy: [{ createdAt: 'desc' }], take: boundedLimit })
         .then((items) => items.map(toProjectSummary)),
-      prisma.service.findMany({ where: PUBLISHED, select: legacySelect, orderBy: [{ createdAt: 'desc' }], take: limit })
+      prisma.service.findMany({ where: PUBLISHED, select: legacySelect, orderBy: [{ createdAt: 'desc' }], take: boundedLimit })
         .then((items) => items.map((item) => ({
           id: item.id, type: 'service' as const, title: item.title, slug: item.slug,
-          classification: item.classification, shortDescription: item.shortDescription,
-          image: item.images[0] || '', images: item.images, createdAt: item.createdAt,
+          classification: item.classification, shortDescription: item.shortDescription.slice(0, 700),
+          image: item.images[0] || '', images: item.images.slice(0, 12), createdAt: item.createdAt,
         }))),
-      prisma.product.findMany({ where: PUBLISHED, select: featuredSelect, orderBy: [{ createdAt: 'desc' }], take: limit })
+      prisma.product.findMany({ where: PUBLISHED, select: featuredSelect, orderBy: [{ createdAt: 'desc' }], take: boundedLimit })
         .then((items) => items.map((item) => ({
           id: item.id, type: 'product' as const, title: item.title, slug: item.slug,
-          classification: item.classification, shortDescription: item.shortDescription,
-          image: item.images[0] || '', images: item.images, featured: item.featured, createdAt: item.createdAt,
+          classification: item.classification, shortDescription: item.shortDescription.slice(0, 700),
+          image: item.images[0] || '', images: item.images.slice(0, 12), featured: item.featured, createdAt: item.createdAt,
         }))),
-      prisma.tool.findMany({ where: PUBLISHED, select: featuredSelect, orderBy: [{ createdAt: 'desc' }], take: limit })
+      prisma.tool.findMany({ where: PUBLISHED, select: featuredSelect, orderBy: [{ createdAt: 'desc' }], take: boundedLimit })
         .then((items) => items.map((item) => ({
           id: item.id, type: 'tool' as const, title: item.title, slug: item.slug,
-          classification: item.classification, shortDescription: item.shortDescription,
-          image: item.images[0] || '', images: item.images, featured: item.featured, createdAt: item.createdAt,
+          classification: item.classification, shortDescription: item.shortDescription.slice(0, 700),
+          image: item.images[0] || '', images: item.images.slice(0, 12), featured: item.featured, createdAt: item.createdAt,
         }))),
-      prisma.successCase.findMany({ where: PUBLISHED, select: successCaseSelect, orderBy: [{ createdAt: 'desc' }], take: limit })
+      prisma.successCase.findMany({ where: PUBLISHED, select: successCaseSelect, orderBy: [{ createdAt: 'desc' }], take: boundedLimit })
         .then((items) => items.map((item) => ({
           id: item.id, type: 'successCase' as const, title: item.title, slug: item.slug,
-          classification: 'success-case', shortDescription: item.description,
-          image: item.images[0] || '', images: item.images, createdAt: item.createdAt,
+          classification: 'success-case', shortDescription: item.description.slice(0, 1_000),
+          image: item.images[0] || '', images: item.images.slice(0, 12), createdAt: item.createdAt,
         }))),
       prisma.blogPost.findMany({
         where: {
@@ -340,14 +349,14 @@ export const portfolioService = {
         },
         select: labSelect,
         orderBy: [{ createdAt: 'desc' }],
-        take: limit,
+        take: boundedLimit,
       })
         .then((items) => items.map(toLabSummary)),
     ]);
 
     return [...projects, ...services, ...products, ...tools, ...successCases, ...labPosts]
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-      .slice(0, limit);
+      .slice(0, boundedLimit);
   },
 
   /** Legacy classifications + project tags, deduped and sorted. */
@@ -379,6 +388,6 @@ export const portfolioService = {
       ...productClassifications,
       ...toolClassifications,
       ...projectTags,
-    ])].sort();
+    ])].sort().slice(0, 100);
   },
 };

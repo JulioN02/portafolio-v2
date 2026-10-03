@@ -1,5 +1,6 @@
-import { PrismaClient, PostStatus } from '@prisma/client';
-import { ToolInput, ToolUpdateInput, ToolFilterInput } from '@jsoft/shared';
+import { Prisma, PrismaClient, PostStatus } from '@prisma/client';
+import { ToolInput, ToolUpdateInput, ToolFilterInput, PublicToolQuery } from '@jsoft/shared';
+import { PUBLIC_TOOL_SELECT, selectPublicTool } from './public.selectors.js';
 
 const prisma = new PrismaClient();
 
@@ -24,6 +25,56 @@ const TOOL_SELECT = {
 } as const;
 
 export const toolService = {
+  async findAllPublic(filter: PublicToolQuery) {
+    const { page, limit, featured, classification } = filter;
+    const where: Prisma.ToolWhereInput = {
+      status: 'PUBLISHED',
+      deletedAt: null,
+      ...(featured !== undefined && { featured }),
+      ...(classification && { classification }),
+    };
+    const [tools, total] = await Promise.all([
+      prisma.tool.findMany({
+        where,
+        select: PUBLIC_TOOL_SELECT,
+        orderBy: [{ createdAt: 'desc' }],
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.tool.count({ where }),
+    ]);
+
+    return {
+      data: tools.map(selectPublicTool),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page * limit < total,
+        hasPrev: page > 1,
+      },
+    };
+  },
+
+  async findPublicBySlug(slug: string) {
+    const tool = await prisma.tool.findFirst({
+      where: { slug, status: 'PUBLISHED', deletedAt: null },
+      select: PUBLIC_TOOL_SELECT,
+    });
+    return tool ? selectPublicTool(tool) : null;
+  },
+
+  async findPublicFeatured(limit = 3) {
+    const tools = await prisma.tool.findMany({
+      where: { featured: true, status: 'PUBLISHED', deletedAt: null },
+      select: PUBLIC_TOOL_SELECT,
+      orderBy: [{ createdAt: 'desc' }],
+      take: Math.min(limit, 12),
+    });
+    return tools.slice(0, 12).map(selectPublicTool);
+  },
+
   async findAll(filter?: ToolFilterInput) {
     const { featured, status, classification, page = 1, limit = 10 } = filter || {};
     const skip = (page - 1) * limit;
@@ -176,6 +227,17 @@ export const toolService = {
       distinct: ['classification'],
       orderBy: { classification: 'asc' },
     });
-    return result.map((item: { classification: string }) => item.classification);
+    return result.map((item: { classification: string }) => item.classification).slice(0, 100);
+  },
+
+  async getPublicClassifications() {
+    const result = await prisma.tool.findMany({
+      where: { status: 'PUBLISHED', deletedAt: null },
+      select: { classification: true },
+      distinct: ['classification'],
+      orderBy: { classification: 'asc' },
+      take: 100,
+    });
+    return result.map((item: { classification: string }) => item.classification).slice(0, 100);
   },
 };

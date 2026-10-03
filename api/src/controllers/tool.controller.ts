@@ -5,6 +5,7 @@ import {
   toolUpdateSchema,
   toolFilterSchema,
   toolStatusSchema,
+  publicToolQuerySchema,
 } from '@jsoft/shared';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { NotFoundError, ValidationError } from '../utils/errors.js';
@@ -25,14 +26,15 @@ const getExistingTool = async (id: string) => {
 
 export const toolController = {
   findAll: asyncHandler(async (req: Request, res: Response) => {
-    const filter = toolFilterSchema.parse(req.query);
-    const result = await toolService.findAll(filter);
+    const filter = publicToolQuerySchema.parse(req.query);
+    const result = await toolService.findAllPublic(filter);
     res.json(result);
   }),
 
   findBySlug: asyncHandler(async (req: Request, res: Response) => {
+    publicToolQuerySchema.parse(req.query);
     const slug = getStringParam(req.params.slug);
-    const tool = await toolService.findBySlug(slug);
+    const tool = await toolService.findPublicBySlug(slug);
     if (!tool) {
       throw new NotFoundError('Tool not found');
     }
@@ -40,8 +42,9 @@ export const toolController = {
   }),
 
   findFeatured: asyncHandler(async (req: Request, res: Response) => {
-    const limit = parseInt(req.query.limit as string) || 3;
-    const tools = await toolService.findFeatured(limit);
+    const filter = publicToolQuerySchema.parse(req.query);
+    const limit = req.query.limit === undefined ? 3 : Math.min(filter.limit, 12);
+    const tools = await toolService.findPublicFeatured(limit);
     res.json(tools);
   }),
 
@@ -106,8 +109,14 @@ export const toolController = {
     res.json(tool);
   }),
 
-  getClassifications: asyncHandler(async (_req: Request, res: Response) => {
-    const classifications = await toolService.getClassifications();
+  getClassifications: asyncHandler(async (req: Request, res: Response) => {
+    publicToolQuerySchema.parse(req.query);
+    const classifications = await toolService.getPublicClassifications();
     res.json(classifications);
+  }),
+
+  findAllAdmin: asyncHandler(async (req: Request, res: Response) => {
+    const filter = toolFilterSchema.parse(req.query);
+    res.json(await toolService.findAll(filter));
   }),
 };

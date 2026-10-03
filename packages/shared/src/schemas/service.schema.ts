@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { postStatusEnum } from './blogPost.schema.js';
 import { getTextFromHTML } from '../utils/getTextFromHTML.js';
+import { safeExternalLinkSchema } from './public.schema.js';
 
 /**
  * Schema for Service entity
@@ -18,8 +19,8 @@ export const serviceSchema = z.object({
     }, 'Short description must be between 10 and 700 characters'),
   fullDescription: z.string().min(50, 'Full description must be at least 50 characters'),
   includedItems: z.array(z.string().min(3)).min(1, 'At least one included item is required'),
-  images: z.array(z.string().url()).min(1, 'At least one image is required'),
-  externalLink: z.string().url().or(z.literal('')).optional(),
+  images: z.array(z.string().url()).min(1, 'At least one image is required').max(12),
+  externalLink: safeExternalLinkSchema,
   status: postStatusEnum.default('DRAFT'),
   
   // Technical fields for recruiters (optional)
@@ -30,7 +31,7 @@ export const serviceSchema = z.object({
       message: 'Technical explanation text must be at most 15000 characters',
     })
     .optional(),
-  technicalImages: z.array(z.string().url()).optional(),
+  technicalImages: z.array(z.string().url()).max(12).optional(),
 });
 
 /**

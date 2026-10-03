@@ -1,5 +1,6 @@
-import { PrismaClient, PostStatus } from '@prisma/client';
-import { ServiceInput, ServiceUpdateInput, ServiceFilterInput } from '@jsoft/shared';
+import { Prisma, PrismaClient, PostStatus } from '@prisma/client';
+import { ServiceInput, ServiceUpdateInput, ServiceFilterInput, PublicServiceQuery } from '@jsoft/shared';
+import { PUBLIC_SERVICE_SELECT, selectPublicService } from './public.selectors.js';
 
 const prisma = new PrismaClient();
 
@@ -23,6 +24,45 @@ const SERVICE_SELECT = {
 } as const;
 
 export const serviceService = {
+  async findAllPublic(filter: PublicServiceQuery) {
+    const { page, limit, classification } = filter;
+    const where: Prisma.ServiceWhereInput = {
+      status: 'PUBLISHED',
+      deletedAt: null,
+      ...(classification && { classification }),
+    };
+    const [services, total] = await Promise.all([
+      prisma.service.findMany({
+        where,
+        select: PUBLIC_SERVICE_SELECT,
+        orderBy: [{ createdAt: 'desc' }],
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.service.count({ where }),
+    ]);
+
+    return {
+      data: services.map(selectPublicService),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page * limit < total,
+        hasPrev: page > 1,
+      },
+    };
+  },
+
+  async findPublicBySlug(slug: string) {
+    const service = await prisma.service.findFirst({
+      where: { slug, status: 'PUBLISHED', deletedAt: null },
+      select: PUBLIC_SERVICE_SELECT,
+    });
+    return service ? selectPublicService(service) : null;
+  },
+
   async findAll(filter?: ServiceFilterInput) {
     const { status, classification, page = 1, limit = 10 } = filter || {};
     const skip = (page - 1) * limit;
@@ -163,6 +203,17 @@ export const serviceService = {
       distinct: ['classification'],
       orderBy: { classification: 'asc' },
     });
-    return result.map((item: { classification: string }) => item.classification);
+    return result.map((item: { classification: string }) => item.classification).slice(0, 100);
+  },
+
+  async getPublicClassifications() {
+    const result = await prisma.service.findMany({
+      where: { status: 'PUBLISHED', deletedAt: null },
+      select: { classification: true },
+      distinct: ['classification'],
+      orderBy: { classification: 'asc' },
+      take: 100,
+    });
+    return result.map((item: { classification: string }) => item.classification).slice(0, 100);
   },
 };

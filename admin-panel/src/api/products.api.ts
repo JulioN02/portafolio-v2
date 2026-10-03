@@ -10,7 +10,7 @@ export const productsApi = {
     if (filters?.featured !== undefined) params.append('featured', String(filters.featured));
     params.append('status', filters?.status || 'ALL');
 
-    const { data } = await apiClient.get(`/products?${params}`);
+    const { data } = await apiClient.get(`/admin/products?${params}`);
     return data;
   },
 

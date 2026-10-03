@@ -8,7 +8,7 @@ export const successCasesApi = {
     if (filters?.limit) params.append('limit', String(filters.limit));
     params.append('status', filters?.status || 'ALL');
 
-    const { data } = await apiClient.get(`/success-cases?${params}`);
+    const { data } = await apiClient.get(`/admin/success-cases?${params}`);
     return data;
   },
 

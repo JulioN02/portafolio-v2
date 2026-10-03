@@ -16,7 +16,7 @@ export const projectsApi = {
     if (filters?.search) params.append('search', filters.search);
     params.append('status', filters?.status || 'ALL');
 
-    const { data } = await apiClient.get(`/projects?${params}`);
+    const { data } = await apiClient.get(`/admin/projects?${params}`);
     return data;
   },
 

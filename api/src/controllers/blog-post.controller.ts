@@ -5,6 +5,7 @@ import {
   blogPostUpdateSchema,
   blogPostFilterSchema,
   postStatusEnum,
+  publicBlogPostQuerySchema,
 } from '@jsoft/shared';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { NotFoundError, ValidationError } from '../utils/errors.js';
@@ -25,14 +26,15 @@ const getExistingPost = async (id: string) => {
 
 export const blogPostController = {
   findAll: asyncHandler(async (req: Request, res: Response) => {
-    const filter = blogPostFilterSchema.parse(req.query);
-    const result = await blogPostService.findAll(filter);
+    const filter = publicBlogPostQuerySchema.parse(req.query);
+    const result = await blogPostService.findAllPublic(filter);
     res.json(result);
   }),
 
   findBySlug: asyncHandler(async (req: Request, res: Response) => {
+    publicBlogPostQuerySchema.parse(req.query);
     const slug = getStringParam(req.params.slug);
-    const post = await blogPostService.findBySlug(slug);
+    const post = await blogPostService.findPublicBySlug(slug);
     if (!post) {
       throw new NotFoundError('Blog post not found');
     }
@@ -94,13 +96,20 @@ export const blogPostController = {
     res.json(post);
   }),
 
-  getCategories: asyncHandler(async (_req: Request, res: Response) => {
-    const categories = await blogPostService.getCategories();
+  getCategories: asyncHandler(async (req: Request, res: Response) => {
+    publicBlogPostQuerySchema.parse(req.query);
+    const categories = await blogPostService.getPublicCategories();
     res.json(categories);
   }),
 
-  getTags: asyncHandler(async (_req: Request, res: Response) => {
+  getTags: asyncHandler(async (req: Request, res: Response) => {
+    publicBlogPostQuerySchema.parse(req.query);
     const tags = await blogPostService.getTags();
     res.json(tags);
+  }),
+
+  findAllAdmin: asyncHandler(async (req: Request, res: Response) => {
+    const filter = blogPostFilterSchema.parse(req.query);
+    res.json(await blogPostService.findAll(filter));
   }),
 };
