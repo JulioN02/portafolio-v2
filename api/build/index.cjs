@@ -48881,6 +48881,93 @@ function getTextFromHTML(html) {
   return html.replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/\s+/g, " ").trim();
 }
 
+// packages/shared/src/schemas/public.schema.ts
+var PUBLIC_DEFAULT_LIMIT = 12;
+var PUBLIC_MAX_PAGE = 1e4;
+var PUBLIC_MAX_LIMIT = 50;
+var PUBLIC_MAX_AGGREGATE = 12;
+var repeatedQueryValue = (value) => Array.isArray(value) ? "__repeated_query_value__" : value;
+var publicIntegerQuery = (defaultValue, max) => external_exports.preprocess(
+  (value) => {
+    if (typeof value === "string" && /^[0-9]+$/.test(value)) return Number(value);
+    return value;
+  },
+  external_exports.number().int().min(1).max(max).default(defaultValue)
+);
+var publicPage = external_exports.preprocess(
+  repeatedQueryValue,
+  publicIntegerQuery(1, PUBLIC_MAX_PAGE)
+);
+var publicLimit = external_exports.preprocess(
+  repeatedQueryValue,
+  publicIntegerQuery(PUBLIC_DEFAULT_LIMIT, PUBLIC_MAX_LIMIT)
+);
+var publicOptionalString = (max) => external_exports.preprocess(
+  repeatedQueryValue,
+  external_exports.string().trim().min(1).max(max).optional()
+);
+var publicBoolean = external_exports.preprocess(
+  (value) => {
+    if (Array.isArray(value)) return "__repeated_query_value__";
+    if (value === "true") return true;
+    if (value === "false") return false;
+    return value;
+  },
+  external_exports.boolean().optional()
+);
+var publicStatusSchema = external_exports.preprocess(
+  repeatedQueryValue,
+  external_exports.literal("PUBLISHED").optional()
+);
+var publicPaginationSchema = external_exports.object({
+  page: publicPage,
+  limit: publicLimit
+});
+var publicServiceQuerySchema = publicPaginationSchema.extend({
+  status: publicStatusSchema,
+  classification: publicOptionalString(50)
+}).strict();
+var publicProductQuerySchema = publicPaginationSchema.extend({
+  status: publicStatusSchema,
+  featured: publicBoolean,
+  classification: publicOptionalString(50)
+}).strict();
+var publicToolQuerySchema = publicProductQuerySchema;
+var publicSuccessCaseQuerySchema = publicPaginationSchema.extend({
+  status: publicStatusSchema
+}).strict();
+var publicProjectQuerySchema = publicPaginationSchema.extend({
+  status: publicStatusSchema,
+  tag: publicOptionalString(100),
+  search: publicOptionalString(200)
+}).strict();
+var publicBlogPostQuerySchema = publicPaginationSchema.extend({
+  status: publicStatusSchema,
+  category: publicOptionalString(100),
+  tag: publicOptionalString(100),
+  search: publicOptionalString(200)
+}).strict();
+var publicPortfolioQuerySchema = publicPaginationSchema.extend({
+  status: publicStatusSchema,
+  classification: publicOptionalString(100),
+  type: external_exports.preprocess(
+    repeatedQueryValue,
+    external_exports.enum(["service", "product", "tool", "successCase", "project", "laboratorio"]).optional()
+  )
+}).strict();
+var httpsUrlSchema = external_exports.string().url().refine(
+  (value) => {
+    try {
+      return new URL(value).protocol === "https:";
+    } catch {
+      return false;
+    }
+  },
+  "URL must use HTTPS"
+);
+var safeExternalLinkSchema = external_exports.union([httpsUrlSchema, external_exports.literal("")]).optional();
+var publicExternalLinkSchema = httpsUrlSchema.nullable();
+
 // packages/shared/src/schemas/blogPost.schema.ts
 var postStatusEnum = external_exports.enum(["DRAFT", "PUBLISHED", "PRIVATE", "ARCHIVED", "ALL"]);
 var blogPostSchema = external_exports.object({
@@ -48893,9 +48980,9 @@ var blogPostSchema = external_exports.object({
     return len >= 10 && len <= 700;
   }, "Short description must be between 10 and 700 characters"),
   coverImage: external_exports.string().url(),
-  mediaGallery: external_exports.array(external_exports.string().url()).optional(),
+  mediaGallery: external_exports.array(external_exports.string().url()).max(12).optional(),
   body: external_exports.string().min(100, "Body must be at least 100 characters").max(5e4),
-  externalLink: external_exports.string().url().optional(),
+  externalLink: safeExternalLinkSchema,
   lessonsLearned: external_exports.string().max(2e4).optional(),
   status: postStatusEnum.default("DRAFT")
 });
@@ -48923,14 +49010,14 @@ var serviceSchema = external_exports.object({
   }, "Short description must be between 10 and 700 characters"),
   fullDescription: external_exports.string().min(50, "Full description must be at least 50 characters"),
   includedItems: external_exports.array(external_exports.string().min(3)).min(1, "At least one included item is required"),
-  images: external_exports.array(external_exports.string().url()).min(1, "At least one image is required"),
-  externalLink: external_exports.string().url().or(external_exports.literal("")).optional(),
+  images: external_exports.array(external_exports.string().url()).min(1, "At least one image is required").max(12),
+  externalLink: safeExternalLinkSchema,
   status: postStatusEnum.default("DRAFT"),
   // Technical fields for recruiters (optional)
   technicalExplanation: external_exports.string().max(2e4, "Technical explanation must be at most 20000 characters").refine((s) => getTextFromHTML(s).length <= 15e3, {
     message: "Technical explanation text must be at most 15000 characters"
   }).optional(),
-  technicalImages: external_exports.array(external_exports.string().url()).optional()
+  technicalImages: external_exports.array(external_exports.string().url()).max(12).optional()
 });
 var serviceUpdateSchema = serviceSchema.partial();
 var serviceFilterSchema = external_exports.object({
@@ -48953,15 +49040,15 @@ var productSchema = external_exports.object({
     return len >= 10 && len <= 700;
   }, "Short description must be between 10 and 700 characters"),
   fullDescription: external_exports.string().min(50),
-  images: external_exports.array(external_exports.string().url()).min(1),
-  externalLink: external_exports.string().url().optional(),
+  images: external_exports.array(external_exports.string().url()).min(1).max(12),
+  externalLink: safeExternalLinkSchema,
   featured: external_exports.boolean().default(false),
   status: postStatusEnum.default("DRAFT"),
   // Technical fields for recruiters (optional)
   technicalExplanation: external_exports.string().max(2e4, "Technical explanation must be at most 20000 characters").refine((s) => getTextFromHTML(s).length <= 15e3, {
     message: "Technical explanation text must be at most 15000 characters"
   }).optional(),
-  technicalImages: external_exports.array(external_exports.string().url()).optional()
+  technicalImages: external_exports.array(external_exports.string().url()).max(12).optional()
 });
 var productUpdateSchema = productSchema.partial();
 var productFilterSchema = external_exports.object({
@@ -48985,8 +49072,8 @@ var toolSchema = external_exports.object({
     return len >= 10 && len <= 700;
   }, "Short description must be between 10 and 700 characters"),
   fullDescription: external_exports.string().min(50),
-  images: external_exports.array(external_exports.string().url()).min(1),
-  externalLink: external_exports.string().url().or(external_exports.literal("")).optional(),
+  images: external_exports.array(external_exports.string().url()).min(1).max(12),
+  externalLink: safeExternalLinkSchema,
   requiresInstall: external_exports.boolean().default(false),
   featured: external_exports.boolean().default(false),
   status: postStatusEnum.default("DRAFT"),
@@ -48994,7 +49081,7 @@ var toolSchema = external_exports.object({
   technicalExplanation: external_exports.string().max(2e4, "Technical explanation must be at most 20000 characters").refine((s) => getTextFromHTML(s).length <= 15e3, {
     message: "Technical explanation text must be at most 15000 characters"
   }).optional(),
-  technicalImages: external_exports.array(external_exports.string().url()).optional()
+  technicalImages: external_exports.array(external_exports.string().url()).max(12).optional()
 });
 var toolUpdateSchema = toolSchema.partial();
 var toolFilterSchema = external_exports.object({
@@ -49013,9 +49100,9 @@ var successCaseSchema = external_exports.object({
   title: external_exports.string().min(3, "Title must be at least 3 characters").max(100),
   slug: external_exports.string().min(3).max(100).regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "Slug must be lowercase with hyphens"),
   description: external_exports.string().min(10).max(1e3),
-  images: external_exports.array(external_exports.string().url()).min(1),
-  videos: external_exports.array(external_exports.string().url()).optional(),
-  links: external_exports.array(external_exports.string().url()).optional(),
+  images: external_exports.array(external_exports.string().url()).min(1).max(12),
+  videos: external_exports.array(httpsUrlSchema).max(12).optional(),
+  links: external_exports.array(httpsUrlSchema).max(12).optional(),
   status: postStatusEnum.default("DRAFT")
 });
 var successCaseUpdateSchema = successCaseSchema.partial();
@@ -49038,8 +49125,8 @@ var projectSchema = external_exports.object({
     return len >= 10 && len <= 700;
   }, "Short description must be between 10 and 700 characters"),
   body: external_exports.string().min(100, "Body must be at least 100 characters").max(5e4),
-  images: external_exports.array(external_exports.string().url()).optional(),
-  repositoryUrl: external_exports.string().url().optional(),
+  images: external_exports.array(external_exports.string().url()).max(12).optional(),
+  repositoryUrl: safeExternalLinkSchema,
   tags: tagsSchema.optional(),
   featured: external_exports.boolean().default(false),
   order: external_exports.number().int().min(0).default(0),
@@ -49259,6 +49346,150 @@ var import_express2 = __toESM(require_express2(), 1);
 
 // api/src/services/service.service.ts
 var import_client3 = require("@prisma/client");
+
+// api/src/services/public.selectors.ts
+var PUBLIC_SERVICE_SELECT = {
+  id: true,
+  title: true,
+  slug: true,
+  classification: true,
+  shortDescription: true,
+  fullDescription: true,
+  includedItems: true,
+  images: true,
+  technicalImages: true,
+  externalLink: true
+};
+var PUBLIC_PRODUCT_SELECT = {
+  id: true,
+  title: true,
+  slug: true,
+  classification: true,
+  shortDescription: true,
+  fullDescription: true,
+  images: true,
+  technicalImages: true,
+  externalLink: true,
+  featured: true
+};
+var PUBLIC_TOOL_SELECT = {
+  ...PUBLIC_PRODUCT_SELECT,
+  requiresInstall: true
+};
+var PUBLIC_SUCCESS_CASE_SELECT = {
+  id: true,
+  title: true,
+  slug: true,
+  description: true,
+  images: true,
+  videos: true,
+  links: true
+};
+var PUBLIC_PROJECT_SELECT = {
+  id: true,
+  title: true,
+  slug: true,
+  shortDescription: true,
+  body: true,
+  images: true,
+  repositoryUrl: true,
+  tags: true,
+  featured: true,
+  order: true
+};
+var PUBLIC_BLOG_POST_SELECT = {
+  id: true,
+  title: true,
+  slug: true,
+  category: true,
+  tags: true,
+  shortDescription: true,
+  coverImage: true,
+  mediaGallery: true,
+  body: true,
+  externalLink: true,
+  lessonsLearned: true
+};
+var MAX_SHORT_DESCRIPTION = 700;
+var MAX_FULL_DESCRIPTION = 5e4;
+var MAX_BODY = 5e4;
+var MAX_LESSONS_LEARNED = 2e4;
+var MAX_TAG_LENGTH = 100;
+var cap = (value, max) => (value ?? "").slice(0, max);
+var capArray = (values, maxItems, maxItemLength = 2e3) => (values ?? []).slice(0, maxItems).map((value) => cap(value, maxItemLength));
+var safeHttpsUrl = (value) => {
+  if (!value) return null;
+  try {
+    return new URL(value).protocol === "https:" ? value : null;
+  } catch {
+    return null;
+  }
+};
+var safeHttpsUrls = (values) => values.map((value) => safeHttpsUrl(value)).filter((value) => value !== null).slice(0, 12);
+var selectPublicService = (item) => ({
+  id: item.id,
+  title: item.title,
+  slug: item.slug,
+  classification: item.classification,
+  shortDescription: cap(item.shortDescription, MAX_SHORT_DESCRIPTION),
+  fullDescription: cap(item.fullDescription, MAX_FULL_DESCRIPTION),
+  includedItems: capArray(item.includedItems, 20),
+  images: (item.images ?? []).slice(0, 12),
+  technicalImages: (item.technicalImages ?? []).slice(0, 12),
+  externalLink: safeHttpsUrl(item.externalLink)
+});
+var selectPublicProduct = (item) => ({
+  id: item.id,
+  title: item.title,
+  slug: item.slug,
+  classification: item.classification,
+  shortDescription: cap(item.shortDescription, MAX_SHORT_DESCRIPTION),
+  fullDescription: cap(item.fullDescription, MAX_FULL_DESCRIPTION),
+  images: (item.images ?? []).slice(0, 12),
+  technicalImages: (item.technicalImages ?? []).slice(0, 12),
+  externalLink: safeHttpsUrl(item.externalLink),
+  featured: item.featured
+});
+var selectPublicTool = (item) => ({
+  ...selectPublicProduct(item),
+  requiresInstall: item.requiresInstall
+});
+var selectPublicSuccessCase = (item) => ({
+  id: item.id,
+  title: item.title,
+  slug: item.slug,
+  description: cap(item.description, 1e3),
+  images: (item.images ?? []).slice(0, 12),
+  videos: safeHttpsUrls(item.videos ?? []),
+  links: safeHttpsUrls(item.links ?? [])
+});
+var selectPublicProject = (item) => ({
+  id: item.id,
+  title: item.title,
+  slug: item.slug,
+  shortDescription: cap(item.shortDescription, MAX_SHORT_DESCRIPTION),
+  body: cap(item.body, MAX_BODY),
+  images: (item.images ?? []).slice(0, 12),
+  repositoryUrl: safeHttpsUrl(item.repositoryUrl),
+  tags: capArray(item.tags, 20, MAX_TAG_LENGTH),
+  featured: item.featured,
+  order: item.order
+});
+var selectPublicBlogPost = (item) => ({
+  id: item.id,
+  title: item.title,
+  slug: item.slug,
+  category: item.category,
+  tags: capArray(item.tags, 20, MAX_TAG_LENGTH),
+  shortDescription: cap(item.shortDescription, MAX_SHORT_DESCRIPTION),
+  coverImage: item.coverImage,
+  mediaGallery: (item.mediaGallery ?? []).slice(0, 12),
+  body: cap(item.body, MAX_BODY),
+  externalLink: safeHttpsUrl(item.externalLink),
+  lessonsLearned: item.lessonsLearned === null ? null : cap(item.lessonsLearned, MAX_LESSONS_LEARNED)
+});
+
+// api/src/services/service.service.ts
 var prisma3 = new import_client3.PrismaClient();
 var SERVICE_SELECT = {
   id: true,
@@ -49279,6 +49510,42 @@ var SERVICE_SELECT = {
   updatedAt: true
 };
 var serviceService = {
+  async findAllPublic(filter) {
+    const { page, limit, classification } = filter;
+    const where = {
+      status: "PUBLISHED",
+      deletedAt: null,
+      ...classification && { classification }
+    };
+    const [services, total] = await Promise.all([
+      prisma3.service.findMany({
+        where,
+        select: PUBLIC_SERVICE_SELECT,
+        orderBy: [{ createdAt: "desc" }],
+        skip: (page - 1) * limit,
+        take: limit
+      }),
+      prisma3.service.count({ where })
+    ]);
+    return {
+      data: services.map(selectPublicService),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page * limit < total,
+        hasPrev: page > 1
+      }
+    };
+  },
+  async findPublicBySlug(slug) {
+    const service = await prisma3.service.findFirst({
+      where: { slug, status: "PUBLISHED", deletedAt: null },
+      select: PUBLIC_SERVICE_SELECT
+    });
+    return service ? selectPublicService(service) : null;
+  },
   async findAll(filter) {
     const { status, classification, page = 1, limit = 10 } = filter || {};
     const skip = (page - 1) * limit;
@@ -49404,7 +49671,17 @@ var serviceService = {
       distinct: ["classification"],
       orderBy: { classification: "asc" }
     });
-    return result.map((item) => item.classification);
+    return result.map((item) => item.classification).slice(0, 100);
+  },
+  async getPublicClassifications() {
+    const result = await prisma3.service.findMany({
+      where: { status: "PUBLISHED", deletedAt: null },
+      select: { classification: true },
+      distinct: ["classification"],
+      orderBy: { classification: "asc" },
+      take: 100
+    });
+    return result.map((item) => item.classification).slice(0, 100);
   }
 };
 
@@ -49422,13 +49699,14 @@ var getExistingService = async (id) => {
 };
 var serviceController = {
   findAll: asyncHandler(async (req, res) => {
-    const filter = serviceFilterSchema.parse(req.query);
-    const result = await serviceService.findAll(filter);
+    const filter = publicServiceQuerySchema.parse(req.query);
+    const result = await serviceService.findAllPublic(filter);
     res.json(result);
   }),
   findBySlug: asyncHandler(async (req, res) => {
+    publicServiceQuerySchema.parse(req.query);
     const slug = getStringParam(req.params.slug);
-    const service = await serviceService.findBySlug(slug);
+    const service = await serviceService.findPublicBySlug(slug);
     if (!service) {
       throw new NotFoundError("Service not found");
     }
@@ -49480,9 +49758,14 @@ var serviceController = {
     const service = await serviceService.updateStatus(id, status);
     res.json(service);
   }),
-  getClassifications: asyncHandler(async (_req, res) => {
-    const classifications = await serviceService.getClassifications();
+  getClassifications: asyncHandler(async (req, res) => {
+    publicServiceQuerySchema.parse(req.query);
+    const classifications = await serviceService.getPublicClassifications();
     res.json(classifications);
+  }),
+  findAllAdmin: asyncHandler(async (req, res) => {
+    const filter = serviceFilterSchema.parse(req.query);
+    res.json(await serviceService.findAll(filter));
   })
 };
 
@@ -49498,6 +49781,8 @@ router2.patch("/:id/restore", authMiddleware, serviceController.restore);
 router2.patch("/:id/status", authMiddleware, serviceController.updateStatus);
 router2.get("/:slug", serviceController.findBySlug);
 var service_routes_default = router2;
+var adminServiceRoutes = (0, import_express2.Router)();
+adminServiceRoutes.get("/", authMiddleware, serviceController.findAllAdmin);
 
 // api/src/routes/product.routes.ts
 var import_express3 = __toESM(require_express2(), 1);
@@ -49524,6 +49809,52 @@ var PRODUCT_SELECT = {
   updatedAt: true
 };
 var productService = {
+  async findAllPublic(filter) {
+    const { page, limit, featured, classification } = filter;
+    const where = {
+      status: "PUBLISHED",
+      deletedAt: null,
+      ...featured !== void 0 && { featured },
+      ...classification && { classification }
+    };
+    const [products, total] = await Promise.all([
+      prisma4.product.findMany({
+        where,
+        select: PUBLIC_PRODUCT_SELECT,
+        orderBy: [{ createdAt: "desc" }],
+        skip: (page - 1) * limit,
+        take: limit
+      }),
+      prisma4.product.count({ where })
+    ]);
+    return {
+      data: products.map(selectPublicProduct),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page * limit < total,
+        hasPrev: page > 1
+      }
+    };
+  },
+  async findPublicBySlug(slug) {
+    const product = await prisma4.product.findFirst({
+      where: { slug, status: "PUBLISHED", deletedAt: null },
+      select: PUBLIC_PRODUCT_SELECT
+    });
+    return product ? selectPublicProduct(product) : null;
+  },
+  async findPublicFeatured(limit = 3) {
+    const products = await prisma4.product.findMany({
+      where: { featured: true, status: "PUBLISHED", deletedAt: null },
+      select: PUBLIC_PRODUCT_SELECT,
+      orderBy: [{ createdAt: "desc" }],
+      take: Math.min(limit, 12)
+    });
+    return products.slice(0, 12).map(selectPublicProduct);
+  },
   async findAll(filter) {
     const { featured, status, classification, page = 1, limit = 10 } = filter || {};
     const skip = (page - 1) * limit;
@@ -49658,7 +49989,17 @@ var productService = {
       distinct: ["classification"],
       orderBy: { classification: "asc" }
     });
-    return result.map((item) => item.classification);
+    return result.map((item) => item.classification).slice(0, 100);
+  },
+  async getPublicClassifications() {
+    const result = await prisma4.product.findMany({
+      where: { status: "PUBLISHED", deletedAt: null },
+      select: { classification: true },
+      distinct: ["classification"],
+      orderBy: { classification: "asc" },
+      take: 100
+    });
+    return result.map((item) => item.classification).slice(0, 100);
   }
 };
 
@@ -49676,21 +50017,23 @@ var getExistingProduct = async (id) => {
 };
 var productController = {
   findAll: asyncHandler(async (req, res) => {
-    const filter = productFilterSchema.parse(req.query);
-    const result = await productService.findAll(filter);
+    const filter = publicProductQuerySchema.parse(req.query);
+    const result = await productService.findAllPublic(filter);
     res.json(result);
   }),
   findBySlug: asyncHandler(async (req, res) => {
+    publicProductQuerySchema.parse(req.query);
     const slug = getStringParam2(req.params.slug);
-    const product = await productService.findBySlug(slug);
+    const product = await productService.findPublicBySlug(slug);
     if (!product) {
       throw new NotFoundError("Product not found");
     }
     res.json(product);
   }),
   findFeatured: asyncHandler(async (req, res) => {
-    const limit = parseInt(req.query.limit) || 3;
-    const products = await productService.findFeatured(limit);
+    const filter = publicProductQuerySchema.parse(req.query);
+    const limit = req.query.limit === void 0 ? 3 : Math.min(filter.limit, 12);
+    const products = await productService.findPublicFeatured(limit);
     res.json(products);
   }),
   findById: asyncHandler(async (req, res) => {
@@ -49749,9 +50092,14 @@ var productController = {
     const product = await productService.updateStatus(id, status);
     res.json(product);
   }),
-  getClassifications: asyncHandler(async (_req, res) => {
-    const classifications = await productService.getClassifications();
+  getClassifications: asyncHandler(async (req, res) => {
+    publicProductQuerySchema.parse(req.query);
+    const classifications = await productService.getPublicClassifications();
     res.json(classifications);
+  }),
+  findAllAdmin: asyncHandler(async (req, res) => {
+    const filter = productFilterSchema.parse(req.query);
+    res.json(await productService.findAll(filter));
   })
 };
 
@@ -49769,6 +50117,8 @@ router3.patch("/:id/featured", authMiddleware, productController.toggleFeatured)
 router3.patch("/:id/status", authMiddleware, productController.updateStatus);
 router3.get("/:slug", productController.findBySlug);
 var product_routes_default = router3;
+var adminProductRoutes = (0, import_express3.Router)();
+adminProductRoutes.get("/", authMiddleware, productController.findAllAdmin);
 
 // api/src/routes/tool.routes.ts
 var import_express4 = __toESM(require_express2(), 1);
@@ -49796,6 +50146,52 @@ var TOOL_SELECT = {
   updatedAt: true
 };
 var toolService = {
+  async findAllPublic(filter) {
+    const { page, limit, featured, classification } = filter;
+    const where = {
+      status: "PUBLISHED",
+      deletedAt: null,
+      ...featured !== void 0 && { featured },
+      ...classification && { classification }
+    };
+    const [tools, total] = await Promise.all([
+      prisma5.tool.findMany({
+        where,
+        select: PUBLIC_TOOL_SELECT,
+        orderBy: [{ createdAt: "desc" }],
+        skip: (page - 1) * limit,
+        take: limit
+      }),
+      prisma5.tool.count({ where })
+    ]);
+    return {
+      data: tools.map(selectPublicTool),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page * limit < total,
+        hasPrev: page > 1
+      }
+    };
+  },
+  async findPublicBySlug(slug) {
+    const tool = await prisma5.tool.findFirst({
+      where: { slug, status: "PUBLISHED", deletedAt: null },
+      select: PUBLIC_TOOL_SELECT
+    });
+    return tool ? selectPublicTool(tool) : null;
+  },
+  async findPublicFeatured(limit = 3) {
+    const tools = await prisma5.tool.findMany({
+      where: { featured: true, status: "PUBLISHED", deletedAt: null },
+      select: PUBLIC_TOOL_SELECT,
+      orderBy: [{ createdAt: "desc" }],
+      take: Math.min(limit, 12)
+    });
+    return tools.slice(0, 12).map(selectPublicTool);
+  },
   async findAll(filter) {
     const { featured, status, classification, page = 1, limit = 10 } = filter || {};
     const skip = (page - 1) * limit;
@@ -49932,7 +50328,17 @@ var toolService = {
       distinct: ["classification"],
       orderBy: { classification: "asc" }
     });
-    return result.map((item) => item.classification);
+    return result.map((item) => item.classification).slice(0, 100);
+  },
+  async getPublicClassifications() {
+    const result = await prisma5.tool.findMany({
+      where: { status: "PUBLISHED", deletedAt: null },
+      select: { classification: true },
+      distinct: ["classification"],
+      orderBy: { classification: "asc" },
+      take: 100
+    });
+    return result.map((item) => item.classification).slice(0, 100);
   }
 };
 
@@ -49950,21 +50356,23 @@ var getExistingTool = async (id) => {
 };
 var toolController = {
   findAll: asyncHandler(async (req, res) => {
-    const filter = toolFilterSchema.parse(req.query);
-    const result = await toolService.findAll(filter);
+    const filter = publicToolQuerySchema.parse(req.query);
+    const result = await toolService.findAllPublic(filter);
     res.json(result);
   }),
   findBySlug: asyncHandler(async (req, res) => {
+    publicToolQuerySchema.parse(req.query);
     const slug = getStringParam3(req.params.slug);
-    const tool = await toolService.findBySlug(slug);
+    const tool = await toolService.findPublicBySlug(slug);
     if (!tool) {
       throw new NotFoundError("Tool not found");
     }
     res.json(tool);
   }),
   findFeatured: asyncHandler(async (req, res) => {
-    const limit = parseInt(req.query.limit) || 3;
-    const tools = await toolService.findFeatured(limit);
+    const filter = publicToolQuerySchema.parse(req.query);
+    const limit = req.query.limit === void 0 ? 3 : Math.min(filter.limit, 12);
+    const tools = await toolService.findPublicFeatured(limit);
     res.json(tools);
   }),
   findById: asyncHandler(async (req, res) => {
@@ -50023,9 +50431,14 @@ var toolController = {
     const tool = await toolService.updateStatus(id, status);
     res.json(tool);
   }),
-  getClassifications: asyncHandler(async (_req, res) => {
-    const classifications = await toolService.getClassifications();
+  getClassifications: asyncHandler(async (req, res) => {
+    publicToolQuerySchema.parse(req.query);
+    const classifications = await toolService.getPublicClassifications();
     res.json(classifications);
+  }),
+  findAllAdmin: asyncHandler(async (req, res) => {
+    const filter = toolFilterSchema.parse(req.query);
+    res.json(await toolService.findAll(filter));
   })
 };
 
@@ -50043,6 +50456,8 @@ router4.patch("/:id/featured", authMiddleware, toolController.toggleFeatured);
 router4.patch("/:id/status", authMiddleware, toolController.updateStatus);
 router4.get("/:slug", toolController.findBySlug);
 var tool_routes_default = router4;
+var adminToolRoutes = (0, import_express4.Router)();
+adminToolRoutes.get("/", authMiddleware, toolController.findAllAdmin);
 
 // api/src/routes/successCase.routes.ts
 var import_express5 = __toESM(require_express2(), 1);
@@ -50065,6 +50480,47 @@ var SUCCESS_CASE_SELECT = {
   updatedAt: true
 };
 var successCaseService = {
+  async findAllPublic(filter) {
+    const { page, limit } = filter;
+    const where = { status: "PUBLISHED", deletedAt: null };
+    const [successCases, total] = await Promise.all([
+      prisma6.successCase.findMany({
+        where,
+        select: PUBLIC_SUCCESS_CASE_SELECT,
+        orderBy: [{ createdAt: "desc" }],
+        skip: (page - 1) * limit,
+        take: limit
+      }),
+      prisma6.successCase.count({ where })
+    ]);
+    return {
+      data: successCases.map(selectPublicSuccessCase),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page * limit < total,
+        hasPrev: page > 1
+      }
+    };
+  },
+  async findPublicBySlug(slug) {
+    const successCase = await prisma6.successCase.findFirst({
+      where: { slug, status: "PUBLISHED", deletedAt: null },
+      select: PUBLIC_SUCCESS_CASE_SELECT
+    });
+    return successCase ? selectPublicSuccessCase(successCase) : null;
+  },
+  async findPublicRecent(limit = 3) {
+    const successCases = await prisma6.successCase.findMany({
+      where: { status: "PUBLISHED", deletedAt: null },
+      select: PUBLIC_SUCCESS_CASE_SELECT,
+      orderBy: [{ createdAt: "desc" }],
+      take: Math.min(limit, 12)
+    });
+    return successCases.slice(0, 12).map(selectPublicSuccessCase);
+  },
   async findAll(filter) {
     const { status, page = 1, limit = 10 } = filter || {};
     const skip = (page - 1) * limit;
@@ -50198,21 +50654,23 @@ var getExistingCase = async (id) => {
 };
 var successCaseController = {
   findAll: asyncHandler(async (req, res) => {
-    const filter = successCaseFilterSchema.parse(req.query);
-    const result = await successCaseService.findAll(filter);
+    const filter = publicSuccessCaseQuerySchema.parse(req.query);
+    const result = await successCaseService.findAllPublic(filter);
     res.json(result);
   }),
   findBySlug: asyncHandler(async (req, res) => {
+    publicSuccessCaseQuerySchema.parse(req.query);
     const slug = getStringParam4(req.params.slug);
-    const successCase = await successCaseService.findBySlug(slug);
+    const successCase = await successCaseService.findPublicBySlug(slug);
     if (!successCase) {
       throw new NotFoundError("Success case not found");
     }
     res.json(successCase);
   }),
   findRecent: asyncHandler(async (req, res) => {
-    const limit = parseInt(req.query.limit) || 3;
-    const successCases = await successCaseService.findRecent(limit);
+    const filter = publicSuccessCaseQuerySchema.parse(req.query);
+    const limit = req.query.limit === void 0 ? 3 : Math.min(filter.limit, 12);
+    const successCases = await successCaseService.findPublicRecent(limit);
     res.json(successCases);
   }),
   findById: asyncHandler(async (req, res) => {
@@ -50260,6 +50718,10 @@ var successCaseController = {
     await getExistingCase(id);
     const successCase = await successCaseService.updateStatus(id, status);
     res.json(successCase);
+  }),
+  findAllAdmin: asyncHandler(async (req, res) => {
+    const filter = successCaseFilterSchema.parse(req.query);
+    res.json(await successCaseService.findAll(filter));
   })
 };
 
@@ -50275,6 +50737,8 @@ router5.patch("/:id/restore", authMiddleware, successCaseController.restore);
 router5.patch("/:id/status", authMiddleware, successCaseController.updateStatus);
 router5.get("/:slug", successCaseController.findBySlug);
 var successCase_routes_default = router5;
+var adminSuccessCaseRoutes = (0, import_express5.Router)();
+adminSuccessCaseRoutes.get("/", authMiddleware, successCaseController.findAllAdmin);
 
 // api/src/routes/project.routes.ts
 var import_express6 = __toESM(require_express2(), 1);
@@ -50300,6 +50764,49 @@ var PROJECT_SELECT = {
   publishedAt: true
 };
 var projectService = {
+  async findAllPublic(filter) {
+    const { page, limit, tag, search } = filter;
+    const where = {
+      status: "PUBLISHED",
+      deletedAt: null,
+      ...tag && { tags: { hasSome: [tag] } }
+    };
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: "insensitive" } },
+        { shortDescription: { contains: search, mode: "insensitive" } },
+        { body: { contains: search, mode: "insensitive" } }
+      ];
+    }
+    const [projects, total] = await Promise.all([
+      prisma7.project.findMany({
+        where,
+        select: PUBLIC_PROJECT_SELECT,
+        orderBy: [{ createdAt: "desc" }],
+        skip: (page - 1) * limit,
+        take: limit
+      }),
+      prisma7.project.count({ where })
+    ]);
+    return {
+      data: projects.map(selectPublicProject),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page * limit < total,
+        hasPrev: page > 1
+      }
+    };
+  },
+  async findPublicBySlug(slug) {
+    const project = await prisma7.project.findFirst({
+      where: { slug, status: "PUBLISHED", deletedAt: null },
+      select: PUBLIC_PROJECT_SELECT
+    });
+    return project ? selectPublicProject(project) : null;
+  },
   async findAll(filter) {
     const { status, tag, search, page = 1, limit = 10 } = filter || {};
     const skip = (page - 1) * limit;
@@ -50435,7 +50942,7 @@ var projectService = {
       select: { tags: true }
     });
     const tags = [...new Set(projects.flatMap((project) => project.tags))].sort();
-    return tags;
+    return tags.slice(0, 100);
   }
 };
 
@@ -50453,13 +50960,14 @@ var getExistingProject = async (id) => {
 };
 var projectController = {
   findAll: asyncHandler(async (req, res) => {
-    const filter = projectFilterSchema.parse(req.query);
-    const result = await projectService.findAll(filter);
+    const filter = publicProjectQuerySchema.parse(req.query);
+    const result = await projectService.findAllPublic(filter);
     res.json(result);
   }),
   findBySlug: asyncHandler(async (req, res) => {
+    publicProjectQuerySchema.parse(req.query);
     const slug = getStringParam5(req.params.slug);
-    const project = await projectService.findBySlug(slug);
+    const project = await projectService.findPublicBySlug(slug);
     if (!project) {
       throw new NotFoundError("Project not found");
     }
@@ -50519,9 +51027,14 @@ var projectController = {
     const project = await projectService.reorder(id, order);
     res.json(project);
   }),
-  getTags: asyncHandler(async (_req, res) => {
+  getTags: asyncHandler(async (req, res) => {
+    publicProjectQuerySchema.parse(req.query);
     const tags = await projectService.getTags();
     res.json(tags);
+  }),
+  findAllAdmin: asyncHandler(async (req, res) => {
+    const filter = projectFilterSchema.parse(req.query);
+    res.json(await projectService.findAll(filter));
   })
 };
 
@@ -50538,6 +51051,8 @@ router6.patch("/:id/status", authMiddleware, projectController.updateStatus);
 router6.patch("/:id/reorder", authMiddleware, projectController.reorder);
 router6.get("/:slug", projectController.findBySlug);
 var project_routes_default = router6;
+var adminProjectRoutes = (0, import_express6.Router)();
+adminProjectRoutes.get("/", authMiddleware, projectController.findAllAdmin);
 
 // api/src/routes/portfolio.routes.ts
 var import_express7 = __toESM(require_express2(), 1);
@@ -50554,10 +51069,10 @@ var toProjectSummary = (item) => ({
   title: item.title,
   slug: item.slug,
   classification: item.tags[0] || "",
-  tags: item.tags,
-  shortDescription: item.shortDescription,
+  tags: item.tags.slice(0, 20),
+  shortDescription: item.shortDescription.slice(0, 700),
   image: item.images[0] || "",
-  images: item.images,
+  images: item.images.slice(0, 12),
   featured: item.featured,
   createdAt: item.createdAt
 });
@@ -50567,15 +51082,16 @@ var toLabSummary = (item) => ({
   title: item.title,
   slug: item.slug,
   classification: item.tags[0] || "",
-  shortDescription: item.shortDescription,
+  shortDescription: item.shortDescription.slice(0, 700),
   image: item.coverImage,
-  images: [item.coverImage, ...item.mediaGallery].filter(Boolean),
+  images: [item.coverImage, ...item.mediaGallery].filter(Boolean).slice(0, 12),
   createdAt: item.createdAt
 });
 var portfolioService = {
   async findAll(filter) {
     const { page = 1, limit = 10, classification, type } = filter || {};
-    const skip = (page - 1) * limit;
+    const boundedLimit = Math.min(limit, PUBLIC_MAX_AGGREGATE);
+    const skip = (page - 1) * boundedLimit;
     const queries = [];
     if (!type || type === "project") {
       queries.push(
@@ -50595,7 +51111,8 @@ var portfolioService = {
             order: true,
             createdAt: true
           },
-          orderBy: [{ createdAt: "desc" }]
+          orderBy: [{ createdAt: "desc" }],
+          take: PUBLIC_MAX_AGGREGATE
         }).then((items) => items.map(toProjectSummary))
       );
     }
@@ -50615,16 +51132,17 @@ var portfolioService = {
             images: true,
             createdAt: true
           },
-          orderBy: [{ createdAt: "desc" }]
+          orderBy: [{ createdAt: "desc" }],
+          take: PUBLIC_MAX_AGGREGATE
         }).then((items) => items.map((item) => ({
           id: item.id,
           type: "service",
           title: item.title,
           slug: item.slug,
           classification: item.classification,
-          shortDescription: item.shortDescription,
+          shortDescription: item.shortDescription.slice(0, 700),
           image: item.images[0] || "",
-          images: item.images,
+          images: item.images.slice(0, 12),
           createdAt: item.createdAt
         })))
       );
@@ -50646,16 +51164,17 @@ var portfolioService = {
             featured: true,
             createdAt: true
           },
-          orderBy: [{ createdAt: "desc" }]
+          orderBy: [{ createdAt: "desc" }],
+          take: PUBLIC_MAX_AGGREGATE
         }).then((items) => items.map((item) => ({
           id: item.id,
           type: "product",
           title: item.title,
           slug: item.slug,
           classification: item.classification,
-          shortDescription: item.shortDescription,
+          shortDescription: item.shortDescription.slice(0, 700),
           image: item.images[0] || "",
-          images: item.images,
+          images: item.images.slice(0, 12),
           featured: item.featured,
           createdAt: item.createdAt
         })))
@@ -50678,16 +51197,17 @@ var portfolioService = {
             featured: true,
             createdAt: true
           },
-          orderBy: [{ createdAt: "desc" }]
+          orderBy: [{ createdAt: "desc" }],
+          take: PUBLIC_MAX_AGGREGATE
         }).then((items) => items.map((item) => ({
           id: item.id,
           type: "tool",
           title: item.title,
           slug: item.slug,
           classification: item.classification,
-          shortDescription: item.shortDescription,
+          shortDescription: item.shortDescription.slice(0, 700),
           image: item.images[0] || "",
-          images: item.images,
+          images: item.images.slice(0, 12),
           featured: item.featured,
           createdAt: item.createdAt
         })))
@@ -50707,16 +51227,17 @@ var portfolioService = {
             images: true,
             createdAt: true
           },
-          orderBy: [{ createdAt: "desc" }]
+          orderBy: [{ createdAt: "desc" }],
+          take: PUBLIC_MAX_AGGREGATE
         }).then((items) => items.map((item) => ({
           id: item.id,
           type: "successCase",
           title: item.title,
           slug: item.slug,
           classification: "success-case",
-          shortDescription: item.description,
+          shortDescription: item.description.slice(0, 1e3),
           image: item.images[0] || "",
-          images: item.images,
+          images: item.images.slice(0, 12),
           createdAt: item.createdAt
         })))
       );
@@ -50742,7 +51263,8 @@ var portfolioService = {
             mediaGallery: true,
             createdAt: true
           },
-          orderBy: [{ createdAt: "desc" }]
+          orderBy: [{ createdAt: "desc" }],
+          take: PUBLIC_MAX_AGGREGATE
         }).then((items) => items.map(toLabSummary))
       );
     }
@@ -50750,18 +51272,19 @@ var portfolioService = {
     const allProjects = results.flat().sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
     const total = allProjects.length;
     return {
-      data: allProjects.slice(skip, skip + limit),
+      data: allProjects.slice(skip, skip + boundedLimit),
       pagination: {
         page,
-        limit,
+        limit: boundedLimit,
         total,
-        totalPages: Math.ceil(total / limit),
-        hasNext: page * limit < total,
+        totalPages: Math.ceil(total / boundedLimit),
+        hasNext: page * boundedLimit < total,
         hasPrev: page > 1
       }
     };
   },
   async findRecent(limit = 3) {
+    const boundedLimit = Math.min(limit, PUBLIC_MAX_AGGREGATE);
     const projectSelect = {
       id: true,
       title: true,
@@ -50805,51 +51328,51 @@ var portfolioService = {
       createdAt: true
     };
     const [projects, services, products, tools, successCases, labPosts] = await Promise.all([
-      prisma8.project.findMany({ where: PUBLISHED, select: projectSelect, orderBy: [{ createdAt: "desc" }], take: limit }).then((items) => items.map(toProjectSummary)),
-      prisma8.service.findMany({ where: PUBLISHED, select: legacySelect, orderBy: [{ createdAt: "desc" }], take: limit }).then((items) => items.map((item) => ({
+      prisma8.project.findMany({ where: PUBLISHED, select: projectSelect, orderBy: [{ createdAt: "desc" }], take: boundedLimit }).then((items) => items.map(toProjectSummary)),
+      prisma8.service.findMany({ where: PUBLISHED, select: legacySelect, orderBy: [{ createdAt: "desc" }], take: boundedLimit }).then((items) => items.map((item) => ({
         id: item.id,
         type: "service",
         title: item.title,
         slug: item.slug,
         classification: item.classification,
-        shortDescription: item.shortDescription,
+        shortDescription: item.shortDescription.slice(0, 700),
         image: item.images[0] || "",
-        images: item.images,
+        images: item.images.slice(0, 12),
         createdAt: item.createdAt
       }))),
-      prisma8.product.findMany({ where: PUBLISHED, select: featuredSelect, orderBy: [{ createdAt: "desc" }], take: limit }).then((items) => items.map((item) => ({
+      prisma8.product.findMany({ where: PUBLISHED, select: featuredSelect, orderBy: [{ createdAt: "desc" }], take: boundedLimit }).then((items) => items.map((item) => ({
         id: item.id,
         type: "product",
         title: item.title,
         slug: item.slug,
         classification: item.classification,
-        shortDescription: item.shortDescription,
+        shortDescription: item.shortDescription.slice(0, 700),
         image: item.images[0] || "",
-        images: item.images,
+        images: item.images.slice(0, 12),
         featured: item.featured,
         createdAt: item.createdAt
       }))),
-      prisma8.tool.findMany({ where: PUBLISHED, select: featuredSelect, orderBy: [{ createdAt: "desc" }], take: limit }).then((items) => items.map((item) => ({
+      prisma8.tool.findMany({ where: PUBLISHED, select: featuredSelect, orderBy: [{ createdAt: "desc" }], take: boundedLimit }).then((items) => items.map((item) => ({
         id: item.id,
         type: "tool",
         title: item.title,
         slug: item.slug,
         classification: item.classification,
-        shortDescription: item.shortDescription,
+        shortDescription: item.shortDescription.slice(0, 700),
         image: item.images[0] || "",
-        images: item.images,
+        images: item.images.slice(0, 12),
         featured: item.featured,
         createdAt: item.createdAt
       }))),
-      prisma8.successCase.findMany({ where: PUBLISHED, select: successCaseSelect, orderBy: [{ createdAt: "desc" }], take: limit }).then((items) => items.map((item) => ({
+      prisma8.successCase.findMany({ where: PUBLISHED, select: successCaseSelect, orderBy: [{ createdAt: "desc" }], take: boundedLimit }).then((items) => items.map((item) => ({
         id: item.id,
         type: "successCase",
         title: item.title,
         slug: item.slug,
         classification: "success-case",
-        shortDescription: item.description,
+        shortDescription: item.description.slice(0, 1e3),
         image: item.images[0] || "",
-        images: item.images,
+        images: item.images.slice(0, 12),
         createdAt: item.createdAt
       }))),
       prisma8.blogPost.findMany({
@@ -50862,10 +51385,10 @@ var portfolioService = {
         },
         select: labSelect,
         orderBy: [{ createdAt: "desc" }],
-        take: limit
+        take: boundedLimit
       }).then((items) => items.map(toLabSummary))
     ]);
-    return [...projects, ...services, ...products, ...tools, ...successCases, ...labPosts].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()).slice(0, limit);
+    return [...projects, ...services, ...products, ...tools, ...successCases, ...labPosts].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()).slice(0, boundedLimit);
   },
   /** Legacy classifications + project tags, deduped and sorted. */
   async getClassifications() {
@@ -50895,26 +51418,20 @@ var portfolioService = {
       ...productClassifications,
       ...toolClassifications,
       ...projectTags
-    ])].sort();
+    ])].sort().slice(0, 100);
   }
 };
 
 // api/src/controllers/portfolio.controller.ts
-var VALID_TYPES = ["service", "product", "tool", "successCase", "project", "laboratorio"];
 var portfolioController = {
   findAll: asyncHandler(async (req, res) => {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const classification = req.query.classification;
-    const type = req.query.type;
-    if (type && !VALID_TYPES.includes(type)) {
-      throw new ValidationError(`Invalid type. Must be: ${VALID_TYPES.join(", ")}`);
-    }
-    const result = await portfolioService.findAll({ page, limit, classification, type });
+    const filter = publicPortfolioQuerySchema.parse(req.query);
+    const result = await portfolioService.findAll(filter);
     res.json(result);
   }),
   findRecent: asyncHandler(async (req, res) => {
-    const limit = parseInt(req.query.limit) || 3;
+    const filter = publicPortfolioQuerySchema.parse(req.query);
+    const limit = req.query.limit === void 0 ? 3 : Math.min(filter.limit, 12);
     const projects = await portfolioService.findRecent(limit);
     res.json({
       data: projects,
@@ -50928,7 +51445,8 @@ var portfolioController = {
       }
     });
   }),
-  getClassifications: asyncHandler(async (_req, res) => {
+  getClassifications: asyncHandler(async (req, res) => {
+    publicPortfolioQuerySchema.parse(req.query);
     const classifications = await portfolioService.getClassifications();
     res.json(classifications);
   })
@@ -51628,6 +52146,50 @@ var BLOG_POST_SELECT = {
   publishedAt: true
 };
 var blogPostService = {
+  async findAllPublic(filter) {
+    const { page, limit, category, tag, search } = filter;
+    const where = {
+      status: "PUBLISHED",
+      deletedAt: null,
+      ...category && { category },
+      ...tag && { tags: { hasSome: [tag] } }
+    };
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: "insensitive" } },
+        { shortDescription: { contains: search, mode: "insensitive" } },
+        { body: { contains: search, mode: "insensitive" } }
+      ];
+    }
+    const [posts, total] = await Promise.all([
+      prisma10.blogPost.findMany({
+        where,
+        select: PUBLIC_BLOG_POST_SELECT,
+        orderBy: [{ createdAt: "desc" }],
+        skip: (page - 1) * limit,
+        take: limit
+      }),
+      prisma10.blogPost.count({ where })
+    ]);
+    return {
+      data: posts.map(selectPublicBlogPost),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page * limit < total,
+        hasPrev: page > 1
+      }
+    };
+  },
+  async findPublicBySlug(slug) {
+    const post = await prisma10.blogPost.findFirst({
+      where: { slug, status: "PUBLISHED", deletedAt: null },
+      select: PUBLIC_BLOG_POST_SELECT
+    });
+    return post ? selectPublicBlogPost(post) : null;
+  },
   async findAll(filter) {
     const { status, category, tag, page = 1, limit = 10 } = filter || {};
     const skip = (page - 1) * limit;
@@ -51766,7 +52328,17 @@ var blogPostService = {
       distinct: ["category"],
       orderBy: { category: "asc" }
     });
-    return result.map((item) => item.category);
+    return result.map((item) => item.category).slice(0, 100);
+  },
+  async getPublicCategories() {
+    const result = await prisma10.blogPost.findMany({
+      where: { status: "PUBLISHED", deletedAt: null },
+      select: { category: true },
+      distinct: ["category"],
+      orderBy: { category: "asc" },
+      take: 100
+    });
+    return result.map((item) => item.category).slice(0, 100);
   },
   /** Distinct tags among PUBLISHED, non-deleted posts, sorted. */
   async getTags() {
@@ -51774,7 +52346,7 @@ var blogPostService = {
       where: { status: "PUBLISHED", deletedAt: null },
       select: { tags: true }
     });
-    return [...new Set(posts.flatMap((post) => post.tags))].sort();
+    return [...new Set(posts.flatMap((post) => post.tags))].sort().slice(0, 100);
   }
 };
 
@@ -51792,13 +52364,14 @@ var getExistingPost = async (id) => {
 };
 var blogPostController = {
   findAll: asyncHandler(async (req, res) => {
-    const filter = blogPostFilterSchema.parse(req.query);
-    const result = await blogPostService.findAll(filter);
+    const filter = publicBlogPostQuerySchema.parse(req.query);
+    const result = await blogPostService.findAllPublic(filter);
     res.json(result);
   }),
   findBySlug: asyncHandler(async (req, res) => {
+    publicBlogPostQuerySchema.parse(req.query);
     const slug = getStringParam6(req.params.slug);
-    const post = await blogPostService.findBySlug(slug);
+    const post = await blogPostService.findPublicBySlug(slug);
     if (!post) {
       throw new NotFoundError("Blog post not found");
     }
@@ -51854,13 +52427,19 @@ var blogPostController = {
     const post = await blogPostService.updateStatus(id, parsedStatus.data);
     res.json(post);
   }),
-  getCategories: asyncHandler(async (_req, res) => {
-    const categories = await blogPostService.getCategories();
+  getCategories: asyncHandler(async (req, res) => {
+    publicBlogPostQuerySchema.parse(req.query);
+    const categories = await blogPostService.getPublicCategories();
     res.json(categories);
   }),
-  getTags: asyncHandler(async (_req, res) => {
+  getTags: asyncHandler(async (req, res) => {
+    publicBlogPostQuerySchema.parse(req.query);
     const tags = await blogPostService.getTags();
     res.json(tags);
+  }),
+  findAllAdmin: asyncHandler(async (req, res) => {
+    const filter = blogPostFilterSchema.parse(req.query);
+    res.json(await blogPostService.findAll(filter));
   })
 };
 
@@ -51877,6 +52456,8 @@ router10.patch("/:id/restore", authMiddleware, blogPostController.restore);
 router10.patch("/:id/status", authMiddleware, blogPostController.updateStatus);
 router10.get("/:slug", blogPostController.findBySlug);
 var blog_post_routes_default = router10;
+var adminBlogPostRoutes = (0, import_express10.Router)();
+adminBlogPostRoutes.get("/", authMiddleware, blogPostController.findAllAdmin);
 
 // api/src/routes/siteSection.routes.ts
 var import_express11 = __toESM(require_express2(), 1);
@@ -52234,16 +52815,19 @@ var simulator_routes_default = router12;
 
 // api/src/middleware/errorHandler.middleware.ts
 var import_multer3 = __toESM(require_multer(), 1);
-function errorHandler(err, _req, res, _next) {
+var createErrorEnvelope = (code, message, fields = {}) => ({ code, message, fields });
+function errorHandler(err, req, res, _next) {
   if (err instanceof AppError) {
+    const fields = err instanceof ValidationError ? err.details ?? {} : {};
     const body = {
-      message: err.message
+      message: err.message,
+      error: createErrorEnvelope(err.code ?? "INTERNAL_ERROR", err.message, fields)
     };
     if (err.code) {
       body.code = err.code;
     }
-    if (err instanceof ValidationError && err.details) {
-      body.details = err.details;
+    if (err instanceof ValidationError) {
+      body.details = fields;
     }
     res.status(err.statusCode).json(body);
     return;
@@ -52253,21 +52837,32 @@ function errorHandler(err, _req, res, _next) {
     res.status(400).json({
       message: "Validation failed",
       code: "VALIDATION_ERROR",
-      details: flattened.fieldErrors
+      details: flattened.fieldErrors,
+      error: {
+        code: "VALIDATION_ERROR",
+        message: "Validation failed",
+        fields: flattened.fieldErrors
+      }
     });
     return;
   }
   if (err instanceof import_multer3.default.MulterError) {
     res.status(400).json({
       message: `Upload error: ${err.message}`,
-      code: "UPLOAD_ERROR"
+      code: "UPLOAD_ERROR",
+      error: createErrorEnvelope("UPLOAD_ERROR", `Upload error: ${err.message}`)
     });
     return;
   }
-  console.error("Unhandled error:", err);
+  console.error("Unhandled request failure", {
+    method: req.method,
+    path: req.path,
+    status: 500
+  });
   res.status(500).json({
     message: "Internal server error",
-    code: "INTERNAL_ERROR"
+    code: "INTERNAL_ERROR",
+    error: createErrorEnvelope("INTERNAL_ERROR", "Internal server error")
   });
 }
 
@@ -52297,11 +52892,26 @@ app.use(helmet({
   }
 }));
 app.use("/api", apiLimiter);
+var configuredCorsOrigins = process.env.CORS_ORIGIN?.split(",").map((origin) => origin.trim()).filter(Boolean);
+var corsOrigins = configuredCorsOrigins?.length ? configuredCorsOrigins : ["http://localhost:5173", "http://localhost:4173"];
+if (corsOrigins.includes("*")) {
+  throw new Error("CORS_ORIGIN must contain explicit origins when credentials are enabled");
+}
 var corsOptions = {
-  origin: process.env.CORS_ORIGIN?.split(",") || ["http://localhost:5173", "http://localhost:4173"],
+  origin: (origin, callback) => {
+    if (!origin || corsOrigins.includes(origin)) {
+      callback(null, true);
+      return;
+    }
+    callback(new ForbiddenError("Origin is not allowed"));
+  },
   credentials: true
 };
 app.use((0, import_cors.default)(corsOptions));
+app.use((_req, res, next) => {
+  res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  next();
+});
 app.use(import_express13.default.json({ limit: "10mb" }));
 app.use(import_express13.default.urlencoded({ extended: true }));
 app.get("/api/health", (_req, res) => {
@@ -52317,11 +52927,25 @@ app.use("/api/portfolio/projects", portfolio_routes_default);
 app.use("/api/upload", upload_routes_default);
 app.use("/api/contact", contact_routes_default);
 app.use("/api/blog-posts", blog_post_routes_default);
+app.use("/api/admin/services", adminServiceRoutes);
+app.use("/api/admin/products", adminProductRoutes);
+app.use("/api/admin/tools", adminToolRoutes);
+app.use("/api/admin/success-cases", adminSuccessCaseRoutes);
+app.use("/api/admin/projects", adminProjectRoutes);
+app.use("/api/admin/blog-posts", adminBlogPostRoutes);
 app.use("/api/site-sections", siteSection_routes_default);
 app.use("/api/simulators", simulator_routes_default);
 app.use(errorHandler);
 app.use((_req, res) => {
-  res.status(404).json({ message: "Not Found", code: "NOT_FOUND" });
+  res.status(404).json({
+    message: "Not Found",
+    code: "NOT_FOUND",
+    error: {
+      code: "NOT_FOUND",
+      message: "Not Found",
+      fields: {}
+    }
+  });
 });
 var app_default = app;
 
