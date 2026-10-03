@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
-import { RichTextEditor, serviceSchema } from '@jsoft/shared';
+import { RichTextEditor, serviceSchema, SERVICE_CLASSIFICATIONS } from '@jsoft/shared';
 import type { ServiceInput } from '@jsoft/shared';
 import { getTextFromHTML } from '../../utils/getTextFromHTML';
 import { ImageUploader } from '../uploads/ImageUploader';
@@ -197,13 +197,10 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
         </div>
         <div className={formStyles.formGroup}>
           <label className={formStyles.formLabel} htmlFor="classification">{t('form.classification')}</label>
-          <input
-            id="classification"
-            className={`${formStyles.formInput} ${errors.classification ? formStyles.inputError : ''}`}
-            value={classification}
-            onChange={(e) => setClassification(e.target.value)}
-            required
-          />
+          <input list="service-classifications" id="classification" className={`${formStyles.formInput} ${errors.classification ? formStyles.inputError : ''}`} value={classification} onChange={(e) => setClassification(e.target.value)} required />
+          <datalist id="service-classifications">
+            {SERVICE_CLASSIFICATIONS.map((option) => <option key={option} value={option} />)}
+          </datalist>
           {errors.classification && <span className={formStyles.formError}>{errors.classification}</span>}
         </div>
       </fieldset>
@@ -246,6 +243,7 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
             multiple
             label={t('form.images')}
             error={errors.images}
+            bucket="servicios"
           />
         </div>
         <div className={formStyles.formGroup}>
@@ -255,6 +253,7 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
             onChange={handleTechnicalImagesChange}
             multiple
             label={t('form.technicalImages')}
+            bucket="servicios"
           />
         </div>
       </fieldset>
