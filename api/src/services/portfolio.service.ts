@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 // against the old aggregation that leaked DRAFT/PRIVATE rows).
 export interface PortfolioProjectSummary {
   id: string;
-  type: 'service' | 'product' | 'tool' | 'successCase' | 'project' | 'laboratorio';
+  type: 'product' | 'tool' | 'successCase' | 'project' | 'laboratorio';
   title: string;
   slug: string;
   classification: string;
@@ -108,38 +108,6 @@ export const portfolioService = {
           orderBy: [{ createdAt: 'desc' }],
           take: PUBLIC_MAX_AGGREGATE,
         }).then((items) => items.map(toProjectSummary)),
-      );
-    }
-
-    if (!type || type === 'service') {
-      queries.push(
-        prisma.service.findMany({
-          where: {
-            ...PUBLISHED,
-            ...(classification && { classification }),
-          },
-          select: {
-            id: true,
-            title: true,
-            slug: true,
-            classification: true,
-            shortDescription: true,
-            images: true,
-            createdAt: true,
-          },
-          orderBy: [{ createdAt: 'desc' }],
-          take: PUBLIC_MAX_AGGREGATE,
-        }).then((items) => items.map((item) => ({
-          id: item.id,
-          type: 'service' as const,
-          title: item.title,
-          slug: item.slug,
-          classification: item.classification,
-           shortDescription: item.shortDescription.slice(0, 700),
-           image: item.images[0] || '',
-           images: item.images.slice(0, 12),
-          createdAt: item.createdAt,
-        }))),
       );
     }
 
@@ -312,15 +280,9 @@ export const portfolioService = {
       shortDescription: true, coverImage: true, mediaGallery: true, createdAt: true,
     } as const;
 
-    const [projects, services, products, tools, successCases, labPosts] = await Promise.all([
+    const [projects, products, tools, successCases, labPosts] = await Promise.all([
       prisma.project.findMany({ where: PUBLISHED, select: projectSelect, orderBy: [{ createdAt: 'desc' }], take: boundedLimit })
         .then((items) => items.map(toProjectSummary)),
-      prisma.service.findMany({ where: PUBLISHED, select: legacySelect, orderBy: [{ createdAt: 'desc' }], take: boundedLimit })
-        .then((items) => items.map((item) => ({
-          id: item.id, type: 'service' as const, title: item.title, slug: item.slug,
-          classification: item.classification, shortDescription: item.shortDescription.slice(0, 700),
-          image: item.images[0] || '', images: item.images.slice(0, 12), createdAt: item.createdAt,
-        }))),
       prisma.product.findMany({ where: PUBLISHED, select: featuredSelect, orderBy: [{ createdAt: 'desc' }], take: boundedLimit })
         .then((items) => items.map((item) => ({
           id: item.id, type: 'product' as const, title: item.title, slug: item.slug,
@@ -354,19 +316,14 @@ export const portfolioService = {
         .then((items) => items.map(toLabSummary)),
     ]);
 
-    return [...projects, ...services, ...products, ...tools, ...successCases, ...labPosts]
+    return [...projects, ...products, ...tools, ...successCases, ...labPosts]
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
       .slice(0, boundedLimit);
   },
 
   /** Legacy classifications + project tags, deduped and sorted. */
   async getClassifications(): Promise<string[]> {
-    const [serviceClassifications, productClassifications, toolClassifications, projectTags] = await Promise.all([
-      prisma.service.findMany({
-        where: PUBLISHED,
-        select: { classification: true },
-        distinct: ['classification'],
-      }).then((items) => items.map((i) => i.classification)),
+    const [productClassifications, toolClassifications, projectTags] = await Promise.all([
       prisma.product.findMany({
         where: PUBLISHED,
         select: { classification: true },
@@ -384,7 +341,6 @@ export const portfolioService = {
     ]);
 
     return [...new Set([
-      ...serviceClassifications,
       ...productClassifications,
       ...toolClassifications,
       ...projectTags,

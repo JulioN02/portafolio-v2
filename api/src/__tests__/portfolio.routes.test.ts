@@ -34,7 +34,6 @@ describe('Portfolio routes (integration)', () => {
     (mockPrisma.project.findMany as jest.Mock).mockResolvedValue([
       { id: 'p1', title: 'Proyecto', slug: 'proyecto', tags: ['x'], shortDescription: 'D', images: [], featured: false, order: 0, createdAt: new Date('2024-01-02') },
     ]);
-    (mockPrisma.service.findMany as jest.Mock).mockResolvedValue([]);
     (mockPrisma.product.findMany as jest.Mock).mockResolvedValue([]);
     (mockPrisma.tool.findMany as jest.Mock).mockResolvedValue([]);
     (mockPrisma.successCase.findMany as jest.Mock).mockResolvedValue([]);
@@ -69,10 +68,9 @@ describe('Portfolio routes (integration)', () => {
     (mockPrisma.project.findMany as jest.Mock).mockResolvedValue([
       { id: 'p1', title: 'Proyecto', slug: 'proyecto', tags: [], shortDescription: 'D', images: [], featured: false, order: 0, createdAt: new Date('2024-01-03') },
     ]);
-    (mockPrisma.service.findMany as jest.Mock).mockResolvedValue([
-      { id: 's1', title: 'Servicio', slug: 'servicio', classification: 'web', shortDescription: 'D', images: [], featured: true, createdAt: new Date('2024-01-01') },
+    (mockPrisma.product.findMany as jest.Mock).mockResolvedValue([
+      { id: 'prod1', title: 'Producto', slug: 'producto', classification: 'app', shortDescription: 'D', images: [], featured: false, createdAt: new Date('2024-01-01') },
     ]);
-    (mockPrisma.product.findMany as jest.Mock).mockResolvedValue([]);
     (mockPrisma.tool.findMany as jest.Mock).mockResolvedValue([]);
     (mockPrisma.successCase.findMany as jest.Mock).mockResolvedValue([]);
     (mockPrisma.blogPost.findMany as jest.Mock).mockResolvedValue([]);
@@ -86,8 +84,7 @@ describe('Portfolio routes (integration)', () => {
   });
 
   it('GET /classifications returns deduped classifications + project tags', async () => {
-    (mockPrisma.service.findMany as jest.Mock).mockResolvedValue([{ classification: 'web' }]);
-    (mockPrisma.product.findMany as jest.Mock).mockResolvedValue([]);
+    (mockPrisma.product.findMany as jest.Mock).mockResolvedValue([{ classification: 'web' }]);
     (mockPrisma.tool.findMany as jest.Mock).mockResolvedValue([]);
     (mockPrisma.project.findMany as jest.Mock).mockResolvedValue([{ tags: ['proyecto-rapido'] }]);
     (mockPrisma.blogPost.findMany as jest.Mock).mockResolvedValue([]);

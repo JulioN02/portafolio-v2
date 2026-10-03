@@ -69,7 +69,7 @@ export interface PublicBlogPost {
 
 export interface PublicPortfolioItem {
   id: string;
-  type: 'service' | 'product' | 'tool' | 'successCase' | 'project' | 'laboratorio';
+  type: 'product' | 'tool' | 'successCase' | 'project' | 'laboratorio';
   title: string;
   slug: string;
   classification: string;

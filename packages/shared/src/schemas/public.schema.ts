@@ -92,7 +92,7 @@ export const publicPortfolioQuerySchema = publicPaginationSchema.extend({
   classification: publicOptionalString(100),
   type: z.preprocess(
     repeatedQueryValue,
-    z.enum(['service', 'product', 'tool', 'successCase', 'project', 'laboratorio']).optional(),
+    z.enum(['product', 'tool', 'successCase', 'project', 'laboratorio']).optional(),
   ),
 }).strict();
 

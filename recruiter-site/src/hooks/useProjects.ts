@@ -47,12 +47,10 @@ export function useRecentProjects() {
  * (handled in ProjectList — no endpoint needed here).
  */
 const detailEndpointMap: Record<string, string> = {
-  service: '/services',
   product: '/products',
   tool: '/tools',
   successCase: '/success-cases',
   project: '/projects',
-  SERVICE: '/services',
   PRODUCT: '/products',
   TOOL: '/tools',
   SUCCESS_CASE: '/success-cases',

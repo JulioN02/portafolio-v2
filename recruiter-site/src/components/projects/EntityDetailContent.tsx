@@ -9,7 +9,7 @@ import { useTranslation } from '../../i18n/LanguageContext';
 import styles from './EntityDetailContent.module.css';
 
 interface EntityDetailContentProps {
-  /** Normalized type: service | product | tool | successCase | project. */
+  /** Normalized type: product | tool | successCase | project. */
   type: string;
   /** Resolved detail payload from useProjectDetail. */
   detail: Record<string, unknown>;
@@ -134,7 +134,7 @@ export function EntityDetailContent({
         </a>
       )}
 
-      {/* ── Service / Product / Tool branch: external website link ── */}
+      {/* ── Product / Tool branch: external website link ── */}
       {!isProject && !isSuccessCase && externalLink && (
         <a
           href={externalLink}

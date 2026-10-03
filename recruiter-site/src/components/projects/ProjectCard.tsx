@@ -9,13 +9,11 @@ interface ProjectCardProps {
 
 /** Maps API type values to Spanish labels */
 const typeLabels: Record<string, string> = {
-  service: 'Servicio',
   product: 'Producto',
   tool: 'Herramienta',
   successCase: 'Caso de Éxito',
   project: 'Proyecto',
   laboratorio: 'Laboratorio',
-  SERVICE: 'Servicio',
   PRODUCT: 'Producto',
   TOOL: 'Herramienta',
   SUCCESS_CASE: 'Caso de Éxito',

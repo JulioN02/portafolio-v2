@@ -4,7 +4,6 @@
 
 /** Source types returned by the portfolio aggregation endpoint. */
 export type ProjectType =
-  | 'service'
   | 'product'
   | 'tool'
   | 'successCase'
