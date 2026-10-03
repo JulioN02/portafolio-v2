@@ -80,7 +80,6 @@ const REQUIRED_KEYS = [
   'projectDetailModal.technicalImages',
   'projectDetailModal.viewRepository',
   'projectDetailModal.viewExternalLink',
-  'projectDetailModal.type.service',
   'projectDetailModal.type.product',
   'projectDetailModal.type.tool',
   'projectDetailModal.type.successCase',

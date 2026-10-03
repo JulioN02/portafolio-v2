@@ -229,7 +229,6 @@ describe('ProjectDetailModal (close)', () => {
 
 describe('ProjectDetailModal (Ver Completo navigation)', () => {
   it.each([
-    ['service', 'Servicio'],
     ['product', 'Producto'],
     ['tool', 'Tool'],
     ['successCase', 'Caso de éxito'],

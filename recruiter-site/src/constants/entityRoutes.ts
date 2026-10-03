@@ -6,13 +6,11 @@
 
 /** Normalizes API type values (lowercase or legacy UPPERCASE) to canonical keys. */
 export const NORMALIZED_TYPE_MAP: Record<string, string> = {
-  service: 'service',
   product: 'product',
   tool: 'tool',
   successCase: 'successCase',
   project: 'project',
   laboratorio: 'laboratorio',
-  SERVICE: 'service',
   PRODUCT: 'product',
   TOOL: 'tool',
   SUCCESS_CASE: 'successCase',

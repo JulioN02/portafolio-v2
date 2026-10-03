@@ -177,14 +177,14 @@ describe('EntityDetailPage (per-type content)', () => {
   it('renders exactly one accessible share action for a recruiter entity detail', () => {
     mockDetail.mockReturnValue(
       resolvedDetail({
-        title: 'Servicio para compartir',
+        title: 'Producto para compartir',
         images: ['https://example.com/cover.png'],
       }),
     );
 
-    renderPage('/proyectos/service/servicio-para-compartir');
+    renderPage('/proyectos/product/producto-para-compartir');
 
-    expect(screen.getAllByRole('button', { name: 'Compartir Servicio para compartir' })).toHaveLength(1);
+    expect(screen.getAllByRole('button', { name: 'Compartir Producto para compartir' })).toHaveLength(1);
   });
 
   it('keeps one share action when the detail uses a project entity type', () => {
@@ -233,7 +233,7 @@ describe('EntityDetailPage (per-type content)', () => {
     expect(screen.queryByText('clasificacion')).toBeNull();
   });
 
-  it('renders fullDescription, technicalExplanation and technicalImages sections for service/product/tool', async () => {
+  it('renders fullDescription, technicalExplanation and technicalImages sections for product/tool', async () => {
     mockDetail.mockReturnValue(
       resolvedDetail({
         classification: 'Desarrollo',
@@ -302,7 +302,6 @@ describe('EntityDetailPage (per-type content)', () => {
 
 describe('EntityDetailPage external link per type (spec entity-external-links)', () => {
   it.each([
-    ['service', 'service-external'],
     ['product', 'product-external'],
     ['tool', 'tool-external'],
   ])('renders the view-website link for %s when externalLink is present', async (tipo, href) => {
@@ -322,7 +321,7 @@ describe('EntityDetailPage external link per type (spec entity-external-links)',
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
-  it('omits the view-website link for service/product/tool when externalLink is absent', async () => {
+  it('omits the view-website link for product/tool when externalLink is absent', async () => {
     mockDetail.mockReturnValue(
       resolvedDetail({ fullDescription: '<p>Descripción completa</p>' }),
     );

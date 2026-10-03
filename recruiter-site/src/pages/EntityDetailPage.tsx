@@ -15,7 +15,7 @@ import { normalizeEntityType } from '../constants/entityRoutes';
 import styles from './EntityDetailPage.module.css';
 
 /** Types that have a real detail page under /proyectos/:tipo/:slug. */
-const DETAIL_TYPES = ['service', 'product', 'tool', 'successCase', 'project'] as const;
+const DETAIL_TYPES = ['product', 'tool', 'successCase', 'project'] as const;
 
 const FALLBACK_IMG = 'https://placehold.co/600x400/e5e7eb/9ca3af?text=Sin+imagen';
 
@@ -110,7 +110,7 @@ export function EntityDetailPage() {
   const title = (detailRecord.title as string) ?? '';
   const typeLabelKey = `projectDetailModal.type.${normalizedType}`;
   const typeLabel = t(typeLabelKey);
-  // Classification is aggregation-only — service/product/tool carry it,
+  // Classification is aggregation-only — product/tool carry it,
   // project/successCase do NOT (D9) → conditional chip, no empty label.
   const classification = detailRecord.classification as string | undefined;
   const shortDescription =
