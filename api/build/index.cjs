@@ -48952,7 +48952,7 @@ var publicPortfolioQuerySchema = publicPaginationSchema.extend({
   classification: publicOptionalString(100),
   type: external_exports.preprocess(
     repeatedQueryValue,
-    external_exports.enum(["service", "product", "tool", "successCase", "project", "laboratorio"]).optional()
+    external_exports.enum(["product", "tool", "successCase", "project", "laboratorio"]).optional()
   )
 }).strict();
 var httpsUrlSchema = external_exports.string().url().refine(
@@ -51116,37 +51116,6 @@ var portfolioService = {
         }).then((items) => items.map(toProjectSummary))
       );
     }
-    if (!type || type === "service") {
-      queries.push(
-        prisma8.service.findMany({
-          where: {
-            ...PUBLISHED,
-            ...classification && { classification }
-          },
-          select: {
-            id: true,
-            title: true,
-            slug: true,
-            classification: true,
-            shortDescription: true,
-            images: true,
-            createdAt: true
-          },
-          orderBy: [{ createdAt: "desc" }],
-          take: PUBLIC_MAX_AGGREGATE
-        }).then((items) => items.map((item) => ({
-          id: item.id,
-          type: "service",
-          title: item.title,
-          slug: item.slug,
-          classification: item.classification,
-          shortDescription: item.shortDescription.slice(0, 700),
-          image: item.images[0] || "",
-          images: item.images.slice(0, 12),
-          createdAt: item.createdAt
-        })))
-      );
-    }
     if (!type || type === "product") {
       queries.push(
         prisma8.product.findMany({
@@ -51327,19 +51296,8 @@ var portfolioService = {
       mediaGallery: true,
       createdAt: true
     };
-    const [projects, services, products, tools, successCases, labPosts] = await Promise.all([
+    const [projects, products, tools, successCases, labPosts] = await Promise.all([
       prisma8.project.findMany({ where: PUBLISHED, select: projectSelect, orderBy: [{ createdAt: "desc" }], take: boundedLimit }).then((items) => items.map(toProjectSummary)),
-      prisma8.service.findMany({ where: PUBLISHED, select: legacySelect, orderBy: [{ createdAt: "desc" }], take: boundedLimit }).then((items) => items.map((item) => ({
-        id: item.id,
-        type: "service",
-        title: item.title,
-        slug: item.slug,
-        classification: item.classification,
-        shortDescription: item.shortDescription.slice(0, 700),
-        image: item.images[0] || "",
-        images: item.images.slice(0, 12),
-        createdAt: item.createdAt
-      }))),
       prisma8.product.findMany({ where: PUBLISHED, select: featuredSelect, orderBy: [{ createdAt: "desc" }], take: boundedLimit }).then((items) => items.map((item) => ({
         id: item.id,
         type: "product",
@@ -51388,16 +51346,11 @@ var portfolioService = {
         take: boundedLimit
       }).then((items) => items.map(toLabSummary))
     ]);
-    return [...projects, ...services, ...products, ...tools, ...successCases, ...labPosts].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()).slice(0, boundedLimit);
+    return [...projects, ...products, ...tools, ...successCases, ...labPosts].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()).slice(0, boundedLimit);
   },
   /** Legacy classifications + project tags, deduped and sorted. */
   async getClassifications() {
-    const [serviceClassifications, productClassifications, toolClassifications, projectTags] = await Promise.all([
-      prisma8.service.findMany({
-        where: PUBLISHED,
-        select: { classification: true },
-        distinct: ["classification"]
-      }).then((items) => items.map((i) => i.classification)),
+    const [productClassifications, toolClassifications, projectTags] = await Promise.all([
       prisma8.product.findMany({
         where: PUBLISHED,
         select: { classification: true },
@@ -51414,7 +51367,6 @@ var portfolioService = {
       }).then((items) => items.flatMap((i) => i.tags))
     ]);
     return [.../* @__PURE__ */ new Set([
-      ...serviceClassifications,
       ...productClassifications,
       ...toolClassifications,
       ...projectTags
