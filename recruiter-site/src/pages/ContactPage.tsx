@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { PROFILE } from '@jsoft/shared';
 import { RecruiterContactForm } from '../components/contact/RecruiterContactForm';
 import { useTranslation } from '../i18n/LanguageContext';
+import { MetaTags } from '../components/seo/MetaTags';
 
 // Contact values come from the shared canonical PROFILE constants (CIN-3).
 // Phone/WhatsApp PII removed for public launch (public-pii-minimization).
@@ -27,6 +28,12 @@ export function ContactPage() {
   const { t } = useTranslation();
   return (
     <main>
+      <MetaTags
+        title={`Contacto | ${PROFILE.fullName}`}
+        description="Conecta para conversar sobre sistemas, APIs y desarrollo backend."
+        canonicalUrl={typeof window !== 'undefined' ? `${window.location.origin}/contacto` : undefined}
+        ogImage={typeof window !== 'undefined' ? `${window.location.origin}/images/contacto.png` : undefined}
+      />
       {/* ── Banner ── */}
       <section
         style={{

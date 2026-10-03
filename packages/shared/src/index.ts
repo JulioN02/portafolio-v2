@@ -88,6 +88,10 @@ export type {
 // Utils
 export { sanitizeHtml, SIMULATOR_CONTENT_SRC_REGEX } from './utils/sanitize.js';
 export type { SanitizeOptions } from './utils/sanitize.js';
+export { buildPublicMetadata, h1DiffersFromTitle } from './publicSeo.js';
+export type { PublicMetadata } from './publicSeo.js';
+export { getPublicImageSemantics } from './publicMedia.js';
+export type { PublicImageKind, PublicImageSemantics } from './publicMedia.js';
 export { getTextFromHTML } from './utils/getTextFromHTML.js';
 export { normalizePhone, PHONE_REGEX } from './utils/phone.js';
 

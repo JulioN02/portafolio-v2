@@ -1,10 +1,11 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { PROFILE } from '@jsoft/shared';
 import { LanguageProvider } from '../i18n/LanguageContext';
 import { ContactPage } from './ContactPage';
+import { HelmetProvider } from 'react-helmet-async';
 
 vi.mock('../api/client', () => ({
   apiClient: { post: vi.fn(), get: vi.fn() },
@@ -17,11 +18,13 @@ const queryClient = new QueryClient({
 function renderPage() {
   return render(
     <QueryClientProvider client={queryClient}>
-      <MemoryRouter>
-        <LanguageProvider>
-          <ContactPage />
-        </LanguageProvider>
-      </MemoryRouter>
+      <HelmetProvider>
+        <MemoryRouter>
+          <LanguageProvider>
+            <ContactPage />
+          </LanguageProvider>
+        </MemoryRouter>
+      </HelmetProvider>
     </QueryClientProvider>,
   );
 }
@@ -48,5 +51,33 @@ describe('ContactPage contact channels (public-pii-minimization)', () => {
       'href',
       `mailto:${PROFILE.email}`,
     );
+  });
+
+  it('publishes route-specific SEO metadata for contact', async () => {
+    renderPage();
+
+    await waitFor(() => {
+      expect(document.title).toBe(`Contacto | ${PROFILE.fullName}`);
+      expect(document.head.querySelector('meta[name="description"]')).toHaveAttribute(
+        'content',
+        'Conecta para conversar sobre sistemas, APIs y desarrollo backend.',
+      );
+      expect(document.head.querySelector('link[rel="canonical"]')).toHaveAttribute(
+        'href',
+        'http://localhost:3000/contacto',
+      );
+      expect(document.head.querySelector('meta[property="og:title"]')).toHaveAttribute(
+        'content',
+        `Contacto | ${PROFILE.fullName}`,
+      );
+      expect(document.head.querySelector('meta[property="og:type"]')).toHaveAttribute(
+        'content',
+        'website',
+      );
+      expect(document.head.querySelector('meta[property="og:image"]')).toHaveAttribute(
+        'content',
+        'http://localhost:3000/images/contacto.png',
+      );
+    });
   });
 });
