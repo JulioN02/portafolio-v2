@@ -131,7 +131,7 @@ describe('EntityDetailPage (loading / error / notFound)', () => {
     expect(screen.queryByRole('heading', { name: 'Descripción' })).toBeNull();
   });
 
-  it('shows the i18n error state with the error detail and a retry that refetches', () => {
+  it('shows a neutral error state and a retry without exposing technical details', () => {
     const refetch = vi.fn();
     mockDetail.mockReturnValue({
       data: undefined,
@@ -146,7 +146,8 @@ describe('EntityDetailPage (loading / error / notFound)', () => {
     expect(
       screen.getByText('No se pudieron cargar los detalles del proyecto.'),
     ).toBeInTheDocument();
-    expect(screen.getByText('boom')).toBeInTheDocument();
+    expect(screen.getByText('Error de conexión')).toBeInTheDocument();
+    expect(screen.queryByText('boom')).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'Intentar de nuevo' }));
     expect(refetch).toHaveBeenCalledTimes(1);
   });
@@ -173,6 +174,33 @@ describe('EntityDetailPage (loading / error / notFound)', () => {
 });
 
 describe('EntityDetailPage (per-type content)', () => {
+  it('renders exactly one accessible share action for a recruiter entity detail', () => {
+    mockDetail.mockReturnValue(
+      resolvedDetail({
+        title: 'Servicio para compartir',
+        images: ['https://example.com/cover.png'],
+      }),
+    );
+
+    renderPage('/proyectos/service/servicio-para-compartir');
+
+    expect(screen.getAllByRole('button', { name: 'Compartir Servicio para compartir' })).toHaveLength(1);
+  });
+
+  it('keeps one share action when the detail uses a project entity type', () => {
+    mockDetail.mockReturnValue(
+      resolvedDetail({
+        title: 'Proyecto para compartir',
+        body: '<p>Contenido del proyecto</p>',
+        images: [],
+      }),
+    );
+
+    renderPage('/proyectos/project/proyecto-para-compartir');
+
+    expect(screen.getAllByRole('button', { name: 'Compartir Proyecto para compartir' })).toHaveLength(1);
+  });
+
   it('renders the back link, header, tags, sanitized body and repository link for a project', async () => {
     mockDetail.mockReturnValue(
       resolvedDetail({

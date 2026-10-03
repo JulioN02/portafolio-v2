@@ -18,7 +18,7 @@ export function BlogPage() {
 
   const [searchInput, setSearchInput] = useState(search || '');
 
-  const { data, isLoading, isError, error, refetch } = useBlogPosts(page, { category, tag, search });
+  const { data, isLoading, isError, refetch } = useBlogPosts(page, { category, tag, search });
   const { data: categories } = useBlogCategories();
   const { data: tags = [] } = useBlogTags();
 
@@ -94,7 +94,7 @@ export function BlogPage() {
         />
         <h1 className={styles.title}>{t('blog.title')}</h1>
         <p className={styles.subtitle}>{t('blog.subtitle')}</p>
-        <div className={styles.skeletonGrid}>
+        <div className={styles.skeletonGrid} role="status" aria-label="Cargando artículos">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={`skel-${i}`} className={styles.skeleton}>
               <div className={styles.skeletonImage} />
@@ -115,9 +115,9 @@ export function BlogPage() {
     return (
       <div className={styles.page}>
         <MetaTags title={t('blog.meta.title')} noindex />
-        <div className={styles.error}>
+        <div className={styles.error} role="alert">
           <p className={styles.errorMessage}>
-            {error instanceof Error ? error.message : t('blog.error.message')}
+            {t('blog.error.message')}
           </p>
           <button className={styles.retryButton} onClick={() => refetch()}>
             {t('blog.error.retry')}
@@ -139,7 +139,7 @@ export function BlogPage() {
         />
         <h1 className={styles.title}>{t('blog.title')}</h1>
         {hasFilters ? (
-          <div className={styles.empty}>
+          <div className={styles.empty} role="status">
             <p className={styles.emptyMessage}>{t('blog.empty.withFilters')}</p>
             <p className={styles.emptySubtitle}>{t('blog.empty.tryDifferent')}</p>
             <button
@@ -150,7 +150,7 @@ export function BlogPage() {
             </button>
           </div>
         ) : (
-          <div className={styles.empty}>
+          <div className={styles.empty} role="status">
             <p className={styles.emptyMessage}>{t('blog.empty.noPosts')}</p>
             <p className={styles.emptySubtitle}>{t('blog.empty.comeBack')}</p>
           </div>

@@ -20,7 +20,7 @@
   .public-sticky-cta {
     display: block;
     position: fixed;
-    z-index: 20;
+    z-index: var(--z-sticky);
     right: 1rem;
     bottom: calc(1rem + env(safe-area-inset-bottom, 0px) + env(keyboard-inset-height, 0px));
     padding: .75rem 1rem;
@@ -28,5 +28,10 @@
     background: var(--color-blue-ui);
     color: white;
     box-shadow: 0 .25rem 1rem rgb(0 0 0 / 20%);
+    transition: background-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
   }
+  .public-sticky-cta:hover { background: var(--color-blue-medium); color: var(--color-neutral-0); transform: translateY(-1px); }
+  .public-sticky-cta:active { transform: translateY(0); }
+  .public-sticky-cta:focus-visible { outline: 3px solid var(--color-green-accent); outline-offset: 3px; }
 }
+@media (prefers-reduced-motion: reduce) { .public-sticky-cta { transition: none; } }

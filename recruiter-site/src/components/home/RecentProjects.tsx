@@ -31,7 +31,7 @@ export function RecentProjects() {
     skipSnaps: false,
   });
 
-  const { data, isLoading, isError, error } = useRecentProjects();
+  const { data, isLoading, isError } = useRecentProjects();
 
   const projects = data?.data ?? [];
 
@@ -40,7 +40,7 @@ export function RecentProjects() {
       <section className={styles.section}>
         <div className={styles.container}>
           <SectionTitle title={t('recentProjects.title')} />
-          <div className={styles.loadingState}>
+            <div className={styles.loadingState} role="status" aria-live="polite">
             <div className={styles.spinner} />
             <p>{t('recentProjects.loading')}</p>
           </div>
@@ -54,10 +54,10 @@ export function RecentProjects() {
       <section className={styles.section}>
         <div className={styles.container}>
           <SectionTitle title={t('recentProjects.title')} />
-          <div className={styles.errorState}>
+            <div className={styles.errorState} role="alert">
             <p>{t('recentProjects.error')}</p>
             <p className={styles.errorDetail}>
-              {error instanceof Error ? error.message : t('recentProjects.errorDetail')}
+              {t('recentProjects.errorDetail')}
             </p>
           </div>
         </div>
@@ -70,7 +70,7 @@ export function RecentProjects() {
       <section className={styles.section}>
         <div className={styles.container}>
           <SectionTitle title={t('recentProjects.title')} />
-          <div className={styles.emptyState}>
+            <div className={styles.emptyState} role="status">
             <p>{t('recentProjects.empty')}</p>
           </div>
         </div>

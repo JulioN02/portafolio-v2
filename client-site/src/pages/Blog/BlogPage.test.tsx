@@ -95,4 +95,12 @@ describe('BlogPage tag filter', () => {
     expect(filters.tag).toBeUndefined();
     expect(filters.category).toBe('laboratorio');
   });
+
+  it('renders a neutral alert instead of exposing an API error', () => {
+    mockPosts.mockReturnValue({ data: undefined, isLoading: false, isError: true, error: new Error('internal token detail'), refetch: vi.fn() });
+    renderPage();
+
+    expect(screen.getByRole('alert')).toHaveTextContent('No se pudieron cargar los artículos.');
+    expect(screen.getByRole('alert')).not.toHaveTextContent('internal token detail');
+  });
 });

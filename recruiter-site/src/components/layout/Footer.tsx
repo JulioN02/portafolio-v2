@@ -1,6 +1,8 @@
 import { PROFILE } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import styles from './Footer.module.css';
+import { CONSENT_REOPEN_EVENT } from '../public/ConsentBanner';
+import { reopenConsent } from '../public/consent';
 
 // Contact values come from the shared canonical PROFILE constants (CIN-3).
 // Phone/WhatsApp PII removed for public launch (public-pii-minimization).
@@ -97,6 +99,7 @@ export function Footer() {
           <div className={styles.legalLinks}>
             <a href="/privacidad">{t('footer.privacy')}</a>
             <a href="/terminos">{t('footer.terms')}</a>
+            <button type="button" onClick={() => { reopenConsent(); window.dispatchEvent(new Event(CONSENT_REOPEN_EVENT)); }}>Preferencias de privacidad</button>
           </div>
         </div>
       </div>

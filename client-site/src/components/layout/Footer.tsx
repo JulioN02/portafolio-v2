@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom';
 import { PROFILE } from '@jsoft/shared';
 import { useTranslation } from '../../i18n/LanguageContext';
 import styles from './Footer.module.css';
+import { CONSENT_REOPEN_EVENT } from '../public/ConsentBanner';
+import { reopenConsent } from '../public/consent';
 
 const socialLinks = [
   {
@@ -113,6 +115,7 @@ export function Footer() {
               </Link>
             ))}
           </nav>
+          <button type="button" className={styles.legalLink} onClick={() => { reopenConsent(); window.dispatchEvent(new Event(CONSENT_REOPEN_EVENT)); }}>Preferencias de privacidad</button>
         </div>
       </div>
     </footer>
