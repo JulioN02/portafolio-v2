@@ -41,6 +41,13 @@ export const blogPostController = {
     res.json(post);
   }),
 
+  findFeatured: asyncHandler(async (req: Request, res: Response) => {
+    const filter = publicBlogPostQuerySchema.parse(req.query);
+    const limit = req.query.limit === undefined ? 3 : Math.min(filter.limit, 12);
+    const posts = await blogPostService.findPublicFeatured(limit);
+    res.json(posts);
+  }),
+
   findById: asyncHandler(async (req: Request, res: Response) => {
     const id = getStringParam(req.params.id);
     // Admin scope passthrough: ?status=ALL disables the PUBLISHED filter so
@@ -80,6 +87,17 @@ export const blogPostController = {
     const id = getStringParam(req.params.id);
     await getExistingPost(id);
     const post = await blogPostService.restore(id);
+    res.json(post);
+  }),
+
+  toggleFeatured: asyncHandler(async (req: Request, res: Response) => {
+    const id = getStringParam(req.params.id);
+    const { featured } = req.body;
+    if (typeof featured !== 'boolean') {
+      throw new ValidationError('Featured must be a boolean');
+    }
+    await getExistingPost(id);
+    const post = await blogPostService.update(id, { featured });
     res.json(post);
   }),
 

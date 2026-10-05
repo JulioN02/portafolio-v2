@@ -11,6 +11,7 @@ const router: IRouter = Router();
 // Public routes
 router.get('/', serviceController.findAll);
 router.get('/classifications', serviceController.getClassifications);
+router.get('/featured', serviceController.findFeatured);
 
 // Protected routes (admin) — detail-by-id requires auth: public sites only
 // use /:slug, so protecting by-id cannot break public rendering.
@@ -19,6 +20,7 @@ router.post('/', authMiddleware, serviceController.create);
 router.put('/:id', authMiddleware, serviceController.update);
 router.delete('/:id', authMiddleware, serviceController.delete);
 router.patch('/:id/restore', authMiddleware, serviceController.restore);
+router.patch('/:id/featured', authMiddleware, serviceController.toggleFeatured);
 router.patch('/:id/status', authMiddleware, serviceController.updateStatus);
 
 // Public detail — MUST come last so /by-id/:id wins.

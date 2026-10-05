@@ -11,3 +11,5 @@ export * from './siteSection.schema.js';
 export * from './profile.schema.js';
 export * from './twoFactor.schema.js';
 export * from './public.schema.js';
+export * from './situation.schema.js';
+export * from './featured.schema.js';

@@ -19,6 +19,9 @@ const SERVICE_SELECT = {
   deletedAt: true,
   technicalExplanation: true,
   technicalImages: true,
+  featured: true,
+  order: true,
+  situationId: true,
   createdAt: true,
   updatedAt: true,
 } as const;
@@ -61,6 +64,16 @@ export const serviceService = {
       select: PUBLIC_SERVICE_SELECT,
     });
     return service ? selectPublicService(service) : null;
+  },
+
+  async findPublicFeatured(limit = 3) {
+    const services = await prisma.service.findMany({
+      where: { featured: true, status: 'PUBLISHED', deletedAt: null },
+      select: PUBLIC_SERVICE_SELECT,
+      orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
+      take: Math.min(limit, 12),
+    });
+    return services.slice(0, 12).map(selectPublicService);
   },
 
   async findAll(filter?: ServiceFilterInput) {
@@ -133,6 +146,9 @@ export const serviceService = {
         externalLink: data.externalLink,
         status: (data.status && data.status !== 'ALL') ? data.status : 'DRAFT',
         ...(data.status === 'PUBLISHED' && { publishedAt: new Date() }),
+        featured: data.featured ?? false,
+        order: data.order ?? 0,
+        situationId: data.situationId ?? null,
         technicalExplanation: data.technicalExplanation,
         technicalImages: data.technicalImages,
       },
@@ -159,6 +175,9 @@ export const serviceService = {
     }
     if (data.technicalExplanation !== undefined) updateData.technicalExplanation = data.technicalExplanation;
     if (data.technicalImages !== undefined) updateData.technicalImages = data.technicalImages;
+    if (data.featured !== undefined) updateData.featured = data.featured;
+    if (data.order !== undefined) updateData.order = data.order;
+    if (data.situationId !== undefined) updateData.situationId = data.situationId;
 
     return prisma.service.update({
       where: { id },

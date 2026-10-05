@@ -13,6 +13,7 @@ export const successCaseSchema = z.object({
   images: z.array(z.string().url()).min(1).max(12),
   videos: z.array(httpsUrlSchema).max(12).optional(),
   links: z.array(httpsUrlSchema).max(12).optional(),
+  featured: z.boolean().optional(),
   status: postStatusEnum.default('DRAFT'),
 });
 
