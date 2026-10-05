@@ -49,6 +49,11 @@ export const projectsApi = {
     return data;
   },
 
+  toggleFeatured: async (id: string, featured: boolean): Promise<ProjectResponse> => {
+    const { data } = await apiClient.patch(`/projects/${id}/featured`, { featured });
+    return data;
+  },
+
   updateStatus: async (id: string, status: string): Promise<ProjectResponse> => {
     const { data } = await apiClient.patch(`/projects/${id}/status`, { status });
     return data;

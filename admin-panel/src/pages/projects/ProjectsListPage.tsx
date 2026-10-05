@@ -11,12 +11,13 @@ export function ProjectsListPage() {
   const { t } = useTranslation();
   const [tagFilter, setTagFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
-  const { useGetAll, useSoftDelete, useUpdateStatus } = useProjects();
+  const { useGetAll, useSoftDelete, useUpdateStatus, useToggleFeatured } = useProjects();
   const { data, isLoading, error } = useGetAll(
     tagFilter ? { tag: tagFilter, page: 1, limit: 50 } : { page: 1, limit: 50 }
   );
   const deleteMutation = useSoftDelete();
   const updateStatusMutation = useUpdateStatus();
+  const toggleFeaturedMutation = useToggleFeatured();
 
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
 
@@ -85,6 +86,7 @@ export function ProjectsListPage() {
           projects={filteredProjects}
           onDelete={handleDelete}
           onStatusChange={handleStatusChange}
+          onToggleFeatured={(id, featured) => toggleFeaturedMutation.mutate({ id, featured })}
         />
       </div>
 

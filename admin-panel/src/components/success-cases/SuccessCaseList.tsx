@@ -8,6 +8,7 @@ interface SuccessCaseListProps {
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
   onStatusChange?: (id: string, status: string) => void;
+  onToggleFeatured?: (id: string, featured: boolean) => void;
 }
 
 interface ExtendedSuccessCase extends SuccessCaseResponse {
@@ -23,7 +24,7 @@ const statusClassMap: Record<string, string> = {
   ARCHIVED: formStyles.badgeArchived,
 };
 
-export function SuccessCaseList({ successCases, onEdit, onDelete, onStatusChange }: SuccessCaseListProps) {
+export function SuccessCaseList({ successCases, onEdit, onDelete, onStatusChange, onToggleFeatured }: SuccessCaseListProps) {
   const { t } = useTranslation();
   const cases = successCases as ExtendedSuccessCase[];
 
@@ -73,6 +74,18 @@ export function SuccessCaseList({ successCases, onEdit, onDelete, onStatusChange
               </a>
             )}
             <div className={listStyles.actions}>
+              {onToggleFeatured && (
+                <button
+                  type="button"
+                  className={formStyles.btnStatus}
+                  aria-pressed={Boolean(successCase.featured)}
+                  aria-label={t('services.featured')}
+                  title={t('services.featured')}
+                  onClick={() => onToggleFeatured(successCase.id, !successCase.featured)}
+                >
+                  {successCase.featured ? '★' : '☆'}
+                </button>
+              )}
               <button className={formStyles.btnEdit} onClick={() => onEdit(successCase.id)}>{t('successCases.edit')}</button>
               <button className={formStyles.btnDelete} onClick={() => onDelete(successCase.id)}>{t('successCases.delete')}</button>
             </div>

@@ -52,6 +52,15 @@ export function useServices() {
       },
     });
 
+  const useToggleFeatured = () =>
+    useMutation({
+      mutationFn: ({ id, featured }: { id: string; featured: boolean }) =>
+        servicesApi.toggleFeatured(id, featured),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['services'] });
+      },
+    });
+
   return {
     useGetAll,
     useGetById,
@@ -59,5 +68,6 @@ export function useServices() {
     useUpdate,
     useDelete,
     useUpdateStatus,
+    useToggleFeatured,
   };
 }

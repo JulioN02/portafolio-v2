@@ -79,6 +79,15 @@ export function useProjects() {
       },
     });
 
+  const useToggleFeatured = () =>
+    useMutation({
+      mutationFn: ({ id, featured }: { id: string; featured: boolean }) =>
+        projectsApi.toggleFeatured(id, featured),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['projects'] });
+      },
+    });
+
   return {
     useGetAll,
     useGetById,
@@ -89,5 +98,6 @@ export function useProjects() {
     useRestore,
     useUpdateStatus,
     useReorder,
+    useToggleFeatured,
   };
 }

@@ -8,9 +8,10 @@ interface BlogPostListProps {
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
   onStatusChange?: (id: string, newStatus: string) => void;
+  onToggleFeatured?: (id: string, featured: boolean) => void;
 }
 
-export function BlogPostList({ posts, onEdit, onDelete, onStatusChange }: BlogPostListProps) {
+export function BlogPostList({ posts, onEdit, onDelete, onStatusChange, onToggleFeatured }: BlogPostListProps) {
   const { t } = useTranslation();
 
   const formatDate = (date: Date | string) => {
@@ -84,6 +85,18 @@ export function BlogPostList({ posts, onEdit, onDelete, onStatusChange }: BlogPo
               </div>
             </div>
             <div className={listStyles.actionsColumn}>
+              {onToggleFeatured && (
+                <button
+                  type="button"
+                  className={formStyles.btnStatus}
+                  aria-pressed={Boolean(post.featured)}
+                  aria-label={t('services.featured')}
+                  title={t('services.featured')}
+                  onClick={() => onToggleFeatured(post.id, !post.featured)}
+                >
+                  {post.featured ? '★' : '☆'}
+                </button>
+              )}
               <button className={formStyles.btnEdit} onClick={() => onEdit(post.id)}>{t('blog.edit')}</button>
               <button className={formStyles.btnDelete} onClick={() => onDelete(post.id)}>{t('blog.delete')}</button>
             </div>

@@ -8,6 +8,7 @@ interface ServiceTableProps {
   services: ServiceResponse[];
   onDelete: (id: string) => void;
   onStatusChange?: (id: string, status: string) => void;
+  onToggleFeatured?: (id: string, featured: boolean) => void;
 }
 
 const statusClassMap: Record<string, string> = {
@@ -17,7 +18,7 @@ const statusClassMap: Record<string, string> = {
   ARCHIVED: formStyles.badgeArchived,
 };
 
-export function ServiceTable({ services, onDelete, onStatusChange }: ServiceTableProps) {
+export function ServiceTable({ services, onDelete, onStatusChange, onToggleFeatured }: ServiceTableProps) {
   const { t } = useTranslation();
 
   if (services.length === 0) {
@@ -55,6 +56,18 @@ export function ServiceTable({ services, onDelete, onStatusChange }: ServiceTabl
               <span className={badgeClass}>{service.status}</span>
             )}
             <div className={listStyles.actions}>
+              {onToggleFeatured && (
+                <button
+                  type="button"
+                  className={formStyles.btnStatus}
+                  aria-pressed={Boolean(service.featured)}
+                  aria-label={t('services.featured')}
+                  title={t('services.featured')}
+                  onClick={() => onToggleFeatured(service.id, !service.featured)}
+                >
+                  {service.featured ? '★' : '☆'}
+                </button>
+              )}
               <Link to={`/services/edit/${service.id}`}>
                 <button className={formStyles.btnEdit}>{t('services.edit')}</button>
               </Link>

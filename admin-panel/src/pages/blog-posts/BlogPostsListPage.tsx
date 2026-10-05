@@ -10,10 +10,11 @@ import formStyles from '../../styles/form.module.css';
 export function BlogPostsListPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { useGetAll, useDelete, useUpdateStatus } = useBlogPosts();
+  const { useGetAll, useDelete, useUpdateStatus, useToggleFeatured } = useBlogPosts();
   const { data, isLoading, error } = useGetAll();
   const deleteMutation = useDelete();
   const updateStatusMutation = useUpdateStatus();
+  const toggleFeaturedMutation = useToggleFeatured();
 
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
   const [filter, setFilter] = useState<'all' | 'DRAFT' | 'PUBLISHED'>('all');
@@ -77,6 +78,7 @@ export function BlogPostsListPage() {
           onEdit={(id) => navigate(`/blog-posts/edit/${id}`)}
           onDelete={handleDelete}
           onStatusChange={handleStatusChange}
+          onToggleFeatured={(id, featured) => toggleFeaturedMutation.mutate({ id, featured })}
         />
       </div>
 

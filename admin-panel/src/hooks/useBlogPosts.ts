@@ -60,6 +60,15 @@ export function useBlogPosts() {
       },
     });
 
+  const useToggleFeatured = () =>
+    useMutation({
+      mutationFn: ({ id, featured }: { id: string; featured: boolean }) =>
+        blogPostsApi.toggleFeatured(id, featured),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['blogPosts'] });
+      },
+    });
+
   return {
     useGetAll,
     useGetById,
@@ -68,5 +77,6 @@ export function useBlogPosts() {
     useDelete,
     useUpdateStatus,
     useRestore,
+    useToggleFeatured,
   };
 }

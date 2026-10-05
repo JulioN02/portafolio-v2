@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { RichTextEditor, serviceSchema, SERVICE_CLASSIFICATIONS } from '@jsoft/shared';
 import type { ServiceInput } from '@jsoft/shared';
 import { getTextFromHTML } from '../../utils/getTextFromHTML';
 import { ImageUploader } from '../uploads/ImageUploader';
+import { situationsApi, type SituationAdmin } from '../../api/situations.api';
 import formStyles from '../../styles/form.module.css';
 
 interface ServiceFormProps {
@@ -101,7 +102,17 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
   const [includedItems, setIncludedItems] = useState<string[]>(initialData?.includedItems || []);
   const [technicalExplanation, setTechnicalExplanation] = useState(initialData?.technicalExplanation || '');
   const [technicalImages, setTechnicalImages] = useState<string[]>(initialData?.technicalImages || []);
+  const [featured, setFeatured] = useState(initialData?.featured ?? false);
+  const [order, setOrder] = useState(initialData?.order ?? 0);
+  const [situationId, setSituationId] = useState(initialData?.situationId ?? '');
+  const [situations, setSituations] = useState<SituationAdmin[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    situationsApi.getAll()
+      .then((result) => setSituations(result))
+      .catch(() => setSituations([]));
+  }, []);
 
   const handleTitleChange = (newTitle: string) => {
     setTitle(newTitle);
@@ -147,6 +158,9 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
         externalLink: externalLink || undefined,
         technicalExplanation: technicalExplanation || undefined,
         technicalImages,
+        featured,
+        order,
+        situationId: situationId || null,
       };
 
       // Final gate: same Zod schema as the API (see BlogPostForm).
@@ -294,6 +308,47 @@ export function ServiceForm({ initialData, onSubmit, isLoading }: ServiceFormPro
             <option value="PRIVATE">{t('blog.private')}</option>
             <option value="ARCHIVED">{t('blog.archived')}</option>
           </select>
+        </div>
+        <div className={formStyles.formGroup}>
+          <label className={formStyles.formLabel} htmlFor="situation">{t('services.situation')}</label>
+          <select
+            id="situation"
+            value={situationId ?? ''}
+            onChange={(e) => setSituationId(e.target.value)}
+            className={formStyles.formInput}
+          >
+            <option value="">{t('services.noSituation')}</option>
+            {situations.map((situation) => (
+              <option key={situation.id} value={situation.id}>{situation.title}</option>
+            ))}
+          </select>
+          <p className={formStyles.hint}>{t('services.situationHint')}</p>
+        </div>
+        <div className={formStyles.fieldRow}>
+          <div className={formStyles.formGroup}>
+            <label className={formStyles.checkboxLabel} htmlFor="featured">
+              <input
+                id="featured"
+                type="checkbox"
+                checked={featured}
+                onChange={(e) => setFeatured(e.target.checked)}
+              />
+              {t('services.featured')}
+            </label>
+            <p className={formStyles.hint}>{t('services.featuredHint')}</p>
+          </div>
+          <div className={formStyles.formGroup}>
+            <label className={formStyles.formLabel} htmlFor="order">{t('services.order')}</label>
+            <input
+              id="order"
+              type="number"
+              min={0}
+              max={10000}
+              className={formStyles.formInput}
+              value={order}
+              onChange={(e) => setOrder(Number(e.target.value))}
+            />
+          </div>
         </div>
       </fieldset>
 
