@@ -24,6 +24,16 @@ export function useRecentSuccessCases(limit = 3) {
   });
 }
 
+export function useFeaturedSuccessCases(limit = 3) {
+  return useQuery({
+    queryKey: ['successCases', 'featured', limit],
+    queryFn: () =>
+      apiClient.get<SuccessCaseResponse[]>('/success-cases/featured', {
+        params: { limit } as Record<string, string | number | boolean>,
+      }),
+  });
+}
+
 export function useSuccessCaseBySlug(slug: string) {
   return useQuery({
     queryKey: ['successCases', 'slug', slug],

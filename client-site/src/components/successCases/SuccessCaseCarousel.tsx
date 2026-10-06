@@ -1,14 +1,19 @@
 import { useTranslation } from '../../i18n/LanguageContext';
-import { useRecentSuccessCases } from '../../hooks/useSuccessCases';
+import { useFeaturedSuccessCases, useRecentSuccessCases } from '../../hooks/useSuccessCases';
 import { Loading } from '../common/Loading';
 import styles from './SuccessCaseCarousel.module.css';
 
 export function SuccessCaseCarousel() {
   const { t } = useTranslation();
-  const { data: cases, isLoading, error } = useRecentSuccessCases(3);
+  const featured = useFeaturedSuccessCases(3);
+  const recent = useRecentSuccessCases(3);
+
+  const cases = featured.data && featured.data.length > 0 ? featured.data : recent.data;
+  const isLoading = featured.isLoading || (recent.isLoading && !featured.data?.length);
+  const isError = featured.isError && recent.isError;
 
   if (isLoading) return <Loading message={t('successCaseCarousel.loading')} />;
-  if (error) return <p className={styles.error}>{t('successCaseCarousel.error')}</p>;
+  if (isError) return <p className={styles.error}>{t('successCaseCarousel.error')}</p>;
   if (!cases?.length) return null;
 
   return (

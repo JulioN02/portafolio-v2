@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from '../../i18n/LanguageContext';
-import { useBlogPosts } from '../../hooks/useBlogPosts';
+import { useBlogPosts, useFeaturedBlogPosts } from '../../hooks/useBlogPosts';
 import { BlogCard } from '../../components/blog/BlogCard';
 import styles from './BlogTeaser.module.css';
 
@@ -8,7 +8,20 @@ const TEASER_LIMIT = 3;
 
 export function BlogTeaser() {
   const { t } = useTranslation();
-  const { data, isLoading } = useBlogPosts(1, undefined, TEASER_LIMIT);
+  const featured = useFeaturedBlogPosts(TEASER_LIMIT);
+  const recent = useBlogPosts(1, undefined, TEASER_LIMIT);
+
+  // Featured-first, then fill remaining slots with the most recent posts.
+  const merged = [...(featured.data ?? [])];
+  for (const post of recent.data?.data ?? []) {
+    if (merged.length >= TEASER_LIMIT) break;
+    if (!merged.some((existing) => existing.id === post.id)) {
+      merged.push(post);
+    }
+  }
+  const posts = merged.slice(0, TEASER_LIMIT);
+
+  const isLoading = posts.length === 0 && (featured.isLoading || recent.isLoading);
 
   if (isLoading) {
     return (
@@ -26,7 +39,7 @@ export function BlogTeaser() {
   }
 
   // Empty or error → hide the whole section (no layout break, no crash).
-  if (!data?.data?.length) return null;
+  if (posts.length === 0) return null;
 
   return (
     <section className={styles.section}>
@@ -38,7 +51,7 @@ export function BlogTeaser() {
           </Link>
         </div>
         <div className={styles.grid}>
-          {data.data.map((post) => (
+          {posts.map((post) => (
             <BlogCard key={post.id} post={post} />
           ))}
         </div>

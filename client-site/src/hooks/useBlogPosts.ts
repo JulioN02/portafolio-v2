@@ -32,6 +32,16 @@ export function useBlogCategories() {
   });
 }
 
+export function useFeaturedBlogPosts(limit = 3) {
+  return useQuery({
+    queryKey: ['blog-posts', 'featured', limit],
+    queryFn: () =>
+      apiClient.get<BlogPostResponse[]>('/blog-posts/featured', {
+        params: { limit } as Record<string, string | number | boolean>,
+      }),
+  });
+}
+
 /** Distinct tags among PUBLISHED posts — powers the tag filter chips. */
 export function useBlogTags() {
   return useQuery({

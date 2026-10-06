@@ -21,11 +21,9 @@ export function useFeaturedServices(limit = 3) {
   return useQuery({
     queryKey: ['services', 'featured', limit],
     queryFn: () =>
-      apiClient
-        .get<PaginatedResponse<ServiceResponse>>('/services', {
-          params: { limit, status: 'PUBLISHED' } as Record<string, string | number | boolean>,
-        })
-        .then((res) => res.data),
+      apiClient.get<ServiceResponse[]>('/services/featured', {
+        params: { limit } as Record<string, string | number | boolean>,
+      }),
   });
 }
 
