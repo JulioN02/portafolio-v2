@@ -102,6 +102,17 @@ export const projectController = {
     res.json(project);
   }),
 
+  toggleFeatured: asyncHandler(async (req: Request, res: Response) => {
+    const id = getStringParam(req.params.id);
+    const { featured } = req.body;
+    if (typeof featured !== 'boolean') {
+      throw new ValidationError('Featured must be a boolean');
+    }
+    await getExistingProject(id);
+    const project = await projectService.update(id, { featured });
+    res.json(project);
+  }),
+
   getTags: asyncHandler(async (req: Request, res: Response) => {
     publicProjectQuerySchema.parse(req.query);
     const tags = await projectService.getTags();
