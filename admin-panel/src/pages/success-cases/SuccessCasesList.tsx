@@ -11,7 +11,7 @@ export function SuccessCasesList() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
-  const { useGetAll, useDelete, useUpdateStatus } = useSuccessCases();
+  const { useGetAll, useDelete, useUpdateStatus, useToggleFeatured } = useSuccessCases();
   
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
@@ -19,6 +19,7 @@ export function SuccessCasesList() {
   const { data, isLoading, error } = useGetAll({ page, limit });
   const deleteMutation = useDelete();
   const updateStatusMutation = useUpdateStatus();
+  const toggleFeaturedMutation = useToggleFeatured();
 
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
 
@@ -97,6 +98,7 @@ export function SuccessCasesList() {
               onEdit={handleEdit}
               onDelete={handleDelete}
               onStatusChange={handleStatusChange}
+              onToggleFeatured={(id, featured) => toggleFeaturedMutation.mutate({ id, featured })}
             />
           </div>
           

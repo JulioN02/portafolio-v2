@@ -8,6 +8,7 @@ interface ProjectTableProps {
   projects: ProjectResponse[];
   onDelete: (id: string) => void;
   onStatusChange?: (id: string, status: string) => void;
+  onToggleFeatured?: (id: string, featured: boolean) => void;
 }
 
 const statusClassMap: Record<string, string> = {
@@ -17,7 +18,7 @@ const statusClassMap: Record<string, string> = {
   ARCHIVED: formStyles.badgeArchived,
 };
 
-export function ProjectTable({ projects, onDelete, onStatusChange }: ProjectTableProps) {
+export function ProjectTable({ projects, onDelete, onStatusChange, onToggleFeatured }: ProjectTableProps) {
   const { t } = useTranslation();
 
   if (projects.length === 0) {
@@ -55,6 +56,18 @@ export function ProjectTable({ projects, onDelete, onStatusChange }: ProjectTabl
               <span className={badgeClass}>{project.status}</span>
             )}
             <div className={listStyles.actions}>
+              {onToggleFeatured && (
+                <button
+                  type="button"
+                  className={formStyles.btnStatus}
+                  aria-pressed={Boolean(project.featured)}
+                  aria-label={t('services.featured')}
+                  title={t('services.featured')}
+                  onClick={() => onToggleFeatured(project.id, !project.featured)}
+                >
+                  {project.featured ? '★' : '☆'}
+                </button>
+              )}
               <Link to={`/projects/edit/${project.id}`}>
                 <button className={formStyles.btnEdit}>{t('projects.edit')}</button>
               </Link>

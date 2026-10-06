@@ -11,12 +11,13 @@ export function ServicesListPage() {
   const { t } = useTranslation();
   const [classificationFilter, setClassificationFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
-  const { useGetAll, useDelete, useUpdateStatus } = useServices();
+  const { useGetAll, useDelete, useUpdateStatus, useToggleFeatured } = useServices();
   const { data, isLoading, error } = useGetAll(
     classificationFilter ? { classification: classificationFilter, page: 1, limit: 10 } : undefined
   );
   const deleteMutation = useDelete();
   const updateStatusMutation = useUpdateStatus();
+  const toggleFeaturedMutation = useToggleFeatured();
 
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
 
@@ -85,6 +86,7 @@ export function ServicesListPage() {
           services={filteredServices}
           onDelete={handleDelete}
           onStatusChange={handleStatusChange}
+          onToggleFeatured={(id, featured) => toggleFeaturedMutation.mutate({ id, featured })}
         />
       </div>
 

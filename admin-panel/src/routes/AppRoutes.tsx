@@ -56,6 +56,8 @@ const ProjectCreatePage = lazy(() => import('../pages/projects/ProjectCreatePage
 const ProjectEditPage = lazy(() => import('../pages/projects/ProjectEditPage').then(m => ({ default: m.ProjectEditPage })));
 const SuccessCaseCreatePage = lazy(() => import('../pages/success-cases/SuccessCaseCreate').then(m => ({ default: m.SuccessCaseCreate })));
 const SuccessCaseEditPage = lazy(() => import('../pages/success-cases/SuccessCaseEdit').then(m => ({ default: m.SuccessCaseEdit })));
+const SituationsListPage = lazy(() => import('../pages/situations/SituationsListPage').then(m => ({ default: m.SituationsListPage })));
+const SituationFormPage = lazy(() => import('../pages/situations/SituationFormPage').then(m => ({ default: m.SituationFormPage })));
 
 function AppRoutes() {
   return (
@@ -339,6 +341,43 @@ function AppRoutes() {
           <ErrorBoundary>
             <ProtectedLayout>
               <PagesListPage />
+            </ProtectedLayout>
+          </ErrorBoundary>
+        }
+      />
+
+      <Route
+        path="/situations"
+        element={
+          <ErrorBoundary>
+            <ProtectedLayout>
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>Cargando...</div>}>
+                <SituationsListPage />
+              </Suspense>
+            </ProtectedLayout>
+          </ErrorBoundary>
+        }
+      />
+      <Route
+        path="/situations/create"
+        element={
+          <ErrorBoundary>
+            <ProtectedLayout>
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>Cargando...</div>}>
+                <SituationFormPage />
+              </Suspense>
+            </ProtectedLayout>
+          </ErrorBoundary>
+        }
+      />
+      <Route
+        path="/situations/edit/:id"
+        element={
+          <ErrorBoundary>
+            <ProtectedLayout>
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>Cargando...</div>}>
+                <SituationFormPage />
+              </Suspense>
             </ProtectedLayout>
           </ErrorBoundary>
         }

@@ -43,6 +43,11 @@ export const successCasesApi = {
     return data;
   },
 
+  toggleFeatured: async (id: string, featured: boolean): Promise<SuccessCaseResponse> => {
+    const { data } = await apiClient.patch(`/success-cases/${id}/featured`, { featured });
+    return data;
+  },
+
   updateStatus: async (id: string, status: string): Promise<SuccessCaseResponse> => {
     const { data } = await apiClient.patch(`/success-cases/${id}/status`, { status });
     return data;

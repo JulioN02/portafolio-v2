@@ -44,6 +44,11 @@ export const servicesApi = {
     return data;
   },
 
+  toggleFeatured: async (id: string, featured: boolean): Promise<ServiceResponse> => {
+    const { data } = await apiClient.patch(`/services/${id}/featured`, { featured });
+    return data;
+  },
+
   updateStatus: async (id: string, status: string): Promise<ServiceResponse> => {
     const { data } = await apiClient.patch(`/services/${id}/status`, { status });
     return data;

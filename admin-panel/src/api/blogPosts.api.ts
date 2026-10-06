@@ -44,6 +44,11 @@ export const blogPostsApi = {
     return data;
   },
 
+  toggleFeatured: async (id: string, featured: boolean): Promise<BlogPostResponse> => {
+    const { data } = await apiClient.patch(`/blog-posts/${id}/featured`, { featured });
+    return data;
+  },
+
   updateStatus: async (id: string, status: string): Promise<BlogPostResponse> => {
     const { data } = await apiClient.patch(`/blog-posts/${id}/status`, { status });
     return data;
