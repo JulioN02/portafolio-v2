@@ -18086,17 +18086,17 @@ var require_router = __commonJS({
     var toString = Object.prototype.toString;
     var proto = module2.exports = function(options) {
       var opts = options || {};
-      function router13(req, res, next) {
-        router13.handle(req, res, next);
+      function router14(req, res, next) {
+        router14.handle(req, res, next);
       }
-      setPrototypeOf(router13, proto);
-      router13.params = {};
-      router13._params = [];
-      router13.caseSensitive = opts.caseSensitive;
-      router13.mergeParams = opts.mergeParams;
-      router13.strict = opts.strict;
-      router13.stack = [];
-      return router13;
+      setPrototypeOf(router14, proto);
+      router14.params = {};
+      router14._params = [];
+      router14.caseSensitive = opts.caseSensitive;
+      router14.mergeParams = opts.mergeParams;
+      router14.strict = opts.strict;
+      router14.stack = [];
+      return router14;
     };
     proto.param = function param(name, fn) {
       if (typeof name === "function") {
@@ -20688,7 +20688,7 @@ var require_application = __commonJS({
   "node_modules/.pnpm/express@4.22.1/node_modules/express/lib/application.js"(exports2, module2) {
     "use strict";
     var finalhandler = require_finalhandler();
-    var Router13 = require_router();
+    var Router14 = require_router();
     var methods = require_methods();
     var middleware = require_init();
     var query = require_query();
@@ -20753,7 +20753,7 @@ var require_application = __commonJS({
     };
     app2.lazyrouter = function lazyrouter() {
       if (!this._router) {
-        this._router = new Router13({
+        this._router = new Router14({
           caseSensitive: this.enabled("case sensitive routing"),
           strict: this.enabled("strict routing")
         });
@@ -20762,17 +20762,17 @@ var require_application = __commonJS({
       }
     };
     app2.handle = function handle(req, res, callback) {
-      var router13 = this._router;
+      var router14 = this._router;
       var done = callback || finalhandler(req, res, {
         env: this.get("env"),
         onerror: logerror.bind(this)
       });
-      if (!router13) {
+      if (!router14) {
         debug("no routes defined on app");
         done();
         return;
       }
-      router13.handle(req, res, done);
+      router14.handle(req, res, done);
     };
     app2.use = function use(fn) {
       var offset = 0;
@@ -20792,15 +20792,15 @@ var require_application = __commonJS({
         throw new TypeError("app.use() requires a middleware function");
       }
       this.lazyrouter();
-      var router13 = this._router;
+      var router14 = this._router;
       fns.forEach(function(fn2) {
         if (!fn2 || !fn2.handle || !fn2.set) {
-          return router13.use(path6, fn2);
+          return router14.use(path6, fn2);
         }
         debug(".use app under %s", path6);
         fn2.mountpath = path6;
         fn2.parent = this;
-        router13.use(path6, function mounted_app(req, res, next) {
+        router14.use(path6, function mounted_app(req, res, next) {
           var orig = req.app;
           fn2.handle(req, res, function(err) {
             setPrototypeOf(req, orig.request);
@@ -22617,7 +22617,7 @@ var require_express = __commonJS({
     var mixin = require_merge_descriptors();
     var proto = require_application();
     var Route = require_route();
-    var Router13 = require_router();
+    var Router14 = require_router();
     var req = require_request();
     var res = require_response();
     exports2 = module2.exports = createApplication;
@@ -22640,7 +22640,7 @@ var require_express = __commonJS({
     exports2.request = req;
     exports2.response = res;
     exports2.Route = Route;
-    exports2.Router = Router13;
+    exports2.Router = Router14;
     exports2.json = bodyParser.json;
     exports2.query = require_query();
     exports2.raw = bodyParser.raw;
@@ -42842,7 +42842,7 @@ __export(index_exports, {
 module.exports = __toCommonJS(index_exports);
 
 // api/src/app.ts
-var import_express13 = __toESM(require_express2(), 1);
+var import_express14 = __toESM(require_express2(), 1);
 var import_cors = __toESM(require_lib3(), 1);
 
 // node_modules/.pnpm/helmet@8.1.0/node_modules/helmet/index.mjs
@@ -43431,6 +43431,12 @@ var ForbiddenError = class extends AppError {
   constructor(message = "Access denied") {
     super(message, 403, "FORBIDDEN");
     this.name = "ForbiddenError";
+  }
+};
+var ConflictError = class extends AppError {
+  constructor(message, code = "CONFLICT") {
+    super(message, 409, code);
+    this.name = "ConflictError";
   }
 };
 
@@ -48984,6 +48990,7 @@ var blogPostSchema = external_exports.object({
   body: external_exports.string().min(100, "Body must be at least 100 characters").max(5e4),
   externalLink: safeExternalLinkSchema,
   lessonsLearned: external_exports.string().max(2e4).optional(),
+  featured: external_exports.boolean().optional(),
   status: postStatusEnum.default("DRAFT")
 });
 var blogPostUpdateSchema = blogPostSchema.partial();
@@ -49013,6 +49020,9 @@ var serviceSchema = external_exports.object({
   images: external_exports.array(external_exports.string().url()).min(1, "At least one image is required").max(12),
   externalLink: safeExternalLinkSchema,
   status: postStatusEnum.default("DRAFT"),
+  featured: external_exports.boolean().optional(),
+  order: external_exports.number().int().min(0).max(1e4).optional(),
+  situationId: external_exports.string().nullable().optional(),
   // Technical fields for recruiters (optional)
   technicalExplanation: external_exports.string().max(2e4, "Technical explanation must be at most 20000 characters").refine((s) => getTextFromHTML(s).length <= 15e3, {
     message: "Technical explanation text must be at most 15000 characters"
@@ -49103,6 +49113,7 @@ var successCaseSchema = external_exports.object({
   images: external_exports.array(external_exports.string().url()).min(1).max(12),
   videos: external_exports.array(httpsUrlSchema).max(12).optional(),
   links: external_exports.array(httpsUrlSchema).max(12).optional(),
+  featured: external_exports.boolean().optional(),
   status: postStatusEnum.default("DRAFT")
 });
 var successCaseUpdateSchema = successCaseSchema.partial();
@@ -49252,6 +49263,38 @@ var changePasswordSchema = external_exports.object({
       message: "Provide either a TOTP code or a recovery code, not both"
     });
   }
+});
+
+// packages/shared/src/schemas/situation.schema.ts
+var serviceIdsField = external_exports.array(external_exports.string().min(1)).max(3).refine(
+  (ids) => new Set(ids).size === ids.length,
+  { message: "serviceIds must be unique" }
+);
+var situationCreateSchema = external_exports.object({
+  title: external_exports.string().min(1).max(120),
+  description: external_exports.string().min(1).max(500),
+  active: external_exports.boolean().optional(),
+  order: external_exports.number().int().min(0).max(1e4).optional(),
+  serviceIds: serviceIdsField.optional()
+});
+var situationUpdateSchema = external_exports.object({
+  title: external_exports.string().min(1).max(120),
+  description: external_exports.string().min(1).max(500),
+  active: external_exports.boolean().optional(),
+  order: external_exports.number().int().min(0).max(1e4).optional(),
+  serviceIds: serviceIdsField.optional()
+});
+var situationPatchSchema = external_exports.object({
+  active: external_exports.boolean().optional(),
+  order: external_exports.number().int().min(0).max(1e4).optional(),
+  serviceIds: serviceIdsField.optional()
+}).refine((value) => Object.keys(value).length > 0, {
+  message: "At least one field is required"
+});
+
+// packages/shared/src/schemas/featured.schema.ts
+var featuredSchema = external_exports.object({
+  featured: external_exports.boolean()
 });
 
 // api/src/utils/asyncHandler.ts
@@ -49506,6 +49549,9 @@ var SERVICE_SELECT = {
   deletedAt: true,
   technicalExplanation: true,
   technicalImages: true,
+  featured: true,
+  order: true,
+  situationId: true,
   createdAt: true,
   updatedAt: true
 };
@@ -49545,6 +49591,15 @@ var serviceService = {
       select: PUBLIC_SERVICE_SELECT
     });
     return service ? selectPublicService(service) : null;
+  },
+  async findPublicFeatured(limit = 3) {
+    const services = await prisma3.service.findMany({
+      where: { featured: true, status: "PUBLISHED", deletedAt: null },
+      select: PUBLIC_SERVICE_SELECT,
+      orderBy: [{ order: "asc" }, { createdAt: "desc" }],
+      take: Math.min(limit, 12)
+    });
+    return services.slice(0, 12).map(selectPublicService);
   },
   async findAll(filter) {
     const { status, classification, page = 1, limit = 10 } = filter || {};
@@ -49609,6 +49664,9 @@ var serviceService = {
         externalLink: data.externalLink,
         status: data.status && data.status !== "ALL" ? data.status : "DRAFT",
         ...data.status === "PUBLISHED" && { publishedAt: /* @__PURE__ */ new Date() },
+        featured: data.featured ?? false,
+        order: data.order ?? 0,
+        situationId: data.situationId ?? null,
         technicalExplanation: data.technicalExplanation,
         technicalImages: data.technicalImages
       },
@@ -49633,6 +49691,9 @@ var serviceService = {
     }
     if (data.technicalExplanation !== void 0) updateData.technicalExplanation = data.technicalExplanation;
     if (data.technicalImages !== void 0) updateData.technicalImages = data.technicalImages;
+    if (data.featured !== void 0) updateData.featured = data.featured;
+    if (data.order !== void 0) updateData.order = data.order;
+    if (data.situationId !== void 0) updateData.situationId = data.situationId;
     return prisma3.service.update({
       where: { id },
       data: updateData,
@@ -49712,6 +49773,12 @@ var serviceController = {
     }
     res.json(service);
   }),
+  findFeatured: asyncHandler(async (req, res) => {
+    const filter = publicServiceQuerySchema.parse(req.query);
+    const limit = req.query.limit === void 0 ? 3 : Math.min(filter.limit, 12);
+    const services = await serviceService.findPublicFeatured(limit);
+    res.json(services);
+  }),
   findById: asyncHandler(async (req, res) => {
     const id = getStringParam(req.params.id);
     const service = await serviceService.findById(
@@ -49747,6 +49814,16 @@ var serviceController = {
     const service = await serviceService.restore(id);
     res.json(service);
   }),
+  toggleFeatured: asyncHandler(async (req, res) => {
+    const id = getStringParam(req.params.id);
+    const { featured } = req.body;
+    if (typeof featured !== "boolean") {
+      throw new ValidationError("Featured must be a boolean");
+    }
+    await getExistingService(id);
+    const service = await serviceService.update(id, { featured });
+    res.json(service);
+  }),
   updateStatus: asyncHandler(async (req, res) => {
     const id = getStringParam(req.params.id);
     const { status } = serviceStatusSchema.parse(req.body);
@@ -49773,11 +49850,13 @@ var serviceController = {
 var router2 = (0, import_express2.Router)();
 router2.get("/", serviceController.findAll);
 router2.get("/classifications", serviceController.getClassifications);
+router2.get("/featured", serviceController.findFeatured);
 router2.get("/by-id/:id", authMiddleware, serviceController.findById);
 router2.post("/", authMiddleware, serviceController.create);
 router2.put("/:id", authMiddleware, serviceController.update);
 router2.delete("/:id", authMiddleware, serviceController.delete);
 router2.patch("/:id/restore", authMiddleware, serviceController.restore);
+router2.patch("/:id/featured", authMiddleware, serviceController.toggleFeatured);
 router2.patch("/:id/status", authMiddleware, serviceController.updateStatus);
 router2.get("/:slug", serviceController.findBySlug);
 var service_routes_default = router2;
@@ -50473,6 +50552,7 @@ var SUCCESS_CASE_SELECT = {
   images: true,
   videos: true,
   links: true,
+  featured: true,
   status: true,
   publishedAt: true,
   deletedAt: true,
@@ -50515,6 +50595,15 @@ var successCaseService = {
   async findPublicRecent(limit = 3) {
     const successCases = await prisma6.successCase.findMany({
       where: { status: "PUBLISHED", deletedAt: null },
+      select: PUBLIC_SUCCESS_CASE_SELECT,
+      orderBy: [{ createdAt: "desc" }],
+      take: Math.min(limit, 12)
+    });
+    return successCases.slice(0, 12).map(selectPublicSuccessCase);
+  },
+  async findPublicFeatured(limit = 3) {
+    const successCases = await prisma6.successCase.findMany({
+      where: { featured: true, status: "PUBLISHED", deletedAt: null },
       select: PUBLIC_SUCCESS_CASE_SELECT,
       orderBy: [{ createdAt: "desc" }],
       take: Math.min(limit, 12)
@@ -50587,6 +50676,7 @@ var successCaseService = {
         images: data.images,
         videos: data.videos ?? [],
         links: data.links ?? [],
+        featured: data.featured ?? false,
         status: data.status && data.status !== "ALL" ? data.status : "DRAFT",
         ...data.status === "PUBLISHED" && { publishedAt: /* @__PURE__ */ new Date() }
       },
@@ -50601,6 +50691,7 @@ var successCaseService = {
     if (data.images !== void 0) updateData.images = data.images;
     if (data.videos !== void 0) updateData.videos = data.videos;
     if (data.links !== void 0) updateData.links = data.links;
+    if (data.featured !== void 0) updateData.featured = data.featured;
     if (data.status !== void 0) {
       updateData.status = data.status;
       if (data.status === "PUBLISHED") {
@@ -50673,6 +50764,12 @@ var successCaseController = {
     const successCases = await successCaseService.findPublicRecent(limit);
     res.json(successCases);
   }),
+  findFeatured: asyncHandler(async (req, res) => {
+    const filter = publicSuccessCaseQuerySchema.parse(req.query);
+    const limit = req.query.limit === void 0 ? 3 : Math.min(filter.limit, 12);
+    const successCases = await successCaseService.findPublicFeatured(limit);
+    res.json(successCases);
+  }),
   findById: asyncHandler(async (req, res) => {
     const id = getStringParam4(req.params.id);
     const successCase = await successCaseService.findById(
@@ -50708,6 +50805,16 @@ var successCaseController = {
     const successCase = await successCaseService.restore(id);
     res.json(successCase);
   }),
+  toggleFeatured: asyncHandler(async (req, res) => {
+    const id = getStringParam4(req.params.id);
+    const { featured } = req.body;
+    if (typeof featured !== "boolean") {
+      throw new ValidationError("Featured must be a boolean");
+    }
+    await getExistingCase(id);
+    const successCase = await successCaseService.update(id, { featured });
+    res.json(successCase);
+  }),
   updateStatus: asyncHandler(async (req, res) => {
     const id = getStringParam4(req.params.id);
     const { status } = successCaseStatusSchema.parse(req.body);
@@ -50729,11 +50836,13 @@ var successCaseController = {
 var router5 = (0, import_express5.Router)();
 router5.get("/", successCaseController.findAll);
 router5.get("/recent", successCaseController.findRecent);
+router5.get("/featured", successCaseController.findFeatured);
 router5.get("/by-id/:id", authMiddleware, successCaseController.findById);
 router5.post("/", authMiddleware, successCaseController.create);
 router5.put("/:id", authMiddleware, successCaseController.update);
 router5.delete("/:id", authMiddleware, successCaseController.delete);
 router5.patch("/:id/restore", authMiddleware, successCaseController.restore);
+router5.patch("/:id/featured", authMiddleware, successCaseController.toggleFeatured);
 router5.patch("/:id/status", authMiddleware, successCaseController.updateStatus);
 router5.get("/:slug", successCaseController.findBySlug);
 var successCase_routes_default = router5;
@@ -52091,6 +52200,7 @@ var BLOG_POST_SELECT = {
   body: true,
   externalLink: true,
   lessonsLearned: true,
+  featured: true,
   status: true,
   deletedAt: true,
   createdAt: true,
@@ -52141,6 +52251,15 @@ var blogPostService = {
       select: PUBLIC_BLOG_POST_SELECT
     });
     return post ? selectPublicBlogPost(post) : null;
+  },
+  async findPublicFeatured(limit = 3) {
+    const posts = await prisma10.blogPost.findMany({
+      where: { featured: true, status: "PUBLISHED", deletedAt: null },
+      select: PUBLIC_BLOG_POST_SELECT,
+      orderBy: [{ createdAt: "desc" }],
+      take: Math.min(limit, 12)
+    });
+    return posts.slice(0, 12).map(selectPublicBlogPost);
   },
   async findAll(filter) {
     const { status, category, tag, page = 1, limit = 10 } = filter || {};
@@ -52214,6 +52333,7 @@ var blogPostService = {
         body: data.body,
         externalLink: data.externalLink,
         lessonsLearned: data.lessonsLearned,
+        featured: data.featured ?? false,
         status: data.status && data.status !== "ALL" ? data.status : "DRAFT",
         ...data.status === "PUBLISHED" && { publishedAt: /* @__PURE__ */ new Date() }
       },
@@ -52236,6 +52356,7 @@ var blogPostService = {
     if (data.body !== void 0) updateData.body = data.body;
     if (data.externalLink !== void 0) updateData.externalLink = data.externalLink;
     if (data.lessonsLearned !== void 0) updateData.lessonsLearned = data.lessonsLearned;
+    if (data.featured !== void 0) updateData.featured = data.featured;
     if (data.status !== void 0) {
       updateData.status = data.status;
       if (data.status === "PUBLISHED") {
@@ -52329,6 +52450,12 @@ var blogPostController = {
     }
     res.json(post);
   }),
+  findFeatured: asyncHandler(async (req, res) => {
+    const filter = publicBlogPostQuerySchema.parse(req.query);
+    const limit = req.query.limit === void 0 ? 3 : Math.min(filter.limit, 12);
+    const posts = await blogPostService.findPublicFeatured(limit);
+    res.json(posts);
+  }),
   findById: asyncHandler(async (req, res) => {
     const id = getStringParam6(req.params.id);
     const post = await blogPostService.findById(
@@ -52362,6 +52489,16 @@ var blogPostController = {
     const id = getStringParam6(req.params.id);
     await getExistingPost(id);
     const post = await blogPostService.restore(id);
+    res.json(post);
+  }),
+  toggleFeatured: asyncHandler(async (req, res) => {
+    const id = getStringParam6(req.params.id);
+    const { featured } = req.body;
+    if (typeof featured !== "boolean") {
+      throw new ValidationError("Featured must be a boolean");
+    }
+    await getExistingPost(id);
+    const post = await blogPostService.update(id, { featured });
     res.json(post);
   }),
   updateStatus: asyncHandler(async (req, res) => {
@@ -52400,11 +52537,13 @@ var router10 = (0, import_express10.Router)();
 router10.get("/", blogPostController.findAll);
 router10.get("/tags", blogPostController.getTags);
 router10.get("/categories", blogPostController.getCategories);
+router10.get("/featured", blogPostController.findFeatured);
 router10.get("/by-id/:id", authMiddleware, blogPostController.findById);
 router10.post("/", authMiddleware, blogPostController.create);
 router10.put("/:id", authMiddleware, blogPostController.update);
 router10.delete("/:id", authMiddleware, blogPostController.delete);
 router10.patch("/:id/restore", authMiddleware, blogPostController.restore);
+router10.patch("/:id/featured", authMiddleware, blogPostController.toggleFeatured);
 router10.patch("/:id/status", authMiddleware, blogPostController.updateStatus);
 router10.get("/:slug", blogPostController.findBySlug);
 var blog_post_routes_default = router10;
@@ -52508,8 +52647,225 @@ router11.put("/reorder", authMiddleware, siteSectionController.reorder);
 router11.patch("/:id", authMiddleware, siteSectionController.update);
 var siteSection_routes_default = router11;
 
-// api/src/routes/simulator.routes.ts
+// api/src/routes/situation.routes.ts
 var import_express12 = __toESM(require_express2(), 1);
+
+// api/src/services/situation.service.ts
+var import_client12 = require("@prisma/client");
+var prisma12 = new import_client12.PrismaClient();
+var MAX_SERVICES_PER_SITUATION = 3;
+var SITUATION_SELECT = {
+  id: true,
+  title: true,
+  description: true,
+  active: true,
+  order: true,
+  createdAt: true,
+  updatedAt: true
+};
+var situationService = {
+  /** Public: active situations with ≥1 PUBLISHED, non-deleted service. */
+  async findPublic() {
+    const situations = await prisma12.situation.findMany({
+      where: {
+        active: true,
+        services: { some: { status: "PUBLISHED", deletedAt: null } }
+      },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        order: true,
+        services: {
+          where: { status: "PUBLISHED", deletedAt: null },
+          select: PUBLIC_SERVICE_SELECT,
+          orderBy: [{ order: "asc" }, { createdAt: "asc" }, { id: "asc" }],
+          take: MAX_SERVICES_PER_SITUATION
+        }
+      },
+      orderBy: [{ order: "asc" }, { id: "asc" }]
+    });
+    return {
+      data: situations.map((situation) => ({
+        id: situation.id,
+        title: situation.title,
+        description: situation.description,
+        order: situation.order,
+        services: situation.services.map(selectPublicService)
+      }))
+    };
+  },
+  async findAll() {
+    const situations = await prisma12.situation.findMany({
+      select: {
+        ...SITUATION_SELECT,
+        services: {
+          select: { id: true, title: true, classification: true, status: true, deletedAt: true },
+          orderBy: [{ order: "asc" }, { createdAt: "asc" }]
+        }
+      },
+      orderBy: [{ order: "asc" }, { id: "asc" }]
+    });
+    return situations.map((situation) => ({
+      ...situation,
+      services: situation.services.filter((service) => service.deletedAt === null)
+    }));
+  },
+  async findById(id) {
+    const situation = await prisma12.situation.findUnique({
+      where: { id },
+      select: {
+        ...SITUATION_SELECT,
+        services: {
+          where: { deletedAt: null },
+          select: { id: true, title: true, classification: true, status: true },
+          orderBy: [{ order: "asc" }, { createdAt: "asc" }]
+        }
+      }
+    });
+    if (!situation) {
+      throw new NotFoundError("Situation not found");
+    }
+    return situation;
+  },
+  /**
+   * Applies the situation's service set inside a transaction.
+   * `serviceIds` REPLACES the linked services (omitted = keep current links).
+   * Hard max-3 rule: payload >3 is rejected by Zod (400); a concurrent
+   * transaction that would still push the set over 3 loses with 409
+   * SITUATION_SERVICE_LIMIT (serializable isolation re-check).
+   */
+  async applyServiceLinks(tx, situationId, serviceIds) {
+    if (serviceIds === void 0) return;
+    const services = await tx.service.findMany({
+      where: { id: { in: serviceIds }, deletedAt: null },
+      select: { id: true }
+    });
+    if (services.length !== new Set(serviceIds).size) {
+      throw new NotFoundError("One or more services not found");
+    }
+    await tx.service.updateMany({ where: { situationId }, data: { situationId: null } });
+    if (serviceIds.length > 0) {
+      await tx.service.updateMany({
+        where: { id: { in: serviceIds } },
+        data: { situationId }
+      });
+    }
+    const linked = await tx.service.count({ where: { situationId } });
+    if (linked > MAX_SERVICES_PER_SITUATION) {
+      throw new ConflictError(
+        `Una situaci\xF3n no puede tener m\xE1s de ${MAX_SERVICES_PER_SITUATION} servicios`,
+        "SITUATION_SERVICE_LIMIT"
+      );
+    }
+  },
+  async create(data) {
+    return prisma12.$transaction(
+      async (tx) => {
+        const situation = await tx.situation.create({
+          data: {
+            title: data.title,
+            description: data.description,
+            active: data.active ?? true,
+            order: data.order ?? 0
+          },
+          select: SITUATION_SELECT
+        });
+        await this.applyServiceLinks(tx, situation.id, data.serviceIds);
+        return situation;
+      },
+      { isolationLevel: import_client12.Prisma.TransactionIsolationLevel.Serializable }
+    );
+  },
+  async update(id, data) {
+    await this.findById(id);
+    return prisma12.$transaction(
+      async (tx) => {
+        const updateData = {};
+        if (data.title !== void 0) updateData.title = data.title;
+        if (data.description !== void 0) updateData.description = data.description;
+        if (data.active !== void 0) updateData.active = data.active;
+        if (data.order !== void 0) updateData.order = data.order;
+        const situation = await tx.situation.update({
+          where: { id },
+          data: updateData,
+          select: SITUATION_SELECT
+        });
+        await this.applyServiceLinks(tx, id, data.serviceIds);
+        return situation;
+      },
+      { isolationLevel: import_client12.Prisma.TransactionIsolationLevel.Serializable }
+    );
+  },
+  async patch(id, data) {
+    await this.findById(id);
+    return prisma12.situation.update({
+      where: { id },
+      data: {
+        ...data.active !== void 0 && { active: data.active },
+        ...data.order !== void 0 && { order: data.order }
+      },
+      select: SITUATION_SELECT
+    });
+  },
+  async remove(id) {
+    await this.findById(id);
+    return prisma12.situation.delete({ where: { id }, select: SITUATION_SELECT });
+  }
+};
+
+// api/src/controllers/situation.controller.ts
+var getStringParam8 = (param) => {
+  if (Array.isArray(param)) return param[0];
+  return param || "";
+};
+var situationController = {
+  findPublic: asyncHandler(async (_req, res) => {
+    res.json(await situationService.findPublic());
+  }),
+  findAll: asyncHandler(async (_req, res) => {
+    res.json({ data: await situationService.findAll() });
+  }),
+  findById: asyncHandler(async (req, res) => {
+    const id = getStringParam8(req.params.id);
+    res.json(await situationService.findById(id));
+  }),
+  create: asyncHandler(async (req, res) => {
+    const data = situationCreateSchema.parse(req.body);
+    const situation = await situationService.create(data);
+    res.status(201).json(situation);
+  }),
+  update: asyncHandler(async (req, res) => {
+    const id = getStringParam8(req.params.id);
+    const data = situationUpdateSchema.parse(req.body);
+    res.json(await situationService.update(id, data));
+  }),
+  patch: asyncHandler(async (req, res) => {
+    const id = getStringParam8(req.params.id);
+    const data = situationPatchSchema.parse(req.body);
+    res.json(await situationService.patch(id, data));
+  }),
+  delete: asyncHandler(async (req, res) => {
+    const id = getStringParam8(req.params.id);
+    await situationService.remove(id);
+    res.json({ message: "Situation deleted successfully" });
+  })
+};
+
+// api/src/routes/situation.routes.ts
+var router12 = (0, import_express12.Router)();
+router12.get("/", situationController.findPublic);
+var situation_routes_default = router12;
+var adminSituationRoutes = (0, import_express12.Router)();
+adminSituationRoutes.get("/", authMiddleware, situationController.findAll);
+adminSituationRoutes.get("/:id", authMiddleware, situationController.findById);
+adminSituationRoutes.post("/", authMiddleware, situationController.create);
+adminSituationRoutes.put("/:id", authMiddleware, situationController.update);
+adminSituationRoutes.patch("/:id", authMiddleware, situationController.patch);
+adminSituationRoutes.delete("/:id", authMiddleware, situationController.delete);
+
+// api/src/routes/simulator.routes.ts
+var import_express13 = __toESM(require_express2(), 1);
 
 // api/src/controllers/simulator.controller.ts
 var import_stream2 = require("stream");
@@ -52518,8 +52874,8 @@ var import_path5 = __toESM(require("path"), 1);
 
 // api/src/services/simulator.service.ts
 var import_path4 = __toESM(require("path"), 1);
-var import_client12 = require("@prisma/client");
-var prisma12 = new import_client12.PrismaClient();
+var import_client13 = require("@prisma/client");
+var prisma13 = new import_client13.PrismaClient();
 var SIMULATOR_MAX_SIZE = 1 * 1024 * 1024;
 var SIMULATOR_BUCKET = "simulators";
 function validateSimulatorFile(file) {
@@ -52564,7 +52920,7 @@ var simulatorService = {
     }
     const slug = await this.resolveUniqueSlug(cleanTitle);
     const { filename } = await uploadService.saveFile(file, SIMULATOR_BUCKET);
-    return prisma12.simulator.create({
+    return prisma13.simulator.create({
       data: {
         title: cleanTitle,
         slug,
@@ -52578,14 +52934,14 @@ var simulatorService = {
   },
   /** All non-deleted simulators, newest upload first (admin list / picker). */
   async list() {
-    return prisma12.simulator.findMany({
+    return prisma13.simulator.findMany({
       where: { deletedAt: null },
       orderBy: { uploadedAt: "desc" }
     });
   },
   /** Metadata for a single non-deleted simulator (admin editor prefill). */
   async getMetadata(id) {
-    return prisma12.simulator.findFirst({
+    return prisma13.simulator.findFirst({
       where: { id, deletedAt: null }
     });
   },
@@ -52595,7 +52951,7 @@ var simulatorService = {
    * Returns null when the simulator is unknown/soft-deleted (controller → 404).
    */
   async download(id) {
-    const record = await prisma12.simulator.findFirst({
+    const record = await prisma13.simulator.findFirst({
       where: { id, deletedAt: null }
     });
     if (!record) return null;
@@ -52607,7 +52963,7 @@ var simulatorService = {
   },
   /** Soft-delete: content stops being served and disappears from the picker. */
   async softDelete(id) {
-    return prisma12.simulator.update({
+    return prisma13.simulator.update({
       where: { id },
       data: { deletedAt: /* @__PURE__ */ new Date() }
     });
@@ -52618,7 +52974,7 @@ var simulatorService = {
     let candidate = base;
     let counter = 2;
     while (true) {
-      const existing = await prisma12.simulator.findUnique({ where: { slug: candidate } });
+      const existing = await prisma13.simulator.findUnique({ where: { slug: candidate } });
       if (!existing) return candidate;
       candidate = `${base}-${counter}`;
       counter += 1;
@@ -52641,7 +52997,7 @@ var upload2 = (0, import_multer2.default)({
   fileFilter: fileFilter2
 });
 var simulatorUploadMiddleware = upload2;
-var getStringParam8 = (param) => {
+var getStringParam9 = (param) => {
   if (Array.isArray(param)) return param[0];
   return param || "";
 };
@@ -52714,7 +53070,7 @@ var simulatorController = {
   }),
   /** GET /api/simulators/:id (JWT) — metadata for editor prefill. */
   getMetadata: asyncHandler(async (req, res) => {
-    const id = getStringParam8(req.params.id);
+    const id = getStringParam9(req.params.id);
     const simulator = await simulatorService.getMetadata(id);
     if (!simulator) {
       throw new NotFoundError("Simulator not found");
@@ -52728,7 +53084,7 @@ var simulatorController = {
    * soft-delete (deletedAt), responding { message } on success.
    */
   remove: asyncHandler(async (req, res) => {
-    const id = getStringParam8(req.params.id);
+    const id = getStringParam9(req.params.id);
     const simulator = await simulatorService.getMetadata(id);
     if (!simulator) {
       throw new NotFoundError("Simulator not found");
@@ -52742,7 +53098,7 @@ var simulatorController = {
    * content is contained by the sandbox, not by sanitization.
    */
   getContent: asyncHandler(async (req, res) => {
-    const id = getStringParam8(req.params.id);
+    const id = getStringParam9(req.params.id);
     const result = await simulatorService.download(id);
     if (!result) {
       throw new NotFoundError("Simulator not found");
@@ -52757,13 +53113,13 @@ var simulatorController = {
 };
 
 // api/src/routes/simulator.routes.ts
-var router12 = (0, import_express12.Router)();
-router12.post("/upload", authMiddleware, simulatorUploadMiddleware.single("file"), simulatorController.upload);
-router12.get("/", authMiddleware, simulatorController.list);
-router12.get("/:id", authMiddleware, simulatorController.getMetadata);
-router12.delete("/:id", authMiddleware, simulatorController.remove);
-router12.get("/:id/content", simulatorController.getContent);
-var simulator_routes_default = router12;
+var router13 = (0, import_express13.Router)();
+router13.post("/upload", authMiddleware, simulatorUploadMiddleware.single("file"), simulatorController.upload);
+router13.get("/", authMiddleware, simulatorController.list);
+router13.get("/:id", authMiddleware, simulatorController.getMetadata);
+router13.delete("/:id", authMiddleware, simulatorController.remove);
+router13.get("/:id/content", simulatorController.getContent);
+var simulator_routes_default = router13;
 
 // api/src/middleware/errorHandler.middleware.ts
 var import_multer3 = __toESM(require_multer(), 1);
@@ -52820,7 +53176,7 @@ function errorHandler(err, req, res, _next) {
 
 // api/src/app.ts
 import_dotenv.default.config();
-var app = (0, import_express13.default)();
+var app = (0, import_express14.default)();
 app.set("trust proxy", 1);
 if (!process.env.JWT_SECRET && true) {
   throw new Error("JWT_SECRET must be set in production");
@@ -52864,8 +53220,8 @@ app.use((_req, res, next) => {
   res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
   next();
 });
-app.use(import_express13.default.json({ limit: "10mb" }));
-app.use(import_express13.default.urlencoded({ extended: true }));
+app.use(import_express14.default.json({ limit: "10mb" }));
+app.use(import_express14.default.urlencoded({ extended: true }));
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok", timestamp: (/* @__PURE__ */ new Date()).toISOString() });
 });
@@ -52886,6 +53242,8 @@ app.use("/api/admin/success-cases", adminSuccessCaseRoutes);
 app.use("/api/admin/projects", adminProjectRoutes);
 app.use("/api/admin/blog-posts", adminBlogPostRoutes);
 app.use("/api/site-sections", siteSection_routes_default);
+app.use("/api/situations", situation_routes_default);
+app.use("/api/admin/situations", adminSituationRoutes);
 app.use("/api/simulators", simulator_routes_default);
 app.use(errorHandler);
 app.use((_req, res) => {
@@ -52902,12 +53260,12 @@ app.use((_req, res) => {
 var app_default = app;
 
 // api/src/index.ts
-var import_client13 = require("@prisma/client");
-var prisma13 = new import_client13.PrismaClient();
+var import_client14 = require("@prisma/client");
+var prisma14 = new import_client14.PrismaClient();
 var PORT = process.env.PORT || 3e3;
 async function main() {
   try {
-    await prisma13.$connect();
+    await prisma14.$connect();
     console.log("\u2705 Database connected successfully");
     app_default.listen(PORT, () => {
       console.log(`\u{1F680} Server running on http://localhost:${PORT}`);
@@ -52922,12 +53280,12 @@ if (!process.env.VERCEL) {
   main();
 }
 process.on("SIGINT", async () => {
-  await prisma13.$disconnect();
+  await prisma14.$disconnect();
   console.log("Database disconnected");
   process.exit(0);
 });
 process.on("SIGTERM", async () => {
-  await prisma13.$disconnect();
+  await prisma14.$disconnect();
   console.log("Database disconnected");
   process.exit(0);
 });
