@@ -97,9 +97,9 @@ export function Footer() {
             <p className={styles.madeIn}>{t('footer.madeIn')}</p>
           </div>
           <div className={styles.legalLinks}>
-            <a href="/privacidad">{t('footer.privacy')}</a>
-            <a href="/terminos">{t('footer.terms')}</a>
-            <button type="button" onClick={() => { reopenConsent(); window.dispatchEvent(new Event(CONSENT_REOPEN_EVENT)); }}>Preferencias de privacidad</button>
+            <a href="/privacidad" className={styles.legalLink}>{t('footer.privacy')}</a>
+            <a href="/terminos" className={styles.legalLink}>{t('footer.terms')}</a>
+            <button type="button" className={styles.legalLink} onClick={() => { reopenConsent(); window.dispatchEvent(new Event(CONSENT_REOPEN_EVENT)); }}>{t('footer.privacyPreferences')}</button>
           </div>
         </div>
       </div>

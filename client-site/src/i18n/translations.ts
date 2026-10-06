@@ -22,6 +22,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'footer.madeIn': 'Hecho con ❤️ en Colombia',
     'footer.privacy': 'Política de Privacidad',
     'footer.terms': 'Términos y Condiciones',
+    'footer.privacyPreferences': 'Preferencias de privacidad',
 
     // =========== HOME ===========
     'home.meta.title': 'J Soft Solutions | Desarrollo web profesional',
@@ -325,6 +326,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'footer.madeIn': 'Made with ❤️ in Colombia',
     'footer.privacy': 'Privacy Policy',
     'footer.terms': 'Terms & Conditions',
+    'footer.privacyPreferences': 'Privacy preferences',
 
     // =========== HOME ===========
     'home.meta.title': 'J Soft Solutions | Professional Web Development',

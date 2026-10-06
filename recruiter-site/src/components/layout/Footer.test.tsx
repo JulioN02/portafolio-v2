@@ -1,8 +1,9 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { PROFILE } from '@jsoft/shared';
 import { LanguageProvider } from '../../i18n/LanguageContext';
 import { Footer } from './Footer';
+import { CONSENT_REOPEN_EVENT } from '../public/ConsentBanner';
 import type { ReactNode } from 'react';
 
 function renderWithProviders(ui: ReactNode) {
@@ -39,5 +40,33 @@ describe('Footer social links (CIN-3)', () => {
     const { container } = renderWithProviders(<Footer />);
     expect(container.innerHTML).not.toContain('573001234567');
     expect(container.innerHTML).not.toContain('info@jsoftsolutions.com');
+  });
+});
+
+describe('Footer privacy preferences button', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it('exposes the privacy preferences control with the ES label by default', () => {
+    renderWithProviders(<Footer />);
+    expect(screen.getByRole('button', { name: 'Preferencias de privacidad' })).toBeInTheDocument();
+  });
+
+  it('reopens consent preferences and clears the stored choice on click', () => {
+    localStorage.setItem('jsoft-consent-v1', 'accepted');
+    const listener = vi.fn();
+    window.addEventListener(CONSENT_REOPEN_EVENT, listener);
+    renderWithProviders(<Footer />);
+    screen.getByRole('button', { name: 'Preferencias de privacidad' }).click();
+    expect(localStorage.getItem('jsoft-consent-v1')).toBeNull();
+    expect(listener).toHaveBeenCalledTimes(1);
+    window.removeEventListener(CONSENT_REOPEN_EVENT, listener);
+  });
+
+  it('uses the English label when the stored language is en', async () => {
+    localStorage.setItem('site_language', 'en');
+    renderWithProviders(<Footer />);
+    expect(await screen.findByRole('button', { name: 'Privacy preferences' })).toBeInTheDocument();
   });
 });
