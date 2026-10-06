@@ -51136,6 +51136,16 @@ var projectController = {
     const project = await projectService.reorder(id, order);
     res.json(project);
   }),
+  toggleFeatured: asyncHandler(async (req, res) => {
+    const id = getStringParam5(req.params.id);
+    const { featured } = req.body;
+    if (typeof featured !== "boolean") {
+      throw new ValidationError("Featured must be a boolean");
+    }
+    await getExistingProject(id);
+    const project = await projectService.update(id, { featured });
+    res.json(project);
+  }),
   getTags: asyncHandler(async (req, res) => {
     publicProjectQuerySchema.parse(req.query);
     const tags = await projectService.getTags();
@@ -51158,6 +51168,7 @@ router6.delete("/:id", authMiddleware, projectController.delete);
 router6.patch("/:id/restore", authMiddleware, projectController.restore);
 router6.patch("/:id/status", authMiddleware, projectController.updateStatus);
 router6.patch("/:id/reorder", authMiddleware, projectController.reorder);
+router6.patch("/:id/featured", authMiddleware, projectController.toggleFeatured);
 router6.get("/:slug", projectController.findBySlug);
 var project_routes_default = router6;
 var adminProjectRoutes = (0, import_express6.Router)();
