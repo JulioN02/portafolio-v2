@@ -21,6 +21,7 @@ router.delete('/:id', authMiddleware, projectController.delete);
 router.patch('/:id/restore', authMiddleware, projectController.restore);
 router.patch('/:id/status', authMiddleware, projectController.updateStatus);
 router.patch('/:id/reorder', authMiddleware, projectController.reorder);
+router.patch('/:id/featured', authMiddleware, projectController.toggleFeatured);
 
 // Public detail — MUST come last so /tags and /by-id/:id win.
 router.get('/:slug', projectController.findBySlug);
