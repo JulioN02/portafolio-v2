@@ -34,6 +34,23 @@ model User {
 }
 
 // ============================================
+// SITUACIONES (Homepage problem selector)
+// ============================================
+model Situation {
+  id          String    @id @default(cuid())
+  title       String
+  description String
+  active      Boolean   @default(true)
+  order       Int       @default(0)
+  services    Service[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([active, order])
+}
+
+// ============================================
 // SERVICIOS
 // ============================================
 model Service {
@@ -48,6 +65,10 @@ model Service {
   externalLink        String?
   status              PostStatus  @default(DRAFT)
   deletedAt           DateTime?
+  featured            Boolean     @default(false)
+  order               Int         @default(0)
+  situationId         String?
+  situation           Situation?  @relation(fields: [situationId], references: [id], onDelete: SetNull)
 
   // Campos técnicos para reclutadores
   technicalExplanation String?
@@ -59,6 +80,8 @@ model Service {
 
   @@index([status, deletedAt])
   @@index([publishedAt])
+  @@index([featured, deletedAt])
+  @@index([situationId])
 }
 
 // ============================================
@@ -131,6 +154,7 @@ model SuccessCase {
   images      String[]
   videos      String[]
   links       String[]
+  featured    Boolean     @default(false)
   status      PostStatus  @default(DRAFT)
   deletedAt   DateTime?
 
@@ -140,6 +164,7 @@ model SuccessCase {
 
   @@index([status, deletedAt])
   @@index([publishedAt])
+  @@index([featured, deletedAt])
 }
 
 // ============================================
@@ -219,6 +244,7 @@ model BlogPost {
   body             String
   externalLink     String?
   lessonsLearned   String?
+  featured         Boolean     @default(false)
   status           PostStatus  @default(DRAFT)
   deletedAt        DateTime?
 
@@ -228,6 +254,7 @@ model BlogPost {
 
   @@index([status, deletedAt])
   @@index([publishedAt])
+  @@index([featured, deletedAt])
 }
 
 enum PostStatus {

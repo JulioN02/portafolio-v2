@@ -12,6 +12,7 @@ const SUCCESS_CASE_SELECT = {
   images: true,
   videos: true,
   links: true,
+  featured: true,
   status: true,
   publishedAt: true,
   deletedAt: true,
@@ -58,6 +59,16 @@ export const successCaseService = {
   async findPublicRecent(limit = 3) {
     const successCases = await prisma.successCase.findMany({
       where: { status: 'PUBLISHED', deletedAt: null },
+      select: PUBLIC_SUCCESS_CASE_SELECT,
+      orderBy: [{ createdAt: 'desc' }],
+      take: Math.min(limit, 12),
+    });
+    return successCases.slice(0, 12).map(selectPublicSuccessCase);
+  },
+
+  async findPublicFeatured(limit = 3) {
+    const successCases = await prisma.successCase.findMany({
+      where: { featured: true, status: 'PUBLISHED', deletedAt: null },
       select: PUBLIC_SUCCESS_CASE_SELECT,
       orderBy: [{ createdAt: 'desc' }],
       take: Math.min(limit, 12),
@@ -139,6 +150,7 @@ export const successCaseService = {
         images: data.images,
         videos: data.videos ?? [],
         links: data.links ?? [],
+        featured: data.featured ?? false,
         status: (data.status && data.status !== 'ALL') ? data.status : 'DRAFT',
         ...(data.status === 'PUBLISHED' && { publishedAt: new Date() }),
       },
@@ -155,6 +167,7 @@ export const successCaseService = {
     if (data.images !== undefined) updateData.images = data.images;
     if (data.videos !== undefined) updateData.videos = data.videos;
     if (data.links !== undefined) updateData.links = data.links;
+    if (data.featured !== undefined) updateData.featured = data.featured;
     if (data.status !== undefined) {
       updateData.status = data.status;
       if (data.status === 'PUBLISHED') {

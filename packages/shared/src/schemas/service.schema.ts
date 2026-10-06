@@ -22,6 +22,9 @@ export const serviceSchema = z.object({
   images: z.array(z.string().url()).min(1, 'At least one image is required').max(12),
   externalLink: safeExternalLinkSchema,
   status: postStatusEnum.default('DRAFT'),
+  featured: z.boolean().optional(),
+  order: z.number().int().min(0).max(10000).optional(),
+  situationId: z.string().nullable().optional(),
   
   // Technical fields for recruiters (optional)
   technicalExplanation: z

@@ -7,6 +7,8 @@ export * from './schemas/index.js';
 // Constants
 export { PROFILE } from './constants/profile.js';
 export type { ProfileInfo } from './constants/profile.js';
+export { DEFAULT_SECTION_ORDER } from './constants/sections.js';
+export type { DefaultSection, HomeSectionKey } from './constants/sections.js';
 
 // Types
 export type {
@@ -76,6 +78,7 @@ export type {
 
 // API Client
 export { createApiClient } from './api-client/index.js';
+export { situationsApi, featuredApi } from './api-client/index.js';
 export type {
   ApiClient,
   ApiClientConfig,

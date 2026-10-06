@@ -11,6 +11,7 @@ const router: IRouter = Router();
 // Public routes
 router.get('/', successCaseController.findAll);
 router.get('/recent', successCaseController.findRecent);
+router.get('/featured', successCaseController.findFeatured);
 
 // Protected routes (admin) — detail-by-id requires auth.
 router.get('/by-id/:id', authMiddleware, successCaseController.findById);
@@ -18,6 +19,7 @@ router.post('/', authMiddleware, successCaseController.create);
 router.put('/:id', authMiddleware, successCaseController.update);
 router.delete('/:id', authMiddleware, successCaseController.delete);
 router.patch('/:id/restore', authMiddleware, successCaseController.restore);
+router.patch('/:id/featured', authMiddleware, successCaseController.toggleFeatured);
 router.patch('/:id/status', authMiddleware, successCaseController.updateStatus);
 
 // Public detail — MUST come last so /by-id/:id wins.

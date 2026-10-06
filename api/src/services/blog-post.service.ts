@@ -16,6 +16,7 @@ const BLOG_POST_SELECT = {
   body: true,
   externalLink: true,
   lessonsLearned: true,
+  featured: true,
   status: true,
   deletedAt: true,
   createdAt: true,
@@ -70,6 +71,16 @@ export const blogPostService = {
       select: PUBLIC_BLOG_POST_SELECT,
     });
     return post ? selectPublicBlogPost(post) : null;
+  },
+
+  async findPublicFeatured(limit = 3) {
+    const posts = await prisma.blogPost.findMany({
+      where: { featured: true, status: 'PUBLISHED', deletedAt: null },
+      select: PUBLIC_BLOG_POST_SELECT,
+      orderBy: [{ createdAt: 'desc' }],
+      take: Math.min(limit, 12),
+    });
+    return posts.slice(0, 12).map(selectPublicBlogPost);
   },
 
   async findAll(filter?: BlogPostFilterInput) {
@@ -153,6 +164,7 @@ export const blogPostService = {
         body: data.body,
         externalLink: data.externalLink,
         lessonsLearned: data.lessonsLearned,
+        featured: data.featured ?? false,
         status: (data.status && data.status !== 'ALL') ? data.status : 'DRAFT',
         ...(data.status === 'PUBLISHED' && { publishedAt: new Date() }),
       },
@@ -178,6 +190,7 @@ export const blogPostService = {
     if (data.body !== undefined) updateData.body = data.body;
     if (data.externalLink !== undefined) updateData.externalLink = data.externalLink;
     if (data.lessonsLearned !== undefined) updateData.lessonsLearned = data.lessonsLearned;
+    if (data.featured !== undefined) updateData.featured = data.featured;
     if (data.status !== undefined) {
       updateData.status = data.status;
       if (data.status === 'PUBLISHED') {

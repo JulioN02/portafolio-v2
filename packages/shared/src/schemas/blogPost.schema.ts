@@ -29,6 +29,7 @@ export const blogPostSchema = z.object({
   body: z.string().min(100, 'Body must be at least 100 characters').max(50000),
   externalLink: safeExternalLinkSchema,
   lessonsLearned: z.string().max(20000).optional(),
+  featured: z.boolean().optional(),
   status: postStatusEnum.default('DRAFT'),
 });
 

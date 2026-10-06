@@ -8,7 +8,7 @@ import {
   publicSuccessCaseQuerySchema,
 } from '@jsoft/shared';
 import { asyncHandler } from '../utils/asyncHandler.js';
-import { NotFoundError } from '../utils/errors.js';
+import { NotFoundError, ValidationError } from '../utils/errors.js';
 
 const getStringParam = (param: string | string[] | undefined): string => {
   if (Array.isArray(param)) return param[0];
@@ -45,6 +45,13 @@ export const successCaseController = {
     const filter = publicSuccessCaseQuerySchema.parse(req.query);
     const limit = req.query.limit === undefined ? 3 : Math.min(filter.limit, 12);
     const successCases = await successCaseService.findPublicRecent(limit);
+    res.json(successCases);
+  }),
+
+  findFeatured: asyncHandler(async (req: Request, res: Response) => {
+    const filter = publicSuccessCaseQuerySchema.parse(req.query);
+    const limit = req.query.limit === undefined ? 3 : Math.min(filter.limit, 12);
+    const successCases = await successCaseService.findPublicFeatured(limit);
     res.json(successCases);
   }),
 
@@ -86,6 +93,17 @@ export const successCaseController = {
     const id = getStringParam(req.params.id);
     await getExistingCase(id);
     const successCase = await successCaseService.restore(id);
+    res.json(successCase);
+  }),
+
+  toggleFeatured: asyncHandler(async (req: Request, res: Response) => {
+    const id = getStringParam(req.params.id);
+    const { featured } = req.body;
+    if (typeof featured !== 'boolean') {
+      throw new ValidationError('Featured must be a boolean');
+    }
+    await getExistingCase(id);
+    const successCase = await successCaseService.update(id, { featured });
     res.json(successCase);
   }),
 

@@ -14,6 +14,7 @@ import uploadRoutes from './routes/upload.routes.js';
 import contactRoutes from './routes/contact.routes.js';
 import blogPostRoutes, { adminBlogPostRoutes } from './routes/blog-post.routes.js';
 import siteSectionRoutes from './routes/siteSection.routes.js';
+import situationRoutes, { adminSituationRoutes } from './routes/situation.routes.js';
 import simulatorRoutes from './routes/simulator.routes.js';
 import { errorHandler } from './middleware/errorHandler.middleware.js';
 import { apiLimiter } from './middleware/rateLimit.middleware.js';
@@ -115,6 +116,8 @@ app.use('/api/admin/success-cases', adminSuccessCaseRoutes);
 app.use('/api/admin/projects', adminProjectRoutes);
 app.use('/api/admin/blog-posts', adminBlogPostRoutes);
 app.use('/api/site-sections', siteSectionRoutes);
+app.use('/api/situations', situationRoutes);
+app.use('/api/admin/situations', adminSituationRoutes);
 app.use('/api/simulators', simulatorRoutes);
 
 // Centralized error handler (must be registered after all routes)

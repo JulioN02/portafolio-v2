@@ -89,10 +89,29 @@ jest.mock('@prisma/client', () => {
       delete: jest.fn(),
       count: jest.fn(),
     },
+    situation: {
+      findMany: jest.fn(),
+      findFirst: jest.fn(),
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      updateMany: jest.fn(),
+      delete: jest.fn(),
+      deleteMany: jest.fn(),
+      count: jest.fn(),
+    },
     $transaction: jest.fn(),
   };
   
   return {
     PrismaClient: jest.fn(() => mockPrismaClient),
+    Prisma: {
+      TransactionIsolationLevel: {
+        ReadUncommitted: 'ReadUncommitted',
+        ReadCommitted: 'ReadCommitted',
+        RepeatableRead: 'RepeatableRead',
+        Serializable: 'Serializable',
+      },
+    },
   };
 });

@@ -8,7 +8,7 @@ import {
   publicServiceQuerySchema,
 } from '@jsoft/shared';
 import { asyncHandler } from '../utils/asyncHandler.js';
-import { NotFoundError } from '../utils/errors.js';
+import { NotFoundError, ValidationError } from '../utils/errors.js';
 
 const getStringParam = (param: string | string[] | undefined): string => {
   if (Array.isArray(param)) return param[0];
@@ -40,6 +40,13 @@ export const serviceController = {
       throw new NotFoundError('Service not found');
     }
     res.json(service);
+  }),
+
+  findFeatured: asyncHandler(async (req: Request, res: Response) => {
+    const filter = publicServiceQuerySchema.parse(req.query);
+    const limit = req.query.limit === undefined ? 3 : Math.min(filter.limit, 12);
+    const services = await serviceService.findPublicFeatured(limit);
+    res.json(services);
   }),
 
   findById: asyncHandler(async (req: Request, res: Response) => {
@@ -81,6 +88,17 @@ export const serviceController = {
     const id = getStringParam(req.params.id);
     await getExistingService(id);
     const service = await serviceService.restore(id);
+    res.json(service);
+  }),
+
+  toggleFeatured: asyncHandler(async (req: Request, res: Response) => {
+    const id = getStringParam(req.params.id);
+    const { featured } = req.body;
+    if (typeof featured !== 'boolean') {
+      throw new ValidationError('Featured must be a boolean');
+    }
+    await getExistingService(id);
+    const service = await serviceService.update(id, { featured });
     res.json(service);
   }),
 

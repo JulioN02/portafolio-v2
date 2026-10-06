@@ -12,6 +12,7 @@ const router: IRouter = Router();
 router.get('/', blogPostController.findAll);
 router.get('/tags', blogPostController.getTags);
 router.get('/categories', blogPostController.getCategories);
+router.get('/featured', blogPostController.findFeatured);
 
 // Protected routes (admin) — /by-id/:id registered before /:slug so "by-id"
 // is never captured as a slug.
@@ -20,6 +21,7 @@ router.post('/', authMiddleware, blogPostController.create);
 router.put('/:id', authMiddleware, blogPostController.update);
 router.delete('/:id', authMiddleware, blogPostController.delete);
 router.patch('/:id/restore', authMiddleware, blogPostController.restore);
+router.patch('/:id/featured', authMiddleware, blogPostController.toggleFeatured);
 router.patch('/:id/status', authMiddleware, blogPostController.updateStatus);
 
 // Public detail — MUST come last so /tags and /by-id/:id win.
