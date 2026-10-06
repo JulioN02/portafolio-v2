@@ -21,14 +21,11 @@ const SECTION_COMPONENTS: Record<string, React.FC> = {
 
 export function HomePage() {
   const { t } = useTranslation();
-  const { sections, isLoading, error } = useVisibleSections();
+  const { sections } = useVisibleSections();
 
-  // Mientras carga o si hay error, mostramos todo en el orden por defecto
-  const showAll = isLoading || error;
-
-  const orderedKeys = showAll
-    ? ['services', 'success-cases', 'products', 'tools']
-    : sections.map((s) => s.key);
+  // The hook always returns a usable list: the API-driven visible sections
+  // sorted by order, or the default order when loading/error/empty.
+  const orderedKeys = sections.map((section) => section.key);
 
   return (
     <>
