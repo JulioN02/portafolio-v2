@@ -7,7 +7,7 @@ export * from './schemas/index.js';
 // Constants
 export { PROFILE } from './constants/profile.js';
 export type { ProfileInfo } from './constants/profile.js';
-export { DEFAULT_SECTION_ORDER } from './constants/sections.js';
+export { DEFAULT_SECTION_ORDER, DEFAULT_SECTION_KEYS, resolveDefaultSectionOrder } from './constants/sections.js';
 export type { DefaultSection, HomeSectionKey } from './constants/sections.js';
 
 // Types
