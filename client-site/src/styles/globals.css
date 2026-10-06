@@ -71,7 +71,6 @@ button {
 @media (max-width: 767px) {
   body {
     --public-sticky-cta-space: calc(4rem + env(safe-area-inset-bottom, 0px) + env(keyboard-inset-height, 0px));
-    padding-bottom: var(--public-sticky-cta-space);
     scroll-padding-bottom: var(--public-sticky-cta-space);
   }
   .public-sticky-cta {

@@ -18,6 +18,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'footer.madeIn': 'Hecho con ❤️ en Colombia',
     'footer.privacy': 'Privacidad',
     'footer.terms': 'Términos',
+    'footer.privacyPreferences': 'Preferencias de privacidad',
 
     // =========== HOME ===========
     'home.meta.title': '{name} | Ingeniero de Sistemas y Desarrollador Backend',
@@ -290,6 +291,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'footer.madeIn': 'Made with ❤️ in Colombia',
     'footer.privacy': 'Privacy',
     'footer.terms': 'Terms',
+    'footer.privacyPreferences': 'Privacy preferences',
 
     // =========== HOME ===========
     'home.meta.title': '{name} | Systems Engineer and Backend Developer',

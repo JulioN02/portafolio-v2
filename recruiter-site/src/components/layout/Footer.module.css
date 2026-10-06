@@ -164,19 +164,46 @@
 
 .legalLinks {
   display: flex;
+  align-items: center;
   gap: 1rem;
 }
 
-.legalLinks a {
+.legalLink {
   font-size: var(--font-size-xs);
   color: rgba(255, 255, 255, 0.5);
   text-decoration: none;
   transition: color var(--transition-fast);
+  background: none;
+  border: 0;
+  font-family: inherit;
+  padding: 0;
+  line-height: inherit;
+  cursor: pointer;
 }
 
 @media (hover: hover) {
-  .legalLinks a:hover {
+  .legalLink:hover {
     color: var(--color-green-accent-text);
+  }
+}
+
+.legalLink:focus-visible {
+  outline: 2px solid var(--color-green-accent-text);
+  outline-offset: 2px;
+}
+
+@media (max-width: 768px) {
+  .legalLinks {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+/* Mobile: reserve space for the fixed sticky CTA inside the footer so the
+   footer background reaches the end of the document (no strip below it). */
+@media (max-width: 767px) {
+  .footer {
+    padding-bottom: var(--public-sticky-cta-space);
   }
 }
 

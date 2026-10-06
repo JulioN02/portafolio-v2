@@ -1,9 +1,10 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { PROFILE } from '@jsoft/shared';
 import { LanguageProvider } from '../../i18n/LanguageContext';
 import { Footer } from './Footer';
+import { CONSENT_REOPEN_EVENT } from '../public/ConsentBanner';
 
 function renderFooter() {
   return render(
@@ -41,5 +42,33 @@ describe('Footer contact sweep (CIN-1/3/4)', () => {
     expect(container.innerHTML).not.toContain('info@jsoftsolutions.com');
     expect(container.innerHTML).not.toContain('github.com/julion');
     expect(container.innerHTML).not.toContain('linkedin.com/in/julion');
+  });
+});
+
+describe('Footer privacy preferences button', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it('exposes the privacy preferences control with the ES label by default', () => {
+    renderFooter();
+    expect(screen.getByRole('button', { name: 'Preferencias de privacidad' })).toBeInTheDocument();
+  });
+
+  it('reopens consent preferences and clears the stored choice on click', () => {
+    localStorage.setItem('jsoft-consent-v1', 'accepted');
+    const listener = vi.fn();
+    window.addEventListener(CONSENT_REOPEN_EVENT, listener);
+    renderFooter();
+    screen.getByRole('button', { name: 'Preferencias de privacidad' }).click();
+    expect(localStorage.getItem('jsoft-consent-v1')).toBeNull();
+    expect(listener).toHaveBeenCalledTimes(1);
+    window.removeEventListener(CONSENT_REOPEN_EVENT, listener);
+  });
+
+  it('uses the English label when the stored language is en', async () => {
+    localStorage.setItem('site_language', 'en');
+    renderFooter();
+    expect(await screen.findByRole('button', { name: 'Privacy preferences' })).toBeInTheDocument();
   });
 });

@@ -114,8 +114,8 @@ export function Footer() {
                 {t(link.key)}
               </Link>
             ))}
+            <button type="button" className={styles.legalLink} onClick={() => { reopenConsent(); window.dispatchEvent(new Event(CONSENT_REOPEN_EVENT)); }}>{t('footer.privacyPreferences')}</button>
           </nav>
-          <button type="button" className={styles.legalLink} onClick={() => { reopenConsent(); window.dispatchEvent(new Event(CONSENT_REOPEN_EVENT)); }}>Preferencias de privacidad</button>
         </div>
       </div>
     </footer>
