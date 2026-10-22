@@ -14,19 +14,19 @@ export const situationsApi = {
   },
 
   create<T>(client: ApiClient, input: SituationInput): Promise<T> {
-    return client.post<T>('/api/situations', input);
+    return client.post<T>('/api/admin/situations', input);
   },
 
   update<T>(client: ApiClient, id: string, input: SituationUpdateInput): Promise<T> {
-    return client.put<T>(`/api/situations/${id}`, input);
+    return client.put<T>(`/api/admin/situations/${id}`, input);
   },
 
   patch<T>(client: ApiClient, id: string, input: SituationPatchInput): Promise<T> {
-    return client.patch<T>(`/api/situations/${id}`, input);
+    return client.patch<T>(`/api/admin/situations/${id}`, input);
   },
 
   remove<T>(client: ApiClient, id: string): Promise<T> {
-    return client.delete<T>(`/api/situations/${id}`);
+    return client.delete<T>(`/api/admin/situations/${id}`);
   },
 };
 
