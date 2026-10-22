@@ -31,21 +31,21 @@ export const situationsApi = {
   },
 
   create: async (input: SituationInput): Promise<SituationAdmin> => {
-    const { data } = await apiClient.post<SituationAdmin>('/situations', input);
+    const { data } = await apiClient.post<SituationAdmin>('/admin/situations', input);
     return data;
   },
 
   update: async (id: string, input: SituationUpdateInput): Promise<SituationAdmin> => {
-    const { data } = await apiClient.put<SituationAdmin>(`/situations/${id}`, input);
+    const { data } = await apiClient.put<SituationAdmin>(`/admin/situations/${id}`, input);
     return data;
   },
 
   patch: async (id: string, input: SituationPatchInput): Promise<SituationAdmin> => {
-    const { data } = await apiClient.patch<SituationAdmin>(`/situations/${id}`, input);
+    const { data } = await apiClient.patch<SituationAdmin>(`/admin/situations/${id}`, input);
     return data;
   },
 
   remove: async (id: string): Promise<void> => {
-    await apiClient.delete(`/situations/${id}`);
+    await apiClient.delete(`/admin/situations/${id}`);
   },
 };

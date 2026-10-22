@@ -34,7 +34,7 @@ describe('situationsApi', () => {
     expect(result).toEqual({ data: [] });
   });
 
-  it('creates a situation via POST /api/situations', async () => {
+  it('creates a situation via POST /api/admin/situations', async () => {
     const fetchMock = vi.fn().mockResolvedValue(okResponse({ id: 'sit-1' }, 201));
     vi.stubGlobal('fetch', fetchMock);
 
@@ -43,12 +43,12 @@ describe('situationsApi', () => {
     await situationsApi.create(client, input);
 
     const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(url).toBe('http://api.test/api/situations');
+    expect(url).toBe('http://api.test/api/admin/situations');
     expect(init.method).toBe('POST');
     expect(JSON.parse(String(init.body))).toEqual(input);
   });
 
-  it('updates a situation via PUT /api/situations/:id', async () => {
+  it('updates a situation via PUT /api/admin/situations/:id', async () => {
     const fetchMock = vi.fn().mockResolvedValue(okResponse({ id: 'sit-1' }));
     vi.stubGlobal('fetch', fetchMock);
 
@@ -56,11 +56,11 @@ describe('situationsApi', () => {
     await situationsApi.update(client, 'sit-1', { title: 'Nuevo', description: 'Otra' });
 
     const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(url).toBe('http://api.test/api/situations/sit-1');
+    expect(url).toBe('http://api.test/api/admin/situations/sit-1');
     expect(init.method).toBe('PUT');
   });
 
-  it('patches a situation via PATCH /api/situations/:id', async () => {
+  it('patches a situation via PATCH /api/admin/situations/:id', async () => {
     const fetchMock = vi.fn().mockResolvedValue(okResponse({ id: 'sit-1' }));
     vi.stubGlobal('fetch', fetchMock);
 
@@ -68,12 +68,12 @@ describe('situationsApi', () => {
     await situationsApi.patch(client, 'sit-1', { order: 2 });
 
     const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(url).toBe('http://api.test/api/situations/sit-1');
+    expect(url).toBe('http://api.test/api/admin/situations/sit-1');
     expect(init.method).toBe('PATCH');
     expect(JSON.parse(String(init.body))).toEqual({ order: 2 });
   });
 
-  it('deletes a situation via DELETE /api/situations/:id', async () => {
+  it('deletes a situation via DELETE /api/admin/situations/:id', async () => {
     const fetchMock = vi.fn().mockResolvedValue(okResponse({ message: 'deleted' }));
     vi.stubGlobal('fetch', fetchMock);
 
@@ -81,7 +81,7 @@ describe('situationsApi', () => {
     await situationsApi.remove(client, 'sit-1');
 
     const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(url).toBe('http://api.test/api/situations/sit-1');
+    expect(url).toBe('http://api.test/api/admin/situations/sit-1');
     expect(init.method).toBe('DELETE');
   });
 
